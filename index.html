@@ -132,6 +132,8 @@ const DEMOS = {
     desc:"az/el/dist sliders drive a hand-built lookAt; u/v/w rows exposed" },
   "dot-cross": { title:"Dot &amp; Cross Products: Angle and Projection",
     desc:"drag a/b — arrows, projection, and a·b / |a| / |b| / θ / a×b panel" },
+  "axis-angle": { title:"Axis-Angle Rotation: Rodrigues, Live",
+    desc:"drag axis + angle — a cube spins about the axis; q and R panel update" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -145,7 +147,9 @@ const SESSIONS = [
     lab:"sessions/S02-vectors-dot-cross/lab02/index.html",
     demos:["dot-cross"] },
   { id:"S03", title:"Rotation: Axis-Angle, Quaternions, Gimbal Lock",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S03-rotation-quaternions/index.html",
+    lab:"sessions/S03-rotation-quaternions/lab03/index.html",
+    demos:["axis-angle"] },
   { id:"S04", title:"Matrices &amp; Coordinate Spaces",
     deck:null, lab:null, demos:[] },
   { id:"S05", title:"Scene Graphs &amp; Hierarchical Modeling",

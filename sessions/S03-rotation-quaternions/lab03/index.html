@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 03 — Projection: shadows, reflection &amp; cylinders</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 03 — Projection: shadows, reflection &amp; cylinders</h1>
+  <div class="meta">Week 3 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture derived rotation from last week's <b>projection split</b>: to spin a vector about an axis you
+peel it into the piece <b>along</b> the axis and the piece <b>across</b> it. Today's three exercises are pure
+projection — <b>EX4</b> (shadow on a plane), <b>EX5</b> (reflection across a plane), and <b>EX6</b> (project onto a
+cylinder). Each one splits a point into an along-a-direction part and an across-it part, exactly the move behind
+Rodrigues. Work at your own pace; the instructor is circulating.</p>
+
+<div class="box warn">
+  <b>The course rule is in force.</b> Build from the <b>primitive</b> operations only:
+  <code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>.normalized</code>, <code>.magnitude</code>, component
+  access, and vector <code>+ - *</code>. Do <b>not</b> reach for <code>Vector3.Project</code>,
+  <code>Vector3.ProjectOnPlane</code>, <code>Vector3.Reflect</code>, or <code>Vector3.Angle</code> — building those by
+  hand <i>is</i> the exercise.
+</div>
+
+<h2>0 · Get the exercise project</h2>
+<p>The three exercise skeletons are provided in the <b>course materials on Canvas</b>
+(<code>Topic3-InClassCodingExercises</code>). Download, unzip somewhere without spaces in the path, and add the folder
+in Unity Hub (<b>Projects → Add → Add project from disk</b>). Open it with the pinned editor from Lab 01.</p>
+<ul class="check">
+  <li>Project opens and compiles without errors.</li>
+  <li>You can see <code>EX4_ShadowOnPlane.cs</code>, <code>EX5_ReflectionExercise.cs</code>, and
+      <code>EX6_ProjectToCylinderExercise.cs</code> under <code>Assets/</code>.</li>
+  <li>Each exercise is its own scene — open the matching scene before you press Play.</li>
+  <li>The plane convention (stated in every file) is <code>n · P = D</code>, i.e. <code>n · P − D = 0</code>.</li>
+</ul>
+
+<h2>1 · EX4 — Shadow on a plane</h2>
+<p><b>Goal.</b> Drop a point <code>P</code> straight onto the white plane <b>along the plane's normal</b>, show the
+landing spot with <code>ShadowPoint</code>, and color <code>P</code> <b>green</b> when it is in front of the plane and
+<b>red</b> when behind. This is the parallel/perpendicular split from lecture Part 2, applied to a plane.</p>
+
+<div class="api"><b>Allowed API:</b> <code>WhitePlane.up</code> (the unit normal <code>n</code>),
+  <code>Vector3.Dot</code>, <code>P.localPosition</code>, <code>WhitePlane.localPosition</code> (a point on the plane),
+  component access, vector <code>+ - *</code>, and the color setter from the file
+  (<code>GetComponent&lt;Renderer&gt;().material.color</code>). The helper <code>Support.UpdatePlaneNormal</code> is
+  already wired.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 4a</span>
+  <h3>Project P onto the infinite plane</h3>
+  <p>The shadow of <code>P</code> is <code>P</code> minus the part of it that sticks out along the normal. Compute the
+  signed distance <code>P</code> is off the plane (<code>n · P − D</code>), then step back along <code>n</code> by that
+  much. Set <code>ShadowPoint</code> to the result.</p>
+  <div class="predict"><b>Predict first:</b> the shadow is <code>P − (n · P − D) * n</code>. Before running, work out on
+  paper what <code>D</code> is — it is <code>n · Q</code> for a known point <code>Q</code> on the plane (its
+  position). If you forgot the <code>− D</code> term and used <code>P − (n · P) * n</code>, would the shadow land on
+  the plane, or on a parallel plane through the origin? When would you not notice the bug?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 4b</span>
+  <h3>Color P by which side it is on</h3>
+  <p>Reuse the signed distance from 4a. Its <b>sign</b> is the which-side test: positive means <code>P</code> is on the
+  normal's side (in front). Set <code>P</code>'s color green in front, red behind.</p>
+  <div class="predict"><b>Predict first:</b> before you move anything, predict the color for a point clearly above the
+  plane, then clearly below. Now drag <code>P</code> slowly through the plane — at the exact instant the color flips,
+  what is the value of <code>n · P − D</code>? Confirm the shadow point sits under your cursor the whole time.</div>
+</div>
+
+<h2>2 · EX5 — Reflection across a plane</h2>
+<p><b>Goal.</b> A line runs from <code>P1</code> to <code>P2</code> and pierces the white plane at <code>Pt</code>.
+Find <code>Pt</code>, then <b>reflect</b> the segment across the plane's normal — but only reflect when <code>P2</code>
+is in front of the plane. Color <code>P2</code> green when it reflects, red when it does not.</p>
+
+<div class="api"><b>Allowed API:</b> <code>WhitePlane.up</code>, <code>Vector3.Dot</code>,
+  <code>P1.localPosition</code> / <code>P2.localPosition</code>, <code>.normalized</code>, <code>.magnitude</code>,
+  vector <code>+ - *</code>, and the given <code>Support.UpdateLine</code> / <code>Support.CreateLine</code> helpers.
+  <b>Not</b> <code>Vector3.Reflect</code> — build the reflection yourself.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 5a</span>
+  <h3>Find where the line crosses the plane</h3>
+  <p>Walk the segment <code>P1 → P2</code> and stop where the signed distance hits zero. The crossing parameter is
+  <code>t = (D − n · P1) / (n · (P2 − P1))</code>; then <code>Pt = P1 + t (P2 − P1)</code>.</p>
+  <div class="predict"><b>Predict first:</b> what does the denominator <code>n · (P2 − P1)</code> measure, and what does
+  it mean geometrically when it is <b>zero</b>? Predict what should happen to <code>Pt</code> when the line runs
+  <i>parallel</i> to the plane — and decide how your code will guard that case before you run it.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 5b</span>
+  <h3>Reflect the incoming direction across the normal</h3>
+  <p>Take the incoming direction <code>d = (P2 − P1).normalized</code>. Split it into its along-normal part and its
+  in-plane part, then <b>flip</b> the along-normal part. The reflected direction keeps the in-plane part and negates the
+  normal part.</p>
+  <div class="predict"><b>Predict first:</b> the reflection is <code>d − 2 (d · n) n</code>. Expand it as
+  "(in-plane part) − (along-normal part)" and convince yourself on paper it matches the split. If you dropped the factor
+  of <code>2</code> and used <code>d − (d · n) n</code>, what would you get instead — and what does <i>that</i> vector
+  already have a name for from EX4?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 5c</span>
+  <h3>Reflect only from the front; color P2</h3>
+  <p>Draw the reflected segment starting at <code>Pt</code>. Reflect only when <code>P2</code> is in front of the plane
+  (<code>n · P2 − D &gt; 0</code>); color <code>P2</code> green when it reflects, red when it does not.</p>
+  <div class="predict"><b>Predict first:</b> which reused quantity from EX4 decides front-vs-behind here? Move
+  <code>P2</code> from front to back through the plane and predict the moment the green segment disappears.</div>
+</div>
+
+<h2>3 · EX6 — Project onto a cylinder</h2>
+<p><b>Goal.</b> Project a point <code>P</code> onto the <b>surface</b> of a vertical cylinder: drop <code>P</code> onto
+the cylinder's axis, push out to the radius, and mark the spot with <code>Pt</code>. If the projection falls outside
+the cylinder's height, color it <b>red</b>; inside, color it <b>blue</b>. Same split — along the axis vs. across
+it.</p>
+
+<div class="api"><b>Allowed API:</b> <code>TheCylinder.up</code> (the axis direction <code>vn</code>),
+  <code>TheCylinder.localPosition</code>, <code>CylinderRadius</code>, <code>Vector3.Dot</code>, <code>.normalized</code>,
+  <code>.magnitude</code>, vector <code>+ - *</code>, and the color setter. <code>CP1</code>/<code>CP2</code> (the axis
+  endpoints) and the cylinder scale are already computed in the skeleton's <code>Update</code>.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 6a</span>
+  <h3>Drop P onto the cylinder's axis</h3>
+  <p>Project <code>P</code> onto the axis line to get the foot point <code>F</code>: with the axis passing through the
+  cylinder center <code>C</code> in unit direction <code>vn</code>, <code>F = C + (Dot(P − C, vn)) * vn</code>.</p>
+  <div class="predict"><b>Predict first:</b> this is the point-to-line projection from Week 2. What is
+  <code>Dot(P − C, vn)</code> measuring, in what units, and what does its <b>sign</b> tell you about whether
+  <code>P</code> is above or below the cylinder's center? Match it to the height check you will need in 6c.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 6b</span>
+  <h3>Push out to the surface</h3>
+  <p>The across-axis part is <code>P − F</code>. Normalize it and step out by <code>CylinderRadius</code> from
+  <code>F</code>: <code>Pt = F + CylinderRadius * (P − F).normalized</code>.</p>
+  <div class="predict"><b>Predict first:</b> <code>P − F</code> is the perpendicular from the axis to <code>P</code> —
+  the same <code>v-perp</code> idea as lecture Part 2. What happens to <code>(P − F).normalized</code> when
+  <code>P</code> sits exactly <i>on</i> the axis, and how will you keep it from blowing up?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 6c</span>
+  <h3>Color by inside vs. outside the height</h3>
+  <p>Compare the along-axis distance from 6a against the cylinder's half-height. Color <code>Pt</code> blue when the
+  foot point <code>F</code> lies between the two endpoints, red when it runs off either end.</p>
+  <div class="predict"><b>Predict first:</b> the height test is a <b>clamp</b> on the same scalar you found in 6a
+  (Week 2's segment test). Slide <code>P</code> up past the top cap — predict the exact height at which
+  <code>Pt</code> turns from blue to red.</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<p>On paper, name the split each exercise leans on:</p>
+<table>
+  <tr><th>Exercise</th><th>Core operation</th><th>Lecture idea</th></tr>
+  <tr><td>EX4 shadow on plane</td><td>project along the plane normal; sign = which side</td><td></td></tr>
+  <tr><td>EX5 reflection</td><td>split into along-normal / in-plane, flip the normal part</td><td></td></tr>
+  <tr><td>EX6 project to cylinder</td><td>project onto the axis, push out to the radius</td><td></td></tr>
+</table>
+
+<h2>4 · MP3 kickoff</h2>
+<div class="box">
+  <p><b>MP3 (Machine Problem 3)</b> goes out this week. It builds on the same
+  <b>implement-and-replace</b> discipline as tonight's projections: build the query (shadow, reflection, or nearest
+  point) from <code>Vector3.Dot</code>, <code>Vector3.Cross</code>, and <code>.normalized</code>, then sanity-check
+  against the engine's own helper.</p>
+  <p><b>MP2</b> is <b>due this week</b> — submit it before you leave if you have not. <b>Details, due dates, and points
+  for both MP2 and MP3 are on Canvas</b> (the single source of truth). Skim the MP3 write-up before you leave and post
+  questions on the Canvas discussion board.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>EX4: the shadow point tracks under <code>P</code> on the plane, and <code>P</code> is green in front / red behind.</li>
+  <li>EX5: <code>Pt</code> sits where the line crosses the plane, and the segment reflects only from the front.</li>
+  <li>EX6: <code>Pt</code> rides the cylinder surface and turns red once it runs off either end.</li>
+  <li>You used only the allowed primitive operations (no <code>Project</code> / <code>Reflect</code> / <code>Angle</code>).</li>
+  <li>You submitted MP2 and opened the MP3 write-up on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Exercise skeletons courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic3 in-class coding exercises). Stuck? Ask the instructor, who circulates during Thursday studio, or post on
+  the Canvas discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>
