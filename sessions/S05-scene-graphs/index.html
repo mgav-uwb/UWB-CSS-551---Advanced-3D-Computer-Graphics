@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS 551 · L05 — Scene Graphs &amp; Hierarchical Modeling</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+  <!-- lib.css is REQUIRED for any deck hosting a data-demo host (else the
+       cockpit layout collapses past the 700px slide budget). -->
+  <link rel="stylesheet" href="../../lib/core/lib.css">
+
+  <style>
+    :root { --accent: #00b46e; }
+    .reveal h2 { color: #1c2530; }
+    .reveal h3 { color: var(--accent); }
+    .reveal section small { color: #66708a; }
+    .reveal table { font-size: 0.78em; }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.44em; }
+    .reveal pre code { border-radius: 8px; }
+    .reveal blockquote { width: 92%; }
+
+    /* Demo-embed layout (playbook §4 / tools/_fixture-deck): keep the viewport
+       + value panel side by side and CROP the viewport so the slide stays
+       inside reveal's 700px height budget. The canvas pixel buffer is
+       untouched, so the harness probe still reads a full-resolution render;
+       only the on-slide footprint shrinks. */
+    [data-demo] { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: center; }
+    [data-demo] .demo-controls { flex: 1 1 100%; max-width: 460px; margin: 0 auto; }
+    [data-demo] .demo-viewport { height: 200px !important; overflow: hidden; }
+    [data-demo] canvas { height: 200px !important; width: auto !important; }
+    /* fallback shows only when the live demo failed to build */
+    .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
+
+    /* scene-graph embed: one Mat4Panel (the hand's W_hand) plus a breadcrumb +
+       caption line under a 400x300 viewport. Shrink the viewport and compact
+       the panel so the whole cockpit stays inside the 700px slide budget.
+       Data untouched; only the on-slide footprint changes. */
+    [data-demo="scene-graph"] .demo-viewport { height: 176px !important; }
+    [data-demo="scene-graph"] canvas { height: 176px !important; }
+    [data-demo="scene-graph"] .demo-panel .mat-panel { font-size: 10px; }
+    [data-demo="scene-graph"] .demo-panel .mat-panel td { padding: 1.5px 5px; min-width: 2.4em; }
+    [data-demo="scene-graph"] .demo-panel .demo-hint { font-size: 10px !important; }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section
+        data-markdown="L05-scene-graphs.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+  <script type="module">
+    import { initDeckDemos } from '../../lib/deck.js';
+
+    Reveal.initialize({
+      hash: true,
+      slideNumber: "c/t",
+      transition: "slide",
+      plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+    }).then(() => {
+      // Markdown slides exist in the DOM only after init resolves — build the
+      // embedded [data-demo] hosts now (never on DOMContentLoaded).
+      initDeckDemos();
+
+      // Demo slider focus vs. deck navigation: when a demo's range input is set
+      // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses
+      // the element), the slider keeps DOM focus, so reveal's ArrowRight is
+      // swallowed by the slider instead of advancing the deck — the walk gets
+      // pinned on the demo slide. Blur demo sliders after a NON-interactive
+      // input so navigation keys reach reveal again. Live mouse-drag (pointer
+      // down) and keyboard fine-tuning (key held) are preserved untouched.
+      document.querySelectorAll('[data-demo] input[type=range]').forEach((el) => {
+        let pointerDown = false, kbd = false;
+        el.addEventListener('pointerdown', () => { pointerDown = true; });
+        window.addEventListener('pointerup', () => { pointerDown = false; });
+        el.addEventListener('keydown', () => { kbd = true; });
+        el.addEventListener('keyup', () => { kbd = false; });
+        el.addEventListener('input', () => { if (!pointerDown && !kbd) el.blur(); });
+      });
+    });
+  </script>
+</body>
+</html>

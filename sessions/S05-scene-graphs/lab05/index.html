@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 05 — Scene Graphs: build, poke &amp; predict the hierarchy</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 05 — Scene Graphs: build, poke &amp; predict the hierarchy</h1>
+  <div class="meta">Week 5 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture chained per-node local transforms into world transforms with one rule &mdash;
+<code>W_child = W_parent &middot; L_child</code> &mdash; computed by Sung's <code>SceneNode.CompositeXform</code>
+<b>recursion</b> down the tree. Today you <b>run</b> the real scene-node projects, <b>trace</b> that recursion,
+<b>add</b> a node, and <b>re-pivot</b> a joint &mdash; predicting the composite each time <i>before</i> you press Play.
+The instructor circulates. The second half is <b>MP4 lab time</b> &mdash; the four-generation hierarchy.</p>
+
+<div class="box warn">
+  <b>Predict before you run &mdash; every time.</b> The whole point of the studio is to catch the moment your mental model
+  and the screen disagree. If you press Play first, you have learned nothing. Say the answer out loud or jot it, then
+  run.
+</div>
+
+<h2>0 · Get the Topic5 projects</h2>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic5-SceneNode+HierarchicalModeling</code>).
+Download, unzip somewhere without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add
+project from disk</b>). Open with the pinned editor from Lab 01. Today's two:</p>
+<ul class="check">
+  <li><code>5.1.SceneNode+PrimitiveList</code> and <code>5.2.SceneNodeControl</code> each open and compile without
+      errors.</li>
+  <li>Find <code>SceneNode.cs</code> and <code>NodePrimitive.cs</code> under <code>Assets/Source/Model/</code>.</li>
+  <li>In the Hierarchy window, confirm the scene has <code>SceneNode</code> objects wired parent-to-child through their
+      <code>ChildrenList</code> (base &rarr; arm &rarr; hand), not through Unity's own transform parenting.</li>
+</ul>
+
+<h2>1 · Trace CompositeXform</h2>
+<p><b>Goal.</b> See the recursion compute every node's world matrix in one top-down pass. Open
+<code>SceneNode.cs</code> and re-read the one line that is the whole rule:</p>
+<pre>mCombinedParentXform = parentXform * orgT * trs;   // W = W_parent &middot; L
+foreach (SceneNode child in ChildrenList)
+    child.CompositeXform(ref mCombinedParentXform); // pass THIS node's world down</pre>
+
+<div class="api"><b>Where to look:</b> <code>5.1.SceneNode+PrimitiveList/Assets/Source/Model/SceneNode.cs</code> &mdash;
+  the <code>CompositeXform(ref Matrix4x4 parentXform)</code> method. The root call passes
+  <code>Matrix4x4.identity</code> as the top parent (find where <code>TheWorld</code> kicks it off).</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>Predict the call stack</h3>
+  <p>The tree is base &rarr; arm &rarr; hand. Trace the recursion by hand on paper.</p>
+  <div class="predict"><b>Predict first:</b> write the three assignments the recursion makes, in order &mdash;
+  <code>W_base = ?</code>, <code>W_arm = ?</code>, <code>W_hand = ?</code> &mdash; each as a product of local
+  matrices. Which node's <code>CompositeXform</code> receives <code>identity</code>? Which receives
+  <code>W_arm</code>? Confirm your <code>W_hand</code> is the product of all three locals, root-most on the left.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Where does geometry get its matrix?</h3>
+  <p>Read <code>NodePrimitive.LoadShaderMatrix</code>: <code>m = nodeMatrix * p * trs * invp</code>.</p>
+  <div class="predict"><b>Predict first:</b> <code>nodeMatrix</code> is the node's world matrix handed in by
+  <code>CompositeXform</code>. Predict what <code>p * trs * invp</code> is (hint: it is a pivot idiom from Lab 04). If a
+  node carried <b>two</b> primitives with different <code>Pivot</code> values, would they share a world frame? Explain
+  in one sentence, then confirm by adding a second primitive to a node's <code>PrimitiveList</code>.</div>
+</div>
+
+<h2>2 · Add a node, predict its composite</h2>
+<p><b>Goal.</b> Extend the tree and predict the new node's world matrix <i>before</i> running. In the Hierarchy, duplicate
+the <b>hand</b> node (or create a new <code>SceneNode</code>) and wire it as a child of the <b>arm</b>, alongside the
+existing hand.</p>
+
+<div class="api"><b>How to wire it:</b> select the <b>arm</b> node; in its <code>SceneNode</code> component, add your new
+  node to the <code>ChildrenList</code>. Give the new node a primitive (add a <code>NodePrimitive</code> to its
+  <code>PrimitiveList</code>) and a clear local offset in its Transform (say <code>localPosition = (0, 1, 0)</code>).</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2a</span>
+  <h3>Predict the world position</h3>
+  <p>Your new node is a child of the arm with local offset <code>(0, 1, 0)</code>.</p>
+  <div class="predict"><b>Predict first:</b> its world matrix is <code>W_new = W_arm &middot; L_new</code>. Without
+  computing every entry, predict where its origin lands relative to the existing hand &mdash; same tip, higher, offset?
+  Then bend the arm (<code>armBend</code>-style rotation on the arm node) and predict: does your new node swing <b>with</b>
+  the arm, or stay behind? Run and check the box moved as one with the arm subtree.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2b</span>
+  <h3>Move the parent, watch the children</h3>
+  <p>Select the <b>base</b> and yaw it; then select the <b>arm</b> and yaw it.</p>
+  <div class="predict"><b>Predict first:</b> yawing the <b>base</b> should sweep base, arm, hand, <i>and</i> your new
+  node together; yawing the <b>arm</b> should move arm, hand, and your new node but leave the base fixed. Predict which
+  nodes move for each edit <b>before</b> dragging, then confirm. Name the invariant this demonstrates in your own
+  words.</div>
+</div>
+
+<h2>3 · Re-pivot a joint</h2>
+<p><b>Goal.</b> Change <i>where</i> a node hinges and predict the swing. In lecture, the arm bent about its <b>lower
+end</b> (the joint) because of the pivot sandwich <code>T(p)&middot;R&middot;T(-p)</code>. Now move that pivot.</p>
+
+<div class="api"><b>Where to look:</b> in <code>5.2.SceneNodeControl</code>, select the <b>arm</b> node; find its
+  <code>NodeOrigin</code> (the <code>orgT</code> offset in <code>CompositeXform</code>) and/or the primitive's
+  <code>Pivot</code>. Change one and observe how the arm rotates.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3a</span>
+  <h3>Predict the fixed point</h3>
+  <p>Set the arm's pivot to its lower end (the joint), then to its <b>center</b>, then to its <b>tip</b>.</p>
+  <div class="predict"><b>Predict first:</b> the pivot point is the <b>fixed point</b> of the rotation &mdash; it does not
+  move as the node bends. For each of the three pivots, predict which point on the arm stays put and how the far end
+  swings. Point at the spot on screen, then enable rotation and check. Which pivot keeps the hand glued to the tip the
+  way lecture's demo did?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3b</span>
+  <h3>Does the child care where the parent pivots?</h3>
+  <p>With the hand still on the arm's tip, change the <b>arm's</b> pivot and re-bend.</p>
+  <div class="predict"><b>Predict first:</b> the hand's local transform never mentions the arm's pivot &mdash; it only
+  says "sit at the arm's tip". Predict: when you move the arm's pivot and bend, does the hand still ride the tip
+  correctly, or does it detach? Explain using <code>W_hand = W_arm &middot; L_hand</code> &mdash; what does the hand
+  inherit, and what does it not?</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<p>On paper, name the lecture idea each project demonstrates:</p>
+<table>
+  <tr><th>Project</th><th>What it shows</th><th>Lecture idea</th></tr>
+  <tr><td>5.1 SceneNode+PrimitiveList</td><td>recursion computes every node's world matrix</td><td></td></tr>
+  <tr><td>5.2 SceneNodeControl</td><td>edit a node's local transform; the subtree follows</td><td></td></tr>
+  <tr><td>your added node</td><td>a new child inherits the parent chain automatically</td><td></td></tr>
+</table>
+
+<h2>4 · MP4 kickoff &mdash; the four-generation hierarchy</h2>
+<div class="box">
+  <p><b>MP4</b> is a <b>four-generation hierarchy</b> built on the same <code>SceneNode</code> you just traced &mdash;
+  one generation deeper than tonight's base-arm-hand arm. The <code>CompositeXform</code> recursion already handles any
+  depth, so a fourth level is one more application of <code>W_child = W_parent &middot; L_child</code>.</p>
+  <p>Get MP4 open now and make a start: sketch your four-level tree on paper (root &rarr; child &rarr; grandchild &rarr;
+  great-grandchild), decide each node's local transform in its <b>parent's</b> frame, and wire the first two generations
+  as <code>SceneNode</code>s. Pull the instructor over with a <i>specific</i> blocker &mdash; this is the best
+  help-per-minute of the week.</p>
+  <p><b>Details, requirements, due dates, and points are on Canvas</b> (the single source of truth) &mdash; do not rely
+  on anything quoted elsewhere.</p>
+</div>
+
+<h2>5 · MP3 + MP3a</h2>
+<div class="box">
+  <p><b>MP3 and MP3a are due</b> this week. Before you dive into MP4, make sure both are submitted on Canvas. If you are
+  stuck on either, this studio is the place to ask.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>You traced <code>CompositeXform</code> and wrote <code>W_base</code>, <code>W_arm</code>, <code>W_hand</code> as
+      products of locals.</li>
+  <li>You added a node under the arm and predicted (then confirmed) its world placement.</li>
+  <li>You moved a parent and confirmed the whole subtree &mdash; including your new node &mdash; followed.</li>
+  <li>You re-pivoted the arm's joint and can name the fixed point for each pivot.</li>
+  <li>You opened MP4, sketched the four-level tree, and submitted MP3 + MP3a on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic5-SceneNode+HierarchicalModeling). Stuck? Ask the instructor, who circulates during Thursday studio, or post on
+  the Canvas discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>
