@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+  CSS 551 — course hub. Serve the WHOLE course from one server:
+      cd css551 && python3 -m http.server 8551      # then open http://localhost:8551/
+  Every session deck/lab uses relative asset paths, so one root serves them all.
+
+  LAYOUT: one row per session — the session card on the left, its relevant
+  handouts in the middle, its interactive demos on the right.
+  TO ADD A SESSION: fill in its dir/deck/lab under the SESSIONS array below
+  (deck/lab stay null until that session's files exist — null renders unlinked,
+  exactly like 343's exam rows). handouts/demos = keys into the HANDOUTS/DEMOS maps.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 — Course Hub</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:36px clamp(14px,4vw,64px) 72px}
+  header{margin-bottom:8px}
+  h1{font-size:34px;margin:0;letter-spacing:.5px}
+  .course-sub{font-size:18px;color:var(--ink);margin:4px 0 2px;font-weight:500}
+  .meta{color:var(--dim);font-size:13.5px}
+
+  /* quick links (course-wide materials) */
+  .quick{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 6px}
+  a.q{display:inline-block;text-decoration:none;color:var(--ink);background:var(--panel);
+      border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;
+      font-weight:600;transition:border-color .15s,background .15s}
+  a.q:hover{border-color:var(--accent);background:#181b24}
+  a.q .qd{color:var(--dim);font-weight:400}
+  span.q{display:inline-block;color:var(--dim);background:transparent;
+      border:1px dashed var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;
+      font-weight:600;cursor:default}
+  span.q .qd{color:var(--dim);font-weight:400}
+
+  /* the session table: session | handouts | demos */
+  #sessions{display:grid;grid-template-columns:minmax(330px,1.15fr) minmax(180px,.55fr) minmax(210px,.75fr);
+            gap:12px 16px;margin-top:26px;align-items:stretch}
+  .colhead{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);
+           font-weight:600;padding:0 2px 2px;border-bottom:1px solid var(--line);align-self:end}
+  .colhead a{color:var(--accent2);text-decoration:none;font-weight:600;text-transform:none;letter-spacing:0}
+  .colhead a:hover{text-decoration:underline}
+
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--panel);
+         border:1px solid var(--line);border-left:3px solid var(--line);border-radius:11px;
+         padding:15px 17px;transition:border-color .15s,transform .15s,background .15s}
+  a.card:hover{border-color:var(--accent);border-left-color:var(--accent);
+               transform:translateY(-2px);background:#181b24}
+  .lec{display:flex;gap:14px;align-items:flex-start}
+  .badge{flex:0 0 auto;font-weight:700;font-size:14px;color:var(--accent);
+         border:1px solid var(--accent);border-radius:8px;padding:6px 9px;letter-spacing:.5px;
+         background:#00e58a14}
+  .ctitle{font-size:16.5px;font-weight:600;margin:0 0 4px}
+  .go{color:var(--accent2);font-size:13px;margin-top:9px;font-weight:600}
+
+  /* unlinked rows (no deck/lab yet) */
+  .card.unlinked{background:transparent;border-style:dashed;cursor:default}
+  .card.unlinked .badge{color:var(--dim);border-color:var(--line);background:transparent}
+
+  /* handout / demo chips */
+  .cell{display:flex;flex-direction:column;gap:8px;justify-content:flex-start}
+  a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--panel);
+         border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;
+         line-height:1.35;transition:border-color .15s,background .15s}
+  a.chip:hover{border-color:var(--accent);background:#181b24}
+  a.chip .t{font-weight:600}
+  a.chip .d{color:var(--dim);font-size:11.5px;display:block;margin-top:1px}
+  .chip.h .t::before{content:"📄 "}
+  .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:10.5px;vertical-align:1px}
+  .none{color:#3a3f4d;font-size:12.5px;padding:8px 2px}
+
+  /* session cell: deck card + optional lab chip, stacked */
+  .card-wrap{display:flex;flex-direction:column;gap:8px}
+  .card-wrap a.card{flex:1 1 auto}
+  a.chip.lab{align-self:flex-start;padding:6px 11px}
+  .chip.lab .t::before{content:"🧪 "}
+
+  /* narrow screens: stack each session's three cells vertically */
+  @media (max-width: 920px){
+    #sessions{grid-template-columns:1fr}
+    .colhead{display:none}
+    .cell{flex-direction:row;flex-wrap:wrap}
+    .cell a.chip{flex:0 0 auto}
+    .none{display:none}
+    a.card{margin-top:6px}
+  }
+
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
+  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
+</style>
+</head>
+<body>
+  <header>
+    <h1>CSS 551 <span style="color:var(--dim);font-weight:400">&lt;/&gt;</span></h1>
+    <div class="course-sub">Advanced 3D Computer Graphics</div>
+    <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online (lecture) / Thu 5:45–7:45 PM in person (studio) · Dr. Marcel Gavriliu</div>
+  </header>
+
+  <div class="quick" id="quick"></div>
+
+  <div id="sessions"></div>
+
+  <footer>
+    One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
+    → open <code>http://localhost:8551/</code>.
+  </footer>
+
+<script>
+// ───────── course-wide quick links (bar under the header) ─────────
+// href:null renders as an unlinked (dashed) chip until that page exists.
+const QUICKLINKS = [
+  { href:null, title:"Schedule", desc:"session-by-session plan" },
+  { href:null, title:"Syllabus", desc:"policies & grading" },
+  { href:null, title:"Assignments", desc:"studio labs & projects" },
+];
+
+// ───────── course-wide handouts & references (keyed; attach per session) ─────────
+const HANDOUTS = {
+};
+
+// ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
+const DEMOS = {
+  "mvc-transform": { title:"MVC: One Model, Two Views (Transform)",
+    desc:"drag tx/ry/s — cube view and matrix-panel view stay in sync" },
+  "view-matrix": { title:"The View Matrix: Hand-Built, Glass Cockpit",
+    desc:"az/el/dist sliders drive a hand-built lookAt; u/v/w rows exposed" },
+};
+
+// ───────── one row per session: card + its handouts + its demos ─────────
+const SESSIONS = [
+  { id:"S01", title:"Graphics Systems &amp; MVC",
+    deck:"sessions/S01-graphics-systems-mvc/index.html",
+    lab:"sessions/S01-graphics-systems-mvc/lab01/index.html",
+    demos:["mvc-transform"] },
+  { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
+    deck:null, lab:null, demos:[] },
+  { id:"S03", title:"Rotation: Axis-Angle, Quaternions, Gimbal Lock",
+    deck:null, lab:null, demos:[] },
+  { id:"S04", title:"Matrices &amp; Coordinate Spaces",
+    deck:null, lab:null, demos:[] },
+  { id:"S05", title:"Scene Graphs &amp; Hierarchical Modeling",
+    deck:null, lab:null, demos:[] },
+  { id:"S06", title:"3D Viewing: View &amp; Projection Matrices",
+    deck:null, lab:null, demos:["view-matrix"] },
+  { id:"S07", title:"Polygonal Modeling",
+    deck:null, lab:null, demos:[] },
+  { id:"S08", title:"Texture Mapping",
+    deck:null, lab:null, demos:[] },
+  { id:"S09", title:"Illumination",
+    deck:null, lab:null, demos:[] },
+  { id:"S10", title:"The Rendering Equation, PBR &amp; Neural Rendering",
+    deck:null, lab:null, demos:[] },
+];
+
+const quickCell = q => q.href ? `
+  <a class="q" href="${q.href}">${q.title} <span class="qd">· ${q.desc}</span></a>` : `
+  <span class="q">${q.title} <span class="qd">· ${q.desc}</span></span>`;
+
+const sessionCell = s => {
+  if (!s.deck && !s.lab) return `
+  <div class="card unlinked">
+    <div class="lec">
+      <span class="badge">${s.id}</span>
+      <div>
+        <div class="ctitle">${s.title}</div>
+      </div>
+    </div>
+  </div>`;
+  const primary = s.deck || s.lab;
+  const primaryLabel = s.deck ? "Open deck →" : "Open lab →";
+  const labChip = (s.deck && s.lab) ? `
+    <a class="chip lab" href="${s.lab}"><span class="t">Lab</span></a>` : "";
+  return `
+  <div class="card-wrap">
+    <a class="card" href="${primary}">
+      <div class="lec">
+        <span class="badge">${s.id}</span>
+        <div>
+          <div class="ctitle">${s.title}</div>
+          <div class="go">${primaryLabel}</div>
+        </div>
+      </div>
+    </a>${labChip}
+  </div>`;
+};
+
+const handoutCell = s => {
+  const hs = (s.handouts || []).map(k => HANDOUTS[k]).filter(Boolean);
+  if (!hs.length) return `<div class="cell"><span class="none">—</span></div>`;
+  return `<div class="cell">` + hs.map(h => `
+    <a class="chip h" href="${h.href}"><span class="t">${h.title}</span><span class="d">${h.desc}</span></a>`).join("") + `</div>`;
+};
+
+const demoCell = s => {
+  const ds = (s.demos || []).map(k => [k, DEMOS[k]]).filter(([,d]) => d);
+  if (!ds.length) return `<div class="cell"><span class="none">—</span></div>`;
+  return `<div class="cell">` + ds.map(([k, d]) => `
+    <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("") + `</div>`;
+};
+
+document.getElementById("quick").innerHTML = QUICKLINKS.map(quickCell).join("");
+
+document.getElementById("sessions").innerHTML =
+  `<div class="colhead">Sessions</div>
+   <div class="colhead">Handouts</div>
+   <div class="colhead">Demos</div>` +
+  SESSIONS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+CSS 551 Course Content — Advanced 3D Computer Graphics
+Copyright (c) 2026 Marcel Gavriliu
+
+This work (lecture decks, handouts, syllabus, schedule, session figures, study
+guides, and other course content in this repository) is licensed under the
+Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
+(CC BY-NC-SA 4.0).
+
+To view a copy of this license, visit:
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Exception — third-party figures: a small number of figures under
+sessions/*/figures/ are adapted from Sedgewick & Wayne, "Algorithms," 4th
+edition. Those figures are NOT covered by the license above; they are used
+under the authors' stated educational-use policy (see
+https://algs4.cs.princeton.edu/faq/), with attribution, and remain the
+copyright of their original authors.
+
+Code (the lib/ interactive-demo library, ICA/PA starter files, and any other
+source code in this repository) is licensed separately — see LICENSE-CODE.

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 01 — Unity setup &amp; the interactive loop</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 01 — Unity setup &amp; the interactive loop</h1>
+  <div class="meta">Week 1 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture built the mental model: interactive graphics is a <b>loop</b> (input → update → redraw)
+organized as <b>MVC</b>. Today you install the workbench and watch that loop run in real code — the same two
+projects we toured on slides. Work at your own pace; the instructor is circulating.</p>
+
+<div class="box warn">
+  <b>Goal for today:</b> Unity installed and running, the tour projects open, and you have changed a variable,
+  predicted the result, and confirmed it. That is the whole "Practice" half of Code–Demo–Practice.
+</div>
+
+<h2>1 · Install Unity 6 (Unity Hub)</h2>
+<p>We standardize on one editor version so everyone's projects open identically. Install <b>Unity Hub</b> first,
+then use it to install the pinned editor.</p>
+<ul class="check">
+  <li>Download <b>Unity Hub</b> from unity.com/download and install it.</li>
+  <li>Sign in / create a free <b>Unity account</b> (a personal license is fine for coursework).</li>
+  <li>In Hub → <b>Installs → Install Editor</b>, pick <b>Unity 6000.3.11f1 LTS</b> (the pinned version for this course).</li>
+  <li>When prompted for modules, the default set is fine; you do <b>not</b> need mobile/console build support.</li>
+  <li>Let it finish (this download is large — start it first thing).</li>
+</ul>
+<div class="box warn">
+  <b>Version matters.</b> Opening a project in a different editor version can silently upgrade it and cause diffs
+  that are not your work. If Hub offers to open a project in a newer version, decline and add
+  <code>6000.3.11f1</code> instead.
+</div>
+
+<h2>2 · Get the tour projects</h2>
+<p>These projects are provided in the <b>course materials on Canvas</b>. Download and unzip them somewhere without
+spaces in the path if you can:</p>
+<table>
+  <tr><th>Project</th><th>What it is</th></tr>
+  <tr><td><code>Topic1-Intro/1.1.IntroToTool</code></td><td>Two tiny scripts that move objects every frame — the raw interactive loop.</td></tr>
+  <tr><td><code>Topic1-Intro/1.2.SimpleGUI</code></td><td>Buttons and a toggle driving the scene — a Controller wiring up handlers.</td></tr>
+  <tr><td><code>Topic2-UI+MVC/2.3.SliderWithEcho</code></td><td>The full MVC triad in one small project — you map its files to M/V/C in §5.</td></tr>
+</table>
+<ul class="check">
+  <li>In Unity Hub → <b>Projects → Add → Add project from disk</b>, select the <code>1.1.IntroToTool</code> folder.</li>
+  <li>Add <code>1.2.SimpleGUI</code> and <code>2.3.SliderWithEcho</code> the same way.</li>
+  <li>Open <code>1.1.IntroToTool</code> first. First open compiles for a minute — that is normal.</li>
+</ul>
+
+<h2>3 · Run the loop — 1.1.IntroToTool</h2>
+<p>Open the scene, press <b>Play</b> (the ▶ button at the top), and watch. Then read the two scripts under
+<code>Assets/Source/</code>: <code>MoveInX.cs</code> and <code>BounceUpAndDown.cs</code>.</p>
+
+<div class="step">
+  <span class="tag">POKE 1</span>
+  <h3>Change the drive speed</h3>
+  <p>In <code>MoveInX.cs</code>, the <code>Update()</code> body advances x every frame:</p>
+  <pre>p.x += 1.0f * Time.smoothDeltaTime;</pre>
+  <div class="predict"><b>Predict first:</b> if you change <code>1.0f</code> to <code>3.0f</code>, what changes about the
+  motion — the direction, the speed, or the starting point? Write your guess down.</div>
+  <p><b>Do it:</b> change the value, save the file, return to Unity (it recompiles), press Play. Compare to your guess.</p>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 2</span>
+  <h3>Change the bounce range</h3>
+  <p><code>BounceUpAndDown.cs</code> has a field <code>yRange</code> that bounds the vertical bounce:</p>
+  <pre>public float yRange = 10f;</pre>
+  <div class="predict"><b>Predict first:</b> set <code>yRange</code> to <code>3f</code>. Will the object bounce
+  faster, or over a shorter distance, or both? Why?</div>
+  <p><b>Do it:</b> change it, Play, and watch. Then ask yourself: <code>yRange</code> is a <code>public</code>
+  field — where else could you have changed it <i>without</i> editing the file? (Hint: the Inspector.)</p>
+</div>
+
+<div class="box">
+  <b>Frame-rate note.</b> Notice <code>MoveInX</code> multiplies by <code>Time.smoothDeltaTime</code>. Delete the
+  <code>* Time.smoothDeltaTime</code> so it reads <code>p.x += 1.0f;</code>, Play, and watch the speed jump. That
+  is a per-<i>frame</i> step instead of a per-<i>second</i> step — put it back when you have seen it.
+</div>
+
+<h2>4 · Read the Controller — 1.2.SimpleGUI</h2>
+<p>Open <code>1.2.SimpleGUI</code>. Press Play: use the buttons to create cubes and the toggle to show/hide the
+sphere. Then open <code>MainController.cs</code> (under <code>Assets/Source/UI Support/</code>) and read it top to
+bottom — it is the whole app.</p>
+
+<div class="step">
+  <span class="tag">POKE 3</span>
+  <h3>Change where new cubes appear</h3>
+  <p>In <code>MainController.cs</code>, <code>CreateNewCube()</code> places each cube at:</p>
+  <pre>cube.transform.position = new Vector3(10, 0, 10);</pre>
+  <div class="predict"><b>Predict first:</b> change it to <code>new Vector3(0, 5, 0)</code>. Where will the next
+  created cube appear relative to the old spot?</div>
+  <p><b>Do it:</b> change it, Play, click Create, and confirm. Then find the three <code>AddListener(...)</code>
+  calls in <code>Start()</code> — each is one button/toggle wired to one handler. Which handler runs when you
+  click <b>Create</b>?</p>
+</div>
+
+<h3>Map the code to MVC</h3>
+<p>On paper, label each of these with <b>M</b>, <b>V</b>, or <b>C</b> from Tuesday's lecture:</p>
+<table>
+  <tr><th>In SimpleGUI…</th><th>M / V / C?</th></tr>
+  <tr><td>the cube and sphere you see on screen</td><td></td></tr>
+  <tr><td><code>CreateNewCube()</code> / <code>ShowSphere()</code> handlers</td><td></td></tr>
+  <tr><td>the scene objects' positions and visibility (their state)</td><td></td></tr>
+</table>
+
+<h2>5 · SliderWithEcho — map the MVC triad</h2>
+<p>Open <code>2.3.SliderWithEcho</code> (the project we toured in lecture Part 4). Press Play: click to place a
+sphere, drag the slider, and watch its radius change while the number echoes. Then open the three source files
+under <code>Assets/Source/</code> and match each to a box from Tuesday.</p>
+<table>
+  <tr><th>File</th><th>M / V / C?</th></tr>
+  <tr><td><code>Model/TheWorld.cs</code></td><td></td></tr>
+  <tr><td><code>UI Support/MainController.cs</code> (wires <code>RadiusChanged</code>)</td><td></td></tr>
+  <tr><td><code>Prefab Support/UIPrefab/SliderWithEcho.cs</code></td><td></td></tr>
+  <tr><td>the sphere you see resize on screen</td><td></td></tr>
+</table>
+<p><b>Trace it:</b> follow one slider drag from <code>SliderValueChange</code> → <code>RadiusChanged</code> →
+<code>TheWorld.SetSelelectedRadius</code> → the sphere redrawing. Notice every arrow points one way:
+Controller → Model → View. That one-way flow is the whole point of MVC.</p>
+
+<h2>6 · MP1 kickoff</h2>
+<div class="box">
+  <p><b>MP1 (Machine Problem 1) — orientation</b> goes out this week. It is your first
+  <b>implement-and-replace</b>: you will orient an object using only <b>primitive</b> vector/matrix operations
+  (<code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>Vector3.Normalize</code>, component access) and then
+  check your result against what the engine's own helper produces. The composited helpers
+  (<code>Transform.LookAt</code>, <code>Quaternion.LookRotation</code>) are off-limits where the assignment says so
+  — building them <i>is</i> the assignment.</p>
+  <p><b>Details, due date, and points are on Canvas</b> (the single source of truth). Skim the MP1 write-up before
+  you leave today and post questions on the Canvas discussion board.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>Unity 6000.3.11f1 installed via Hub; all three projects open and Play without errors.</li>
+  <li>You completed Pokes 1–3: predicted, ran, compared.</li>
+  <li>You mapped SimpleGUI and SliderWithEcho to M/V/C.</li>
+  <li>You opened the MP1 write-up on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Tour projects courtesy of Prof. Kelvin Sung's CSS 451 examples.
+  Stuck? Ask the instructor, who circulates during Thursday studio, or post on the Canvas discussion board;
+  Canvas has due dates and office hours.
+</footer>
+</body>
+</html>

@@ -1,0 +1,76 @@
+/* Cockpit UI stylesheet — the ONE stylesheet every demo/deck links.
+   Every selector is namespaced under .cockpit so it can't bleed into deck
+   styles when a deck embeds a demo alongside its own CSS. */
+
+.cockpit {
+  background: #0b0c10;
+  color: #e7eaf0;
+  font: 14px/1.4 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.cockpit .mat-panel {
+  border-collapse: collapse;
+  background: #14161d;
+  border: 1px solid #262a35;
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+}
+
+.cockpit .mat-panel td {
+  padding: 6px 10px;
+  text-align: right;
+  min-width: 3.6em;
+  border-bottom: 1px solid #1c1f28;
+}
+
+.cockpit .mat-panel tr:last-child td {
+  border-bottom: none;
+}
+
+.cockpit .row-u {
+  color: #ff7b72;
+}
+
+.cockpit .row-v {
+  color: #7ee787;
+}
+
+.cockpit .row-w {
+  color: #79c0ff;
+}
+
+.cockpit .row-h {
+  color: #8b93a7;
+}
+
+.cockpit .slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #14161d;
+  border: 1px solid #262a35;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.cockpit .slider-label {
+  font-size: 13px;
+  min-width: 2.5em;
+  color: #e7eaf0;
+}
+
+.cockpit .slider-row input[type='range'] {
+  flex: 1;
+  accent-color: #5cd47a;
+}
+
+.cockpit .slider-readout {
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  min-width: 3.6em;
+  text-align: right;
+  color: #8b93a7;
+}

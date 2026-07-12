@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo Sandbox</title>
+<link rel="stylesheet" href="./core/lib.css">
+</head>
+<body class="cockpit">
+  <div id="demo-root"></div>
+
+  <script type="module">
+    import { DEMOS } from './demos/registry.js';
+
+    const slug = new URLSearchParams(location.search).get('demo');
+    const root = document.getElementById('demo-root');
+    const demo = slug ? DEMOS[slug] : undefined;
+
+    if (!demo) {
+      document.title = 'Unknown demo';
+      const msg = document.createElement('p');
+      msg.className = 'unknown-demo';
+      msg.textContent = slug
+        ? `Unknown demo: "${slug}". Check the slug against lib/demos/registry.js.`
+        : 'No demo specified. Add ?demo=<slug> to the URL.';
+      root.appendChild(msg);
+    } else {
+      document.title = demo.title;
+      const h1 = document.createElement('h1');
+      h1.className = 'demo-title';
+      h1.textContent = demo.title;
+      root.appendChild(h1);
+      demo.make(root, { stage: 'full' });
+    }
+  </script>
+</body>
+</html>
