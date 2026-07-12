@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 04 — Matrices in Unity: order, pivots &amp; inverses</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 04 — Matrices in Unity: order, pivots &amp; inverses</h1>
+  <div class="meta">Week 4 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture packaged translate, rotate, and scale into one 4&times;4 matrix, composed by
+<b>multiplication</b> (read right-to-left), undone by an <b>inverse</b>, and steered onto any pivot with the
+<b>sandwich</b> <code>T(p)&middot;R&middot;T(-p)</code>. Today you <b>run</b> the real Topic4 projects that do exactly
+this and <b>poke</b> them — each project uploads a hand-built matrix to the shader as <code>MyXformMat</code>. The
+studio is <b>predict-then-run</b>: write your prediction down <i>before</i> you press Play, then reconcile. The
+instructor circulates. The second half is <b>MP3 lab time</b>.</p>
+
+<div class="box warn">
+  <b>Predict before you run — every time.</b> The whole point of the studio is to catch the moment your mental model
+  and the screen disagree. If you press Play first, you have learned nothing. Say the answer out loud or jot it, then
+  run.
+</div>
+
+<h2>0 · Get the Topic4 projects</h2>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic4-Matrices</code>). Download, unzip somewhere
+without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add project from disk</b>).
+Open with the pinned editor from Lab 01. Today's three:</p>
+<ul class="check">
+  <li><code>4.5.TSvsST</code>, <code>4.7.PivotedScaleRotate</code>, and <code>4.6.InverseTransform</code> each open and
+      compile without errors.</li>
+  <li>Each has an <code>XformLoader</code> script that builds a <code>Matrix4x4</code> and calls
+      <code>SetMatrix("MyXformMat", ...)</code> — find it under <code>Assets/Source/Model/</code>.</li>
+  <li>The shader is <code>451Shader.shader</code>; confirm it applies <code>MyXformMat</code> first, then
+      <code>UNITY_MATRIX_VP</code> (the stage-by-stage pipeline from lecture Part 4).</li>
+</ul>
+
+<h2>1 · TSvsST — order is the operation</h2>
+<p><b>Goal.</b> Watch the <i>same</i> scale and translate produce two different results depending on multiplication
+order. <code>XformLoader</code> has a <code>mode</code> field: <code>ScaleThenTranslate</code> builds
+<code>tm * sm</code>, <code>TranslateThenScale</code> builds <code>sm * tm</code>.</p>
+
+<div class="api"><b>Where to look:</b> <code>4.5.TSvsST/Assets/Source/Model/XformLoader.cs</code> — the
+  <code>switch(mode)</code> block. Flip <code>mode</code> in the Inspector on the object that has the script; adjust
+  the object's <b>Scale</b> and <b>Position</b> in the Transform to make the effect large.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>Predict which cube moves where</h3>
+  <p>Set a non-uniform scale (say <code>2, 1, 1</code>) and a clear offset (say <code>3, 0, 0</code>).</p>
+  <div class="predict"><b>Predict first:</b> in <code>ScaleThenTranslate</code> (<code>tm * sm</code>, scale acts first), does
+  the offset get stretched, or stay <code>3</code>? In <code>TranslateThenScale</code> (<code>sm * tm</code>, translate
+  acts first), the scale multiplies the <i>whole</i> matrix — what happens to the <code>3</code> then? Write both
+  predicted x-positions before you flip <code>mode</code>.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Read it off the matrix column</h3>
+  <p>Column 3 of <code>MyXformMat</code> is the translation (lecture Part 1). Reason about column 3 for each order.</p>
+  <div class="predict"><b>Predict first:</b> for <code>sm * tm</code> with scale <code>(2,1,1)</code> and translate
+  <code>(3,0,0)</code>, predict column 3 by hand — does the <code>x</code> entry read <code>3</code> or <code>6</code>?
+  Match your prediction to where the cube lands. Which order is the one Unity's own <code>Matrix4x4.TRS</code> uses
+  (scale first, then rotate, then translate)?</div>
+</div>
+
+<h2>2 · PivotedScaleRotate — the pivot sandwich</h2>
+<p><b>Goal.</b> Rotate an object about a chosen <b>pivot</b> instead of its own origin. <code>XformLoader</code> builds
+<code>m = pm * m * ipm</code> = <code>T(p)&middot;M&middot;T(-p)</code>, with the pivot exposed as
+<code>PivotPosition</code> (an offset in the object's own space).</p>
+
+<div class="api"><b>Where to look:</b> <code>4.7.PivotedScaleRotate/Assets/Source/Model/XformLoader.cs</code> — the
+  <code>pm * m * ipm</code> line and the <code>PivotPosition</code> field. A small marker (<code>ShowPivotPosition</code>)
+  is drawn at the pivot. Toggle <code>ShowRotation</code> on to see it spin.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2a</span>
+  <h3>Predict the fixed point</h3>
+  <p>Set <code>PivotPosition</code> to a clear offset — try <code>(1.5, 0, 0)</code>.</p>
+  <div class="predict"><b>Predict first:</b> lecture said the pivot point itself is the <b>fixed point</b> of
+  <code>T(p)&middot;R&middot;T(-p)</code> — it does not move. Before enabling rotation, predict: as the object spins,
+  which single point on (or near) it stays put? Point at that spot on screen, then turn <code>ShowRotation</code> on and
+  check the marker.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2b</span>
+  <h3>Move the pivot, re-predict the arc</h3>
+  <p>Change <code>PivotPosition</code> to <code>(0, 0, 0)</code>, then to a large offset like <code>(3, 0, 0)</code>.</p>
+  <div class="predict"><b>Predict first:</b> at pivot <code>(0,0,0)</code> the object spins in place; at a large offset it
+  sweeps a wide arc. Predict the <b>radius</b> of the swept circle for pivot <code>(3,0,0)</code> — what distance is the
+  object from its own pivot? Then predict: is this <code>T&middot;R</code> behavior or <code>R&middot;T</code> behavior
+  from lecture Part 2, and why?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2c</span>
+  <h3>Where did column 3 go?</h3>
+  <p>Lecture noted the translation column of a pivoted rotation is <code>(I - R)p</code> — not the pivot, not zero.</p>
+  <div class="predict"><b>Predict first:</b> without computing exactly, predict whether column 3 of the final
+  <code>MyXformMat</code> equals <code>PivotPosition</code>. (It does not — that is why you build the sandwich instead of
+  typing a translation by hand.) If you had to hand-enter a pivoted rotation as a single <code>TRS</code>, what would go
+  wrong?</div>
+</div>
+
+<h2>3 · InverseTransform — undo, and change frames</h2>
+<p><b>Goal.</b> Watch <code>M&#8315;&#185;</code> peel a transform apart. <code>XformLoader</code> builds
+<code>invT</code>, <code>invR</code>, <code>invS</code> separately and chains <code>invS &middot; invR &middot; invT</code>
+onto a copy of a reference tree; a <code>DeltaPosition</code> slider slides the inverted copies apart so you can see each
+stage.</p>
+
+<div class="api"><b>Where to look:</b> <code>4.6.InverseTransform/Assets/Source/Model/XformLoader.cs</code> — the
+  <code>ToShow</code> enum (<code>ShowInvT</code>, <code>ShowInvRT</code>, <code>ShowInvSRT</code>, <code>ShowTRS</code>)
+  and the three inverse constructions. Cycle <code>ToShow</code> and drag <code>DeltaPosition</code>.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3a</span>
+  <h3>Predict what each inverse undoes</h3>
+  <p>Cycle <code>ToShow</code> from <code>ShowTRS</code> through <code>ShowInvT</code>, <code>ShowInvRT</code>,
+  <code>ShowInvSRT</code>.</p>
+  <div class="predict"><b>Predict first:</b> the reversal rule is <code>(T&middot;R&middot;S)&#8315;&#185; =
+  S&#8315;&#185;&middot;R&#8315;&#185;&middot;T&#8315;&#185;</code> — undo in reverse order. Predict what
+  <code>invT &middot; TRS</code> leaves behind (translation gone, rotation + scale remain?), then
+  <code>invR &middot; invT &middot; TRS</code>, then the full <code>invS &middot; invR &middot; invT &middot; TRS</code>.
+  What pose should the last one land on?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3b</span>
+  <h3>Rotation inverse is a transpose</h3>
+  <p>The code inverts rotation with <code>Quaternion.AngleAxis(-rotAngle, rotAxis)</code> — same axis, negated angle.</p>
+  <div class="predict"><b>Predict first:</b> lecture said a rotation matrix is orthonormal, so <code>R&#8315;&#185; =
+  R&#7480;</code> (its transpose) — no division, no new trig. The code negates the angle instead; convince yourself on
+  paper these give the <b>same</b> matrix. Then predict: what does the "assuming no zeros" comment on the scale inverse
+  guard against, and what would <code>invS</code> do if a scale factor were <code>0</code>?</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<p>On paper, name the lecture idea each project demonstrates:</p>
+<table>
+  <tr><th>Project</th><th>What it shows</th><th>Lecture idea</th></tr>
+  <tr><td>4.5 TSvsST</td><td>same factors, opposite multiplication order</td><td></td></tr>
+  <tr><td>4.7 PivotedScaleRotate</td><td>rotate about a chosen point; pivot is the fixed point</td><td></td></tr>
+  <tr><td>4.6 InverseTransform</td><td>peel a transform apart in reverse order</td><td></td></tr>
+</table>
+
+<h2>4 · MP3 lab time</h2>
+<div class="box">
+  <p>The second half of studio is <b>dedicated MP3 work time</b>. Get MP3 open, make progress on your machine, and pull
+  the instructor over when you are stuck — this is the best help-per-minute of the week. Bring your specific blocker,
+  not "it does not work".</p>
+  <p>Use tonight's tools: build transforms as <code>Matrix4x4.TRS</code> (or by hand, column 3 = translation), compose
+  in the right order, and invert when you need to move a world-space point into an object's frame.</p>
+</div>
+
+<h2>5 · MP3a kickoff</h2>
+<div class="box">
+  <p><b>MP3a</b> (the next deliverable) goes out this week. Skim the write-up before you leave and post questions on the
+  Canvas discussion board. <b>Details, due dates, and points are on Canvas</b> (the single source of truth) — do not
+  rely on dates quoted anywhere else.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>TSvsST: you predicted and confirmed both x-positions, and can say which order Unity's <code>TRS</code> uses.</li>
+  <li>PivotedScaleRotate: you found the fixed point and predicted the arc radius for a moved pivot.</li>
+  <li>InverseTransform: you watched the full inverse chain snap a copy back to the identity pose.</li>
+  <li>You can state why column 3 of a pivoted rotation is not the pivot.</li>
+  <li>You made progress on MP3 and opened the MP3a write-up on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic4-Matrices). Stuck? Ask the instructor, who circulates during Thursday studio, or post on the Canvas
+  discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>

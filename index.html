@@ -134,6 +134,8 @@ const DEMOS = {
     desc:"drag a/b — arrows, projection, and a·b / |a| / |b| / θ / a×b panel" },
   "axis-angle": { title:"Axis-Angle Rotation: Rodrigues, Live",
     desc:"drag axis + angle — a cube spins about the axis; q and R panel update" },
+  "trs-order": { title:"Matrix Composition: Order Matters (T·R vs R·T)",
+    desc:"drag tx/ry — two cubes, same factors, opposite order; T·R and R·T panels" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -151,7 +153,9 @@ const SESSIONS = [
     lab:"sessions/S03-rotation-quaternions/lab03/index.html",
     demos:["axis-angle"] },
   { id:"S04", title:"Matrices &amp; Coordinate Spaces",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S04-matrices-spaces/index.html",
+    lab:"sessions/S04-matrices-spaces/lab04/index.html",
+    demos:["trs-order"] },
   { id:"S05", title:"Scene Graphs &amp; Hierarchical Modeling",
     deck:null, lab:null, demos:[] },
   { id:"S06", title:"3D Viewing: View &amp; Projection Matrices",
