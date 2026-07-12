@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 02 — Vectors, planes &amp; the in-front-of test</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 02 — Vectors, planes &amp; the in-front-of test</h1>
+  <div class="meta">Week 2 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture built the toolbox: a <b>vector is a displacement</b>, the <b>dot product</b> measures alignment
+(angle, projection, which side), and the <b>cross product</b> makes perpendicularity (a normal, an area, a frame).
+Today you turn that math into code in three exercises — <b>EX1</b> (vectors), <b>EX2</b> (plane), and
+<b>EX3</b> (in front of). Work at your own pace; the instructor is circulating.</p>
+
+<div class="box warn">
+  <b>The course rule is in force where each exercise says so.</b> Build from the <b>primitive</b> operations only:
+  <code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>.normalized</code>, <code>.magnitude</code>, component
+  access, and vector <code>+ - *</code>. Do <b>not</b> reach for <code>Transform.LookAt</code>,
+  <code>Vector3.Angle</code>, <code>Vector3.Project</code>, or any "do it for me" helper — building them <i>is</i> the
+  exercise.
+</div>
+
+<h2>0 · Get the exercise project</h2>
+<p>The three exercise skeletons are provided in the <b>course materials on Canvas</b>
+(<code>Topic3-InClassCodingExercises</code>). Download, unzip somewhere without spaces in the path, and add the folder
+in Unity Hub (<b>Projects → Add → Add project from disk</b>). Open it with the pinned editor
+(<code>6000.3.11f1</code>) from Lab 01.</p>
+<ul class="check">
+  <li>Project opens and compiles without errors.</li>
+  <li>You can see <code>EX1_VectorExercise.cs</code>, <code>EX2_PlaneExercise.cs</code>, and
+      <code>EX3_InfrontOfExercise.cs</code> under <code>Assets/</code>.</li>
+  <li>Each exercise is its own scene — open the matching scene before you press Play.</li>
+</ul>
+
+<h2>1 · EX1 — Vectors: march, aim, and fire</h2>
+<p><b>Goal.</b> Make an object march along a line, draw the two guide lines, and — when you press
+<b>Space</b> — launch a ball from the marcher straight at a moving target. This is the aim-line / traveling-ball
+pattern from lecture Part 1 and Part 5.</p>
+
+<div class="api"><b>Allowed API:</b> <code>a - b</code> (displacement), <code>v.normalized</code>,
+  <code>v.magnitude</code>, <code>v * scalar</code>, <code>Time.deltaTime</code>, <code>transform.localPosition</code>,
+  <code>Input.GetKeyDown</code>. <b>Not</b> <code>Vector3.MoveTowards</code> or <code>Vector3.Lerp</code> — do the
+  march yourself.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>March ObjA from p1 toward p2</h3>
+  <p>Each frame, move <code>ObjA</code> a step of <code>ObjASpeed * Time.deltaTime</code> along the direction from
+  <code>p1</code> to <code>p2</code>; when it reaches <code>p2</code>, restart at <code>p1</code>.</p>
+  <div class="predict"><b>Predict first:</b> the step is <code>speed * dt * (p2 - p1).normalized</code>. If you forget
+  <code>.normalized</code> and use the raw <code>(p2 - p1)</code>, does ObjA move faster, slower, or the same — and
+  does the answer depend on how far apart p1 and p2 are? Write your guess, then try it.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Aim and fire the projectile</h3>
+  <p>Inside the <code>if (Input.GetKeyDown(KeyCode.Space))</code> block, start the ball at ObjA's position and give it
+  an aim direction toward <code>Red</code>. Each frame while it is active, march it at <code>ProjectileSpeed</code>;
+  hide it when it reaches Red.</p>
+  <div class="predict"><b>Predict first:</b> you compute <code>aim = (Red.position - ObjA.position).normalized</code>
+  once, at fire time. Red keeps drifting after you fire. Will the ball still hit Red, or sail past where Red
+  <i>was</i>? What would you change to make it track?</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1c</span>
+  <h3>Implement <code>SetLine(p1, p2, cylinder)</code></h3>
+  <p>Draw a cylinder stretched from <code>p1</code> to <code>p2</code>. You need its <b>midpoint</b> (a position), its
+  <b>direction</b> (a unit displacement), and its <b>length</b> (a magnitude) to set the transform's position, up
+  vector, and y-scale.</p>
+  <div class="predict"><b>Predict first:</b> which of the three — midpoint, direction, length — comes from a
+  subtraction, which from <code>.normalized</code>, and which from <code>.magnitude</code>? Match them before you
+  write the function.</div>
+</div>
+
+<h2>2 · EX2 — Plane: draw it from a normal and D</h2>
+<p><b>Goal.</b> Display the white plane from its normal and <code>D</code>, and draw a cylinder standing along the
+plane's normal so you can see which way it faces. The plane convention (stated in the file) is
+<code>n · P = D</code>, i.e. <code>n · P − D = 0</code>.</p>
+
+<div class="api"><b>Allowed API:</b> <code>Vector3.Dot</code>, <code>v.normalized</code>,
+  <code>transform.up</code> / <code>transform.rotation</code>, <code>Quaternion.FromToRotation</code> (to point the
+  plane's up along the normal), component access. Reuse your <code>SetLine</code> from EX1 to draw the normal.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2a</span>
+  <h3>Orient the plane to its normal</h3>
+  <p>Rotate <code>WhitePlane</code> so its up axis points along <code>WhitePlaneNormal</code>, and offset it so it sits
+  the correct distance out (<code>D</code> along the unit normal).</p>
+  <div class="predict"><b>Predict first:</b> with <code>WhitePlaneNormal = (0, 1, 0)</code> and <code>D = 0</code>, where
+  does the plane sit? Now predict where it moves when you set <code>D = 3</code> with the same normal. Then set the
+  normal to <code>(1, 2, 2)</code> — before running, normalize it on paper (<code>|n| = 3</code>) and say which way it
+  tilts.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2b</span>
+  <h3>Draw the normal as a cylinder</h3>
+  <p>Use <code>SetLine</code> to draw a short cylinder from the plane's center along its unit normal, so the plane's
+  facing direction is visible.</p>
+  <div class="predict"><b>Predict first:</b> if you draw the cylinder along <code>WhitePlaneNormal</code> without
+  normalizing first, and the normal is <code>(1, 2, 2)</code>, will the cylinder be the right length, three times too
+  long, or point the wrong way? Why?</div>
+</div>
+
+<h2>3 · EX3 — In front of: the which-side test</h2>
+<p><b>Goal.</b> Given the white plane and a movable point <code>P</code>, color <code>P</code> <b>green</b> when it is
+in front of the plane (the normal's side) and <b>red</b> when it is behind. This is the sign of
+<code>n · P − D</code> from lecture Part 4.</p>
+
+<div class="api"><b>Allowed API:</b> <code>Vector3.Dot</code>, <code>WhitePlane.up</code> (the plane's normal),
+  <code>P.localPosition</code>, component access, and the color setter shown in the file
+  (<code>GetComponent&lt;Renderer&gt;().material.color</code>). One dot, one subtraction, one comparison — no more.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3a</span>
+  <h3>Compute the signed side</h3>
+  <p>Let <code>n = WhitePlane.up</code>. Build <code>D</code> from a known point on the plane (its position), then test
+  the sign of <code>Vector3.Dot(n, P.localPosition) - D</code> and set the color.</p>
+  <div class="predict"><b>Predict first:</b> before you move anything, predict the color for a point clearly above the
+  plane, then for one clearly below. Which sign is "front"? Drag <code>P</code> slowly through the plane and watch the
+  exact moment it flips.</div>
+</div>
+
+<div class="box warn">
+  <b>EX3 gotcha (from the file's own comment):</b> move the plane so its <code>localPosition</code> x, y, z are
+  <b>not all zero</b>. If the plane sits at the origin, <code>D = 0</code> and the test can look right for the wrong
+  reason — you would be testing <code>n · P</code> alone. A non-zero plane position is what actually exercises the
+  <code>− D</code> term.
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<p>On paper, name the lecture idea each exercise leans on:</p>
+<table>
+  <tr><th>Exercise</th><th>Core operation</th><th>Lecture Part</th></tr>
+  <tr><td>EX1 aim / march</td><td>displacement, normalize, scale-then-add</td><td></td></tr>
+  <tr><td>EX2 plane from n, D</td><td>the plane equation <code>n · P = D</code></td><td></td></tr>
+  <tr><td>EX3 which side</td><td>sign of <code>n · P − D</code></td><td></td></tr>
+</table>
+
+<h2>4 · MP2 kickoff</h2>
+<div class="box">
+  <p><b>MP2 (Machine Problem 2)</b> goes out this week and builds directly on tonight's vector math — the same
+  <b>implement-and-replace</b> discipline: build the query (aim, projection, or which-side) from
+  <code>Vector3.Dot</code>, <code>Vector3.Cross</code>, and <code>.normalized</code>, then check your result against
+  the engine's own helper.</p>
+  <p><b>MP1</b> (orientation) is <b>due this week</b> — submit it before you leave if you have not. <b>Details, due
+  dates, and points for both MP1 and MP2 are on Canvas</b> (the single source of truth). Skim the MP2 write-up before
+  you leave today and post questions on the Canvas discussion board.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>EX1: ObjA marches, the projectile aims and fires, and <code>SetLine</code> draws both guide lines.</li>
+  <li>EX2: the white plane orients to its normal and its normal is drawn.</li>
+  <li>EX3: the point turns green in front and red behind — verified by dragging it through the plane.</li>
+  <li>You used only the allowed primitive operations (no <code>LookAt</code> / <code>Project</code> / <code>Angle</code>).</li>
+  <li>You submitted MP1 and opened the MP2 write-up on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Exercise skeletons courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic3 in-class coding exercises). Stuck? Ask the instructor, who circulates during Thursday studio, or post on
+  the Canvas discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>

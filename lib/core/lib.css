@@ -45,6 +45,12 @@
   color: #8b93a7;
 }
 
+.cockpit .mat-panel td.value-label {
+  text-align: left;
+  color: #8b93a7;
+  font-weight: 600;
+}
+
 .cockpit .slider-row {
   display: flex;
   align-items: center;

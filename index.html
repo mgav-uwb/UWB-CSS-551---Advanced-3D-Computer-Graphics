@@ -130,6 +130,8 @@ const DEMOS = {
     desc:"drag tx/ry/s — cube view and matrix-panel view stay in sync" },
   "view-matrix": { title:"The View Matrix: Hand-Built, Glass Cockpit",
     desc:"az/el/dist sliders drive a hand-built lookAt; u/v/w rows exposed" },
+  "dot-cross": { title:"Dot &amp; Cross Products: Angle and Projection",
+    desc:"drag a/b — arrows, projection, and a·b / |a| / |b| / θ / a×b panel" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -139,7 +141,9 @@ const SESSIONS = [
     lab:"sessions/S01-graphics-systems-mvc/lab01/index.html",
     demos:["mvc-transform"] },
   { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S02-vectors-dot-cross/index.html",
+    lab:"sessions/S02-vectors-dot-cross/lab02/index.html",
+    demos:["dot-cross"] },
   { id:"S03", title:"Rotation: Axis-Angle, Quaternions, Gimbal Lock",
     deck:null, lab:null, demos:[] },
   { id:"S04", title:"Matrices &amp; Coordinate Spaces",
