@@ -138,6 +138,8 @@ const DEMOS = {
     desc:"drag tx/ry — two cubes, same factors, opposite order; T·R and R·T panels" },
   "scene-graph": { title:"Scene Graphs: A Hand-Built Base-Arm-Hand Chain",
     desc:"drag baseRy/armBend/handRy/armT — three flat boxes composed by matMul; W_base/W_arm/W_hand panel" },
+  "projection": { title:"Perspective Projection: Squeeze the Frustum",
+    desc:"drag fov/aspect/near/far — a third-person camera frustum; boxes inside stay bright; P + marked-box NDC panel" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -163,7 +165,9 @@ const SESSIONS = [
     lab:"sessions/S05-scene-graphs/lab05/index.html",
     demos:["scene-graph"] },
   { id:"S06", title:"3D Viewing: View &amp; Projection Matrices",
-    deck:null, lab:null, demos:["view-matrix"] },
+    deck:"sessions/S06-3d-viewing/index.html",
+    lab:"sessions/S06-3d-viewing/lab06/index.html",
+    demos:["view-matrix","projection"] },
   { id:"S07", title:"Polygonal Modeling",
     deck:null, lab:null, demos:[] },
   { id:"S08", title:"Texture Mapping",

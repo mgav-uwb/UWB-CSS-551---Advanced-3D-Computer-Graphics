@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 06 — CameraMatrices: build, break &amp; predict the view</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 06 — CameraMatrices: build, break &amp; predict the view</h1>
+  <div class="meta">Week 6 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture built the two matrices that turn a placed 3D world into pixels &mdash; the
+<b>view matrix</b> <code>V</code> (rows are the camera basis <code>u,v,w</code>; the translation is
+<code>&minus;basis&middot;eye</code>) and the <b>perspective matrix</b> <code>P</code> (divide by depth).
+Today you <b>run</b> Sung's <code>CameraMatrices</code> project, switch through all <b>five</b>
+<code>ViewMatrixMode</code> constructions, and <b>break</b> the view on purpose &mdash; predicting what
+each mode does <i>before</i> you press Play. The second half is <b>MP5 kickoff</b> &mdash; the
+camera-manipulation machine.</p>
+
+<div class="box warn">
+  <b>Predict before you run &mdash; every time.</b> The whole point of the studio is to catch the moment your mental model
+  and the screen disagree. If you press Play first, you have learned nothing. Say the answer out loud or jot it, then
+  run.
+</div>
+
+<h2>0 · Get the Topic6 projects</h2>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic6-3DViewing</code>). Download, unzip
+somewhere without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add project from
+disk</b>). Open with the pinned editor from Lab 01. Today's project:</p>
+<ul class="check">
+  <li><code>6.8.OurOwnProjMatrix</code> opens and compiles without errors.</li>
+  <li>Find <code>CameraMatrices.cs</code> under <code>Assets/Soruce/Model/</code> (note Sung's folder spelling,
+      <code>Soruce</code>).</li>
+  <li>Select the camera object; in its <code>CameraMatrices</code> component, locate the <code>ViewMatrixCompute</code>
+      dropdown (the five <code>ViewMatrixMode</code> values) and the <code>ProjectionMode</code> dropdown
+      (<code>Perspective</code> / <code>Orthographics</code>).</li>
+</ul>
+
+<h2>1 · Read the five view-matrix modes</h2>
+<p><b>Goal.</b> See that four of the five modes build the <i>same</i> view matrix by different routes, and one is
+deliberately wrong. Open <code>CameraMatrices.cs</code> and read the <code>switch (ViewMatrixCompute)</code> block:</p>
+<pre>ComputeFromScratch:  W = Cross(V,U); U = Cross(W,V); r.SetRow(0,W); r.SetRow(1,U); r.SetRow(2,V);
+SetMatrixRow:        r.SetRow(0,right); r.SetRow(1,up); r.SetRow(2,-forward);   // basis in the ROWS
+SetMatrixCol:        r.SetColumn(0,right); ...; r = r.inverse;                  // basis in COLUMNS, then invert
+UseTransformRotate:  r = TRS(0, localRotation, 1); r.SetColumn(2,-col2); r = r.inverse;
+ViewMatrixWrong:     break;   // r stays IDENTITY — no rotation at all</pre>
+
+<div class="api"><b>Why four match:</b> for a rotation matrix, "rows = basis" (<code>SetMatrixRow</code>) equals
+"columns = basis, then invert" (<code>SetMatrixCol</code>), because a rotation's inverse is its transpose. The other two
+reach the same place through Unity's <code>transform</code>. <code>ViewMatrixWrong</code> throws the basis away.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>Predict the four "correct" modes</h3>
+  <p>You will switch <code>ViewMatrixCompute</code> between the four non-wrong modes and watch the scene.</p>
+  <div class="predict"><b>Predict first:</b> the view matrix maps world &rarr; camera; all four correct modes build the
+  same rotation (basis as rows, or its transpose-inverse). Predict: as you switch <code>ComputeFromScratch</code> &rarr;
+  <code>SetMatrixRow</code> &rarr; <code>SetMatrixCol</code> &rarr; <code>UseTransformRotate</code>, does the rendered
+  image change at all? Write your prediction, then switch through all four and confirm the picture holds steady &mdash;
+  four routes, one matrix.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Row vs column, by hand</h3>
+  <p>On paper, write the camera basis as rows (<code>SetMatrixRow</code>) and as columns-then-inverted
+  (<code>SetMatrixCol</code>).</p>
+  <div class="predict"><b>Predict first:</b> for an orthonormal basis, the inverse is the transpose. Predict the
+  relationship between the row-form matrix and the column-form-inverted matrix (hint: they should be
+  <i>identical</i>). State why in one sentence, then confirm both dropdown choices render the same view.</div>
+</div>
+
+<h2>2 · Break it: ViewMatrixWrong</h2>
+<p><b>Goal.</b> Prove the basis rows are load-bearing by removing them. Switch <code>ViewMatrixCompute</code> to
+<code>ViewMatrixWrong</code> &mdash; the empty case that leaves the rotation as identity.</p>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2a</span>
+  <h3>Predict what "wrong" looks like</h3>
+  <p>With no basis in the rotation, only the <code>&minus;position</code> translation survives.</p>
+  <div class="predict"><b>Predict first:</b> the camera still sits at the right place (the translation is intact) but
+  never rotates to face the target &mdash; it stares down world <code>&minus;z</code> forever. Predict what the scene
+  looks like: is anything on screen? Is it aimed at the objects, or off to the side? Sketch it, then switch to
+  <code>ViewMatrixWrong</code> and compare. This is the moment the cross products prove they were doing something.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2b</span>
+  <h3>Re-aim and confirm the failure</h3>
+  <p>Still in <code>ViewMatrixWrong</code>, rotate the camera object (change where it points) in the Scene view.</p>
+  <div class="predict"><b>Predict first:</b> a correct view matrix would re-frame the scene as you turn the camera. In
+  <code>ViewMatrixWrong</code>, the rendered image should <i>not</i> respond to aiming, because the rotation is thrown
+  away. Predict: does turning the camera change the picture? Confirm, then switch back to
+  <code>ComputeFromScratch</code> and watch aiming work again &mdash; that difference is exactly the
+  <code>SetRow</code>-of-the-basis lines.</div>
+</div>
+
+<h2>3 · Projection: perspective vs orthographic</h2>
+<p><b>Goal.</b> Connect the <code>fov</code>/<code>near</code>/<code>far</code> sliders to the frustum you squeezed in
+Tuesday's demo, and see the divide-by-depth appear and disappear. In the camera component, switch
+<code>ProjectionMode</code> and edit the camera's Field of View / clip planes.</p>
+
+<div class="api"><b>Where to look:</b> <code>CameraMatrices.cs</code> builds <code>Matrix4x4.Perspective(fov, aspect,
+  near, far)</code> for <code>Perspective</code> and <code>Matrix4x4.Ortho(...)</code> for <code>Orthographics</code>,
+  then <code>Shader.SetGlobalMatrix("CameraProjMatrix", p)</code>. The companion <code>6.4.DrawCameraFrustum</code>
+  draws the frustum with corner height <code>2&middot;near&middot;tan(fov/2)</code> &mdash; the same formula the
+  lecture demo used.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3a</span>
+  <h3>Predict the frustum squeeze</h3>
+  <p>Stay in <code>Perspective</code>. Widen the camera's Field of View, then push the near clip plane outward.</p>
+  <div class="predict"><b>Predict first:</b> widening <code>fov</code> flares the frustum (more of the scene fits, objects
+  look smaller); pushing <code>near</code> out slices off close geometry. Predict which objects appear or disappear for
+  each edit, then make the edits and confirm. Relate the near-plane slice to Tuesday's marked box flipping from INSIDE
+  to OUTSIDE.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3b</span>
+  <h3>Predict: perspective vs orthographic</h3>
+  <p>Switch <code>ProjectionMode</code> from <code>Perspective</code> to <code>Orthographics</code>.</p>
+  <div class="predict"><b>Predict first:</b> perspective divides by depth, so far objects shrink and parallel lines
+  converge; orthographic does <i>not</i> divide, so size is constant and parallels stay parallel. Predict how the same
+  scene looks different under the two modes (which one looks like a CAD drawing?). Switch and confirm, then explain in
+  one sentence which matrix entry &mdash; the <code>&minus;1</code> in the perspective w-row &mdash; causes the
+  divide.</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<p>On paper, name the lecture idea each mode demonstrates:</p>
+<table>
+  <tr><th>Mode / setting</th><th>What it shows</th><th>Lecture idea</th></tr>
+  <tr><td>the four correct <code>ViewMatrixMode</code>s</td><td>same view, different construction</td><td></td></tr>
+  <tr><td><code>ViewMatrixWrong</code></td><td>no rotation &rarr; camera never aims</td><td></td></tr>
+  <tr><td><code>Perspective</code> vs <code>Orthographics</code></td><td>divide by depth, or not</td><td></td></tr>
+</table>
+
+<h2>4 · MP5 kickoff &mdash; the camera-manipulation machine</h2>
+<div class="box">
+  <p><b>MP5</b> is the <b>camera-manipulation machine problem</b> &mdash; interactive camera controls built on the
+  <code>eye</code>/<code>at</code>/<code>up</code> frame and the view matrix you built Tuesday. The three moves are the
+  ones from lecture:</p>
+  <ul>
+    <li><b>tumble</b> (orbit) &mdash; swing <code>eye</code> around <code>at</code> on a sphere (azimuth + elevation)</li>
+    <li><b>track</b> (pan) &mdash; slide <code>eye</code> and <code>at</code> together, sideways</li>
+    <li><b>dolly</b> &mdash; move <code>eye</code> toward / away from <code>at</code> along the sightline</li>
+  </ul>
+  <p>Each move edits the frame, then rebuilds <code>V</code> &mdash; exactly <code>lookAtBasis</code> from lecture. Sung's
+  <code>6.3.Tumble</code> <code>CameraManipulation</code> shows one of them (a pivot sandwich orbiting the eye about the
+  target); open it and trace how it moves <code>eye</code>, then re-aims.</p>
+  <p>Get MP5 open now and make a start: sketch which mouse gesture drives which move, decide how each gesture changes
+  <code>eye</code>/<code>at</code>, and wire the first control (tumble is the natural first). Pull the instructor over with
+  a <i>specific</i> blocker &mdash; this is the best help-per-minute of the week.</p>
+  <p><b>Details, requirements, due dates, and points are on Canvas</b> (the single source of truth) &mdash; do not rely
+  on anything quoted elsewhere.</p>
+</div>
+
+<h2>5 · MP4</h2>
+<div class="box">
+  <p><b>MP4 is due</b> this week. Before you dive into MP5, make sure it is submitted on Canvas. If you are stuck, this
+  studio is the place to ask.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>You switched all four correct <code>ViewMatrixMode</code>s and confirmed they render the same view.</li>
+  <li>You can say why "rows = basis" equals "columns = basis, then invert" for a rotation.</li>
+  <li>You broke the view with <code>ViewMatrixWrong</code> and predicted (then saw) the camera stop aiming.</li>
+  <li>You squeezed the frustum with <code>fov</code>/<code>near</code> and compared <code>Perspective</code> to
+      <code>Orthographics</code>.</li>
+  <li>You opened MP5, sketched the tumble/track/dolly controls, and submitted MP4 on Canvas.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic6-3DViewing). Stuck? Ask the instructor, who circulates during Thursday studio, or post on the Canvas discussion
+  board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>
