@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 08 — Texture studio &amp; MP6 lab time</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  .time{display:inline-block;background:#181b24;border:1px solid var(--line);border-radius:6px;
+        color:var(--accent2);font-size:12.5px;font-weight:700;padding:2px 9px;margin-left:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 08 — Texture studio &amp; MP6 lab time</h1>
+  <div class="meta">Week 8 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture turned a bare mesh into a textured one: a <b>UV coordinate</b> per vertex, a
+<b>3&times;3 matrix</b> that places the image, a <b>sampler</b> that reads a color back, and a
+<b>procedural</b> texture that is pure math. Today has two halves. <b>First</b>, you run Sung's real
+<code>Topic8</code> texture projects: read the UVs, place the image by hand, blend two textures, and
+inspect the procedural checker. <b>Second</b>, dedicated <b>MP6 lab time</b> &mdash; its
+texture-placement part is exactly Tuesday's Part 3, on your own mesh.</p>
+
+<div class="box warn">
+  <b>Predict before you run &mdash; every time.</b> Each placement poke below asks you to state what the
+  offset / rotation / tile will do <i>before</i> you press Play. The point is to catch the moment your
+  mental model and the screen disagree &mdash; that gap is where the learning is.
+</div>
+
+<h2>Part A · Texture studio <span class="time">~55 min</span></h2>
+
+<h3>0 · Get the Topic8 projects</h3>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic8-TextureMapping</code>). Download,
+unzip somewhere without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add
+project from disk</b>). Open with the pinned editor from Lab 01. Today's projects:</p>
+<ul class="check">
+  <li><code>8.1.UVOnVertices</code>, <code>8.2.OurOwnTexturePlacement</code>,
+      <code>8.6.MultiTexturing</code>, and <code>8.7.SynthesizedTextures</code> each open and compile
+      without errors.</li>
+  <li>In each, find <code>MyMesh.cs</code> (and, where present, <code>TexturePlacement.cs</code> /
+      <code>CheckerTexture.cs</code> and the <code>.shader</code> file) under <code>Assets/</code>.</li>
+</ul>
+
+<h3>1 · Read the per-vertex UVs</h3>
+<p><b>Goal.</b> Confirm the 9 UVs on paper match the code. Open
+<code>8.1.UVOnVertices/Assets/MyMesh.cs</code> and read the <code>uv[0..8]</code> assignments beside the
+<code>v[0..8]</code> positions.</p>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>Match the UVs to the grid</h3>
+  <p>On paper, draw the 3&times;3 lattice from lecture and label each corner with its <code>uv[i]</code>.</p>
+  <div class="predict"><b>Predict first:</b> the mapping is <code>(u,v) = (col/2, row/2)</code>, so the four
+  grid corners take the four corners of the unit square and the center vertex <code>v4</code> takes
+  <code>(0.5, 0.5)</code>. Predict <code>uv[4]</code> and <code>uv[8]</code> before you read them, then
+  confirm against the array.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Interpolation between corners</h3>
+  <p>Only the corners carry UVs; the rasterizer interpolates the rest.</p>
+  <div class="predict"><b>Predict first:</b> the spatial midpoint of edge <code>(0,3)</code> &mdash; halfway
+  from <code>v0</code> to <code>v3</code> &mdash; samples the texture at which <code>(u,v)</code>? (Average
+  the two endpoint UVs.) Predict it, then reason about what that point of the image looks like on the
+  rendered floor.</div>
+</div>
+
+<h3>2 · Place the image by hand</h3>
+<p><b>Goal.</b> See offset and tiling as a UV transform. Open <code>8.2.OurOwnTexturePlacement</code> and
+read <code>TexturePlacement.cs</code>: each frame it multiplies the saved UVs by <code>Scale</code> and adds
+<code>Offset</code>. Select the mesh in the Inspector to expose those two fields.</p>
+
+<div class="api"><b>Where to look:</b> <code>TexturePlacement.cs</code> saves the authored UVs in
+<code>mInitUV</code>, then every <code>Update()</code> sets <code>uv[i] = Offset + mInitUV[i] * Scale</code>.
+<code>Scale</code> is the tile factor; <code>Offset</code> slides the image. (This version scales about the
+<i>corner</i>, no rotation &mdash; the lecture's <code>uvMat3</code> adds the center sandwich and a rotation.)</p>
+
+<div class="step">
+  <span class="tag">POKE 2a &middot; OFFSET</span>
+  <h3>Slide the image</h3>
+  <p>Set <code>Offset</code> to <code>(0.25, 0)</code> and run.</p>
+  <div class="predict"><b>Predict first:</b> adding <code>0.25</code> to every <code>u</code> shifts the image
+  by a quarter of one copy along U. Predict which way the picture slides and by how much, then run and
+  confirm. (Which lecture matrix cell does this offset live in?)</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 2b &middot; TILE</span>
+  <h3>Repeat the image</h3>
+  <p>Set <code>Scale</code> to <code>(2, 2)</code>, then <code>(6, 6)</code>. Make sure the texture's wrap
+  mode is <b>Repeat</b> (Inspector &rarr; the texture asset).</p>
+  <div class="predict"><b>Predict first:</b> scaling the UVs by 2 makes the image fit <i>twice</i> on each
+  axis (repeat wrap turns the extra range into copies); by 6, six times. Predict how many copies you will see
+  at <code>Scale = (6,6)</code>, and predict what happens if the wrap mode is <b>Clamp</b> instead. Run both
+  and confirm.</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 2c &middot; ROTATE (on our demo)</span>
+  <h3>Spin about the center</h3>
+  <p><code>TexturePlacement.cs</code> has no rotation, so use the lecture demo (the <code>uv-placement</code>
+  sandbox on the course hub, with the <code>rot</code> slider). Set <code>tile = 2</code>, <code>rot = 45&deg;</code>,
+  <code>offU = 0.25</code>.</p>
+  <div class="predict"><b>Predict first:</b> the placement matrix should read
+  <code>[1.41, 1.41, -0.66 / -1.41, 1.41, 0.50 / 0.00, 0.00, 1.00]</code> (as the panel displays it, from lecture).
+  Predict the diagonal value from <code>2 &middot; cos45&deg;</code> before you look, then read the panel and
+  check every cell. Does the checker spin about its <i>center</i> or a corner?</div>
+</div>
+
+<h3>3 · Blend two textures</h3>
+<p><b>Goal.</b> See multi-texturing. Open <code>8.6.MultiTexturing</code> and read the fragment shader
+(<code>Assets/Materals/451NoCullShader.shader</code>): it samples <code>_MainTex</code> and <code>_SecTex</code>
+and blends them.</p>
+
+<div class="step">
+  <span class="tag">POKE 3a</span>
+  <h3>Change the blend weights</h3>
+  <p>Find the line <code>col = 0.2 * col + 0.8 * c2;</code> in <code>frag</code>.</p>
+  <div class="predict"><b>Predict first:</b> the fragment is 20% the first texture, 80% the second. Predict
+  what the surface looks like if you swap the weights to <code>0.8 / 0.2</code>, then edit, save, and confirm.
+  What blend weights would show <i>only</i> the second texture?</div>
+</div>
+
+<h3>4 · Inspect the procedural checker</h3>
+<p><b>Goal.</b> See a texture that is pure math. Open <code>8.7.SynthesizedTextures</code>; read
+<code>CheckerTexture.cs</code> (it pushes <code>URepeat</code>, <code>VRepeat</code>, <code>Color1</code>,
+<code>Color2</code> to the material) and the checker block in the shader.</p>
+
+<div class="step">
+  <span class="tag">POKE 4a</span>
+  <h3>Predict the checker from the math</h3>
+  <p>Read the shader lines that compute <code>scaledU</code>, <code>scaledV</code>, and the parity test
+  <code>if (uEven != vEven)</code>.</p>
+  <div class="predict"><b>Predict first:</b> the color is picked by the parity of
+  <code>floor(u &middot; URepeat) + floor(v &middot; VRepeat)</code>. Predict how many checker squares appear at
+  <code>URepeat = VRepeat = 4</code>, then set them and confirm. No image is loaded &mdash; where do the
+  colors come from?</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<table>
+  <tr><th>Project / action</th><th>What it shows</th><th>Lecture part</th></tr>
+  <tr><td><code>8.1.UVOnVertices</code></td><td>one UV per vertex, <code>(col/2, row/2)</code></td><td>Part 2</td></tr>
+  <tr><td><code>8.2.OurOwnTexturePlacement</code></td><td>offset + tile = a UV transform</td><td>Part 3</td></tr>
+  <tr><td><code>8.6.MultiTexturing</code></td><td>blend two samplers per fragment</td><td>Part 4</td></tr>
+  <tr><td><code>8.7.SynthesizedTextures</code></td><td>procedural checker = math &rarr; color</td><td>Part 5</td></tr>
+</table>
+
+<h2>Part B · MP6 lab time <span class="time">~45 min</span></h2>
+
+<div class="box">
+  <p><b>MP6</b> (the polygonal-modeling editor, out last week) has a <b>texture-placement</b> part &mdash;
+  exactly Tuesday's Part 3, applied to your own mesh. Use this block to get it working with the instructor
+  in the room.</p>
+  <p><b>Requirements, due dates, and points are on Canvas</b> (the single source of truth). Nothing new is
+  due today and nothing new goes out &mdash; this is work time on the assignment you already have.</p>
+</div>
+
+<div class="step">
+  <span class="tag">FOCUS</span>
+  <h3>Get placement working on your mesh</h3>
+  <ul>
+    <li>Assign a sensible UV per vertex (the <code>(col/2, row/2)</code> pattern generalizes to your n&times;n grid).</li>
+    <li>Wire up offset / rotation / tile controls that build a placement transform &mdash; the same three
+        knobs as the lecture demo.</li>
+    <li>Verify with a known case: at <code>tile = 2</code>, offset 0, rotation 0, your texture should repeat
+        exactly twice per axis (repeat wrap). If it does not, check the wrap mode and the scale.</li>
+  </ul>
+  <div class="api"><b>Pull the instructor over</b> with a <i>specific</i> question &mdash; "my tiling repeats
+  the wrong number of times" or "my rotation spins about the corner, not the center." A specific question is
+  the best help-per-minute of the week.</div>
+</div>
+
+<div class="step">
+  <span class="tag">STRETCH</span>
+  <h3>If placement already works</h3>
+  <div class="predict"><b>Try:</b> make your rotation spin about the texture <i>center</i> (the
+  <code>T(c) &middot; R &middot; T(-c)</code> sandwich), not the corner. Predict the difference on screen
+  before you change the code, then confirm the image spins in place rather than swinging away.</div>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>You matched <code>8.1</code>'s 9 UVs to the grid and predicted the edge-midpoint interpolation.</li>
+  <li>You slid, tiled, and (on the demo) rotated the texture in <code>8.2</code> / the sandbox, predicting each result first.</li>
+  <li>You changed the blend weights in <code>8.6</code> and inspected the procedural checker math in <code>8.7</code>.</li>
+  <li>You spent MP6 lab time getting texture placement working on your own mesh, and verified the tile-2 case.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic8-TextureMapping). Stuck? Ask the instructor, who circulates during Thursday studio, or post on the
+  Canvas discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>

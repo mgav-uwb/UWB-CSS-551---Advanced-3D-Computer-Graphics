@@ -142,6 +142,8 @@ const DEMOS = {
     desc:"drag fov/aspect/near/far — a third-person camera frustum; boxes inside stay bright; P + marked-box NDC panel" },
   "mesh-grid": { title:"Mesh Grids: Hand-Built Vertices, Indices, Normals",
     desc:"drag n/lift — an n×n quad grid built by hand; counts (n+1)²/2n²/6n² + first-two-triangle triples; wireframe + normals" },
+  "uv-placement": { title:"Texture Placement: The UV Matrix, Live",
+    desc:"drag offU/offV/rot/tile — a checker on a quad placed by our uvMat3; the live 3×3 texture.matrix panel" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -175,7 +177,9 @@ const SESSIONS = [
     lab:"sessions/S07-polygonal-modeling/lab07/index.html",
     demos:["mesh-grid"] },
   { id:"S08", title:"Texture Mapping",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S08-texture-mapping/index.html",
+    lab:"sessions/S08-texture-mapping/lab08/index.html",
+    demos:["uv-placement"] },
   { id:"S09", title:"Illumination",
     deck:null, lab:null, demos:[] },
   { id:"S10", title:"The Rendering Equation, PBR &amp; Neural Rendering",
