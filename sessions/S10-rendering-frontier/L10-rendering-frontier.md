@@ -474,7 +474,7 @@ To make a pixel, **march a ray** from the camera through the field and **accumul
 
 ## A real splat scene, live
 
-<div class="cockpit" data-demo="gsplat" data-controls="orbitAz,dist"><pre class="viz-fallback">  a real 3D Gaussian Splatting scene, rendered live: ~240,000 translucent
+<div class="cockpit" data-demo="gsplat" data-controls="fov"><pre class="viz-fallback">  a real 3D Gaussian Splatting scene, rendered live: ~240,000 translucent
   3D Gaussians, projected and blended back-to-front — a rasterizer, in your
   browser. Drag orbitAz to orbit; dist to move in/out. Notice the soft,
   translucent edges — no triangle mesh, no textures; just fuzzy blobs.
