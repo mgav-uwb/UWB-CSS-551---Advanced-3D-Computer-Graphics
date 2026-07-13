@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 09 — Shader studio &amp; FP progress demos</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  .time{display:inline-block;background:#181b24;border:1px solid var(--line);border-radius:6px;
+        color:var(--accent2);font-size:12.5px;font-weight:700;padding:2px 9px;margin-left:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 09 — Shader studio &amp; FP progress demos</h1>
+  <div class="meta">Week 9 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop</div>
+</header>
+
+<p>Tuesday's lecture shaded a surface from three directions: the light <b>L</b>, the normal <b>N</b>,
+and the eye <b>V</b>, summed into <b>diffuse</b> (<code>max(0, N&middot;L)</code>), <b>specular</b>
+(<code>max(0, R&middot;V)^s</code>), and a constant <b>ambient</b> floor. Today has two halves.
+<b>First</b>, you run Sung's real <code>Topic9</code> illumination shaders: visualize the normal, read the
+diffuse cosine, and tweak the spotlight cone. <b>Second</b>, <b>Final Project progress demos</b> &mdash; each
+team shows where they are, in a short timed slot, and gets fast feedback.</p>
+
+<div class="box warn">
+  <b>Predict before you run &mdash; every time.</b> Each shader poke below asks you to state what the normal,
+  the light angle, or the cone will do <i>before</i> you press Play. The gap between your prediction and the
+  screen is where the learning is.
+</div>
+
+<h2>Part A · Shader studio <span class="time">~50 min</span></h2>
+
+<h3>0 · Get the Topic9 projects</h3>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic9-Illumination</code>). Download,
+unzip somewhere without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add
+project from disk</b>). Open with the pinned editor from Lab 01. Today's projects:</p>
+<ul class="check">
+  <li><code>9.2.AnalyzingTheNormal</code>, <code>9.3.DiffuseIllumination</code>, and
+      <code>9.4.PointLightSource</code> each open and compile without errors.</li>
+  <li>In each, find <code>451NoCullShader.shader</code> under <code>Assets/Materals/</code> (and, in
+      <code>9.4</code>, <code>PointLight.cs</code> / <code>LoadLight.cs</code> under <code>Assets/</code>).</li>
+</ul>
+
+<h3>1 · Visualize the normal</h3>
+<p><b>Goal.</b> See the normal the lighting depends on, and see why a wrong one wrecks shading. Open
+<code>9.2.AnalyzingTheNormal</code>. In <code>451NoCullShader.shader</code>, find the commented debug line in
+<code>frag</code> that returns the normal as a color: <code>return fixed4(i.normal, 1);</code>.</p>
+
+<div class="step">
+  <span class="tag">POKE 1a &middot; NORMAL AS COLOR</span>
+  <h3>Paint the normals</h3>
+  <p>Uncomment the <code>return fixed4(i.normal, 1);</code> line (comment out the normal shading return), save,
+  and look at the surface: each pixel's color is its world-space normal.</p>
+  <div class="predict"><b>Predict first:</b> a face whose normal points along <code>+x</code> shows up reddish,
+  along <code>+y</code> greenish, along <code>+z</code> bluish (the normal's components are the r,g,b). Predict
+  which color the top of the model takes before you look, then confirm. Where the color changes smoothly, the
+  normal is turning smoothly.</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 1b &middot; THE NORMAL TRANSFORM</span>
+  <h3>Read the hand normal-transform</h3>
+  <p>In the vertex stage, read the block that builds <code>o.normal</code> from
+  <code>v.vertex + v.normal</code> pushed through <code>UNITY_MATRIX_M</code> and subtracted &mdash; with the
+  comment "<i>we don't have access to inverse-transpose</i>".</p>
+  <div class="predict"><b>Predict first:</b> lecture said normals need the inverse-transpose
+  <code>(M&#8315;&sup1;)&#7488;</code>, not <code>M</code>. This shader lacks it, so it transforms a point and a
+  point-plus-normal by the <i>same</i> <code>M</code> and subtracts to recover the direction. Predict: for a
+  pure <i>rotation</i>, does this give the right normal? For a non-uniform <i>scale</i>, is it exact or
+  approximate? Reason it out, then discuss with a neighbor.</div>
+</div>
+
+<h3>2 · Read the diffuse term</h3>
+<p><b>Goal.</b> Confirm <code>max(0, N&middot;L)</code> on a real surface. Open
+<code>9.3.DiffuseIllumination</code> and read <code>ComputeDiffuse</code>: it returns
+<code>clamp(dot(i.normal, l), 0, 1)</code> &mdash; exactly the clamped cosine from lecture.</p>
+
+<div class="api"><b>Where to look:</b> <code>ComputeDiffuse</code> builds <code>l = normalize(LightPosition -
+i.vertexWC)</code> (the direction to the light, our <b>L</b>) and returns <code>clamp(dot(i.normal, l), 0,
+1)</code>. That <code>clamp(&hellip;, 0, 1)</code> is the lecture's <code>max(0, N&middot;L)</code> &mdash; back
+faces get zero.</div>
+
+<div class="step">
+  <span class="tag">POKE 2a &middot; MOVE THE LIGHT</span>
+  <h3>Watch the falloff</h3>
+  <p>Select the light object and move it around the surface (or rotate the surface).</p>
+  <div class="predict"><b>Predict first:</b> the surface is brightest where it faces the light
+  (<code>N&middot;L</code> near 1) and fades to black as it turns past 90&deg; (the <code>clamp</code> pins it
+  at 0). Predict where the dark terminator line falls for a given light position, then move the light and
+  confirm the gradient is smooth, not a hard edge. (Recall the lecture number: at the marked point with the
+  default light, <code>N&middot;L = 0.988</code>.)</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 2b &middot; BREAK THE CLAMP</span>
+  <h3>Remove the max, see the bug</h3>
+  <p>Temporarily change <code>clamp(dot(i.normal, l), 0, 1)</code> to just <code>dot(i.normal, l)</code> (no
+  lower clamp). Save and look at the back-facing side.</p>
+  <div class="predict"><b>Predict first:</b> without the <code>max(0, &middot;)</code>, back faces have a
+  <i>negative</i> <code>N&middot;L</code>. Predict what a negative diffuse looks like on screen (and why it is
+  wrong), then confirm. Restore the <code>clamp</code> afterward.</div>
+</div>
+
+<h3>3 · Tweak the spotlight cone</h3>
+<p><b>Goal.</b> See a spotlight as diffuse &times; an angular mask. Open <code>9.4.PointLightSource</code> and
+read <code>ComputeDiffuse</code>: it computes <code>alpha = acos(dot(l, LightDirection))</code> (the angle to
+the spot's aim) and fades between <code>_MinTheta</code> and <code>_MaxTheta</code> with
+<code>smoothstep</code>, then returns <code>ndotl * strength</code>.</p>
+
+<div class="api"><b>Where to look:</b> <code>PointLight.cs</code> pushes <code>LightPosition</code>,
+<code>LightColor</code>, <code>LightDirection</code>, <code>SlightPos</code>, <code>Near</code>/<code>Far</code>
+into shader globals via <code>LoadLightToShader()</code>; <code>LoadLight.cs</code> calls it every frame. The
+<code>_MinTheta</code> / <code>_MaxTheta</code> cone angles are exposed on the material in the Inspector.</div>
+
+<div class="step">
+  <span class="tag">POKE 3a &middot; CONE WIDTH</span>
+  <h3>Widen and narrow the beam</h3>
+  <p>Select the material and change <code>_MaxTheta</code> (the outer cone). Try a small value, then a larger
+  one.</p>
+  <div class="predict"><b>Predict first:</b> <code>alpha</code> is the angle from the beam center;
+  <code>strength</code> is full inside <code>_MinTheta</code>, zero past <code>_MaxTheta</code>, and a
+  <code>smoothstep</code> fade between. Predict what raising <code>_MaxTheta</code> does to the lit circle's
+  <i>size</i>, and what widening the gap <code>_MaxTheta - _MinTheta</code> does to its <i>edge</i>
+  (soft vs hard). Then adjust both and confirm.</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 3b &middot; THE MASKED DIFFUSE</span>
+  <h3>Diffuse times the cone</h3>
+  <p>The function returns <code>ndotl * strength</code> &mdash; the ordinary diffuse cosine multiplied by the
+  cone mask.</p>
+  <div class="predict"><b>Predict first:</b> a point can be inside the cone (<code>strength = 1</code>) yet
+  still dark if it faces away from the light (<code>ndotl = 0</code>). Predict what the surface looks like where
+  the cone hits a steeply-angled face, then find such a spot and confirm. Which lecture term is
+  <code>ndotl</code>? Which is <code>strength</code>?</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<table>
+  <tr><th>Project / action</th><th>What it shows</th><th>Lecture part</th></tr>
+  <tr><td><code>9.2.AnalyzingTheNormal</code></td><td>the normal as color; the hand normal-transform</td><td>Part 2</td></tr>
+  <tr><td><code>9.3.DiffuseIllumination</code></td><td><code>max(0, N&middot;L)</code>, the clamped cosine</td><td>Part 2</td></tr>
+  <tr><td><code>9.4.PointLightSource</code></td><td>point light plumbing + spot cone (<code>acos</code> + <code>smoothstep</code>)</td><td>Part 4</td></tr>
+</table>
+
+<div class="box">
+  <p><b>Prefer the browser demo?</b> The lecture's <code>illumination</code> sandbox (on the course hub) shows
+  the live <code>N&middot;L</code>, <code>R&middot;V</code>, diffuse, and specular numbers at a marked point as
+  you swing the light and change the shininess &mdash; use it to reconcile the shader behavior with the exact
+  worked numbers (<code>N&middot;L = 0.988</code>, <code>R&middot;V = 0.879</code>, specular
+  <code>= 0.879^30 = 0.021</code> at the default light).</p>
+</div>
+
+<h2>Part B · Final Project progress demos <span class="time">~50 min</span></h2>
+
+<div class="box">
+  <p>Each team gives a short, <b>timed</b> progress demo of its Final Project and gets rapid feedback from the
+  room. This is a checkpoint, not a final grade &mdash; the goal is to surface blockers early and trade ideas
+  while there is still time to act on them.</p>
+  <p><b>The running order, per-team timebox, and the feedback form are on Canvas</b> (the single source of
+  truth). <b>MP6 is also due this week &mdash; dates, points, and requirements are on Canvas.</b> Nothing about
+  scheduling or grading is invented here.</p>
+</div>
+
+<h3>Running order &amp; timing</h3>
+<ul>
+  <li><b>Order &amp; timebox:</b> see the <b>Canvas</b> running order &mdash; teams present in that sequence,
+      each within its posted time slot. Watch the clock; a hard timebox keeps every team on the schedule.</li>
+  <li><b>Split your slot</b> roughly: most of it <i>showing something running</i>, a little setup, and leave
+      room at the end for feedback.</li>
+  <li><b>Feedback:</b> while each team presents, the others fill in the <b>Canvas feedback form</b> &mdash; one
+      concrete strength, one concrete suggestion. Specific beats polite.</li>
+</ul>
+
+<div class="step">
+  <span class="tag">PRESENTERS</span>
+  <h3>What to show in your slot</h3>
+  <ul>
+    <li><b>Show it running</b> &mdash; even a rough, partial build beats slides. Lead with the thing that
+        works.</li>
+    <li><b>Name your current blocker</b> &mdash; the one problem you would most like help with. The room is
+        your rubber duck.</li>
+    <li><b>State what is next</b> &mdash; the concrete next step you will take before the project is due.</li>
+  </ul>
+  <div class="api"><b>Tie it to the course:</b> if your project shades surfaces, say which lighting terms you
+  use (diffuse? specular? how many lights?) and where your normals come from &mdash; exactly tonight's Part 2
+  and Part 3. A specific technical question gets you the best help of the week.</div>
+</div>
+
+<div class="step">
+  <span class="tag">AUDIENCE</span>
+  <h3>How to give useful feedback</h3>
+  <div class="predict"><b>For each team, on the Canvas form:</b> one thing that clearly <i>works</i> (be
+  specific &mdash; "the camera control feels smooth," not "nice job") and one <i>actionable</i> suggestion
+  ("try clamping the diffuse &mdash; the back faces look wrong"). Vague praise helps no one; a concrete
+  pointer might unblock a team.</div>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>You visualized the normal in <code>9.2</code> and reasoned about the hand normal-transform.</li>
+  <li>You read <code>max(0, N&middot;L)</code> in <code>9.3</code> and saw what breaks without the clamp.</li>
+  <li>You tweaked the spotlight cone in <code>9.4</code> and identified which term is the diffuse and which is
+      the mask.</li>
+  <li>Your team gave its timed FP progress demo, and you submitted feedback on Canvas for the other teams.</li>
+  <li>You checked Canvas for the MP6 due date and requirements.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic9-Illumination). Stuck? Ask the instructor, who circulates during Thursday studio, or post on the
+  Canvas discussion board; Canvas has due dates, the FP running order, and office hours.
+</footer>
+</body>
+</html>
