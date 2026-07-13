@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 07 — MyMesh studio &amp; Final Project proposal workshop</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  .time{display:inline-block;background:#181b24;border:1px solid var(--line);border-radius:6px;
+        color:var(--accent2);font-size:12.5px;font-weight:700;padding:2px 9px;margin-left:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 07 — MyMesh studio &amp; Final Project proposal workshop</h1>
+  <div class="meta">Week 7 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop and a half-formed project idea</div>
+</header>
+
+<p>Tuesday's lecture built a triangle mesh <b>by hand</b> &mdash; a <b>vertex array</b> plus an
+<b>index array</b> of triangle triples, with <b>normals</b> computed as averaged cross products.
+Today has two halves. <b>First</b>, you run Sung's real <code>MyMesh</code> projects: read the
+hand-built arrays, turn on averaged normals, and drag a vertex to see geometry and normals move
+together. <b>Second</b>, the <b>Final Project proposal workshop</b> &mdash; brainstorm, pitch,
+peer-review, and revise a one-paragraph proposal.</p>
+
+<div class="box warn">
+  <b>Predict before you run &mdash; every time.</b> In the studio half, say (or jot) what you expect the code
+  to do <i>before</i> you press Play. The point is to catch the moment your mental model and the screen disagree.
+</div>
+
+<h2>Part A · MyMesh studio <span class="time">~50 min</span></h2>
+
+<h3>0 · Get the Topic7 projects</h3>
+<p>The projects are in the <b>course materials on Canvas</b> (<code>Topic7-PolygonalModeling</code>). Download,
+unzip somewhere without spaces in the path, and add each folder in Unity Hub (<b>Projects &rarr; Add &rarr; Add project
+from disk</b>). Open with the pinned editor from Lab 01. Today's projects:</p>
+<ul class="check">
+  <li><code>7.3.Simple2x2Mesh</code>, <code>7.5.NormalAverageSupport</code>, and
+      <code>7.4.SimpleAttemptAtMaipulation</code> each open and compile without errors.</li>
+  <li>In each, find <code>MyMesh.cs</code> (and the partial-class files <code>MyMesh_NormalSupport.cs</code> /
+      <code>MyMesh_Manipulate.cs</code> where present) under <code>Assets/</code>.</li>
+</ul>
+
+<h3>1 · Read the hand-built mesh</h3>
+<p><b>Goal.</b> Confirm the 9 vertices and 8 triangles on paper match the code. Open
+<code>7.3.Simple2x2Mesh/Assets/MyMesh.cs</code> and read the <code>v[0..8]</code> assignments and the
+<code>t[0..23]</code> triples.</p>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1a</span>
+  <h3>Match the vertices to the diagram</h3>
+  <p>On paper, draw the 3&times;3 lattice from lecture (row 0 at the back, row 2 at the front) and label each corner
+  with its <code>v[i]</code> position from the code.</p>
+  <div class="predict"><b>Predict first:</b> the nine positions are three rows of three, row = Z, column = X, spanning
+  &minus;1 to 1. Predict <code>v[4]</code>'s position before you read it (hint: it is the center). Confirm, then note
+  that our lecture demo used the same layout but spanned &plusmn;1.5.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 1b</span>
+  <h3>Sung's split vs. the demo's split</h3>
+  <p>Read the eight <code>t[]</code> triples. Sung <b>fans each quad from its lower-left corner</b>:</p>
+  <pre>t[0..5] = 0,3,4,  0,4,1     // quad (0,0): fan from v0
+// ...the lecture DEMO split the same quad the other way:
+//   tri0 = 0,3,1     tri1 = 1,3,4     // split along the v3-v1 diagonal</pre>
+  <div class="predict"><b>Predict first:</b> both are valid meshes of the <i>same</i> 9 vertices &mdash; same surface,
+  different diagonal and index order. Predict: does the rendered floor look any different between Sung's fan and the
+  demo's split? (It should not &mdash; same triangles cover the same area.) Confirm the mesh renders as a flat floor,
+  and note where the two splits' diagonals differ.</div>
+</div>
+
+<h3>2 · Turn on averaged normals</h3>
+<p><b>Goal.</b> See the per-vertex normal averaging from lecture, drawn. Open <code>7.5.NormalAverageSupport</code>
+and read <code>MyMesh_NormalSupport.cs</code>: <code>FaceNormal</code> (normalized cross of two edges) and
+<code>ComputeNormals</code> (each <code>n[i]</code> = normalized sum of its incident face normals).</p>
+
+<div class="api"><b>Where to look:</b> <code>ComputeNormals</code> builds eight <code>triNormal[]</code> face normals,
+then sets each vertex normal to a sum. The center <code>n[4]</code> sums <b>six</b> faces; a corner like
+<code>n[6]</code> sums <b>one</b>; an edge like <code>n[1]</code> sums <b>three</b> &mdash; exactly the "how many
+triangles touch this vertex" count from lecture.</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2a</span>
+  <h3>Predict the flat-mesh normals</h3>
+  <p>Run the project with the mesh flat (no vertex lifted). The normals are drawn as line segments at each vertex.</p>
+  <div class="predict"><b>Predict first:</b> every face of a flat floor has normal <code>(0,1,0)</code>, so every averaged
+  vertex normal is straight up. Predict what the normal segments look like (all parallel, pointing up?). Run and
+  confirm.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 2b</span>
+  <h3>Count the faces at each vertex</h3>
+  <p>On paper, for the center vertex, a mid-edge vertex, and a corner vertex, list which triangles touch it.</p>
+  <div class="predict"><b>Predict first:</b> center touches 6, mid-edge 3, corner 1 (or 2, depending on the split).
+  Predict each count, then check it against the sum in <code>ComputeNormals</code> for that <code>n[i]</code>. This is
+  why <code>n[4]</code> has six terms.</div>
+</div>
+
+<h3>3 · Drag a vertex</h3>
+<p><b>Goal.</b> See geometry and normals move together. Open <code>7.4.SimpleAttemptAtMaipulation</code>; each vertex
+has a draggable sphere handle (<code>InitControllers</code>), and the <code>Update</code> loop reads the handles back
+into the vertex array each frame.</p>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3a</span>
+  <h3>Lift the center vertex</h3>
+  <p>Grab the center vertex's sphere and drag it up. Watch the surface and (in <code>7.5</code>) the normals.</p>
+  <div class="predict"><b>Predict first:</b> lifting the center tents the surface; the six faces around it tilt, so
+  their normals swing away from vertical, and the averaged vertex normals follow &mdash; but the peak's own normal, by
+  symmetry, stays straight up. Predict which normals visibly swing and which stay put, then drag and confirm. This is
+  the lecture demo's <code>lift</code>, in the real project.</div>
+</div>
+
+<div class="step">
+  <span class="tag">CHECKPOINT 3b</span>
+  <h3>Why recompute at all?</h3>
+  <p>Find the line in <code>Update</code> that calls <code>ComputeNormals</code> after re-reading the vertices.</p>
+  <div class="predict"><b>Predict first:</b> positions and normals are coupled &mdash; move a vertex and the old
+  normals are stale. Predict what the lift would look like if <code>ComputeNormals</code> were <i>not</i> called each
+  frame (hint: the shading would not match the new shape). State it in one sentence.</div>
+</div>
+
+<h3>Tie it back to the lecture</h3>
+<table>
+  <tr><th>Project / action</th><th>What it shows</th><th>Lecture idea</th></tr>
+  <tr><td><code>7.3.Simple2x2Mesh</code></td><td>9 vertices, 8 triangle triples, by hand</td><td></td></tr>
+  <tr><td><code>7.5.NormalAverageSupport</code></td><td>per-vertex normals = averaged face normals</td><td></td></tr>
+  <tr><td><code>7.4</code> drag a vertex</td><td>geometry + normals move together</td><td></td></tr>
+</table>
+
+<h2>Part B · Final Project proposal workshop <span class="time">~50 min</span></h2>
+
+<div class="box">
+  <p>The <b>Final Project</b> is your own graphics project, built on the course's techniques &mdash; meshes, the
+  camera, transforms, and (soon) texturing and lighting. It starts with a <b>one-paragraph proposal</b>. Today's
+  workshop turns a rough idea into a peer-reviewed pitch you can submit.</p>
+  <p><b>The proposal template and requirements are on Canvas</b> (the single source of truth) &mdash; due dates,
+  points, and required sections live there, not here.</p>
+</div>
+
+<div class="step">
+  <span class="tag">ROUND 1 &middot; BRAINSTORM</span>
+  <span class="time">~8 min</span>
+  <h3>List ideas, no filtering</h3>
+  <p>Spend the first few minutes dumping <i>candidate</i> ideas &mdash; a small interactive scene, a modeling tool, a
+  rendering effect, a game mechanic. Do not judge them yet; quantity first. Then <b>pick one</b> to develop.</p>
+  <div class="api"><b>Scope check:</b> pick something you can actually finish in the weeks remaining. A finished small
+  thing outscores an unfinished big one. Good seeds reuse what you have built: a mesh you can edit, a camera you can
+  fly, a scene graph you can animate.</div>
+</div>
+
+<div class="step">
+  <span class="tag">ROUND 2 &middot; PITCH</span>
+  <span class="time">~15 min</span>
+  <h3>Write the one-paragraph pitch</h3>
+  <p>Using the Canvas template, write a single paragraph stating three things:</p>
+  <ul>
+    <li><b>the idea</b> &mdash; what you are building, in one or two sentences a classmate can picture</li>
+    <li><b>the core technique</b> &mdash; the main graphics concept it exercises (mesh construction, camera control,
+        hierarchical animation, ...)</li>
+    <li><b>the minimal deliverable</b> &mdash; the smallest version you are confident you can finish and demo</li>
+  </ul>
+</div>
+
+<div class="step">
+  <span class="tag">ROUND 3 &middot; PEER FEEDBACK</span>
+  <span class="time">~18 min</span>
+  <h3>Swap pitches, ask the two questions</h3>
+  <p>Pair up and read each other's pitch. As the reviewer, ask the two questions that matter most:</p>
+  <ul>
+    <li><b>Is the scope finishable?</b> &mdash; can this be built and demoed in the time left? If not, what is the
+        smaller version?</li>
+    <li><b>What is the single biggest risk?</b> &mdash; the one thing most likely to sink it (an unfamiliar technique,
+        an asset you do not have, a hard algorithm)?</li>
+  </ul>
+  <p>Give each other concrete, specific feedback &mdash; "narrow it to X" beats "sounds good". Then switch roles.</p>
+</div>
+
+<div class="step">
+  <span class="tag">ROUND 4 &middot; REVISE</span>
+  <span class="time">~9 min</span>
+  <h3>Tighten and submit</h3>
+  <p>Revise your pitch using the feedback: narrow the scope if it was too big, name the risk and how you will handle
+  it, and make the minimal deliverable concrete. Then submit on Canvas per the template.</p>
+  <div class="api"><b>Pull the instructor over</b> with a <i>specific</i> question &mdash; "is this scope realistic?"
+  or "which technique does this need?" This is the best help-per-minute of the week.</div>
+</div>
+
+<h2>Assignments this week</h2>
+<div class="box">
+  <ul>
+    <li><b>MP5 is due</b> &mdash; submit on Canvas before you start MP6.</li>
+    <li><b>MP6 goes out</b> &mdash; the polygonal-modeling editor: an n&times;n planar mesh (resolution slider),
+        direct vertex manipulation, and a general-cylinder sweep. Today's <code>MyMesh</code> projects are the
+        starting point.</li>
+    <li><b>FP proposal is due</b> &mdash; the one-paragraph pitch you workshopped today.</li>
+  </ul>
+  <p><b>Details, requirements, due dates, and points are on Canvas</b> (the single source of truth) &mdash; do not rely
+  on anything quoted elsewhere.</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>You matched <code>7.3</code>'s 9 vertices and 8 triples to the lecture diagram, and saw how Sung's fan split
+      differs from the demo's.</li>
+  <li>You turned on averaged normals in <code>7.5</code> and counted the faces meeting at a vertex.</li>
+  <li>You dragged a vertex in <code>7.4</code> and saw geometry and normals update together.</li>
+  <li>You brainstormed, pitched, peer-reviewed, and revised your Final Project proposal, and submitted it on Canvas.</li>
+  <li>You submitted MP5 and opened MP6.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. Projects courtesy of Prof. Kelvin Sung's CSS 451 examples
+  (Topic7-PolygonalModeling). Stuck? Ask the instructor, who circulates during Thursday studio, or post on the Canvas
+  discussion board; Canvas has due dates and office hours.
+</footer>
+</body>
+</html>

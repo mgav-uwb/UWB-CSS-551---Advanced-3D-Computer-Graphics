@@ -140,6 +140,8 @@ const DEMOS = {
     desc:"drag baseRy/armBend/handRy/armT — three flat boxes composed by matMul; W_base/W_arm/W_hand panel" },
   "projection": { title:"Perspective Projection: Squeeze the Frustum",
     desc:"drag fov/aspect/near/far — a third-person camera frustum; boxes inside stay bright; P + marked-box NDC panel" },
+  "mesh-grid": { title:"Mesh Grids: Hand-Built Vertices, Indices, Normals",
+    desc:"drag n/lift — an n×n quad grid built by hand; counts (n+1)²/2n²/6n² + first-two-triangle triples; wireframe + normals" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -169,7 +171,9 @@ const SESSIONS = [
     lab:"sessions/S06-3d-viewing/lab06/index.html",
     demos:["view-matrix","projection"] },
   { id:"S07", title:"Polygonal Modeling",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S07-polygonal-modeling/index.html",
+    lab:"sessions/S07-polygonal-modeling/lab07/index.html",
+    demos:["mesh-grid"] },
   { id:"S08", title:"Texture Mapping",
     deck:null, lab:null, demos:[] },
   { id:"S09", title:"Illumination",
