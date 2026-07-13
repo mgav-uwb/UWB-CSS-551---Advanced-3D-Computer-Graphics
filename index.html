@@ -146,6 +146,10 @@ const DEMOS = {
     desc:"drag offU/offV/rot/tile — a checker on a quad placed by our uvMat3; the live 3×3 texture.matrix panel" },
   "illumination": { title:"Phong Lighting: Light a Sphere, Live",
     desc:"drag lightAz/lightEl/shine — one point light on a sphere; live N·L / R·V / diffuse / specular at a marked point" },
+  "brdf-lobe": { title:"BRDF Lobes: Phong vs GGX-Flavored Reflectance Shape",
+    desc:"drag roughness/inAngle — a polar reflectance lobe; Phong s / GGX α, HWHM, and formula panel (shape, not calibrated units)" },
+  "gsplat": { title:"3D Gaussian Splatting: A Real Scene, Live in the Browser",
+    desc:"orbit a real ~240K-splat Mip-NeRF 360 bonsai scene; drag orbitAz/dist — a rasterizer, not a mesh (attribution in media/gsplat/)" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -187,7 +191,9 @@ const SESSIONS = [
     lab:"sessions/S09-illumination/lab09/index.html",
     demos:["illumination"] },
   { id:"S10", title:"The Rendering Equation, PBR &amp; Neural Rendering",
-    deck:null, lab:null, demos:[] },
+    deck:"sessions/S10-rendering-frontier/index.html",
+    lab:"sessions/S10-rendering-frontier/lab10/index.html",
+    demos:["brdf-lobe","gsplat"] },
 ];
 
 const quickCell = q => q.href ? `

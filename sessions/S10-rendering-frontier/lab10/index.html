@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Lab 10 — Final Project studio &amp; demo prep</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --code:#0e1017; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:40px clamp(16px,5vw,80px) 96px;max-width:960px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:8px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:.3px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:14px;margin-top:6px}
+  h2{font-size:22px;margin:38px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  h3{font-size:17px;margin:24px 0 4px;color:var(--accent2)}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px}
+  li{margin:6px 0}
+  code{background:var(--code);border:1px solid var(--line);border-radius:5px;
+       padding:1px 6px;font:14px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;color:#c8f7dc}
+  pre{background:var(--code);border:1px solid var(--line);border-radius:9px;
+      padding:14px 16px;overflow-x:auto;font:13.5px/1.55 ui-monospace,Menlo,monospace;color:#dfe6f0}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:16px 20px;margin:16px 0}
+  .warn{border-color:var(--warn);background:#241f10}
+  .warn b{color:var(--warn)}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"\2610";position:absolute;left:0;color:var(--accent);font-size:18px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:4px 22px 14px;margin:14px 0}
+  .step .tag{display:inline-block;background:var(--accent);color:#062;font-weight:700;font-size:12px;
+       border-radius:6px;padding:2px 9px;margin:14px 0 0}
+  .predict{border-left:3px solid var(--warn);padding:4px 0 4px 14px;margin:10px 0;color:#f0e6c8}
+  .api{border-left:3px solid var(--accent2);padding:4px 0 4px 14px;margin:10px 0}
+  .time{display:inline-block;background:#181b24;border:1px solid var(--line);border-radius:6px;
+        color:var(--accent2);font-size:12.5px;font-weight:700;padding:2px 9px;margin-left:8px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  a{color:var(--accent)}
+  footer{margin-top:56px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Lab 10 — Final Project studio &amp; demo prep</h1>
+  <div class="meta">Week 10 · Thursday in-person studio · Dr. Marcel Gavriliu · bring your laptop and your build</div>
+</header>
+
+<p>This is the <b>last in-person session</b> of the quarter &mdash; a working studio, not a lecture. The
+Final Project is due and demoed in <b>finals week</b>. Today has one job: get every team to a
+<b>demoable state</b>. Use the checkpoint list to find your gaps, use the room (and the instructor) to close
+them, and use the demo-day recap to make sure your demo will land. <b>No new material is taught today.</b></p>
+
+<div class="box warn">
+  <b>Canvas is the single source of truth.</b> The Final Project's exact due date and time, the demo running
+  order and per-team time slot, the required deliverables, and the grading rubric all live on <b>Canvas</b>.
+  Nothing about scheduling, points, or requirements is invented on this sheet &mdash; check Canvas for the
+  authoritative version of every item below.
+</div>
+
+<h2>Part A · Per-team checkpoint <span class="time">~55 min</span></h2>
+
+<p>Work through the checkpoint with your team. Each item is a question to answer honestly about where your
+project <i>actually</i> stands right now &mdash; not where you hope it will be. Anything you cannot check is a
+gap; the rest of the studio is for closing gaps, so surface them early and flag the instructor.</p>
+
+<h3>1 · It runs</h3>
+<ul class="check">
+  <li>Your project <b>builds and runs</b> on the machine you will demo from &mdash; from a clean checkout /
+      fresh open, not just "it works if I don't touch it."</li>
+  <li>You have a <b>known-good starting state</b>: a scene, level, or view that reliably comes up, so a demo
+      never opens on a crash or a black screen.</li>
+  <li>You can <b>recover</b> if something breaks mid-demo (a reset key, a reload, a backup build) &mdash;
+      rehearse the recovery, not just the happy path.</li>
+</ul>
+
+<h3>2 · It shows the pipeline you built</h3>
+<p>Your project should visibly exercise the pipeline from this course. Confirm which pieces yours uses &mdash;
+you will be asked to name them at the demo (this is the connection to the whole quarter, Lecture 10's Part 4).</p>
+<ul class="check">
+  <li><b>Transforms &amp; placement</b> &mdash; objects placed with model/world matrices (composition, a scene
+      graph, or hierarchical parts).</li>
+  <li><b>Camera</b> &mdash; a view matrix and a projection you can point to (even if via the engine, know which
+      is which and roughly what they do).</li>
+  <li><b>Surfaces</b> &mdash; meshes, and, if you use them, textures / UVs.</li>
+  <li><b>Shading</b> &mdash; if your scene is lit, know your lighting terms (diffuse? specular? how many
+      lights?) and where your normals come from.</li>
+</ul>
+
+<h3>3 · It is demoable</h3>
+<ul class="check">
+  <li>You can show the <b>most interesting thing</b> your project does within the first minute &mdash; lead
+      with the payoff, not the loading screen.</li>
+  <li>You have a <b>one-sentence description</b> of what the project is and why it is interesting.</li>
+  <li>You know your <b>current blocker</b> &mdash; the single thing you would most like to fix or get help
+      with before the demo.</li>
+  <li>You have checked the <b>Canvas deliverables list</b> and know what must be submitted alongside the demo
+      (code, write-up, whatever the brief requires).</li>
+</ul>
+
+<div class="step">
+  <span class="tag">DO IT NOW · GAP LIST</span>
+  <h3>Turn the checkpoint into a to-do list</h3>
+  <p>As a team, write down every box you could <i>not</i> check above. Order them: <b>demo-blocking</b> first
+  (it does not run, no reliable starting state), then <b>demo-improving</b> (leads with the payoff, recovery
+  path), then <b>polish</b>. Spend the rest of the studio top-down on that list.</p>
+  <div class="predict"><b>Use the room:</b> if a gap is a specific technical problem &mdash; a transform that
+  looks wrong, a camera that clips, lighting that reads flat &mdash; the instructor circulates during studio,
+  and a specific question ("my world matrix seems to double-apply the parent rotation") gets the fastest help.
+  Your neighbors are your rubber duck too.</div>
+</div>
+
+<h2>Part B · Demo-day requirements recap <span class="time">~35 min</span></h2>
+
+<p>A recap of what a strong finals-week demo looks like, so you can rehearse against it today. <b>The exact
+format, time limit, running order, and rubric are on Canvas</b> &mdash; this is guidance for shaping your demo,
+not a substitute for the authoritative requirements there.</p>
+
+<div class="step">
+  <span class="tag">SHOW</span>
+  <h3>Show it running</h3>
+  <ul>
+    <li><b>Live beats slides.</b> Open with the project actually running and doing its most interesting thing.
+        A rough live build is more convincing than a polished deck about a build.</li>
+    <li><b>Drive it deliberately</b> &mdash; a short rehearsed path through the features, not aimless clicking.</li>
+    <li><b>Have a fallback</b> &mdash; a short screen recording of it working, in case the live build misbehaves
+        on the day.</li>
+  </ul>
+</div>
+
+<div class="step">
+  <span class="tag">EXPLAIN</span>
+  <h3>Name the pipeline pieces you used</h3>
+  <div class="api"><b>Tie it to the course.</b> In your own words, say which stages from this quarter your
+  project uses &mdash; how you place objects (transforms / scene graph), your camera (view &amp; projection),
+  your surfaces (meshes / textures), and your shading (lighting terms, normals). This is exactly Lecture 10's
+  "the course in one picture": you should be able to point at your project and name W, V, P and what they do.</div>
+</div>
+
+<div class="step">
+  <span class="tag">REFLECT</span>
+  <h3>What is next, what was hard</h3>
+  <ul>
+    <li><b>What you would do next</b> with more time &mdash; the concrete next feature or fix.</li>
+    <li><b>What was hard</b> and how you worked around it &mdash; the honest engineering story is often the
+        most interesting part.</li>
+  </ul>
+</div>
+
+<h3>A quick self-rehearsal</h3>
+<table>
+  <tr><th>Beat</th><th>Ask yourself</th></tr>
+  <tr><td>Open</td><td>Does the interesting thing appear in the first minute?</td></tr>
+  <tr><td>Drive</td><td>Do I have a rehearsed path, and a recovery if it breaks?</td></tr>
+  <tr><td>Explain</td><td>Can I name which pipeline pieces (W / V / P, meshes, lighting) I used?</td></tr>
+  <tr><td>Reflect</td><td>Can I state one next step and one hard problem I solved?</td></tr>
+  <tr><td>Submit</td><td>Have I checked the Canvas deliverables list?</td></tr>
+</table>
+
+<h2>Part C · Course evaluation <span class="time">~5 min</span></h2>
+
+<div class="box">
+  <p><b>Please complete the CSS 551 course evaluation.</b> It is <b>anonymous</b>, and it genuinely shapes how
+  this course is taught next time. Specific comments help most: what actually helped your learning, and one
+  concrete thing you would change. Take a few minutes of the studio to do it while it is fresh.</p>
+  <p>The evaluation link/location is on <b>Canvas</b> (or your institution's course-evaluation system as posted
+  there).</p>
+</div>
+
+<h2>Before you leave</h2>
+<ul class="check">
+  <li>Your team has a written <b>gap list</b>, ordered demo-blocking &rarr; improving &rarr; polish, and made
+      progress on it today.</li>
+  <li>Your project <b>runs</b> from a clean start with a reliable starting state and a recovery path.</li>
+  <li>You can <b>name the pipeline pieces</b> your project uses (transforms, camera, surfaces, shading).</li>
+  <li>You have rehearsed a short demo that <b>leads with the payoff</b> and has a recorded fallback.</li>
+  <li>You checked <b>Canvas</b> for the Final Project due date/time, demo running order, deliverables, and
+      rubric.</li>
+  <li>You completed the <b>course evaluation</b>.</li>
+</ul>
+
+<footer>
+  CSS 551 · Autumn 2026 · UW Bothell. This is the last studio of the quarter &mdash; the Final Project is due
+  and demoed in finals week. Stuck? Ask the instructor, who circulates during Thursday studio, or post on the
+  Canvas discussion board; Canvas has the due date, the demo running order, the deliverables list, the rubric,
+  and the course-evaluation link.
+</footer>
+</body>
+</html>
