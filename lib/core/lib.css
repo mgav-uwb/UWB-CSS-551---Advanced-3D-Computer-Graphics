@@ -330,9 +330,11 @@
   position: absolute;
   top: 8px;
   /* Shifted left of the plain 8px corner (Fix 3) to leave room for
-     .gsplat-help-btn, which claims the literal top-right corner in both
-     stages. */
-  right: 36px;
+     .gsplat-help-btn AND .gsplat-settings-btn, which both claim the
+     top-right corner (in that left-to-right order: settings, help) in both
+     stages — 8 (help) + 22 (help width) + 4 (gap) + 22 (settings width) + 8
+     (gap) = 64. */
+  right: 64px;
   padding: 3px 8px;
   background: rgba(11, 12, 16, 0.82);
   color: #8b93a7;
@@ -425,5 +427,125 @@
 }
 
 .gsplat-help-panel-close:hover {
+  color: #e7eaf0;
+}
+
+/* gsplat settings ("⚙") button + panel: same closeable-panel idiom as
+   .gsplat-help-btn/.gsplat-help-panel just above — see lib/demos/gsplat.js
+   make(), built unconditionally in BOTH stages. Positioned immediately left
+   of the help button (34px vs help's 8px: 8 + 22 width + 4 gap = 34) so
+   both sit in the scene's top-right corner without overlapping. Namespaced
+   .gsplat-settings* per spec; deliberately NOT scoped under .cockpit, same
+   reasoning as .gsplat-explore/.gsplat-help-btn above (the bare
+   lib/_gsplat-embed-test/ fixture mounts .gsplat-scene without a
+   .cockpit-classed ancestor). Unlike the help panel (a full inset reader),
+   this is a small anchored form (5 number fields) — sized to its content
+   rather than filling the viewport. */
+.gsplat-settings-btn {
+  position: absolute;
+  top: 8px;
+  right: 34px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: rgba(11, 12, 16, 0.75);
+  color: #8b93a7;
+  border: 1px solid #3a4050;
+  border-radius: 50%;
+  font: 13px/20px -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.gsplat-settings-btn:hover {
+  background: rgba(20, 22, 29, 0.92);
+  color: #e7eaf0;
+}
+
+.gsplat-settings-panel {
+  position: absolute;
+  top: 36px;
+  right: 8px;
+  width: 220px;
+  max-width: calc(100% - 16px);
+  max-height: calc(100% - 44px);
+  overflow-y: auto;
+  z-index: 7;
+  background: rgba(9, 10, 13, 0.97);
+  border: 1px solid #3a4050;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #e7eaf0;
+  font: 13px/1.5 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.gsplat-settings-panel h4 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #79c0ff;
+}
+
+/* Un-scoped-under-.cockpit duplicates of the .gsplat-field* rules (lib.css's
+   originals are all `.cockpit .gsplat-field...`) so the Settings panel's
+   number fields still render styled inside the bare embed-test fixture
+   (which has no .cockpit ancestor) — every OTHER caller of bindNumberField
+   (Camera card) only ever renders inside stage:'full', which always has a
+   .cockpit ancestor, so this gap never showed up before the Settings panel
+   (present in the embed stage too) existed. */
+.gsplat-settings-fields .gsplat-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #e7eaf0;
+}
+
+.gsplat-settings-fields .gsplat-field:last-child {
+  margin-bottom: 0;
+}
+
+.gsplat-settings-fields .gsplat-field-label {
+  flex: 0 0 3.4em;
+  color: #8b93a7;
+}
+
+.gsplat-settings-fields .gsplat-field-input {
+  flex: 1;
+  min-width: 0;
+  background: #0b0c10;
+  border: 1px solid #262a35;
+  border-radius: 4px;
+  color: #e7eaf0;
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  padding: 3px 6px;
+  text-align: right;
+}
+
+.gsplat-settings-panel-hint {
+  margin: 10px 0 0 !important;
+  color: #6b7280 !important;
+  font-size: 11px;
+}
+
+.gsplat-settings-panel-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #8b93a7;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.gsplat-settings-panel-close:hover {
   color: #e7eaf0;
 }
