@@ -70,6 +70,11 @@
 
 .cockpit .slider-row input[type='range'] {
   flex: 1;
+  /* min-width:0 lets the range shrink below its ~129px UA intrinsic width so
+     the row fits the narrow rail card — without it a flex item's default
+     min-width:auto floors the range and pushes the readout past the card edge
+     (a 22px horizontal overflow in every demo's rail). */
+  min-width: 0;
   accent-color: #5cd47a;
 }
 
@@ -145,6 +150,9 @@
 .cockpit .demo-shell-card .mat-panel td {
   padding: 4px 5px;
   min-width: 0;
+  /* long readout values (e.g. a BRDF formula string) wrap inside the narrow
+     rail card instead of clipping past its edge. */
+  overflow-wrap: anywhere;
 }
 
 .cockpit .demo-shell-row {
@@ -359,6 +367,60 @@
    .demo-shell-help-btn — 8 (help) + 22 (help width) + 4 (gap) + 22 (settings
    width) + 8 (gap) = 64, plus a few px of breathing room) so it can never
    overlap those buttons. */
+/* Picture-in-picture slots (demo-shell.js pip:true). The big slot fills the
+   scene and is pointer-transparent (drags fall through to the nav controller);
+   the small slot is a bordered bottom-right inset that captures clicks to
+   swap. Un-scoped (like the other scene overlays) so they work in the bare
+   embed-test fixtures. z-index sits below the ?/gear/legend overlays (5–7). */
+.demo-shell-pip-slot {
+  position: absolute;
+  overflow: hidden;
+}
+
+.demo-shell-pip-slot--big {
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.demo-shell-pip-slot--small {
+  width: 34%;
+  min-width: 150px;
+  height: 34%;
+  min-height: 110px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 3;
+  border: 1px solid #3a4050;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  background: #0b0c10;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.demo-shell-pip-slot--small canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.demo-shell-pip-swap {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 4;
+  width: 20px;
+  height: 20px;
+  background: rgba(11, 12, 16, 0.85);
+  color: #c7cdda;
+  border: 1px solid #3a4050;
+  border-radius: 4px;
+  font: 12px/18px -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+  pointer-events: none;
+}
+
 .demo-shell-legend {
   position: absolute;
   top: 8px;
