@@ -221,6 +221,25 @@
   font-size: 12px;
 }
 
+/* gsplat sandbox full-screen sizing (stage:'full' only — the bare
+   .gsplat-root, never .gsplat-root--embed): fill the viewport below
+   demo.html's title (measured ~58px title bottom + margin -> 90px budget)
+   so the scene viewport reads as a full working canvas, not a small inset.
+   The embed's own .gsplat-root--embed sizing block below is untouched. */
+.cockpit .gsplat-root:not(.gsplat-root--embed) {
+  height: calc(100vh - 90px);
+}
+
+.cockpit .gsplat-root:not(.gsplat-root--embed) .gsplat-scene {
+  height: 100%;
+  min-height: 0;
+}
+
+.cockpit .gsplat-root:not(.gsplat-root--embed) .gsplat-rail {
+  height: 100%;
+  overflow-y: auto;
+}
+
 @media (max-width: 640px) {
   .cockpit .gsplat-root {
     flex-direction: column;
@@ -232,6 +251,22 @@
 
   .cockpit .gsplat-scene {
     min-height: 300px;
+  }
+
+  /* Stacked layout: let the page scroll instead of forcing a fixed
+     viewport-height column (rail below a full-height scene would push
+     itself off-screen). */
+  .cockpit .gsplat-root:not(.gsplat-root--embed) {
+    height: auto;
+  }
+
+  .cockpit .gsplat-root:not(.gsplat-root--embed) .gsplat-scene {
+    height: 420px;
+  }
+
+  .cockpit .gsplat-root:not(.gsplat-root--embed) .gsplat-rail {
+    height: auto;
+    overflow-y: visible;
   }
 }
 
@@ -294,7 +329,10 @@
 .gsplat-exit {
   position: absolute;
   top: 8px;
-  right: 8px;
+  /* Shifted left of the plain 8px corner (Fix 3) to leave room for
+     .gsplat-help-btn, which claims the literal top-right corner in both
+     stages. */
+  right: 36px;
   padding: 3px 8px;
   background: rgba(11, 12, 16, 0.82);
   color: #8b93a7;
@@ -302,4 +340,90 @@
   border-radius: 4px;
   font: 11px/1.2 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   z-index: 5;
+}
+
+/* gsplat help button + panel (Fix 3): present in BOTH stages — see
+   lib/demos/gsplat.js make(), built unconditionally (unlike the stage:
+   'full'-only cockpit cards). Deliberately NOT scoped under .cockpit, same
+   reasoning as .gsplat-explore/.gsplat-exit just above. */
+.gsplat-help-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  background: rgba(11, 12, 16, 0.75);
+  color: #8b93a7;
+  border: 1px solid #3a4050;
+  border-radius: 50%;
+  font: 12px/20px -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.gsplat-help-btn:hover {
+  background: rgba(20, 22, 29, 0.92);
+  color: #e7eaf0;
+}
+
+.gsplat-help-panel {
+  position: absolute;
+  inset: 8px;
+  z-index: 7;
+  overflow-y: auto;
+  background: rgba(9, 10, 13, 0.97);
+  border: 1px solid #3a4050;
+  border-radius: 8px;
+  padding: 16px 20px;
+  color: #e7eaf0;
+  font: 13px/1.5 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.gsplat-help-panel h4 {
+  margin: 14px 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #79c0ff;
+}
+
+.gsplat-help-panel h4:first-child {
+  margin-top: 0;
+}
+
+.gsplat-help-panel p {
+  margin: 0 0 8px;
+  color: #c7cdda;
+}
+
+.gsplat-help-panel code {
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 12px;
+  color: #7ee787;
+}
+
+.gsplat-help-panel-hint {
+  margin-top: 12px !important;
+  color: #6b7280 !important;
+  font-size: 11px;
+}
+
+.gsplat-help-panel-close {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #8b93a7;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.gsplat-help-panel-close:hover {
+  color: #e7eaf0;
 }
