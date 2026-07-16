@@ -13,19 +13,26 @@
   line in math; no <small> around math; verify every slide at 1280x620.
   Matrices are shown as plain preformatted text, not KaTeX, on purpose.
 
-  DEMO: mvc-transform embedded ONCE in Part 2, controls tx,ry,s. Its ASCII
-  viz-fallback shows the HAND-VERIFIED matrix for tx=2, ry=90, s=1:
-    row i, col j = colMajor16[j*4+i]  (Mat4Panel layout); ry=90 rotation block
-    is [[0,0,1],[0,1,0],[-1,0,0]], translation 2 in column 3.
+  DEMOS: three embeds.
+   - Part 0: data-demo="projection" data-controls="fov" (the pipeline's
+     3D-to-2D picture, intuitive level only) and data-demo="raster"
+     data-controls="res,angle" (a triangle becoming framebuffer pixels).
+   - Part 2: mvc-transform, controls tx,ry,s. Its ASCII viz-fallback shows the
+     HAND-VERIFIED matrix for tx=2, ry=90, s=1:
+       row i, col j = colMajor16[j*4+i]  (Mat4Panel layout); ry=90 rotation
+       block is [[0,0,1],[0,1,0],[-1,0,0]], translation 2 in column 3.
+  FIGURES: sessions/S01-.../figures/*.svg are GENERATED — edit
+  tools/gen-figures.mjs and re-run it, never the SVGs.
 
   Session plan (120 min, Tue 5:45-7:45 PM synchronous online). Sums to ~110 + buffer.
     0:00  Intro (title + what tonight sets up)   ~2 min
-    0:02  Part 1  Every pixel was redrawn        20 min   (the frame loop)
-    0:22  Part 2  MVC for interactive graphics   35 min   (two views, one model + demo)
-    0:57  Part 3  The quarter's toolset, honestly 30 min  (Unity object model + the course rule)
-    1:27  Part 4  CDP walkthrough                20 min   (SimpleGUI + SliderWithEcho screen-share)
-    1:47  Wrap                                    5 min   (MP1 out, Thursday lab, office hours)
-    1:52  end (+ buffer)
+    0:02  Part 0  Graphics in five pictures       15 min   (pixels->framebuffer->mesh->projection->raster, all intuitive)
+    0:17  Part 1  Every pixel was redrawn         18 min   (the frame loop)
+    0:35  Part 2  MVC for interactive graphics    30 min   (two views, one model + demo)
+    1:05  Part 3  The quarter's toolset, honestly 25 min   (Unity object model + the course rule)
+    1:30  Part 4  CDP walkthrough                 15 min   (SimpleGUI + SliderWithEcho screen-share)
+    1:45  Wrap                                     5 min   (MP1 out, Thursday lab, office hours)
+    1:50  end (+ buffer)
 -->
 
 ## CSS 551
@@ -40,18 +47,122 @@
 
 ## Tonight
 
-- **Interactive graphics is a loop** — input, update, redraw, forever
-- **MVC** is how we keep that loop from turning into spaghetti
-- **Unity** is our workbench — honest tour of what it gives us
-- The **course rule**: you will *build* the engine's math, not call it
+- **The big picture** — 3D scene to pixels, in five pictures
+- **Interactive graphics is a loop** — input, update, redraw
+- **MVC (Model-View-Controller)** — keeps the loop from spaghetti
+- **Unity** — our workbench, toured honestly
+- **The course rule** — you *build* the engine's math, not call it
 
 <small>Thursday's studio installs Unity and opens the two projects we tour tonight. MP1 goes out this week.</small>
 
 ---
 
+### Part 0 · Computer graphics, in five pictures
+
+<small>(~15 min)</small>
+
+---
+
+## The goal, in one sentence
+
+> Synthesize a 2D **image** of a 3D **scene** — and do it again **60 times every second**.
+
+Five ideas hide in that sentence:
+
+- a screen is a grid of **pixels**
+- a color is **three numbers** in a **framebuffer**
+- a 3D thing is a **mesh** of triangles
+- a **camera projects** 3D onto a flat image
+- **rasterization** fills the pixels each triangle covers
+
+---
+
+## Picture 1 · A screen is a grid of pixels
+
+<img src="figures/pixels-zoom.svg" alt="a coarse pixel grid on a screen, with a 3×3 patch magnified to show each pixel's red, green, blue numbers" style="max-height: 440px; width: auto;">
+
+---
+
+## Picture 2 · A color is three numbers
+
+- each pixel stores **red, green, blue** intensities, 0–255 each
+- the **framebuffer** is that whole array in memory — 1920 × 1080 × 3 ≈ **6 MB**
+- the monitor repaints itself **from the framebuffer**, 60 times a second
+
+So "drawing" — anything, ever — means one thing: **write numbers into the framebuffer.**
+
+---
+
+## Picture 3 · A 3D thing is a mesh of triangles
+
+<img src="figures/mesh-sphere.svg" alt="a low-poly sphere drawn as a wireframe: vertices as dots, one triangle highlighted" style="max-height: 430px; width: auto;">
+
+---
+
+## Picture 4 · A camera projects 3D onto a flat image
+
+A virtual **camera** projects the scene onto its **image plane** — near things big, far things small. Drag `fov`.
+
+<div class="cockpit" data-demo="projection" data-controls="fov"><pre class="viz-fallback">        far plane
+      ┌───────────────┐
+       \    scene    /       the camera's pyramid of visible space
+        \  objects  /        (the "frustum"), seen from outside;
+         \         /         the camera's own picture appears on
+          ┌───────┐          its image plane
+          │ image │
+           \plane/
+            \   /
+             (eye)</pre></div>
+
+---
+
+## Picture 5 · Rasterization fills the pixels
+
+Color every pixel whose **center** falls inside the triangle. Drag `res` — blocky at 8×8, smooth at 64×64.
+
+<div class="cockpit" data-demo="raster" data-controls="res,angle"><pre class="viz-fallback">   the triangle (math)          the pixels (framebuffer, res = 8)
+        ▲                            · · · · · · · ·
+       ╱ ╲                           · · ■ ■ · · · ·
+      ╱   ╲            ──►           · ■ ■ ■ ■ · · ·
+     ╱     ╲                         · ■ ■ ■ ■ ■ · ·
+    ╱───────╲                        ■ ■ ■ ■ ■ ■ ■ ·
+   filled where the pixel CENTER falls inside</pre></div>
+
+---
+
+## Sixty times a second
+
+Put the pictures together — that is **rendering**. Now the punchline of the sentence:
+
+- one frame = project and rasterize the **whole scene** — ~2 million pixels written
+- 60 frames per second = ~**124 million** pixel colors per second
+- that rate is why **GPUs** exist — and why per-frame code must be cheap (Part 1)
+
+---
+
+## Unity runs this pipeline for you
+
+- **Unity** is a cross-platform graphics system: scene in → rendered frames out — same project on Windows, macOS, phones, consoles
+- the pipeline also runs in a browser — **tonight's in-slide demos** are live 3D (a library called three.js), not screenshots
+- our deal with Unity, in Part 3: it runs the pipeline — **we build the math it uses**
+
+---
+
+## Where each picture goes deep
+
+| Tonight's picture | The deep dive |
+| --- | --- |
+| meshes of triangles | week 7 — build one by hand |
+| moving things in 3D | weeks 2–5 — vectors, matrices |
+| the camera & projection | week 6 — build the camera matrix |
+| color, light & surfaces | weeks 8–9 — textures & illumination |
+| rasterization & beyond | week 10 — GPUs, neural scenes |
+
+---
+
 ### Part 1 · Every pixel you've ever seen was redrawn
 
-<small>(~20 min)</small>
+<small>(~18 min)</small>
 
 ---
 
@@ -135,7 +246,7 @@ Frameworks give you two hooks:
 - **`Start()`** — runs **once**, before the loop: set up state, wire up input
 - **`Update()`** — runs **every frame**: the body of the loop is yours
 
-In Unity, a script that puts code in `Update()` is code that runs 60 times a second.
+In Unity, code you put in `Update()` runs **once per frame** — 60 times a second at 60 fps.
 
 ---
 
@@ -164,7 +275,8 @@ Why `* Time.smoothDeltaTime` and not just `+= 1.0f`?
 
 - a frame is **not** a fixed slice of time — 60 fps here, 30 there
 - `+= 1.0f` per frame moves **twice as fast** on the faster machine
-- `dt` = seconds since last frame, so `1.0 * dt` = **1 unit/second**, everywhere
+- `1.0f` is a **rate** (units/second); `dt` = **seconds** since last frame
+- `rate × dt` → **units**: this frame's step — same speed everywhere
 
 ---
 
@@ -181,7 +293,7 @@ Polling asks every frame; events call you when something happens. Both end the s
 
 ### Part 2 · MVC for interactive graphics
 
-<small>(~35 min)</small>
+<small>(~30 min)</small>
 
 ---
 
@@ -360,7 +472,7 @@ Slider value → `RadiusChanged` → `TheWorld` (the Model). One direction, one 
 
 ### Part 3 · The quarter's toolset, honestly
 
-<small>(~30 min)</small>
+<small>(~25 min)</small>
 
 ---
 
@@ -372,6 +484,8 @@ Enough Unity to read the projects and know where our code fits:
 - **Component** — a capability bolted onto a GameObject
 - **Scene** — the current collection of GameObjects
 - **Script** — a Component you write, in C#
+
+<small>Unity gives you objects and hooks — it does not impose MVC. We bring the pattern; Part 4 maps the boxes onto real files.</small>
 
 ---
 
@@ -508,7 +622,7 @@ MP1 is your first implement-and-replace: orient an object, then check against Un
 
 ### Part 4 · CDP walkthrough
 
-<small>(~20 min)</small>
+<small>(~15 min)</small>
 
 ---
 
@@ -620,11 +734,12 @@ Tonight you watched the loop; Thursday you poke it.
 
 ## The whole night, on one slide
 
-- **A loop** — input → update → redraw, ~60× a second
-- **The screen is a rendering of the truth**, not the truth
-- **MVC** — Model is truth, Views draw it, Controllers change it; **one-way** flow
-- **Unity** — GameObjects + Components; our code hooks `Start()` / `Update()`
-- **The rule** — build the engine's math from primitives, check against the engine
+- **The pipeline** — meshes → projection → pixels
+- **A loop** — input → update → redraw, ~60×/s
+- **The screen** is a *rendering* of the truth
+- **MVC** — Model is truth; Views read, Controllers write
+- **Unity** — GameObjects + Components, `Start()`/`Update()`
+- **The rule** — build the math, check against the engine
 
 ---
 

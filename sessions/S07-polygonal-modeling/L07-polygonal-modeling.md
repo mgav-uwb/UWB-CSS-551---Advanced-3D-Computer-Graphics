@@ -19,6 +19,12 @@
   Recomputed via node against lib/demos/mesh-grid.js + lib/core/xform.js
   (cross, sub, normalize). See README for the exact digits.
 
+  FIGURES: sessions/S07-.../figures/*.svg (mesh-anatomy, flat-vs-smooth,
+  profile-sweep) are GENERATED — edit tools/gen-figures.mjs and re-run it,
+  never the SVGs. flat-vs-smooth renders the SAME 80-face icosphere twice:
+  flat = one lambert color per face; smooth = exact Gouraud (a linear
+  intensity field over a triangle IS an SVG linearGradient).
+
   IMPORTANT ordering fact — OUR demo vs Sung's MyMesh.cs differ, ON PURPOSE:
    - OUR mesh-grid.js splits each quad (row,col) as tri0=(v00,v10,v01),
      tri1=(v01,v10,v11) — at n=2 that is (0,3,1) and (1,3,4), both CCW seen
@@ -94,6 +100,12 @@ Every real-time surface — a character, a terrain, a car — is a **triangle me
 - a triangle is always **convex** — filling (rasterizing) it is a fixed, simple loop the GPU does billions of times a second
 
 A quad's four corners can be non-planar (bent), and its fill is ambiguous. Split it into two triangles and both problems vanish.
+
+---
+
+## What a mesh looks like
+
+<img src="figures/mesh-anatomy.svg" alt="a low-poly sphere wireframe: vertex dots and a highlighted triangle, with callouts naming vertex and triangle" style="max-height: 430px; width: auto;">
 
 ---
 
@@ -335,10 +347,7 @@ n[4] = (triNormal[0] + triNormal[1] + triNormal[2]
 
 The averaging is also a **style** choice — the same positions, two different looks:
 
-- **faceted (flat):** give every vertex of a triangle that triangle's **own** face normal. Each face is uniformly lit — you see every facet, a low-poly look.
-- **smooth:** average the incident face normals per vertex (what we just did). Normals vary gradually across a face, so the faceting disappears into a smooth-looking surface.
-
-Same triangles, same positions — only the normals differ. Smooth shading is why a coarse sphere can look round.
+<img src="figures/flat-vs-smooth.svg" alt="the same 80-triangle sphere shaded twice: flat with visible facets, and smooth via averaged vertex normals" style="max-height: 420px; width: auto;">
 
 ---
 
@@ -384,19 +393,11 @@ Move a vertex and its position is stale in nothing else — but its **normal, an
 
 ## Sweeping a profile into a surface
 
-Dragging builds arbitrary surfaces one vertex at a time. For a **surface of revolution** there is a better way: take a **profile curve** and **spin it** around an axis. This is MP6's **general cylinder**.
+For a **surface of revolution**: take a **profile curve**, **spin it** around an axis — MP6's **general cylinder**.
 
-```text
-   profile (in the XY plane)          swept around the Y axis
-        y                                    ___
-        │  ● p3                             /   \      each profile point
-        │ ●  p2                            |     |     traces a circle;
-        │ ●  p1                            |     |     adjacent circles
-        │  ● p0                             \___/      form quad rings
-        └────── x                        (a vase / cylinder)
-```
+<img src="figures/profile-sweep.svg" alt="left: a 7-point vase profile beside the rotation axis; right: the wireframe surface of revolution it sweeps, rings connected by meridians" style="max-height: 330px; width: auto;">
 
-Choose P profile points and S rotation steps → a **P × S grid** of vertices, connected into quads exactly like our flat grid — only now the rows wrap around.
+Choose P profile points and S rotation steps → a **P × S grid** of vertices, in quads like our flat grid — the rows just wrap around.
 
 ---
 

@@ -126,6 +126,8 @@ const HANDOUTS = {
 
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
 const DEMOS = {
+  "raster": { title:"Rasterization: One Triangle Becomes Pixels",
+    desc:"drag res/angle — a triangle sampled onto a coarse framebuffer; covered-pixel readout; grid/centers/outline toggles" },
   "mvc-transform": { title:"MVC: One Model, Two Views (Transform)",
     desc:"drag tx/ry/s — cube view and matrix-panel view stay in sync" },
   "view-matrix": { title:"The View Matrix: Hand-Built, Glass Cockpit",
@@ -157,7 +159,7 @@ const SESSIONS = [
   { id:"S01", title:"Graphics Systems &amp; MVC",
     deck:"sessions/S01-graphics-systems-mvc/index.html",
     lab:"sessions/S01-graphics-systems-mvc/lab01/index.html",
-    demos:["mvc-transform"] },
+    demos:["raster","mvc-transform"] },
   { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
     deck:"sessions/S02-vectors-dot-cross/index.html",
     lab:"sessions/S02-vectors-dot-cross/lab02/index.html",
