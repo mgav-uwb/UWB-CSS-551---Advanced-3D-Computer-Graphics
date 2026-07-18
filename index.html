@@ -122,6 +122,9 @@ const QUICKLINKS = [
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
 const HANDOUTS = {
+  ch01: { href:"handouts/ch01-intro-3d-graphics.html",
+          title:"Ch. 1 · Intro to 3D Computer Graphics",
+          desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
 };
 
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
@@ -165,6 +168,7 @@ const SESSIONS = [
   { id:"S01", title:"3D Computer Graphics: The Big Picture",
     deck:"sessions/S01-cg-overview/index.html",
     lab:"sessions/S01-cg-overview/lab01/index.html",
+    handouts:["ch01"],
     demos:["raster","lod","keyframe","bump-map","mvc-transform"] },
   { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
     deck:"sessions/S02-vectors-dot-cross/index.html",

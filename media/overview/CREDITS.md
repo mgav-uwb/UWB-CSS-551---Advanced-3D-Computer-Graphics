@@ -1,11 +1,11 @@
 ---
 title: "S01 Overview Media Credits"
-version: "1.1"
+version: "1.3"
 status: draft
 created_by: "Claude"
 created_at: "2026-07-18T01:30"
 last_modified_by: "Claude"
-last_modified_at: "2026-07-18T02:00"
+last_modified_at: "2026-07-18T13:30"
 contributors:
   - "Claude"
 tags:
@@ -41,17 +41,29 @@ Images were downscaled to ≤1600px on the long edge and re-exported as JPEG
 | `open-movie-still.jpg` | Big Buck Bunny character still (Blender open movie) | Blender Foundation | https://commons.wikimedia.org/wiki/File:Big.Buck.Bunny.-.Bunny.Portrait.png | CC BY 3.0 | © Blender Foundation \| bigbuckbunny.org |
 | `vr-headset.jpg` | Person using a VR headset | MIKI Yoshihito | https://commons.wikimedia.org/wiki/File:Girl_wears_a_VR_headset._(30161666678).jpg | CC BY 2.0 | MIKI Yoshihito · CC BY 2.0 · via Wikimedia Commons |
 | `cad-model.jpg` | Engineering CAD render (quasi-poloidal stellarator) | U.S. Government (uploader "usa gov") | https://commons.wikimedia.org/wiki/File:Quasi-Poloidal_Stellarator_3d_render.jpg | Public domain (U.S. federal government work, 17 U.S.C. §105) | U.S. Government · Public domain · via Wikimedia Commons |
+| `sketchpad.jpg` | Ivan Sutherland operating Sketchpad at the TX-2 console (dissertation Fig. 1.2) | Ivan Sutherland (scan by Kerry Rodden) | https://commons.wikimedia.org/wiki/File:SketchpadDissertation-Fig1-2.tif | CC BY-SA 3.0 | Ivan Sutherland (scan: Kerry Rodden) · CC BY-SA 3.0 · via Wikimedia Commons |
+| `utah-teapot.jpg` | The original physical Utah (Newell) teapot at the Computer History Museum | Michael Hicks | https://commons.wikimedia.org/wiki/File:Original_Utah_Teapot_-_Computer_History_Museums.jpg | CC BY 2.0 | Michael Hicks · CC BY 2.0 · via Wikimedia Commons |
+| `sgi-workstation.jpg` | SGI Deskside Onyx graphics workstation | Dave Fischer (Retro-Computing Society of RI) | https://commons.wikimedia.org/wiki/File:SGI-onyx.jpg | CC BY-SA 4.0 (also 3.0 / 2.5 / 2.0 / 1.0, GFDL 1.2+) | Dave Fischer · CC BY-SA 4.0 · via Wikimedia Commons |
+| `geforce256.jpg` | Macro of the NVIDIA GeForce 256 (NV10) GPU package on its board — first consumer GPU with hardware T&L | Konstantin Lanzet | https://commons.wikimedia.org/wiki/File:KL_NVIDIA_Geforce_256.jpg | CC BY-SA 3.0 (also GFDL 1.2+) | Konstantin Lanzet · CC BY-SA 3.0 · via Wikimedia Commons |
 
 ## Notes
 
-- No `MISSING:` rows — all 12 subjects sourced under an allowed license.
+- No `MISSING:` rows — all 12 overview subjects plus all 4 ch01 history-era subjects
+  (`sketchpad`, `utah-teapot`, `sgi-workstation`, `geforce256`) sourced under an allowed license.
+- `sketchpad.jpg`: the iconic photo of Sutherland at the TX-2 is his own dissertation figure
+  (Fig. 1.2), uploaded to Commons under CC BY-SA 3.0 — a genuinely free file, unlike the
+  museum-held (MIT Museum / CHM) reprints of the same era, which are not free.
+- `sketchpad.jpg` is kept at the Commons native resolution (1267 × 1015 scan); it is not
+  upscaled — just JPEG-optimized to hold ≤300 KB.
+- `geforce256.jpg` was downscaled to 1400px (square macro image) to hold ≤300 KB.
 - `cad-model.jpg`: the closest clean-licensed match for "CAD/engineering render" was a
   U.S.-government CAD render of a quasi-poloidal stellarator (fusion device). It reads as a
   precise engineering/CAD render; swap later if a more generic mechanical-assembly render is preferred.
 - `open-movie-still.jpg`: Blender open-movie still. CC BY 3.0 requires the exact
   "© Blender Foundation | bigbuckbunny.org" credit line.
-- CC-BY-SA assets (`path-traced-room`, `gi-comparison`, `toon-shading`, `fluid-sim`) carry a
-  share-alike obligation: derivative reuse must stay under a compatible license.
+- CC-BY-SA assets (`path-traced-room`, `gi-comparison`, `toon-shading`, `fluid-sim`,
+  `sketchpad`, `sgi-workstation`, `geforce256`) carry a share-alike obligation:
+  derivative reuse must stay under a compatible license.
 
 ---
 
@@ -59,5 +71,7 @@ Images were downscaled to ≤1600px on the long edge and re-exported as JPEG
 
 | Version | Date             | Author | Summary                                            |
 | ------- | ---------------- | ------ | -------------------------------------------------- |
+| 1.3     | 2026-07-18T13:30 | Claude | Review fixes: `sketchpad.jpg` re-exported at Commons native 1267×1015 (no upscale); `geforce256.jpg` subject reworded to a GPU-package macro; share-alike roll-up note now lists the 3 new CC-BY-SA assets. |
+| 1.2     | 2026-07-18T13:00 | Claude | Added 4 ch01 history-era assets (`sketchpad`, `utah-teapot`, `sgi-workstation`, `geforce256`), all verified on their Commons File pages under CC BY / CC BY-SA. No MISSING rows. |
 | 1.1     | 2026-07-18T02:00 | Claude | Subject-cell fixes to match the actual images: `stanford-bunny.jpg` is a photo of a physical 3D-printed bunny (not a mesh render); `path-traced-room.jpg` is path-traced cow figurines on a glossy table (not a generic interior). |
 | 1.0     | 2026-07-18T01:30 | Claude | Initial manifest — 12 licensed overview assets curated and verified |

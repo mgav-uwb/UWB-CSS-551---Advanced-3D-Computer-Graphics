@@ -39,6 +39,9 @@
   tools/gen-figures.mjs and re-run it, never the SVGs.
   MEDIA: ../../media/overview/*.jpg, all license-verified; on-slide credit
   lines are copied VERBATIM from media/overview/CREDITS.md — edit there first.
+  READING: ../../handouts/ch01-intro-3d-graphics.html is the primary reading
+  (the field's history, papers, people) — pointed to from the "Tonight" slide
+  and the wrap slide's reading line.
 
   Session plan (120 min, Tue 5:45-7:45 PM synchronous online). Sums to ~111 + buffer.
     0:00  Intro (title + tonight's shape)          ~2 min
@@ -78,6 +81,8 @@ We build **one small world** — and meet every area of computer graphics on the
 - step inside
 
 <small>Thursday = hands-on studio: Unity install + your first code.</small>
+
+<small>Primary reading: <a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1 · Introduction to 3D Computer Graphics</a> — the story behind everything tonight.</small>
 
 ---
 
@@ -738,4 +743,5 @@ A game is everything tonight, at once, at 60, forever:
 - you will implement the engine's math yourself, then check it against the engine
 - **Thursday**: Unity install · the interactive loop · MVC — bring a laptop
 - **MP1 is out this week** — *details on Canvas*
+- **Read Chapter 1** — the field's history, the papers, the people (linked from the course site)
 

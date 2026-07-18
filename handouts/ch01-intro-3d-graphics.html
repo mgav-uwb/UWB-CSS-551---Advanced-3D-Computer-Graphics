@@ -1,0 +1,947 @@
+<!doctype html>
+<!-- CSS 551 course chapter - Introduction to 3D Computer Graphics.
+     Self-contained primary reading; history-as-spine. No MathJax needed. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 1: Introduction to 3D Computer Graphics - CSS 551</title>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d5a; --accentbg: #e9f5f0; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; }
+      th { background: #f0f2f6; }
+      figure { margin: 18px 0 6px; text-align: center; }
+      figure svg, figure img { max-width: 100%; height: auto; border-radius: 6px; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 12.5px; color: var(--dim); margin: 7px auto 0; max-width: 92%; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      .era { color: var(--dim); font-family: system-ui, sans-serif; font-size: 12.5px;
+             font-weight: 600; letter-spacing: .4px; background: #eef1f6;
+             border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px;
+             vertical-align: 3px; margin-left: 8px; white-space: nowrap; }
+      .pipe { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch;
+              font-family: system-ui, sans-serif; font-size: 13px; margin: 16px 0; }
+      .pipe .st { border: 1px solid var(--line); background: #f0f2f6; border-radius: 6px;
+                  padding: 7px 11px; text-align: center; flex: 1 1 auto; min-width: 96px; }
+      .pipe .st small { display: block; color: var(--dim); font-size: 11.5px; margin-top: 2px; }
+      .pipe .st.prog { border-color: var(--demo); background: var(--demobg); }
+      .pipe .st.prog strong { color: var(--demo); }
+      .pipe .arr { align-self: center; color: var(--dim); flex: 0 0 auto; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web. Read it through the course website (or download
+        the file and open it in a browser); a Canvas inline preview will not
+        reach the demos.
+      </p>
+
+      <h1>Chapter 1 &middot; Introduction to 3D Computer Graphics</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Primary reading for Week 1. Pairs with the L01 lecture (&ldquo;The Big
+        Picture&rdquo;) and Lab 01.
+      </div>
+
+      <p class="lead">
+        This chapter tells the story of computer graphics &mdash; not as trivia,
+        but as a map. Every topic this course will teach was once somebody&rsquo;s
+        unsolved problem: how to shade a curved surface, how to decide which
+        object is in front, how to make brick look like brick without modeling a
+        single brick. Each was solved by particular people, in particular places,
+        under the hardware constraints of a particular decade, and the field you
+        are entering is the accumulation of those solutions. Knowing the story
+        gives every technique an <em>address</em>: when Session 6 derives Phong
+        illumination or Session 8 unwraps a texture, you will already know where
+        the idea came from, what problem forced it into existence, and why it
+        stuck. Read this the way you would read the founding history of any
+        discipline you intend to practice &mdash; these are your professional
+        ancestors, and several of their papers are linked below in the original.
+      </p>
+
+      <div class="def">
+        <span class="tag">Definition (the field, restated)</span>
+        <strong>Computer graphics</strong> is the discipline of
+        <em>synthesizing</em> a 2D image of a 3D scene: the picture is computed,
+        not photographed. Its mirror twin, computer vision, runs the same bridge
+        the other way &mdash; from image back to world. The L01 lecture
+        introduced this sentence; this chapter is the story of how each of its
+        words &mdash; scene, image, and especially <em>synthesize</em> &mdash;
+        acquired its modern meaning.
+      </div>
+
+      <figure>
+        <img src="figures/cg-timeline.svg"
+             alt="Timeline of computer graphics eras from 1950 to today: birth, the Utah school, chasing the photograph, raster machines, the programmable era, capturing reality, real time catches film, and the neural era, drawn as overlapping horizontal bands." />
+        <figcaption>
+          Seven decades in eight overlapping eras. The bands overlap on purpose:
+          research eras do not end &mdash; they hand their results to hardware and
+          keep going.
+        </figcaption>
+      </figure>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#era-birth">Interactive pictures are born</a> (1950&ndash;1968)</li>
+          <li><a href="#era-utah">The Utah school</a> (1968&ndash;1980)</li>
+          <li><a href="#era-photograph">Chasing the photograph</a> (1975&ndash;1990)</li>
+          <li><a href="#era-raster">The raster machines</a> (1980&ndash;2000)</li>
+          <li><a href="#era-programmable">The programmable era</a> (2000&ndash;2015)</li>
+          <li><a href="#era-capture">Capturing and simulating reality</a> (1990&ndash;2010)</li>
+          <li><a href="#era-realtime">Real time catches film</a> (2010&ndash;2018)</li>
+          <li><a href="#era-neural">The neural era</a> (2020&ndash;)</li>
+          <li><a href="#era-map">The map of the field today</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="era-birth">1 &middot; Interactive pictures are born <span class="era">1950&ndash;1968</span></h2>
+      <p>
+        Computer graphics is older than you might guess &mdash; older than
+        time-sharing, older than the mouse, nearly as old as stored-program
+        computing itself. MIT&rsquo;s <strong>Whirlwind</strong>, operational in
+        1951, was the first computer fast enough to compute in real time, and it
+        talked to its operators through a cathode-ray tube: a
+        <strong>vector display</strong>, meaning the electron beam was steered
+        directly from point to point to draw glowing line segments, like a very
+        fast plotter made of light. There were no pixels; there was no
+        framebuffer; there was only the beam, redrawing every line thirty-odd
+        times a second before the phosphor faded. Whirlwind grew into
+        <strong>SAGE</strong>, the continent-spanning 1950s air-defense system,
+        whose operators watched radar tracks drawn as vectors on round consoles
+        and pointed at aircraft with a light-sensing gun &mdash; arguably the
+        first humans to interact with a computer through a picture.
+      </p>
+      <p>
+        The founding document of the field, though, is a PhD thesis. In 1963
+        <strong>Ivan Sutherland</strong>, a graduate student at MIT working on the
+        TX-2 computer at Lincoln Laboratory, demonstrated
+        <strong>Sketchpad</strong> &mdash; a program that let a person draw
+        directly on the display with a <strong>light pen</strong>, and then
+        <em>talk back</em>: grab a line and stretch it, zoom into a drawing far
+        larger than the screen, declare that two lines must stay parallel or two
+        segments equal in length and watch the system enforce the
+        <strong>constraints</strong> automatically. Sketchpad also let a drawing
+        contain <em>instances</em> of a master drawing &mdash; change the master
+        rivet and every rivet in the bridge changes &mdash; an idea you will meet
+        again in this course as the scene graph, and which computer scientists
+        recognize as an ancestor of object-oriented programming. Nearly every
+        interactive system since, from CAD packages to the graphical user
+        interface itself, descends recognizably from this one program. The thesis
+        is a genuinely readable classic, and a free facsimile edition is online:
+        <a href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-574.html"
+           target="_blank" rel="noopener">Sutherland, <em>Sketchpad: A Man-Machine
+        Graphical Communication System</em> (1963)</a>.
+      </p>
+      <figure>
+        <img src="../media/overview/sketchpad.jpg" style="max-width: min(560px, 100%);"
+             alt="Ivan Sutherland seated at the TX-2 console operating Sketchpad, holding the light pen to the round vector display; a period scan from his dissertation." />
+        <figcaption>
+          Ivan Sutherland operating Sketchpad at the TX-2 console, light pen in
+          hand &mdash; figure 1.2 of his 1963 dissertation. &middot; Ivan
+          Sutherland (scan: Kerry Rodden) &middot; CC BY-SA 3.0 &middot; via
+          Wikimedia Commons
+        </figcaption>
+      </figure>
+      <p>
+        Two years later Sutherland wrote the field&rsquo;s manifesto. In a short
+        1965 essay,
+        <a href="https://worrydream.com/refs/Sutherland_1965_-_The_Ultimate_Display.pdf"
+           target="_blank" rel="noopener">&ldquo;The Ultimate Display&rdquo;</a>,
+        he imagined the display not as a window onto data but as &ldquo;a looking
+        glass into a mathematical wonderland&rdquo; &mdash; a room in which the
+        computer controls the existence of matter itself. It reads today as a
+        product roadmap the industry has been executing for sixty years: virtual
+        reality, physical simulation, direct manipulation. Sutherland then went
+        and built the first piece of it himself: in 1968 he and his students
+        demonstrated the first head-mounted display, a contraption so heavy it
+        hung from the ceiling and was nicknamed the Sword of Damocles. It drew
+        wireframe rooms that stayed put as you turned your head. Keep that date
+        in mind when you reach Section 7 &mdash; consumer virtual reality is this
+        1968 experiment, shipped 48 years later.
+      </p>
+      <p>
+        What held the era back was hardware arithmetic. A vector display could
+        draw a few thousand line segments before flicker set in, and filled,
+        shaded surfaces were out of reach entirely &mdash; there was nowhere to
+        put the picture. Solving that required a place with money, patience, and
+        an unreasonable concentration of talent.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="era-utah">2 &middot; The Utah school <span class="era">1968&ndash;1980</span></h2>
+      <p>
+        In 1965 <strong>David Evans</strong> was recruited home to the
+        <strong>University of Utah</strong> to build a computer science
+        department, and he made a bet: rather than compete everywhere, Utah would
+        do one thing &mdash; graphics &mdash; better than anyone. ARPA funded it
+        lavishly. In 1968 Ivan Sutherland joined him on the faculty, and the two
+        founded the company <strong>Evans &amp; Sutherland</strong> the same
+        year, building flight-simulator image generators a few blocks from
+        campus. For roughly a decade, one department in Salt Lake City produced,
+        as PhD theses, most of the ideas this course will teach you.
+      </p>
+      <p>
+        The organizing obsession was the <strong>hidden-surface problem</strong>:
+        given a scene of 3D objects, decide which surfaces are visible and which
+        are blocked &mdash; the difference between a wireframe ghost and a solid
+        object. A famous 1974 survey by Sutherland and colleagues compared ten
+        competing algorithms; the eventual winner, for reasons of brutal
+        simplicity, came from <strong>Ed Catmull</strong>&rsquo;s 1974 thesis:
+        the <strong>z-buffer</strong>, which simply stores a depth value per
+        pixel and lets the nearest surface win (invented independently the same
+        year by Wolfgang Stra&szlig;er in Berlin). Catmull&rsquo;s thesis gave
+        the field a second gift in the same document &mdash;
+        <strong>texture mapping</strong>, the idea of gluing an image onto a
+        surface &mdash; and a third, subdivision of curved patches, that will
+        return twice in this chapter. It is preserved online:
+        <a href="https://archive.org/details/DTIC_ADA004968" target="_blank"
+           rel="noopener">Catmull, <em>A Subdivision Algorithm for Computer
+        Display of Curved Surfaces</em> (1974)</a>.
+      </p>
+      <p>
+        Shading came from two other Utah students, both of whose names you will
+        use as common nouns. <strong>Henri Gouraud</strong> (1971) made faceted
+        meshes look smooth by computing lighting at the vertices and
+        interpolating the resulting <em>colors</em> across each triangle &mdash;
+        cheap, and still in hardware today
+        (<a href="https://doi.org/10.1109/T-C.1971.223313" target="_blank"
+           rel="noopener">Gouraud, &ldquo;Continuous Shading of Curved
+        Surfaces,&rdquo; 1971</a>). <strong>Bui Tuong Phong</strong> (1975) went
+        further: interpolate the surface <em>orientation</em> instead and
+        re-evaluate the lighting at every pixel, and add a model for the glossy
+        highlight that slides across shiny surfaces. Phong shading and the Phong
+        highlight are in every real-time engine shipping today
+        (<a href="https://doi.org/10.1145/360825.360839" target="_blank"
+           rel="noopener">Phong, &ldquo;Illumination for Computer Generated
+        Pictures,&rdquo; 1975</a>; background:
+        <a href="https://en.wikipedia.org/wiki/Phong_reflection_model"
+           target="_blank" rel="noopener">the Phong reflection model</a>). Phong
+        published the work while gravely ill with leukemia and died in 1975 at
+        32, the year his paper appeared; few researchers in any field have bought
+        so much with one paper. In 1978 <strong>Jim Blinn</strong> &mdash; also
+        Utah &mdash; showed that you could perturb those interpolated surface
+        orientations with a stored pattern and make flat geometry <em>shade</em>
+        as if it were wrinkled: <strong>bump mapping</strong>
+        (<a href="https://doi.org/10.1145/800248.507101" target="_blank"
+           rel="noopener">Blinn, &ldquo;Simulation of Wrinkled Surfaces,&rdquo;
+        1978</a>), the ancestor of the normal mapping under the skin of every
+        modern game character.
+      </p>
+      <figure>
+        <img src="../media/overview/utah-teapot.jpg"
+             alt="The original white Melitta teapot that Martin Newell digitized in 1975, displayed at the Computer History Museum." />
+        <figcaption>
+          The actual teapot &mdash; the Melitta pot Martin Newell digitized in
+          1975, now at the Computer History Museum in Mountain View. &middot;
+          Michael Hicks &middot; CC BY 2.0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="aside">
+        <span class="tag">Why a teapot?</span>
+        Researchers needed a standard object to test shading on, and in 1975 Utah
+        student <strong>Martin Newell</strong> needed a model with particular
+        properties. Over tea, his wife Sandra suggested the tea set on the table.
+        The teapot turned out to be nearly perfect: it is curved everywhere, so
+        it exercises smooth shading; its silhouette is complex (spout, handle,
+        lid); it is partly concave, so it casts shadows <em>onto itself</em>; and
+        it looks recognizable without any texture at all. Newell plotted its
+        profile on graph paper and entered the control points by hand. The
+        dataset escaped into the community and never left &mdash; the teapot has
+        appeared in decades of papers, in film cameos, and (once) as a built-in
+        primitive in graphics libraries. The physical pot survives at the
+        <a href="https://www.computerhistory.org/collections/catalog/X398.84/"
+           target="_blank" rel="noopener">Computer History Museum</a>. One
+        wrinkle: the rendered teapot is squatter than the real one &mdash; an
+        artifact of the era&rsquo;s non-square pixels that the community simply
+        kept.
+      </div>
+      <div class="aside">
+        <span class="tag">The roster</span>
+        The Utah program&rsquo;s alumni list reads like a founding myth, and it
+        is worth reciting because it explains where the industry came from.
+        <strong>Ed Catmull</strong> co-founded Pixar and ran it (and later Disney
+        Animation) for decades. <strong>John Warnock</strong> (hidden-surface
+        thesis, 1969) co-founded Adobe. <strong>Jim Clark</strong> (PhD under
+        Sutherland) founded Silicon Graphics in 1982 and later co-founded
+        Netscape. <strong>Alan Kay</strong> went to Xerox PARC, where his
+        Smalltalk work shaped object-oriented programming and the graphical user
+        interface. <strong>Jim Blinn</strong> went to NASA&rsquo;s Jet Propulsion
+        Laboratory and made the Voyager flyby animations that taught the public
+        what planetary missions do. <strong>Nolan Bushnell</strong>, a Utah
+        undergraduate of the same era, founded Atari. One mid-sized state
+        university department, one decade &mdash; and a striking lesson in what
+        concentrated funding plus an open problem can do.
+      </div>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        The Utah ideas are all in the course sandbox.
+        <a href="../lib/demo.html?demo=illumination" target="_blank"
+           rel="noopener">Illumination</a>: drag the light around a sphere &mdash;
+        the smooth falloff is Gouraud and Phong&rsquo;s interpolation, and the
+        sliding white highlight is Phong&rsquo;s model.
+        <a href="../lib/demo.html?demo=uv-placement" target="_blank"
+           rel="noopener">UV placement</a>: Catmull&rsquo;s texture mapping,
+        with the wrap under your control.
+        <a href="../lib/demo.html?demo=bump-map" target="_blank"
+           rel="noopener">Bump map</a>: Blinn&rsquo;s trick &mdash; swing the
+        light and watch a perfectly flat wall pretend to have mortar grooves,
+        then drag the bump strength to zero and catch it lying.
+      </div>
+      <p>
+        The hardware thread starts here too. Rendering a shaded frame in the
+        1970s took minutes; interactive machines could afford only wireframes.
+        Jim Clark&rsquo;s response, after Utah, was to design the
+        <strong>Geometry Engine</strong> &mdash; a chip that did the
+        transform-and-project arithmetic of graphics in silicon &mdash; and to
+        found <strong>Silicon Graphics (SGI)</strong> around it. That move, from
+        published algorithm to dedicated hardware, is the single most repeated
+        pattern in this chapter, and Section 4 is built on it.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="era-photograph">3 &middot; Chasing the photograph <span class="era">1975&ndash;1990</span></h2>
+      <p>
+        Utah-style shading lights each surface point as if the rest of the scene
+        did not exist: no shadows, no reflections, no light bouncing from a red
+        wall onto a white floor. The next era&rsquo;s question was blunt: can a
+        computed image be indistinguishable from a photograph? Answering it meant
+        taking the physics of light seriously, and it split into two great
+        research programs &mdash; follow the light as rays, or account for it as
+        energy.
+      </p>
+      <p>
+        The rays came first. In 1980 <strong>Turner Whitted</strong>, at Bell
+        Labs, published <strong>recursive ray tracing</strong>: fire a ray from
+        the eye through each pixel into the scene; where it hits a surface,
+        fire more rays &mdash; toward the lights (shadows), in the mirror
+        direction (reflections), through transparent material (refraction) &mdash;
+        and recurse. In one elegant algorithm, the three effects local shading
+        could never produce all fell out of the same few lines
+        (<a href="https://doi.org/10.1145/358876.358882" target="_blank"
+           rel="noopener">Whitted, &ldquo;An Improved Illumination Model for
+        Shaded Display,&rdquo; 1980</a>; background:
+        <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)"
+           target="_blank" rel="noopener">ray tracing</a>). His famous
+        demonstration image &mdash; a glass sphere and a mirrored sphere over a
+        checkered floor &mdash; took over an hour per frame on the era&rsquo;s
+        minicomputer. Hold that thought until Section 7, because the algorithm
+        never changed; the hardware caught up.
+      </p>
+      <p>
+        Materials got the same treatment. In 1982 <strong>Robert Cook</strong>
+        and <strong>Kenneth Torrance</strong> published the
+        <strong>Cook&ndash;Torrance</strong> reflectance model, importing
+        <em>microfacet theory</em> from applied physics: a surface&rsquo;s gloss
+        is modeled as a statistical distribution of microscopic mirrors. It
+        replaced Phong&rsquo;s plausible-looking highlight with a physically
+        derived one, and it is the direct ancestor of the &ldquo;physically based
+        rendering&rdquo; materials in every modern engine (Section 7).
+      </p>
+      <p>
+        The energy program was centered at <strong>Cornell</strong>, where
+        <strong>Donald Greenberg</strong>&rsquo;s Program of Computer Graphics
+        treated image synthesis as a measurement science. In 1984 Cindy Goral,
+        Torrance, Greenberg, and Bennett Battaile published
+        <strong>radiosity</strong>, borrowed from radiative heat transfer:
+        divide the scene into patches, and solve for the light energy every patch
+        exchanges with every other until the room reaches equilibrium
+        (<a href="https://doi.org/10.1145/800031.808601" target="_blank"
+           rel="noopener">&ldquo;Modeling the Interaction of Light Between
+        Diffuse Surfaces,&rdquo; 1984</a>; background:
+        <a href="https://en.wikipedia.org/wiki/Radiosity_(computer_graphics)"
+           target="_blank" rel="noopener">radiosity</a>). Radiosity produced the
+        first convincing <em>interiors</em> &mdash; soft shadows, and the subtle
+        color bleeding where a red wall blushes the floor beside it.
+      </p>
+      <figure>
+        <img src="../media/overview/cornell-box.jpg"
+             alt="The Cornell box: a cube room with a red left wall, green right wall, white floor and ceiling, two boxes inside, lit by a ceiling light, showing soft shadows and color bleeding." />
+        <figcaption>
+          The Cornell box (here a modern open-source render): red wall, green
+          wall, two boxes, one ceiling light &mdash; the field&rsquo;s standard
+          light-transport test scene since 1984. &middot; SeeSchloss &middot;
+          Public domain &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="aside">
+        <span class="tag">The Cornell box is a physical object</span>
+        The most famous scene in computer graphics is not a file &mdash; it is a
+        box. Cornell researchers built a real one: painted panels, a measured
+        light in the ceiling, a camera in the front wall. They measured the
+        paints&rsquo; reflectances and the lamp&rsquo;s emission with laboratory
+        instruments, <em>photographed</em> the box, then rendered the same
+        geometry with their algorithms and compared, pixel by pixel. That is the
+        scientific method applied to rendering: the photograph is the
+        experiment, the renderer is the theory, and the difference image is the
+        error bar. Every &ldquo;Cornell box&rdquo; image you will ever see
+        (including the one above, and the one in the L01 deck) descends from
+        that physical box, and its geometry is still passed around as a
+        standard test file
+        (<a href="https://en.wikipedia.org/wiki/Cornell_box" target="_blank"
+           rel="noopener">history and data</a>).
+      </div>
+      <p>
+        The third thread of this era belongs to film. At Lucasfilm&rsquo;s
+        Computer Division &mdash; staffed heavily from Utah and NYIT, with
+        Catmull at the helm and Cook among the leads &mdash; the question was
+        not &ldquo;can it look real?&rdquo; but &ldquo;can it look real for two
+        million frames, on schedule?&rdquo; Their answer, published in 1987, was
+        the <strong>REYES</strong> architecture (&ldquo;Renders Everything You
+        Ever Saw&rdquo;): dice every surface into <em>micropolygons</em> smaller
+        than a pixel, shade them in parallel with user-written procedures, and
+        stream the scene through memory so film-resolution frames fit on
+        1980s machines
+        (<a href="https://doi.org/10.1145/37402.37414" target="_blank"
+           rel="noopener">Cook, Carpenter &amp; Catmull, &ldquo;The Reyes Image
+        Rendering Architecture,&rdquo; 1987</a>; background:
+        <a href="https://en.wikipedia.org/wiki/Reyes_rendering" target="_blank"
+           rel="noopener">Reyes rendering</a>). REYES became
+        the engine inside <strong>RenderMan</strong>; the division became
+        <strong>Pixar</strong> when Steve Jobs bought it in 1986; and in 1995
+        <em>Toy Story</em> &mdash; the first entirely computer-rendered feature
+        film &mdash; put this era&rsquo;s research on every screen in the world,
+        at hours of rendering per frame. (No live demo for this section: honest
+        light transport does not run at slider speed. The L01 deck&rsquo;s
+        path-traced exhibit &mdash; the chrome, ceramic, and glass figurines
+        &mdash; is this section&rsquo;s ideas computed to convergence.)
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="era-raster">4 &middot; The raster machines <span class="era">1980&ndash;2000</span></h2>
+      <p>
+        While researchers chased the photograph on minicomputers overnight, a
+        parallel story was making <em>interactive</em> graphics real &mdash; and
+        it begins with memory. A vector display draws lines because lines are
+        all it can afford; to show <em>filled, shaded</em> pictures you need a
+        <strong>framebuffer</strong>, a block of memory holding a color for
+        every pixel, with the monitor repainting itself from that memory
+        continuously. In the early 1970s, memory for even one modest color image
+        cost as much as a house, which is why the first real framebuffer system
+        was built at the one lab that would pay:
+        <strong>Richard Shoup</strong>&rsquo;s <strong>SuperPaint</strong> at
+        Xerox PARC (1972&ndash;73), a shift-register frame store with a paint
+        program on top &mdash; the ancestor of every paint tool and, in a real
+        sense, of the modern screen itself
+        (<a href="https://doi.org/10.1109/85.929908" target="_blank"
+           rel="noopener">Shoup&rsquo;s retrospective in the IEEE Annals</a>).
+        As memory prices collapsed, the framebuffer went from exotic instrument
+        to the assumed substrate of all computing &mdash; and the question became
+        how fast you could fill it.
+      </p>
+      <p>
+        The answer was to freeze the algorithms into silicon. By the mid-1980s
+        the steps needed to draw a shaded triangle were settled science &mdash;
+        the same steps you met in the L01 lecture &mdash; and they form a fixed
+        assembly line:
+      </p>
+      <div class="def">
+        <span class="tag">Definition (the graphics pipeline)</span>
+        The <strong>graphics pipeline</strong> is the fixed sequence of stages
+        that turns a scene of triangles into pixels in the framebuffer:
+        transform the vertices, clip and project them, rasterize each triangle
+        into candidate pixels, texture and shade those pixels, and write the
+        survivors of the depth test. A <strong>GPU</strong> is this sequence
+        built as silicon &mdash; hardware shaped like the algorithm.
+      </div>
+      <div class="pipe" aria-label="fixed-function pipeline">
+        <div class="st"><strong>transform &amp; light</strong><small>move vertices to the camera&rsquo;s view; Gouraud-light them</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>clip &amp; project</strong><small>discard what&rsquo;s off-screen; 3D &rarr; 2D</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>rasterize</strong><small>find each triangle&rsquo;s pixels; z-buffer test</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>texture &amp; blend</strong><small>look up texels; combine into a color</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>framebuffer</strong><small>write the pixel</small></div>
+      </div>
+      <p>
+        Every stage of that strip became dedicated hardware, and for a good
+        reason each: transform-and-light is the same small matrix arithmetic
+        repeated per vertex, millions of times &mdash; a perfect fixed circuit;
+        rasterization and the z-buffer test are the same comparison repeated per
+        pixel with no decisions in between; texturing is memory lookups with a
+        predictable pattern. Nothing in the line ever needs to wait for anything
+        surprising, so the whole thing pipelines like a factory: while one
+        triangle is being textured, the next is being rasterized and a third is
+        being transformed. This design &mdash; the
+        <strong>fixed-function pipeline</strong> &mdash; is why graphics hardware
+        exists as a separate thing at all. <strong>SGI</strong> built it into
+        refrigerator-priced workstations (descendants of Clark&rsquo;s Geometry
+        Engine) that ran the film, CAD, and science markets through the 1990s;
+        the machine in the photo below is what &ldquo;serious graphics&rdquo;
+        looked like in 1995.
+      </p>
+      <figure>
+        <img src="../media/overview/sgi-workstation.jpg"
+             alt="An SGI Onyx deskside graphics workstation, a large teal tower from the mid-1990s." />
+        <figcaption>
+          An SGI Onyx deskside workstation &mdash; mid-1990s high-end graphics,
+          at roughly the price of a Ferrari. &middot; Dave Fischer &middot;
+          CC BY-SA 4.0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <p>
+        In 1992 SGI did something commercially odd and historically decisive: it
+        published the pipeline&rsquo;s control interface as an open standard.
+        <strong>OpenGL</strong> is, in essence, the fixed-function pipeline
+        frozen as an API &mdash; its function calls name the strip&rsquo;s
+        stages almost one for one &mdash; and it meant any vendor could build
+        the hardware and any program could drive it
+        (<a href="https://registry.khronos.org/OpenGL/index_gl.php"
+           target="_blank" rel="noopener">the OpenGL registry</a>, still
+        maintained by Khronos today; Microsoft&rsquo;s Direct3D followed in
+        1996). Standard interface plus commodity silicon is a familiar recipe
+        from the rest of computing, and it did here what it always does: the
+        price collapsed. In 1996 the <strong>3dfx Voodoo</strong> put the back
+        half of the pipeline &mdash; rasterize, z-test, texture &mdash; on a
+        consumer add-in card for a few hundred dollars, and PC games
+        (<em>Quake</em>, above all) made it a mass market. In October 1999 NVIDIA&rsquo;s
+        <strong>GeForce 256</strong> pulled the <em>front</em> half &mdash;
+        transform and lighting &mdash; onto the same consumer chip, completing
+        the strip in silicon, and its marketing coined the word that stuck:
+        <strong>GPU</strong>, graphics processing unit.
+      </p>
+      <figure>
+        <img src="../media/overview/geforce256.jpg"
+             alt="Macro photograph of the NVIDIA GeForce 256 NV10 GPU package mounted on its graphics board." />
+        <figcaption>
+          The chip that named its category: a macro of the GeForce 256&rsquo;s
+          NV10 package (1999) &mdash; the first consumer part with hardware
+          transform &amp; lighting, sold as &ldquo;the world&rsquo;s first
+          GPU.&rdquo; &middot; Konstantin Lanzet &middot; CC BY-SA 3.0 &middot;
+          via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        The stage this hardware race was fought over is in the sandbox:
+        <a href="../lib/demo.html?demo=raster" target="_blank"
+           rel="noopener">Rasterization</a> &mdash; one triangle, a pixel grid
+        you control. Drop the resolution to 8 and you are looking at what the
+        silicon does, slowed down a billionfold: test each pixel center, write
+        the winners into the framebuffer.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="era-programmable">5 &middot; The programmable era <span class="era">2000&ndash;2015</span></h2>
+      <p>
+        The fixed-function pipeline had one flaw, and it was aesthetic: every
+        game looked the same. The hardware implemented Gouraud interpolation and
+        a couple of texture-combine modes, so that was what everyone shipped
+        &mdash; the plasticky mid-90s look was baked into the chips themselves.
+        Film had escaped that trap a decade earlier: REYES let artists write
+        arbitrary <em>shading procedures</em>. The obvious question &mdash;
+        could consumer hardware do the same? &mdash; was answered in 2001 by the
+        <strong>GeForce 3</strong>, the first consumer GPU whose transform and
+        shading stages executed small user-written programs called
+        <strong>shaders</strong>. The pipeline&rsquo;s shape survived, but its
+        two computational hearts became programmable:
+      </p>
+      <div class="pipe" aria-label="programmable pipeline">
+        <div class="st prog"><strong>vertex shader</strong><small>your program, per vertex &mdash; any transform, any lighting</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>clip &amp; rasterize</strong><small>still fixed: the factory stages</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st prog"><strong>fragment shader</strong><small>your program, per pixel &mdash; any material, any trick</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>blend &amp; z-test</strong><small>still fixed</small></div>
+        <div class="arr">&#9654;</div>
+        <div class="st"><strong>framebuffer</strong><small>write the pixel</small></div>
+      </div>
+      <p>
+        The first shaders were written in raw GPU assembly; within three years
+        the C-like shading languages arrived &mdash; Microsoft&rsquo;s HLSL and
+        OpenGL&rsquo;s
+        <a href="https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.pdf"
+           target="_blank" rel="noopener">GLSL</a> &mdash; and shader writing
+        became ordinary programming. (It is how you will write the illumination
+        code in this course: Unity&rsquo;s shaders compile to exactly this
+        machinery.) Hardware then took a second step with deep consequences.
+        Early chips had separate vertex units and pixel units, which sat idle in
+        unbalanced scenes; by 2006 &mdash; the Xbox 360&rsquo;s GPU first, then
+        NVIDIA&rsquo;s G80 on the desktop &mdash; the units were
+        <strong>unified</strong>: one pool of identical little processors,
+        scheduled onto whatever work exists. At that moment a GPU quietly
+        stopped being a graphics appliance and became something more general: a
+        massively parallel computer that happens to ship in every PC.
+      </p>
+      <p>
+        NVIDIA made that official in 2007 with
+        <a href="https://developer.nvidia.com/cuda-zone" target="_blank"
+           rel="noopener">CUDA</a>, a toolkit for running non-graphics programs
+        on those same processors &mdash; and that is the one-line answer to a
+        question you may have wondered about: deep learning happened on graphics
+        cards because graphics had already spent thirty years building the
+        cheap, massively parallel arithmetic machines that neural networks
+        needed (the 2012 AlexNet breakthrough was trained on two consumer
+        gaming GPUs).
+      </p>
+      <p>
+        The same fifteen years industrialized the software above the pipeline.
+        id Software&rsquo;s <em>Quake</em> (1996) lineage established the
+        licensed <strong>game engine</strong> as a business; Epic&rsquo;s
+        <strong>Unreal</strong> (1998) and then <strong>Unity</strong> (2005)
+        turned the accumulated engineering of Sections 2&ndash;4 into a product
+        anyone could download &mdash; which is precisely why this course teaches
+        through an engine while making you rebuild its core math yourself. And
+        when the iPhone arrived in 2007 with a real GPU driving it, the
+        programmable pipeline went into everyone&rsquo;s pocket; by the end of
+        this era, the number of GPUs on Earth exceeded the number of people.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="era-capture">6 &middot; Capturing and simulating reality <span class="era">1990&ndash;2010</span></h2>
+      <p>
+        Everything so far assumed somebody <em>modeled</em> the scene. Through
+        the 1990s a complementary idea matured: steal the shape from reality.
+        <strong>Laser range scanning</strong> sweeps a stripe of light across an
+        object and triangulates millions of surface points; software then
+        stitches the overlapping scans into one triangle mesh. The emblem of the
+        era is a garden-store ceramic rabbit that Stanford&rsquo;s Greg Turk and
+        Marc Levoy scanned in 1994: the <strong>Stanford bunny</strong>, 69,451
+        triangles, released freely and adopted as the field&rsquo;s shared test
+        model &mdash; for thirty years, new mesh algorithms have demonstrated
+        themselves on the bunny first. It lives, with its scanner siblings, in
+        the
+        <a href="https://graphics.stanford.edu/data/3Dscanrep/" target="_blank"
+           rel="noopener">Stanford 3D Scanning Repository</a>.
+      </p>
+      <figure>
+        <img src="../media/overview/stanford-bunny.jpg"
+             alt="Photograph of a physical 3D-printed Stanford bunny figurine." />
+        <figcaption>
+          Not a render: a photograph of a <em>3D-printed</em> Stanford bunny.
+          Reality was scanned into data in 1994; here the data is printed back
+          into reality &mdash; the capture loop closed. &middot; funnypolynomial
+          &middot; CC BY 2.0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <p>
+        Capture then went monumental. In 1998&ndash;99 Levoy&rsquo;s team hauled
+        scanners to Florence and digitized Michelangelo&rsquo;s David at
+        quarter-millimeter resolution &mdash; the
+        <a href="https://accademia.stanford.edu/mich/" target="_blank"
+           rel="noopener">Digital Michelangelo Project</a>, roughly two billion
+        polygons of marble, and the moment cultural heritage became a graphics
+        application. The same years developed <strong>photogrammetry</strong>
+        &mdash; recovering shape from many ordinary photographs &mdash; and
+        <strong>point clouds</strong> from LiDAR; today your phone does a pocket
+        version of both, and the pipeline from scan to cleaned-up game asset is
+        a standard industry workflow.
+      </p>
+      <p>
+        Modeling by hand advanced just as far, by reviving a Utah idea. In 1978
+        Ed Catmull and Jim Clark had published a scheme for rounding a coarse
+        polygonal cage into a smooth surface by repeated splitting &mdash;
+        <a href="https://doi.org/10.1016/0010-4485(78)90110-0" target="_blank"
+           rel="noopener">Catmull&ndash;Clark subdivision</a> &mdash; and it
+        waited twenty years for its moment. Pixar&rsquo;s 1997 short
+        <em>Geri&rsquo;s Game</em> was its debut: an old man&rsquo;s face,
+        hands, and jacket modeled as subdivision surfaces rather than the NURBS
+        patches film had used before. The short won the Academy Award for
+        animated short film, Pixar pivoted its whole character pipeline to
+        subdivision, and the same button sits in Blender and every DCC tool
+        today. It is a theme worth noticing: in graphics, ideas are often ten
+        or twenty years older than their breakthrough &mdash; they wait for
+        hardware, or for an artist with a deadline.
+      </p>
+      <p>
+        The last piece of a believable world is <em>behavior</em> &mdash; nobody
+        can hand-animate an ocean. Physically based simulation matured in the
+        late 1990s: Jos Stam&rsquo;s
+        <a href="https://doi.org/10.1145/311535.311548" target="_blank"
+           rel="noopener">&ldquo;Stable Fluids&rdquo; (1999)</a>
+        (<a href="https://www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/ns.pdf"
+           target="_blank" rel="noopener">author&rsquo;s PDF</a>)
+        made fluid solvers that cannot blow up no matter how large the time
+        step, which is what finally let smoke and water into production
+        pipelines and games; Baraff and Witkin&rsquo;s cloth work of 1998 did
+        the same for fabric. The animator&rsquo;s job shifted, as the L01
+        lecture put it, from puppeteer to director of conditions.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        Two of this era&rsquo;s workhorse ideas are in the sandbox.
+        <a href="../lib/demo.html?demo=lod" target="_blank"
+           rel="noopener">Level of detail</a>: one model at five resolutions
+        &mdash; scanned meshes arrive obese, and simplification plus an LOD
+        ladder is the standard diet; push the model away and find the distance
+        where coarse and fine become indistinguishable.
+        <a href="../lib/demo.html?demo=keyframe" target="_blank"
+           rel="noopener">Keyframe</a>: pose the endpoints, let the machine
+        interpolate &mdash; and flip the easing to see why splines (Section
+        2&rsquo;s curves, run through <em>time</em>) are what make motion look
+        alive.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="era-realtime">7 &middot; Real time catches film <span class="era">2010&ndash;2018</span></h2>
+      <p>
+        By the 2010s the two economies of rendering &mdash; the game&rsquo;s 16
+        milliseconds and the film frame&rsquo;s hours &mdash; began to converge,
+        and this short era is the story of that convergence. Its first movement
+        was <strong>physically based rendering (PBR)</strong> becoming a
+        standard: the industry settled on material models derived from
+        measurement rather than eyeballing &mdash; Cook&ndash;Torrance&rsquo;s
+        microfacet lineage, packaged (most influentially by Disney in 2012) into
+        a small set of intuitive sliders: base color, roughness, metalness. The
+        practical win is consistency: a PBR material looks right under any
+        lighting, in any engine, which is why the same panel of sliders greets
+        you in Unity, Unreal, and Blender alike.
+      </p>
+      <p>
+        The second movement closed a forty-year loop. In 2018 NVIDIA&rsquo;s
+        Turing GPUs (the <strong>RTX</strong> line) added dedicated
+        <strong>ray-tracing cores</strong> &mdash; silicon whose job is firing
+        Whitted&rsquo;s 1980 rays and finding what they hit, billions of times a
+        second
+        (<a href="https://developer.nvidia.com/blog/nvidia-turing-architecture-in-depth/"
+           target="_blank" rel="noopener">the Turing architecture, in
+        NVIDIA&rsquo;s own deep-dive</a>). The image that took Whitted over an
+        hour per frame runs at hundreds of frames per second on the card in a
+        student&rsquo;s laptop &mdash; the purest example of this
+        chapter&rsquo;s pattern of algorithms waiting for silicon. Games today
+        run <strong>hybrid pipelines</strong>: rasterization (Section 4&rsquo;s
+        factory) draws the scene, and rays are budgeted where they buy the most
+        &mdash; honest reflections, shadows, and global illumination.
+      </p>
+      <figure>
+        <img src="../media/overview/vr-headset.jpg"
+             alt="A person wearing a virtual reality headset, head tilted upward." />
+        <figcaption>
+          The 1968 Sword of Damocles, consumerized: a modern VR headset &mdash;
+          two renders per frame, at 90 frames per second, forever. &middot;
+          MIKI Yoshihito &middot; CC BY 2.0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <p>
+        The era&rsquo;s third movement was the return of Sutherland&rsquo;s
+        head-mounted display as a product. A 2012 Kickstarter for the Oculus
+        Rift relaunched <strong>virtual reality</strong>; consumer headsets
+        shipped in 2016. VR is this course&rsquo;s subject matter under maximum
+        pressure: two images per frame (one per eye), at 90 or more frames per
+        second, with total motion-to-photon <strong>latency</strong> of about
+        twenty milliseconds &mdash; miss the budget and the user is not annoyed
+        but physically ill. What VR buys with that rigor is
+        <strong>presence</strong>, the body&rsquo;s conviction that it is
+        <em>in</em> the scene &mdash; the &ldquo;looking glass into a
+        mathematical wonderland&rdquo; of the 1965 essay, operating exactly as
+        specified, half a century late.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=projection" target="_blank"
+           rel="noopener">Projection</a> shows the machinery VR doubles: the
+        camera&rsquo;s frustum &mdash; its pyramid of visible space &mdash; and
+        the image it forms. Drag the field of view and imagine two of these,
+        one per eye, re-aimed by your head 90 times a second: that is a
+        headset, and why its frame budget is the tightest in graphics.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="era-neural">8 &middot; The neural era <span class="era">2020&ndash;</span></h2>
+      <p>
+        Every era so far represented a scene explicitly &mdash; triangles,
+        patches, voxels, splats of paint in a framebuffer. The current one asks:
+        what if the scene is <em>learned</em>? In 2020,
+        <a href="https://www.matthewtancik.com/nerf" target="_blank"
+           rel="noopener">NeRF &mdash; neural radiance fields</a> &mdash; showed
+        that a modest neural network can be trained, from a few dozen ordinary
+        photographs of a place, to answer the question &ldquo;what color and
+        density is space at this point, seen from this direction?&rdquo; Render
+        that learned field with a volume-rendering integral and you can move a
+        camera <em>anywhere</em> &mdash; including viewpoints nobody
+        photographed &mdash; with real-world lighting effects (reflections,
+        translucency, fine hair) that would take artists months to fake,
+        because nothing was modeled: it was captured. The catch was speed;
+        early NeRFs took seconds to minutes per frame.
+      </p>
+      <p>
+        In 2023,
+        <a href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/"
+           target="_blank" rel="noopener">3D Gaussian splatting</a> (Kerbl,
+        Kopanas, Leimk&uuml;hler, and Drettakis at Inria) removed the catch by
+        changing the representation: not a network but millions of small
+        translucent 3D blobs &mdash; Gaussians &mdash; each with position,
+        shape, color, and opacity, optimized until, splatted onto the screen
+        back-to-front, they reproduce the photographs. The punchline belongs in
+        this chapter: splatting is <em>rasterization</em> &mdash; Section
+        4&rsquo;s oldest machinery, drawing the field&rsquo;s newest scenes at
+        real-time rates. Next door, generative models now produce 3D content
+        from text prompts, and the boundary between computer graphics and
+        computer vision &mdash; the mirror-twin field that analyzes images
+        instead of synthesizing them &mdash; is dissolving into a shared
+        question: what is a scene, if not the thing that explains its
+        photographs?
+      </p>
+      <p>
+        What does &ldquo;rendering&rdquo; even mean when the scene is learned?
+        Exactly what it meant in 1963: producing an image from a model of a
+        world. The model has changed representation five times in this chapter
+        &mdash; lines, triangles, patches, voxels, Gaussians &mdash; and the
+        craft has survived every change. If you want to watch the field change
+        representation in real time, the place to look is
+        <strong>SIGGRAPH</strong> &mdash; the annual conference that has been
+        the field&rsquo;s home since 1974 &mdash; where the neural era currently
+        fills most of the program.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=gsplat" target="_blank"
+           rel="noopener">Gaussian splatting</a> &mdash; a real photographed
+        scene (the &ldquo;bonsai&rdquo; capture), rendered live in your browser
+        from about 240,000 Gaussians. There is no mesh and no texture anywhere
+        in it: notice the soft edges where leaves fade out instead of ending in
+        triangle silhouettes. This is the newest thing in this chapter, running
+        on the oldest idea in Section 4.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="era-map">9 &middot; The map of the field today</h2>
+      <p>
+        Here is the payoff of reading history first: this course&rsquo;s
+        schedule <em>is</em> this chapter, taught forward. Each era&rsquo;s
+        problem became a body of technique, and each body of technique is now a
+        week or three of CSS 551:
+      </p>
+      <table>
+        <tr><th>era</th><th>what it left us</th><th>where it lives in this course</th></tr>
+        <tr><td>1 &middot; the birth</td><td>interaction, the display loop, instancing</td><td>Lab 01&rsquo;s interactive loop &amp; MVC; S05 scene graphs</td></tr>
+        <tr><td>2 &middot; the Utah school</td><td>z-buffer, shading, texture &amp; bump mapping</td><td>S06 illumination &middot; S07 meshes &middot; S08 texturing</td></tr>
+        <tr><td>3 &middot; chasing the photograph</td><td>ray tracing, physical materials, global illumination</td><td>S09&ndash;S10 advanced rendering</td></tr>
+        <tr><td>4 &middot; the raster machines</td><td>the pipeline, and the math it runs on</td><td>S02&ndash;S04 vectors &amp; matrices &middot; S06 &middot; S09</td></tr>
+        <tr><td>5 &middot; the programmable era</td><td>shaders, engines, GPU computing</td><td>S08&ndash;S09; every Unity shader you write</td></tr>
+        <tr><td>6 &middot; capture &amp; simulation</td><td>scanning, subdivision, simulation, LOD</td><td>S07 &middot; S10; animation woven through the MPs</td></tr>
+        <tr><td>7 &middot; real time catches film</td><td>PBR, hardware rays, VR&rsquo;s frame budget</td><td>S09 &middot; S10</td></tr>
+        <tr><td>8 &middot; the neural era</td><td>learned scenes, splatting, generative 3D</td><td>S10, and wherever you go next</td></tr>
+      </table>
+      <p>
+        The people and places roll up just as cleanly. <strong>Utah</strong>
+        seeded the field and its industry; <strong>Cornell</strong> made
+        rendering a measurement science; <strong>Stanford</strong> owned capture
+        and, later, much of GPU computing; <strong>MIT</strong> started it all
+        and, with <strong>UNC</strong> and <strong>Caltech</strong> (Jim
+        Blinn&rsquo;s later home, and a wellspring of geometry processing),
+        carried the theory; <strong>Pixar</strong> and <strong>ILM</strong>
+        industrialized film rendering; <strong>NVIDIA</strong> turned the
+        pipeline into the world&rsquo;s most numerous computer. The
+        community&rsquo;s annual home is
+        <a href="https://www.siggraph.org" target="_blank"
+           rel="noopener">ACM SIGGRAPH</a>, whose proceedings have carried
+        nearly every paper cited in this chapter. And the field&rsquo;s founders
+        hold computing&rsquo;s highest honor: the Turing Award went to
+        <a href="https://en.wikipedia.org/wiki/Ivan_Sutherland" target="_blank"
+           rel="noopener">Ivan Sutherland</a> in 1988 for Sketchpad and its
+        descendants, and jointly to
+        <a href="https://en.wikipedia.org/wiki/Edwin_Catmull" target="_blank"
+           rel="noopener">Ed Catmull</a> and
+        <a href="https://en.wikipedia.org/wiki/Pat_Hanrahan" target="_blank"
+           rel="noopener">Pat Hanrahan</a> in 2019 for the concepts and practice
+        of computer-generated imagery &mdash; Hanrahan being the lead architect
+        of RenderMan and, later, the Stanford professor whose lab&rsquo;s
+        GPU-computing work fed directly into Section 5&rsquo;s story.
+      </p>
+      <div class="aside">
+        <span class="tag">How to read a SIGGRAPH paper</span>
+        This chapter linked original papers because, as a graduate student, you
+        are now expected to read them &mdash; and there is a technique to it.
+        Do not read a graphics paper front to back like a textbook. First pass:
+        abstract, then <em>every figure and caption</em> in order &mdash;
+        graphics papers are unusual in that the figures usually carry the whole
+        argument &mdash; then the results section, asking &ldquo;what exactly is
+        being compared, and is the baseline fair?&rdquo; Only if the paper still
+        matters to you, take the second pass through the method, with a pencil,
+        re-deriving what you can. Two more habits: follow the citations
+        <em>backward</em> (every paper in this chapter is at the root of a tree
+        you can climb down from any modern paper&rsquo;s related-work section),
+        and check for a project page &mdash; modern graphics papers almost
+        always have one, with video, code, and data, and it is usually a better
+        first contact than the PDF. Start with whichever paper from this
+        chapter caught you; the Sketchpad thesis and &ldquo;The Ultimate
+        Display&rdquo; are the gentlest on-ramps ever written.
+      </div>
+      <p>
+        One chapter, seventy-five years, eight eras of computing a scene. Next
+        week the course leaves the survey altitude and lands where Section 4
+        says everything begins: the vectors and matrices the pipeline runs on.
+        You now know whose shoulders those lectures stand on.
+      </p>
+
+      <footer>
+        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 1 v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Image credits appear in each
+        caption; interactive demos in the course library.
+      </footer>
+    </div>
+  </body>
+</html>
