@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L01 — Graphics Systems &amp; MVC</title>
+  <title>CSS 551 · L01 — 3D Computer Graphics: The Big Picture</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -33,13 +33,26 @@
     [data-demo] canvas { height: 200px !important; width: auto !important; }
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
+
+    /* overview register: hide the demos' readout/matrix cards in this deck —
+       illumination's N·L/R·V card (per the design), and by the same rationale
+       projection's matrix, scene-graph's matrix, mesh-grid's count formulas,
+       and raster's pixel table: L01 is the no-math overview, and the cards
+       also clip against the 200px embed crop. lod and bump-map are exempt:
+       their readouts (lod's exact triangle ladder, bump-map's "triangles: 2")
+       are scale FACTS, not math, and are the pedagogical point of those two
+       slides. Later decks keep them all. */
+    [data-demo]:not([data-demo="lod"]):not([data-demo="bump-map"]) .demo-shell-card:has(.mat-panel) { display: none; }
+    /* curated media slides */
+    .reveal .media-shot { max-height: 420px; width: auto; }
+    .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
       <section
-        data-markdown="L01-graphics-systems-mvc.md"
+        data-markdown="L01-cg-overview.md"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 320" font-family="Helvetica, Arial, sans-serif">
+<rect width="520" height="320" fill="#0b0c10"/>
+<polyline points="60,260 150,60 340,40 460,220" fill="none" stroke="#3a4152" stroke-width="2" stroke-dasharray="7 6"/>
+<polyline points="60,260 64.29,250.76 68.73,241.78 73.3,233.06 78.01,224.61 82.84,216.43 87.81,208.51 92.9,200.86 98.11,193.48 103.43,186.36 108.86,179.51 114.41,172.93 120.05,166.62 125.8,160.57 131.64,154.8 137.57,149.3 143.59,144.06 149.7,139.1 155.89,134.41 162.15,129.99 168.48,125.84 174.89,121.97 181.36,118.37 187.89,115.04 194.47,111.99 201.11,109.21 207.8,106.71 214.54,104.49 221.31,102.53 228.12,100.86 234.97,99.46 241.85,98.34 248.75,97.5 255.67,96.94 262.62,96.65 269.57,96.65 276.54,96.92 283.51,97.47 290.49,98.31 297.46,99.42 304.43,100.82 311.39,102.5 318.34,104.46 325.27,106.71 332.18,109.23 339.06,112.05 345.92,115.14 352.74,118.52 359.53,122.19 366.28,126.14 372.98,130.38 379.64,134.9 386.24,139.71 392.78,144.81 399.27,150.2 405.69,155.87 412.05,161.84 418.34,168.09 424.54,174.63 430.67,181.47 436.72,188.59 442.68,196 448.55,203.71 454.32,211.71 460,220" fill="none" stroke="#00e58a" stroke-width="3.5"/>
+<circle cx="60" cy="260" r="7" fill="#ffb400" stroke="#0b0c10" stroke-width="2"/>
+<text x="60" y="284" fill="#8b93a7" font-size="15" text-anchor="middle">P0</text>
+<circle cx="150" cy="60" r="7" fill="#ffb400" stroke="#0b0c10" stroke-width="2"/>
+<text x="150" y="46" fill="#8b93a7" font-size="15" text-anchor="middle">P1</text>
+<circle cx="340" cy="40" r="7" fill="#ffb400" stroke="#0b0c10" stroke-width="2"/>
+<text x="340" y="26" fill="#8b93a7" font-size="15" text-anchor="middle">P2</text>
+<circle cx="460" cy="220" r="7" fill="#ffb400" stroke="#0b0c10" stroke-width="2"/>
+<text x="460" y="244" fill="#8b93a7" font-size="15" text-anchor="middle">P3</text>
+<text x="260" y="304" fill="#8b93a7" font-size="15" text-anchor="middle">4 control points steer the curve — it touches only the ends</text>
+</svg>

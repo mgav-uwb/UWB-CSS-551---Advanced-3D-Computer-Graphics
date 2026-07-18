@@ -128,6 +128,12 @@ const HANDOUTS = {
 const DEMOS = {
   "raster": { title:"Rasterization: One Triangle Becomes Pixels",
     desc:"drag res/angle — a triangle sampled onto a coarse framebuffer; covered-pixel readout; grid/centers/outline toggles" },
+  "lod": { title:"Level of Detail: One Mesh at Five Resolutions",
+    desc:"drag level/dist — the same icosphere at five triangle counts (20 → 5,120); exact vertex/triangle readout" },
+  "keyframe": { title:"Keyframe Animation: In-Betweening, Linear vs Smooth",
+    desc:"drag t/ease — three keyframes; linear (visible corner at the middle key) vs Catmull-Rom smooth path; interpolated-position readout" },
+  "bump-map": { title:"Bump Mapping: Lighting Lies About Geometry",
+    desc:"drag bump/lightAz — a flat two-triangle wall shaded to look grooved; the readout's triangle count proves the geometry never changed" },
   "mvc-transform": { title:"MVC: One Model, Two Views (Transform)",
     desc:"drag tx/ry/s — cube view and matrix-panel view stay in sync" },
   "view-matrix": { title:"The View Matrix: Hand-Built, Glass Cockpit",
@@ -156,10 +162,10 @@ const DEMOS = {
 
 // ───────── one row per session: card + its handouts + its demos ─────────
 const SESSIONS = [
-  { id:"S01", title:"Graphics Systems &amp; MVC",
-    deck:"sessions/S01-graphics-systems-mvc/index.html",
-    lab:"sessions/S01-graphics-systems-mvc/lab01/index.html",
-    demos:["raster","mvc-transform"] },
+  { id:"S01", title:"3D Computer Graphics: The Big Picture",
+    deck:"sessions/S01-cg-overview/index.html",
+    lab:"sessions/S01-cg-overview/lab01/index.html",
+    demos:["raster","lod","keyframe","bump-map","mvc-transform"] },
   { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
     deck:"sessions/S02-vectors-dot-cross/index.html",
     lab:"sessions/S02-vectors-dot-cross/lab02/index.html",
