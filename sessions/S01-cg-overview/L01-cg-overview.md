@@ -1,10 +1,21 @@
 <!--
   CSS 551 · Lecture 1 (Session 1) — 3D Computer Graphics: The Big Picture.
-  A story-driven, informal overview of the WHOLE field: we build one small
-  world (an island: terrain, water, a lighthouse, a gull, the sun) and meet
-  every area of computer graphics on the way. No math, no equations — scale
-  facts (counts, times) are the only numbers. Every technical term is bolded
-  exactly ONCE, at its introduction, then used plainly ever after.
+  A story-driven, informal overview of the WHOLE field. v2 restructure: the
+  running example is "our scene" — a modified Cornell box (one red wall, one
+  green, white everywhere else; a brick pillar, a sphere, the Stanford bunny
+  on a pedestal, one ceiling light) that the deck renders LIVE (the our-scene
+  demo closes Act 2) and checkpoints with pre-rendered stills at every act
+  close. No math, no equations — scale facts (counts, times) are the only
+  numbers. Every technical term is bolded exactly ONCE, at its introduction,
+  then used plainly ever after.
+
+  Live demos are PAIRS: a setup slide (what the demo shows + what to look
+  for + the act's era-anchor line where the map below says) followed by a
+  full-slide exhibit whose first line is the reveal comment
+      .slide: class="demo-full"
+  holding ONLY a short ## title + the embed div (+ its viz-fallback pre).
+  index.html's .demo-full CSS grows those embeds to ~520px viewports; embeds
+  on ordinary slides (none remain here) keep the 200px teaser crop.
 
   reveal.js: FLAT deck — every slide is a top-level "---" section (no vertical
   "--" stacks). This keeps the verify-deck harness's demo probe correct: it
@@ -17,15 +28,16 @@
   line; no <small> around math; this deck has NO math at all, on purpose —
   the informal register is the point. Verify every slide at 1280x620.
 
-  DEMOS (11 embeds, all registry slugs, embed stage):
-   - Act 1: data-demo="mesh-grid"    data-controls="n,lift"
+  DEMOS (12 embeds, all registry slugs, embed stage; each a setup+demo-full
+  PAIR):
+   - Act 1: data-demo="mesh-view"    data-controls="wire,spin"
+              (REPLACES the old mesh-grid embed — mesh-grid is S07's, not
+               this deck's; the mesh figure slide stays)
             data-demo="scene-graph"  data-controls="baseRy,armBend"
    - Act 2: data-demo="projection"   data-controls="fov"
             data-demo="raster"       data-controls="res,angle"
             data-demo="illumination" data-controls="lightAz,lightEl"
-              (readout/matrix cards are hidden by this deck's index.html for
-               all demos EXCEPT lod and bump-map, whose count readouts are the
-               point — overview register, scale facts only on screen)
+            data-demo="our-scene"    data-controls="stage,lightX"  (act close)
    - Act 3: data-demo="uv-placement" data-controls="offU,tile"
             data-demo="bump-map"     data-controls="bump,lightAz"
    - Act 4: data-demo="raster"       data-controls="res,aa"
@@ -34,27 +46,44 @@
    - Act 8: data-demo="gsplat"       data-controls="fov"
               (fov slider so the verify-deck pixel probe has a control to
                drive; the scene itself needs none)
+  Readout/matrix cards are hidden by this deck's index.html for all demos
+  EXCEPT lod, bump-map, mesh-view, and our-scene, whose count readouts are
+  scale facts and the point (overview register, no math on screen). The
+  upgraded demos (mesh-view, lod, illumination, uv-placement, bump-map)
+  carry a model-selector button row visible in embeds — Notes direct its
+  live use (e.g. "switch to the bunny").
+
+  SCENE STILLS: figures/scene-stage0..4.png + scene-hero.png are GENERATED
+  by tools/gen-scene-shots.mjs (the our-scene demo rendered headless) —
+  re-run the tool, never hand-edit the PNGs. scene-hero.png is an orbited
+  angle with the RED wall out of frame (flagged in its slide's Note);
+  scene-stage4.png is the canonical dual-wall Cornell view — Cornell-box
+  slides use stage4.
 
   FIGURES: sessions/S01-.../figures/*.svg are GENERATED — edit
   tools/gen-figures.mjs and re-run it, never the SVGs.
   MEDIA: ../../media/overview/*.jpg, all license-verified; on-slide credit
   lines are copied VERBATIM from media/overview/CREDITS.md — edit there first.
   READING: ../../handouts/ch01-intro-3d-graphics.html is the primary reading
-  (the field's history, papers, people) — pointed to from the "Tonight" slide
-  and the wrap slide's reading line.
+  (the field's history, papers, people) — pointed to from the "Tonight"
+  slide, the wrap slide's reading line, and the per-act era-anchor lines that
+  deep-link its section ids (#era-utah, #era-raster, #era-photograph,
+  #era-capture, #era-realtime, #era-neural). The Act 0 timeline slide shows
+  ../../handouts/figures/cg-timeline.svg.
 
-  Session plan (120 min, Tue 5:45-7:45 PM synchronous online). Sums to ~111 + buffer.
-    0:00  Intro (title + tonight's shape)          ~2 min
-    0:02  Act 0  The goal, pixels, the island        8 min
-    0:10  Act 1  A world in numbers                 12 min
-    0:22  Act 2  From scene to image                18 min
-    0:40  Act 3  Surfaces that lie                  12 min
-    0:52  Act 4  The jaggies problem                 8 min
-    1:00  Act 5  Chasing the photograph             10 min
-    1:10  Act 6  Where worlds come from             14 min
-    1:24  Act 7  Making it move                     14 min
-    1:38  Act 8  Worlds you can enter                8 min
-    1:46  Wrap                                       5 min
+  Session plan (120 min, Tue 5:45-7:45 PM synchronous online). Sums to ~111
+  + buffer. 84 slides total:
+    0:00  Intro (title + tonight's shape)          ~2 min   (2 slides)
+    0:02  Act 0  The goal, pixels, our scene        8 min   (6 slides)
+    0:10  Act 1  A world in numbers                12 min  (10 slides)
+    0:22  Act 2  From scene to image               18 min  (15 slides)
+    0:40  Act 3  Surfaces that lie                 12 min  (10 slides)
+    0:52  Act 4  The jaggies problem                8 min   (6 slides)
+    1:00  Act 5  Chasing the photograph            10 min   (7 slides)
+    1:10  Act 6  Where worlds come from            14 min  (10 slides)
+    1:24  Act 7  Making it move                    14 min  (10 slides)
+    1:38  Act 8  Worlds you can enter               8 min   (6 slides)
+    1:46  Wrap                                      5 min   (2 slides)
     1:51  end (+ buffer)
 -->
 
@@ -126,24 +155,23 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 
 ---
 
+## Where all this came from
+
+<img src="../../handouts/figures/cg-timeline.svg" alt="timeline of computer graphics from 1950 to today: interactive pictures born, the Utah school, chasing the photograph, the raster machines, the programmable era, capturing reality, real time catches film, the neural era" style="max-height: 340px; width: 88%;">
+
+Seventy-five years, eight eras — tonight's tour crosses all of them.
+
+<small><a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1</a> tells this story properly — the people, the papers, the machines.</small>
+
+---
+
 ## Meet tonight's scene
 
-```text
-                      \  |  /
-                    ─   sun   ─
-                      /  |  \
-                                     gull  ⌄
-                        ██
-                        ██  lighthouse
-                 ▲▲▲   ████
-               ▲▲▲▲▲▲▲ ████ ▲▲
-        ~ ~  ▲▲▲ terrain ▲▲▲▲▲▲  ~ ~
-     ~ ~ ~ ~ ~ ~ ~  water  ~ ~ ~ ~ ~ ~ ~ ~
-```
+<img src="figures/scene-hero.png" alt="our scene: a small room with white walls and a green wall, a brick pillar, a blue-gray sphere, and a rabbit statue on a white pedestal, lit by one square ceiling light" style="max-height: 260px; width: auto;">
 
-An island. Terrain, water, a lighthouse, a gull, the sun.
+A room, two colored walls. A brick pillar, a sphere, a rabbit on a pedestal, one ceiling light.
 
-**By the end of tonight you'll know the name of every trick it takes.**
+**By the end of tonight you'll understand every trick in this picture — and we build it live.**
 
 ---
 
@@ -157,9 +185,9 @@ An island. Terrain, water, a lighthouse, a gull, the sun.
 
 A scene is a cast list, not a picture:
 
-- **objects** — the terrain, the water, the lighthouse, the gull
+- **objects** — the walls, the pillar, the sphere, the rabbit
 - a **camera** — the point of view the image will be made from
-- **lights** — the sun, without which every pixel is black
+- **lights** — the ceiling lamp, without which every pixel is black
 
 ---
 
@@ -171,17 +199,26 @@ A scene is a cast list, not a picture:
 
 ---
 
-## Build the island's ground
+## A real mesh, in hand
 
-Our terrain is just a *grid of vertices with lifted heights*. Drag `n` (how many), then `lift` (how high).
+Every model — hand-built cube or scanned rabbit — is *the same data*: vertices plus triangles.
 
-<div class="cockpit" data-demo="mesh-grid" data-controls="n,lift"><pre class="viz-fallback">  a flat grid of vertices, each cell split into 2 triangles:
-     ●───●───●───●
-     │ ╱ │ ╱ │ ╱ │      drag n:    more vertices per side → finer ground
-     ●───●───●───●      drag lift: raise the heights → the flat sheet
-     │ ╱ │ ╱ │ ╱ │                 becomes rolling terrain
-     ●───●───●───●
-  same recipe at any scale: a game landscape is this, with more vertices</pre></div>
+- drag `wire`: cross-fade the skin away — the triangles were under there all along
+- `spin` it — 3D data, not a picture; the readout counts vertices and triangles
+
+<small>Meshes — and most of tonight's pipeline — came out of one school: the University of Utah, 1968–1980 — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Meshes, live
+
+<div class="cockpit" data-demo="mesh-view" data-controls="wire,spin"><pre class="viz-fallback">  one real triangle mesh, orbiting: vertices + triangles, nothing else
+    cube: 12 triangles ... bunny/dragon: tens of thousands
+  drag wire: cross-fade solid skin ⇄ bare wireframe
+  drag spin: turn it — it's 3D data, not a picture
+  buttons pick the model: cube · teapot · bunny · dragon</pre></div>
 
 ---
 
@@ -189,8 +226,8 @@ Our terrain is just a *grid of vertices with lifted heights*. Drag `n` (how many
 
 Every object carries a **transform**: *place it, orient it, size it.*
 
-- the lighthouse: stood upright, at the island's peak
-- the gull: high above, tilted into the wind
+- the pillar: stood upright, at the back of the room
+- the rabbit: scaled to size, set on its pedestal
 - one mesh, many placements — a forest is one tree transformed a hundred times
 
 ---
@@ -199,12 +236,20 @@ Every object carries a **transform**: *place it, orient it, size it.*
 
 The **scene graph**: objects attach to objects — *move the parent, the children follow.* Drag `baseRy`, then `armBend`.
 
+Watch for: turning the base carries everything above it — bending the arm never moves the base.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The scene graph, live
+
 <div class="cockpit" data-demo="scene-graph" data-controls="baseRy,armBend"><pre class="viz-fallback">  base   (turn it: baseRy)
   └─ arm   (bend it: armBend)
      └─ hand
   turn the base  → arm AND hand come along for the ride
   bend the arm   → only the hand follows; the base ignores it
-  same idea: lighthouse tower → lamp cage → rotating light</pre></div>
+  same idea: a pedestal carries its rabbit</pre></div>
 
 ---
 
@@ -212,9 +257,17 @@ The **scene graph**: objects attach to objects — *move the parent, the childre
 
 Each object also carries a **material** — its *surface recipe*:
 
-- base color — the lighthouse is white with a red cap
-- shininess — water glints, rock doesn't
+- base color — one wall painted red, one green, on an all-white room
+- shininess — the sphere glints, the walls don't
 - much more soon: Act 3 is materials, all the way down
+
+---
+
+## Our scene so far
+
+<img src="figures/scene-stage0.png" alt="our scene drawn as white wireframe on black: the room, the pillar, the pedestal, the sphere, and the bunny, every triangle's edges visible" style="max-height: 370px; width: auto;">
+
+Our world exists — as triangles. Meshes, transforms, a graph, materials. No pixels of it yet.
 
 ---
 
@@ -229,6 +282,14 @@ Everything in this act, together, is **rendering**.
 ## The virtual camera
 
 The camera makes a **projection**: the 3D scene squashed onto a flat image — near things big, far things small: **perspective**. Drag `fov`.
+
+Watch for: the pyramid is everything the camera can see; the picture-in-the-picture is what it sees right now.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The camera, live
 
 <div class="cockpit" data-demo="projection" data-controls="fov"><pre class="viz-fallback">        far plane
       ┌───────────────┐
@@ -258,8 +319,8 @@ The camera makes a **projection**: the 3D scene squashed onto a flat image — n
 ```text
    framebuffer (color per pixel)      z-buffer (depth per pixel)
    ┌──────────────────┐               ┌──────────────────┐
-   │ sky   sky   sky  │               │ far   far   far  │
-   │ gull  hill  hill │               │ near  mid   mid  │
+   │ wall  wall  wall │               │ far   far   far  │
+   │ rabbit box  wall │               │ near  mid   far  │
    └──────────────────┘               └──────────────────┘
    a new surface lands on a pixel:
    closer than what's stored? → draw it, remember its depth. else skip.
@@ -270,6 +331,14 @@ The camera makes a **projection**: the 3D scene squashed onto a flat image — n
 ## Rasterization fills the pixels
 
 **Rasterization**: color every pixel whose *center* falls inside the triangle. Drag `res` — blocky at 8, smooth at 64.
+
+Watch for: the smooth color blend across the face — and the stair-steps on the edges.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Rasterization, live
 
 <div class="cockpit" data-demo="raster" data-controls="res,angle"><pre class="viz-fallback">   the triangle (math)          the pixels (framebuffer, res = 8)
         ▲                            · · · · · · · ·
@@ -291,9 +360,17 @@ The camera makes a **projection**: the 3D scene squashed onto a flat image — n
 
 ---
 
-## Drag the sun
+## Drive the light
 
-One light, one sphere. Swing `lightAz` behind it — watch the dark side. Raise `lightEl` — noon light.
+One light, one sphere — our scene's lamp, taken to the lab. Swing `lightAz` behind it; raise `lightEl` for overhead light.
+
+Watch for: the lit/dark boundary, the white highlight tracking the light, and the dark side never reaching black.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Lighting, live
 
 <div class="cockpit" data-demo="illumination" data-controls="lightAz,lightEl"><pre class="viz-fallback">      light ☀ (position set by lightAz around, lightEl up/down)
          \
@@ -326,11 +403,38 @@ One light, one sphere. Swing `lightAz` behind it — watch the dark side. Raise 
 
 This assembly line is the **pipeline** — and a **GPU** is a machine *shaped like this picture*.
 
+<small>Utah worked out the stations in the 1970s; the machines shaped like them came two decades later — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a> · <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">§4</a></small>
+
 ---
 
-## Act 2: our island renders!
+## The pipeline, run on our scene
 
-The whole pipeline, run once over our scene — terrain, water, lighthouse, gull, sun. And yet:
+Every station at once, live: drag `stage` through the first three stops.
+
+- *wireframe* — Act 1's world: triangles, edges only
+- *flat* — lit, one color per triangle
+- *smooth* — the facets vanish
+- then slide `lightX` — the whole room answers the light
+
+<small>(the slider has two more stops — we haven't earned those acts yet)</small>
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Our scene, live
+
+<div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  our scene — a small room: red wall left, green wall right, a brick
+  pillar, a sphere, the rabbit on its pedestal, one ceiling light
+  drag stage:  wireframe → flat → smooth  (→ textured → anti-aliased:
+               those two stops belong to Acts 3 and 4)
+  drag lightX: slide the ceiling light — the whole room answers</pre></div>
+
+---
+
+## Rendered — and yet
+
+<img src="figures/scene-stage2.png" alt="our scene smooth-shaded: red and green walls, gray untextured pillar and pedestal, sphere and bunny — everything with the same shiny gray plastic look" style="max-height: 230px; width: auto;">
 
 - everything looks like **plastic** — the same shiny gray-ness everywhere
 - every edge is **jagged** — the raster demo's stair-steps, now on everything
@@ -349,9 +453,10 @@ Two problems, two acts.
 
 **Texture mapping**: glue an *image* onto a mesh. The image is the **texture**.
 
-- brick photo on flat wall → instant masonry
+- brick photo on a flat face → instant masonry — our pillar is exactly this
 - detail is now *pixels in an image*, not triangles — enormously cheaper
-- our lighthouse: a white tower with painted-on brick courses and grime
+
+<small>The paint trick is 1974, Catmull; the groove lie two slides ahead is 1978, Blinn — the same Utah school — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
 
 ---
 
@@ -359,12 +464,21 @@ Two problems, two acts.
 
 **UV coordinates**: every vertex knows *its spot on the image* — like gift-wrapping with labeled paper. Drag `offU`, then `tile`.
 
+Watch for: the image slides and repeats across the surface — the mesh never changes.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## UVs, live
+
 <div class="cockpit" data-demo="uv-placement" data-controls="offU,tile"><pre class="viz-fallback">   the texture (image)             the mesh
    ┌───────────────┐            each vertex carries a
    │ ▓▒ brick ▒▓  │            (u, v) address into the image;
    │ ▒▓ rows  ▓▒  │   ─glue─►  pixels between vertices blend
    └───────────────┘            their addresses
-   drag offU: slide the wrap sideways · drag tile: repeat it more</pre></div>
+   drag offU: slide the wrap sideways · drag tile: repeat it more
+   buttons: quad → cube → teapot → bunny (watch for seams)</pre></div>
 
 ---
 
@@ -372,10 +486,19 @@ Two problems, two acts.
 
 **Bump mapping** (and its modern cousin **normal mapping**): the *lighting* lies about the geometry. Drag `lightAz`, then turn `bump` to zero.
 
+Watch for: the readout's triangle count — it never leaves 2.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Bump mapping, live
+
 <div class="cockpit" data-demo="bump-map" data-controls="bump,lightAz"><pre class="viz-fallback">  the wall is 2 flat triangles — but its lighting pretends grooves:
     bump = 0 :  flat shading, the wall looks like what it is (flat)
     bump > 0 :  mortar lines darken and catch light like real recesses
-  swing lightAz: the fake shadows TRACK the light — that's what sells it</pre></div>
+  swing lightAz: the fake shadows TRACK the light — that's what sells it
+  buttons: wall → teapot (the lie works on curved things too)</pre></div>
 
 ---
 
@@ -405,6 +528,14 @@ Two problems, two acts.
 
 ---
 
+## Our scene, after the lies
+
+<img src="figures/scene-stage3.png" alt="our scene with textures applied: the pillar wears brick, the floor is a checkerboard, the walls stay red, green, and white — same geometry as before" style="max-height: 380px; width: auto;">
+
+Brick on the pillar, a checkered floor — and not one new triangle.
+
+---
+
 ### Act 4 · The jaggies problem
 
 <small>(~8 min)</small>
@@ -425,6 +556,14 @@ Two problems, two acts.
 
 **Anti-aliasing** by **supersampling**: take several looks per pixel, *average* them. Set `res` low, then turn `aa` on.
 
+Watch for: edge pixels taking in-between shades — the staircase dissolving.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Anti-aliasing, live
+
 <div class="cockpit" data-demo="raster" data-controls="res,aa"><pre class="viz-fallback">  the same triangle edge, aa off vs on:
     aa off :  ■ ■ ■ □ □ □     each pixel all-or-nothing → stair-steps
     aa 2×2 :  ■ ■ ▓ ░ □ □     4 samples per pixel, averaged →
@@ -441,6 +580,16 @@ Two problems, two acts.
 
 ---
 
+## Our scene, clean-edged
+
+<img src="figures/scene-stage4.png" alt="our scene fully rendered with anti-aliasing: red and green walls, brick pillar, checkered floor, sphere, and bunny, every silhouette smooth" style="max-height: 250px; width: auto;">
+
+Compare any silhouette with the last checkpoint — the stair-steps are gone.
+
+<small>Rasterization's fixed recipe is why the GPU exists: hard-wired raster machines first, programmable at the shading stops later — <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">Chapter 1 §4</a></small>
+
+---
+
 ### Act 5 · Chasing the photograph
 
 <small>(~10 min)</small>
@@ -451,8 +600,8 @@ Two problems, two acts.
 
 Act 2's lighting is **local** — each point is lit *alone*, as if nothing else existed:
 
-- no **shadows** — the lighthouse casts nothing onto the terrain
-- no **reflections** — the water doesn't truly mirror the lighthouse
+- no **shadows** — the pillar casts nothing onto the floor
+- no **reflections** — the sphere doesn't truly mirror the room
 - no color bleeding — a red wall doesn't blush the white floor beside it
 
 ---
@@ -460,11 +609,13 @@ Act 2's lighting is **local** — each point is lit *alone*, as if nothing else 
 ## Global illumination
 
 <div style="display: flex; gap: 16px; justify-content: center; align-items: flex-start;">
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 300px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light"><small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small></div>
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/gi-comparison.jpg" class="media-shot" style="max-height: 300px;" alt="side-by-side comparison of a scene lit with direct light only versus full global illumination with soft shadows and color bleeding"><small class="credit">KaiaVintr · CC BY-SA 4.0 · via Wikimedia Commons</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="figures/scene-stage4.png" style="max-height: 210px; width: auto;" alt="our scene at its best: anti-aliased, textured, locally lit — no shadows, no color bleeding"><small class="credit">our scene — the best Act 4 can do</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 210px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light — soft shadows and color bleeding visible"><small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small></div>
 </div>
 
-**Global illumination (GI)**: let light *bounce*. The Cornell box is the field's standard test scene.
+Our scene copies a famous original: the Cornell box — a *real* box, built and photographed to test exactly this. **Global illumination (GI)**: let light *bounce*.
+
+<small>The race to match the photograph began in the late 1970s — <a href="../../handouts/ch01-intro-3d-graphics.html#era-photograph">Chapter 1 §3</a></small>
 
 ---
 
@@ -512,20 +663,23 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 ## Scan the real world
 
-<img src="../../media/overview/point-cloud.jpg" class="media-shot" style="max-height: 300px;" alt="a LiDAR point cloud of a San Francisco street intersection: millions of colored dots forming buildings, cars, and roads">
+<img src="../../media/overview/point-cloud.jpg" class="media-shot" style="max-height: 220px;" alt="a LiDAR point cloud of a San Francisco street intersection: millions of colored dots forming buildings, cars, and roads">
 <small class="credit">Daniel L. Lu · CC BY 4.0 · via Wikimedia Commons</small>
 
 **3D scanning**: **photogrammetry** (many photos → shape) or **LiDAR** (laser distances) → a **point cloud** → a mesh.
+
+<small>Capturing reality — shape first, then motion — became graphics' own project in the 1990s — <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
 
 ---
 
 ## The Stanford bunny
 
-<img src="../../media/overview/stanford-bunny.jpg" class="media-shot" style="max-height: 300px;" alt="photograph of a physical 3D-printed Stanford bunny, the field's famous scanned rabbit model, printed back into the real world">
+<img src="../../media/overview/stanford-bunny.jpg" class="media-shot" style="max-height: 190px;" alt="photograph of a physical 3D-printed Stanford bunny, the field's famous scanned rabbit model, printed back into the real world">
 <small class="credit">funnypolynomial · CC BY 2.0 · via Wikimedia Commons</small>
 
 - 1994: a ceramic rabbit, laser-scanned → **69,451 triangles** — the field's favorite test object
 - this photo: the scan, **3D-printed back into the world**
+- and you've met it: our scene's rabbit *is* the Stanford bunny
 
 ---
 
@@ -549,11 +703,20 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 **Level of detail (LOD)**: keep the *same object at several resolutions* — a **multi-resolution** ladder. Push it away with `dist` — can you tell?
 
-<div class="cockpit" data-demo="lod" data-controls="level,dist"><pre class="viz-fallback">  the same model at 5 resolutions, L0 (coarse) ... L4 (fine):
-    L0: dozens of triangles ... L4: thousands
+Watch for: the distance where coarse and fine become indistinguishable — that's the trick's whole license.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## LOD, live
+
+<div class="cockpit" data-demo="lod" data-controls="level,dist"><pre class="viz-fallback">  the same model at several resolutions, L0 (coarse) ... fine:
+    L0: hundreds of triangles ... top rung: tens of thousands
   drag level: watch the facets appear/disappear up close
   drag dist:  push it away — at distance, coarse and fine
-              look IDENTICAL, so why pay for fine?</pre></div>
+              look IDENTICAL, so why pay for fine?
+  buttons pick the model: ico · teapot · bunny · dragon</pre></div>
 
 ---
 
@@ -569,7 +732,7 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 - **procedural generation**: worlds *computed* from rules, not sculpted
 - the engine: **noise** — controlled randomness at several scales, stacked
-- confession: our island's terrain was never sculpted — it was noise + the Act 1 grid
+- a grid of vertices, heights lifted by noise: terrain nobody sculpted
 
 ---
 
@@ -592,7 +755,7 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 - **animation**: change the scene's *numbers* between frames — that's all motion is
 - each frame is a still; motion lives in the *differences* between consecutive stills
-- the gull's flight = its transform, changing a little, 60 times a second
+- a flying bird = its transform, changing a little, 60 times a second
 
 ---
 
@@ -600,11 +763,19 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 **Keyframes**: pose the *important moments*; the computer **interpolates** the rest — **in-betweening**. Scrub `t`, then flip `ease`.
 
-<div class="cockpit" data-demo="keyframe" data-controls="t,ease"><pre class="viz-fallback">  the gull's flight: 3 posed keyframes, computer fills between
+Watch for: the corner at the middle key — there with linear, gone with smooth.
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Keyframes, live
+
+<div class="cockpit" data-demo="keyframe" data-controls="t,ease"><pre class="viz-fallback">  a short flight: 3 posed keyframes, computer fills between
      key A ●───────● key B ───────● key C
                  scrub t →
-  ease = linear : constant speed, mechanical turns at keys
-  ease = smooth : the corner at key B vanishes, turns are smooth — alive
+  ease = linear : constant speed, mechanical corner at key B
+  ease = smooth : the corner at key B vanishes — alive
   (the smooth version is a spline — Act 6's 4 points, now in TIME)</pre></div>
 
 ---
@@ -619,10 +790,12 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 ## Motion capture
 
-<img src="../../media/overview/mocap.jpg" class="media-shot" style="max-height: 320px;" alt="a motion-capture suit dotted with reflective markers, shown on a mannequin in a museum display case">
+<img src="../../media/overview/mocap.jpg" class="media-shot" style="max-height: 250px;" alt="a motion-capture suit dotted with reflective markers, shown on a mannequin in a museum display case">
 <small class="credit">Mbrickn · CC0 · via Wikimedia Commons</small>
 
 **Motion capture**: record a *real performer's* motion onto the rig.
+
+<small>Same era, same project as scanning: the 1990s capture wave, pointed at motion — <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
 
 ---
 
@@ -655,7 +828,7 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 ## Procedural animation
 
 - **procedural animation**: motion from *rules*, live — not recorded, not posed
-- a flock: each gull follows three urges — stay close, don't crash, match neighbors
+- a flock: each bird follows three urges — stay close, don't crash, match neighbors
 - the flock's shape is *nobody's* design — it emerges
 
 ---
@@ -689,6 +862,8 @@ A game is everything tonight, at once, at 60, forever:
 - budget lighting (Act 5), streamed LOD worlds (Act 6), animation and physics (Act 7)
 - all inside the loop, answering *you*, every 16 milliseconds
 
+<small>Today's GPUs even trace true rays inside that budget — 1980's photograph-chasing, returned as silicon — <a href="../../handouts/ch01-intro-3d-graphics.html#era-realtime">Chapter 1 §7</a></small>
+
 ---
 
 ## VR & AR
@@ -703,11 +878,15 @@ A game is everything tonight, at once, at 60, forever:
 
 ## The frontier: neural rendering
 
-- **neural rendering**: scenes *learned from photographs* — walk a camera anywhere in a place that was only photographed
+- **neural rendering**: scenes *learned from photographs* — walk a camera where no photo was taken
 - the names on every current paper: **NeRFs** and **Gaussian splatting**
-- next door: generative 3D — describe a scene in words, receive a model — active research, week 10 territory
+- next door: generative 3D — describe a scene in words, receive a model (week 10)
+
+<small>The newest era on the timeline — five years old and moving. Next slide: one, live — <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
 
 ---
+
+<!-- .slide: class="demo-full" -->
 
 ## A scanned world, live
 

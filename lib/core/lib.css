@@ -86,6 +86,62 @@
   color: #8b93a7;
 }
 
+/* ButtonRow (cockpit.js) — a SliderRow-shaped row (same label width/type,
+   same card-colored pill background) whose control is a group of mutually-
+   exclusive option buttons instead of a range input: the shared model
+   selector every S01 demo mounts in its rail. .btn-row-btn reuses
+   .demo-shell-btn's flat rail-button look; the pressed option's .on state
+   reuses .demo-shell-btn-home's green "this one's active" palette so the
+   two "this control is engaged" cues stay visually consistent across the
+   rail. */
+.cockpit .btn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #14161d;
+  border: 1px solid #262a35;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+}
+
+.cockpit .btn-row-group {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.cockpit .btn-row-btn {
+  flex: 1;
+  background: #1c1f28;
+  color: #e7eaf0;
+  border: 1px solid #262a35;
+  border-radius: 4px;
+  padding: 5px 6px;
+  font: 12px/1.2 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.cockpit .btn-row-btn:hover {
+  background: #262a35;
+}
+
+.cockpit .btn-row-btn:active {
+  background: #2f3542;
+}
+
+.cockpit .btn-row-btn.on {
+  background: #17301f;
+  border-color: #2d6b46;
+  color: #7ee787;
+  font-weight: 600;
+}
+
+.cockpit .btn-row-btn.on:hover {
+  background: #1c3c27;
+}
+
 /* demo-shell: the shared scene-dominant layout every demo mounts into
    (lib/core/demo-shell.js) — a large scene viewport + a compact rail of
    cards, with the help, settings, and legend overlays anchored to the scene

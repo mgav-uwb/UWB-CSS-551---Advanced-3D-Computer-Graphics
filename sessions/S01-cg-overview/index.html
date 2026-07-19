@@ -36,13 +36,30 @@
 
     /* overview register: hide the demos' readout/matrix cards in this deck —
        illumination's N·L/R·V card (per the design), and by the same rationale
-       projection's matrix, scene-graph's matrix, mesh-grid's count formulas,
-       and raster's pixel table: L01 is the no-math overview, and the cards
-       also clip against the 200px embed crop. lod and bump-map are exempt:
-       their readouts (lod's exact triangle ladder, bump-map's "triangles: 2")
-       are scale FACTS, not math, and are the pedagogical point of those two
-       slides. Later decks keep them all. */
-    [data-demo]:not([data-demo="lod"]):not([data-demo="bump-map"]) .demo-shell-card:has(.mat-panel) { display: none; }
+       projection's matrix, scene-graph's matrix, and raster's pixel table:
+       L01 is the no-math overview. lod, bump-map, mesh-view, and our-scene
+       are exempt: their readouts (lod's exact triangle ladder, bump-map's
+       "triangles: 2", mesh-view's vertex/triangle counts, our-scene's stage
+       name + scene triangle count) are scale FACTS, not math, and are the
+       pedagogical point of those slides. Later decks keep them all. */
+    [data-demo]:not([data-demo="lod"]):not([data-demo="bump-map"]):not([data-demo="mesh-view"]):not([data-demo="our-scene"]) .demo-shell-card:has(.mat-panel) { display: none; }
+
+    /* v2 full-slide demo exhibits: slides tagged with
+       <!-- .slide: class="demo-full" --> hold ONLY a short ## title + the
+       embed — the demo IS the slide. Override the 200px teaser crop above
+       (same !important, higher specificity): viewport ~520px tall, rail full
+       height beside it, whole exhibit capped at 560px so title + demo stay
+       inside reveal's 700px slide budget. Any embed NOT on a demo-full slide
+       keeps the 200px default crop. */
+    .reveal section.demo-full h2 { font-size: 1.1em; margin-bottom: 8px; }
+    section.demo-full [data-demo] { display: block; }
+    section.demo-full [data-demo] .demo-shell-root--embed { max-width: 96%; max-height: 560px; }
+    section.demo-full [data-demo] .demo-shell-scene--embed { min-height: 520px; }
+    /* rail widened from the embed default 190px so our-scene's readout rows
+       (stage name, scene triangle count) don't wrap mid-number */
+    section.demo-full [data-demo] .demo-shell-rail--embed { max-height: 520px; flex: 0 0 230px; }
+    section.demo-full [data-demo] .demo-viewport,
+    section.demo-full [data-demo] canvas { height: 520px !important; width: auto !important; }
     /* curated media slides */
     .reveal .media-shot { max-height: 420px; width: auto; }
     .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
