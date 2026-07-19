@@ -165,6 +165,8 @@ const DEMOS = {
     desc:"drag roughness/inAngle — a polar reflectance lobe; Phong s / GGX α, HWHM, and formula panel (shape, not calibrated units)" },
   "gsplat": { title:"3D Gaussian Splatting: A Real Scene, Live in the Browser",
     desc:"orbit a real ~240K-splat Mip-NeRF 360 bonsai scene; drag orbitAz/dist — a rasterizer, not a mesh (attribution in media/gsplat/)" },
+  "simplify-compare": { title:"Mesh Simplification: QEM vs Progressive Meshes vs Gavriliu 2001",
+    desc:"drag tris — the same bunny scan simplified three ways at once (QEM snapped levels, PM's exact continuous stream, MG2001's mesh-graph adaptive extraction); per-algorithm tris/maxErr/minAspect readout" },
 };
 
 // ───────── one row per session: card + its handouts + its demos ─────────
@@ -197,7 +199,7 @@ const SESSIONS = [
   { id:"S07", title:"Polygonal Modeling",
     deck:"sessions/S07-polygonal-modeling/index.html",
     lab:"sessions/S07-polygonal-modeling/lab07/index.html",
-    demos:["mesh-grid"] },
+    demos:["mesh-grid","simplify-compare"] },
   { id:"S08", title:"Texture Mapping",
     deck:"sessions/S08-texture-mapping/index.html",
     lab:"sessions/S08-texture-mapping/lab08/index.html",

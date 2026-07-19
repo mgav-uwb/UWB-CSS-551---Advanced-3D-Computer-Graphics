@@ -1,0 +1,155 @@
+{
+  "generated_by": "tools/build-simplify-stats.mjs",
+  "algorithms": {
+    "qem": [
+      {
+        "level": 0,
+        "tris": 868,
+        "maxErr": 0.0154287,
+        "meanErr": 0.00317474,
+        "minAspect": 0.1108,
+        "medianAspect": 0.547074
+      },
+      {
+        "level": 1,
+        "tris": 3472,
+        "maxErr": 0.00634637,
+        "meanErr": 0.00103437,
+        "minAspect": 0.0935314,
+        "medianAspect": 0.530361
+      },
+      {
+        "level": 2,
+        "tris": 13889,
+        "maxErr": 0.00192401,
+        "meanErr": 0.000274767,
+        "minAspect": 0.110578,
+        "medianAspect": 0.550737
+      },
+      {
+        "level": 3,
+        "tris": 69451,
+        "maxErr": 0,
+        "meanErr": 0,
+        "minAspect": 0.13622,
+        "medianAspect": 0.595732
+      }
+    ],
+    "pm": [
+      {
+        "level": 0,
+        "tris": 500,
+        "maxErr": 0.0309235,
+        "meanErr": 0.00550299,
+        "minAspect": 0.0709769,
+        "medianAspect": 0.554672
+      },
+      {
+        "level": 1,
+        "tris": 500,
+        "maxErr": 0.0309235,
+        "meanErr": 0.00550299,
+        "minAspect": 0.0709769,
+        "medianAspect": 0.554672
+      },
+      {
+        "level": 2,
+        "tris": 704,
+        "maxErr": 0.0309235,
+        "meanErr": 0.00400149,
+        "minAspect": 0.15047,
+        "medianAspect": 0.558249
+      },
+      {
+        "level": 3,
+        "tris": 868,
+        "maxErr": 0.0309235,
+        "meanErr": 0.00326767,
+        "minAspect": 0.12157,
+        "medianAspect": 0.558104
+      },
+      {
+        "level": 4,
+        "tris": 1734,
+        "maxErr": 0.0256631,
+        "meanErr": 0.00173602,
+        "minAspect": 0.0728098,
+        "medianAspect": 0.545054
+      },
+      {
+        "level": 5,
+        "tris": 3471,
+        "maxErr": 0.0111483,
+        "meanErr": 0.000934839,
+        "minAspect": 0.089374,
+        "medianAspect": 0.549201
+      },
+      {
+        "level": 6,
+        "tris": 3879,
+        "maxErr": 0.0111483,
+        "meanErr": 0.000850745,
+        "minAspect": 0.089374,
+        "medianAspect": 0.547258
+      },
+      {
+        "level": 7,
+        "tris": 13889,
+        "maxErr": 0.00865796,
+        "meanErr": 0.000264916,
+        "minAspect": 0.099755,
+        "medianAspect": 0.554011
+      },
+      {
+        "level": 8,
+        "tris": 69451,
+        "maxErr": 0,
+        "meanErr": 0,
+        "minAspect": 0.13622,
+        "medianAspect": 0.595732
+      }
+    ],
+    "mg2001": [
+      {
+        "level": 0,
+        "tris": 145,
+        "maxErr": 0.133791,
+        "meanErr": 0.0313435,
+        "minAspect": 0.340644,
+        "medianAspect": 0.686495
+      },
+      {
+        "level": 1,
+        "tris": 300,
+        "maxErr": 0.062715,
+        "meanErr": 0.0134301,
+        "minAspect": 0.2449,
+        "medianAspect": 0.686278
+      },
+      {
+        "level": 2,
+        "tris": 704,
+        "maxErr": 0.0326198,
+        "meanErr": 0.00685543,
+        "minAspect": 0.32328,
+        "medianAspect": 0.711407
+      },
+      {
+        "level": 3,
+        "tris": 1735,
+        "maxErr": 0.0163113,
+        "meanErr": 0.00327214,
+        "minAspect": 0.304122,
+        "medianAspect": 0.708726
+      },
+      {
+        "level": 4,
+        "tris": 3879,
+        "maxErr": 0.0148021,
+        "meanErr": 0.00170073,
+        "minAspect": 0.291732,
+        "medianAspect": 0.698223
+      }
+    ]
+  }
+}

@@ -450,6 +450,21 @@
            rel="noopener">history and data</a>).
       </div>
       <p>
+        In 1986 <strong>James Kajiya</strong> (then at Caltech) unified these
+        threads. His paper
+        <a href="https://doi.org/10.1145/15922.15902" target="_blank"
+           rel="noopener">&ldquo;The Rendering Equation&rdquo;</a> wrote all of
+        light transport as one integral equation &mdash; the light leaving a
+        point is what it emits plus what it reflects of everything arriving
+        &mdash; and showed that local shading, Whitted&rsquo;s mirrors, and
+        radiosity&rsquo;s interreflections are each special-case solutions of
+        it. The same paper introduced <strong>path tracing</strong>: estimate
+        the integral by following many random light paths and averaging. Too
+        slow for the hardware of 1986, path tracing is today the standard
+        renderer of the film industry, and the equation itself is where this
+        course&rsquo;s Week 10 begins.
+      </p>
+      <p>
         The third thread of this era belongs to film. At Lucasfilm&rsquo;s
         Computer Division &mdash; staffed heavily from Utah and NYIT, with
         Catmull at the helm and Cook among the leads &mdash; the question was
@@ -699,6 +714,32 @@
         a standard industry workflow.
       </p>
       <p>
+        Scans of that size made <strong>mesh simplification</strong> its own
+        discipline: algorithms that remove vertices and triangles while
+        bounding the geometric error. The standard operation is the <em>edge
+        collapse</em> (merge an edge&rsquo;s two endpoints into one), applied
+        greedily in error order. Hugues Hoppe&rsquo;s
+        <a href="https://doi.org/10.1145/237170.237216" target="_blank"
+           rel="noopener">&ldquo;Progressive Meshes&rdquo; (1996)</a> recorded
+        each collapse&rsquo;s inverse &mdash; a <em>vertex split</em> &mdash;
+        so one file plays back as a continuous sequence of levels of detail,
+        with smooth transitions between them; his original implementation is
+        open source in the
+        <a href="https://github.com/hhoppe/Mesh-processing-library"
+           target="_blank" rel="noopener">Mesh-processing-library</a> on
+        GitHub. Garland and Heckbert&rsquo;s
+        <a href="https://doi.org/10.1145/258734.258849" target="_blank"
+           rel="noopener">quadric error metrics (1997)</a> gave the collapse
+        ordering its now-standard cost function. A later line of work
+        simplifies by building a candidate-vertex connectivity graph over the
+        mesh directly and extracting a coarser mesh from it adaptively, with
+        a guaranteed output topology and a bounded triangle aspect ratio:
+        Gavriliu, Carranza, Breen &amp; Barr,
+        <a href="https://doi.org/10.1109/VISUAL.2001.964524" target="_blank"
+           rel="noopener">IEEE Visualization 2001</a>; the sandbox below runs
+        that algorithm&rsquo;s mesh-graph variant on the bunny itself.
+      </p>
+      <p>
         Modeling by hand advanced just as far, by reviving a Utah idea. In 1978
         Ed Catmull and Jim Clark had published a scheme for rounding a coarse
         polygonal cage into a smooth surface by repeated splitting &mdash;
@@ -730,12 +771,17 @@
       </p>
       <div class="demo">
         <span class="tag">See it live</span>
-        Two of this era&rsquo;s workhorse ideas are in the sandbox.
+        Three of this era&rsquo;s workhorse ideas are in the sandbox.
         <a href="../lib/demo.html?demo=lod" target="_blank"
            rel="noopener">Level of detail</a>: one model at five resolutions
         &mdash; scanned meshes arrive obese, and simplification plus an LOD
         ladder is the standard diet; push the model away and find the distance
         where coarse and fine become indistinguishable.
+        <a href="../lib/demo.html?demo=simplify-compare" target="_blank"
+           rel="noopener">Simplify compare</a>: compare three simplifiers on
+        the bunny at once &mdash; QEM, Progressive Meshes, and the mesh-graph
+        MG2001 above, each honestly reporting its own triangle count, error,
+        and worst triangle shape at the same slider position.
         <a href="../lib/demo.html?demo=keyframe" target="_blank"
            rel="noopener">Keyframe</a>: pose the endpoints, let the machine
         interpolate &mdash; and flip the easing to see why splines (Section
