@@ -1,21 +1,28 @@
 <!--
   CSS 551 · Lecture 1 (Session 1) — 3D Computer Graphics: The Big Picture.
-  A story-driven, informal overview of the WHOLE field. v2 restructure: the
-  running example is "our scene" — a modified Cornell box (one red wall, one
-  green, white everywhere else; a brick pillar, a sphere, the Stanford bunny
-  on a pedestal, one ceiling light) that the deck renders LIVE (the our-scene
-  demo closes Act 2) and checkpoints with pre-rendered stills at every act
-  close. No math, no equations — scale facts (counts, times) are the only
-  numbers. Every technical term is bolded exactly ONCE, at its introduction,
-  then used plainly ever after.
+  A story-driven, informal overview of the WHOLE field. v3 restructure: the
+  deck now walks the SAME historic spine as the Chapter 1 handout — seventy-
+  five years in eight overlapping eras, 1950 → today, in chronological order:
+      1 interactive pictures born (1950-68)   5 the programmable era (2000-15)
+      2 the Utah school (1968-80)             6 capturing & simulating (1990-2010)
+      3 chasing the photograph (1975-90)      7 real time catches film (2010-18)
+      4 the raster machines (1980-2000)       8 the neural era (2020-)
+  + a "map of the field today" close. Each concept and each live demo is homed
+  in the era that made it the point; where a technique was invented earlier
+  than it became ubiquitous, we teach it where the handout gives it weight and
+  name its origin in passing. The running example is "our scene" — a modified
+  Cornell box (one red wall, one green, white elsewhere; a brick pillar, a
+  sphere, the Stanford bunny on a pedestal, one ceiling light) that threads
+  through the eras: it renders LIVE in the Utah era (the our-scene demo) and
+  checkpoints with pre-rendered stills as later eras add tricks. No math, no
+  equations — scale facts (counts, times) are the only numbers. Every technical
+  term is bolded exactly ONCE, at its introduction, then used plainly after.
 
-  Live demos are PAIRS: a setup slide (what the demo shows + what to look
-  for + the act's era-anchor line where the map below says) followed by a
-  full-slide exhibit whose first line is the reveal comment
+  Live demos are PAIRS: a setup slide (what the demo shows + what to look for)
+  followed by a full-slide exhibit whose first line is the reveal comment
       .slide: class="demo-full"
   holding ONLY a short ## title + the embed div (+ its viz-fallback pre).
-  index.html's .demo-full CSS grows those embeds to ~520px viewports; embeds
-  on ordinary slides (none remain here) keep the 200px teaser crop.
+  index.html's .demo-full CSS grows those embeds to ~520px viewports.
 
   reveal.js: FLAT deck — every slide is a top-level "---" section (no vertical
   "--" stacks). This keeps the verify-deck harness's demo probe correct: it
@@ -29,21 +36,19 @@
   the informal register is the point. Verify every slide at 1280x620.
 
   DEMOS (12 embeds, all registry slugs, embed stage; each a setup+demo-full
-  PAIR):
-   - Act 1: data-demo="mesh-view"    data-controls="wire,spin"
-              (REPLACES the old mesh-grid embed — mesh-grid is S07's, not
-               this deck's; the mesh figure slide stays)
-            data-demo="scene-graph"  data-controls="baseRy,armBend"
-   - Act 2: data-demo="projection"   data-controls="fov"
-            data-demo="raster"       data-controls="res,angle"
-            data-demo="illumination" data-controls="lightAz,lightEl"
-            data-demo="our-scene"    data-controls="stage,lightX"  (act close)
-   - Act 3: data-demo="uv-placement" data-controls="offU,tile"
-            data-demo="bump-map"     data-controls="bump,lightAz"
-   - Act 4: data-demo="raster"       data-controls="res,aa"
-   - Act 6: data-demo="lod"          data-controls="level,dist"
-   - Act 7: data-demo="keyframe"     data-controls="t,ease"
-   - Act 8: data-demo="gsplat"       data-controls="fov"
+  PAIR), now homed by era:
+   - Era 2 (Utah): data-demo="mesh-view"     data-controls="wire,spin"
+                   data-demo="scene-graph"    data-controls="baseRy,armBend"
+                   data-demo="projection"     data-controls="fov"
+                   data-demo="raster"         data-controls="res,angle"
+                   data-demo="illumination"   data-controls="lightAz,lightEl"
+                   data-demo="our-scene"      data-controls="stage,lightX"
+   - Era 4 (raster machines): data-demo="raster"  data-controls="res,aa"
+   - Era 5 (programmable):    data-demo="uv-placement" data-controls="offU,tile"
+                              data-demo="bump-map"     data-controls="bump,lightAz"
+   - Era 6 (capture): data-demo="lod"       data-controls="level,dist"
+                      data-demo="keyframe"   data-controls="t,ease"
+   - Era 8 (neural):  data-demo="gsplat"    data-controls="fov"
               (fov slider so the verify-deck pixel probe has a control to
                drive; the scene itself needs none)
   Readout/matrix cards are hidden by this deck's index.html for all demos
@@ -56,35 +61,39 @@
   SCENE STILLS: figures/scene-stage0..4.png + scene-hero.png are GENERATED
   by tools/gen-scene-shots.mjs (the our-scene demo rendered headless) —
   re-run the tool, never hand-edit the PNGs. scene-hero.png is an orbited
-  angle with the RED wall out of frame (flagged in its slide's Note);
-  scene-stage4.png is the canonical dual-wall Cornell view — Cornell-box
-  slides use stage4.
+  angle with the RED wall out of frame; scene-stage4.png is the canonical
+  dual-wall Cornell view. On the historic spine the stills are used as
+  era checkpoints: stage0 (wireframe) + live stages 0-2 in Era 2; stage2
+  (best local render) in Era 3's GI comparison; stage3 (textured) and
+  stage4 (textured + clean edges) as the Era 5 capstone.
 
   FIGURES: sessions/S01-.../figures/*.svg are GENERATED — edit
   tools/gen-figures.mjs and re-run it, never the SVGs.
   MEDIA: ../../media/overview/*.jpg, all license-verified; on-slide credit
   lines are copied VERBATIM from media/overview/CREDITS.md — edit there first.
+  The four history-era media (sketchpad, utah-teapot, sgi-workstation,
+  geforce256) + gi-comparison anchor the era slides they belong to.
   READING: ../../handouts/ch01-intro-3d-graphics.html is the primary reading
-  (the field's history, papers, people) — pointed to from the "Tonight"
-  slide, the wrap slide's reading line, and the per-act era-anchor lines that
-  deep-link its section ids (#era-utah, #era-raster, #era-photograph,
-  #era-capture, #era-realtime, #era-neural). The Act 0 timeline slide shows
-  ../../handouts/figures/cg-timeline.svg.
+  and the deck's spine — the era dividers deep-link its section ids
+  (#era-birth, #era-utah, #era-photograph, #era-raster, #era-programmable,
+  #era-capture, #era-realtime, #era-neural, #era-map). The opening timeline
+  slide shows ../../handouts/figures/cg-timeline.svg.
 
-  Session plan (120 min, Tue 5:45-7:45 PM synchronous online). Sums to ~111
-  + buffer. 84 slides total:
-    0:00  Intro (title + tonight's shape)          ~2 min   (2 slides)
-    0:02  Act 0  The goal, pixels, our scene        8 min   (6 slides)
-    0:10  Act 1  A world in numbers                12 min  (10 slides)
-    0:22  Act 2  From scene to image               18 min  (15 slides)
-    0:40  Act 3  Surfaces that lie                 12 min  (10 slides)
-    0:52  Act 4  The jaggies problem                8 min   (6 slides)
-    1:00  Act 5  Chasing the photograph            10 min   (7 slides)
-    1:10  Act 6  Where worlds come from            14 min  (10 slides)
-    1:24  Act 7  Making it move                    14 min  (10 slides)
-    1:38  Act 8  Worlds you can enter               8 min   (6 slides)
-    1:46  Wrap                                      5 min   (2 slides)
-    1:51  end (+ buffer)
+  Session plan (120 min, Tue 5:45-7:45 PM synchronous online):
+    0:00  Open (title, Sketchpad, the goal, pixels, our scene, timeline)  ~10 min
+    0:10  Era 1  Interactive pictures born (1950-68)                        6 min
+    0:16  Era 2  The Utah school (1968-80) — a world in numbers, taking     30 min
+                 the picture, our scene live
+    0:46  Era 3  Chasing the photograph (1975-90) — GI, offline light       12 min
+    0:58  Era 4  The raster machines (1980-2000) — silicon, jaggies, AA     12 min
+    1:10  Era 5  The programmable era (2000-15) — shaders, surfaces         14 min
+                 that lie, PBR, our scene complete
+    1:24  Era 6  Capturing & simulating (1990-2010) — scans, shapes,        18 min
+                 LOD, motion & simulation
+    1:42  Era 7  Real time catches film (2010-18) — the loop, games, VR      8 min
+    1:50  Era 8  The neural era (2020-)                                      4 min
+    1:54  Close  The map of the field / Thursday                            4 min
+    1:58  end (+ buffer)
 -->
 
 ## CSS 551
@@ -93,25 +102,18 @@
 
 **Lecture 1 — 3D Computer Graphics: The Big Picture**
 
-*One scene, start to finish.*
+*Seventy-five years, one scene, start to finish.*
 
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 ---
 
-## Tonight
+## It begins with a sketch
 
-We build **one small world** — and meet every area of computer graphics on the way.
+<img src="../../media/overview/sketchpad.jpg" alt="Ivan Sutherland at the TX-2 console operating Sketchpad in 1963, drawing on the display with a light pen" style="max-height: 300px; width: auto;">
+<small class="credit">Ivan Sutherland (scan: Kerry Rodden) · CC BY-SA 3.0 · via Wikimedia Commons</small>
 
-- put a world in numbers — then take its picture
-- make surfaces look real, and fix the jagged edges
-- chase the photograph (or choose not to)
-- where worlds come from — then make them move
-- step inside
-
-<small>Thursday = hands-on studio: Unity install + your first code.</small>
-
-<small>Primary reading: <a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1 · Introduction to 3D Computer Graphics</a> — the story behind everything tonight.</small>
+**1963**: Ivan Sutherland's **Sketchpad** — a person draws directly on the screen with a **light pen**, and the machine answers.
 
 ---
 
@@ -127,7 +129,7 @@ We build **one small world** — and meet every area of computer graphics on the
 
 ## A screen is a grid of pixels
 
-<img src="figures/pixels-zoom.svg" alt="a coarse pixel grid on a screen, with a 3×3 patch magnified to show each pixel's red, green, blue numbers" style="max-height: 370px; width: auto;">
+<img src="figures/pixels-zoom.svg" alt="a coarse pixel grid on a screen, with a 3×3 patch magnified to show each pixel's red, green, blue numbers" style="max-height: 340px; width: auto;">
 
 a **pixel** — *picture element* — is one little colored square of the grid
 
@@ -155,13 +157,15 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 
 ---
 
-## Where all this came from
+## Tonight, in order
 
-<img src="../../handouts/figures/cg-timeline.svg" alt="timeline of computer graphics from 1950 to today: interactive pictures born, the Utah school, chasing the photograph, the raster machines, the programmable era, capturing reality, real time catches film, the neural era" style="max-height: 340px; width: 88%;">
+**Eight eras, 1950 → today** — building **one small world**, a trick per era.
 
-Seventy-five years, eight eras — tonight's tour crosses all of them.
+- **1950s–70s**: pictures born; Utah invents the pipeline
+- **1980s–2000s**: chase the photo; silicon; programmable
+- **1990s–now**: capture, simulate, real time, neural
 
-<small><a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1</a> tells this story properly — the people, the papers, the machines.</small>
+<small>Thursday = studio (Unity). Reading: <a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1</a>.</small>
 
 ---
 
@@ -171,13 +175,47 @@ Seventy-five years, eight eras — tonight's tour crosses all of them.
 
 A room, two colored walls. A brick pillar, a sphere, a rabbit on a pedestal, one ceiling light.
 
-**By the end of tonight you'll understand every trick in this picture — and we build it live.**
+**Watch it gain a trick every era — by the end you'll understand every choice in this picture.**
 
 ---
 
-### Act 1 · A world in numbers
+## Eight eras, one timeline
 
-<small>(~12 min)</small>
+<img src="../../handouts/figures/cg-timeline.svg" alt="timeline of computer graphics from 1950 to today: interactive pictures born, the Utah school, chasing the photograph, the raster machines, the programmable era, capturing reality, real time catches film, the neural era" style="max-height: 275px; width: 88%;">
+
+Tonight is this bar, left to right — the bands **overlap on purpose**: research eras hand results to hardware and keep going.
+
+---
+
+### Era 1 · Interactive pictures are born
+
+<small>1950–1968 · ~6 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-birth">Chapter 1 §1</a></small>
+
+---
+
+## Drawing at the speed of thought
+
+- **1951**: MIT's Whirlwind — the first computer fast enough to draw in *real time*, on a **vector display** (glowing lines, not filled shapes)
+- **1963**: Sketchpad adds the light pen and a solver — *interactive* graphics is born
+- the wall: hardware arithmetic — a few thousand line segments before flicker; **no filled, shaded surfaces yet**
+
+---
+
+## The Ultimate Display
+
+**1965**, Sutherland's manifesto: the display is *"a looking glass into a mathematical wonderland."*
+
+- not a window onto data — a *world* the computer controls
+- **1968**: he builds the first head-mounted display — the **"Sword of Damocles,"** hung from the ceiling
+- that idea comes back, as a product, fifty years from now on this timeline
+
+---
+
+### Era 2 · The Utah school
+
+<small>1968–1980 · ~30 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
+
+One department invented most of what a scene *is* — and how to take its picture.
 
 ---
 
@@ -193,7 +231,7 @@ A scene is a cast list, not a picture:
 
 ## A 3D thing is a mesh of triangles
 
-<img src="figures/mesh-sphere.svg" alt="a low-poly sphere drawn as a wireframe: vertices as dots, one triangle highlighted" style="max-height: 300px; width: auto;">
+<img src="figures/mesh-sphere.svg" alt="a low-poly sphere drawn as a wireframe: vertices as dots, one triangle highlighted" style="max-height: 290px; width: auto;">
 
 **vertices** connected into **triangles** — together, a **mesh** (a triangle is the simplest **polygon**)
 
@@ -205,8 +243,6 @@ Every model — hand-built cube or scanned rabbit — is *the same data*: vertic
 
 - drag `wire`: cross-fade the skin away — the triangles were under there all along
 - `spin` it — 3D data, not a picture; the readout counts vertices and triangles
-
-<small>Meshes — and most of tonight's pipeline — came out of one school: the University of Utah, 1968–1980 — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
 
 ---
 
@@ -259,23 +295,30 @@ Each object also carries a **material** — its *surface recipe*:
 
 - base color — one wall painted red, one green, on an all-white room
 - shininess — the sphere glints, the walls don't
-- much more soon: Act 3 is materials, all the way down
+- much more later: whole eras are spent on materials alone
+
+---
+
+## The Utah teapot
+
+<img src="../../media/overview/utah-teapot.jpg" alt="the original physical Utah teapot, a Melitta pot, on display at the Computer History Museum" style="max-height: 240px; width: auto;">
+<small class="credit">Michael Hicks · CC BY 2.0 · via Wikimedia Commons</small>
+
+**1975**: Martin Newell digitizes his own teapot into a mesh — the field's mascot ever since.
 
 ---
 
 ## Our scene so far
 
-<img src="figures/scene-stage0.png" alt="our scene drawn as white wireframe on black: the room, the pillar, the pedestal, the sphere, and the bunny, every triangle's edges visible" style="max-height: 370px; width: auto;">
+<img src="figures/scene-stage0.png" alt="our scene drawn as white wireframe on black: the room, the pillar, the pedestal, the sphere, and the bunny, every triangle's edges visible" style="max-height: 360px; width: auto;">
 
 Our world exists — as triangles. Meshes, transforms, a graph, materials. No pixels of it yet.
 
 ---
 
-### Act 2 · From scene to image
+### Utah, continued · from scene to image
 
-<small>(~18 min)</small>
-
-Everything in this act, together, is **rendering**.
+Everything on the next slides, together, is **rendering** — the journey from data to pixels.
 
 ---
 
@@ -387,23 +430,7 @@ Watch for: the lit/dark boundary, the white highlight tracking the light, and th
 
 - *flat* — one color per triangle: faceted, disco-ball look
 - *smooth* — blend across triangles: the mesh's secret facets disappear
-- the classic smooth recipes are named **Gouraud** and **Phong** — names to recognize, details later
-
----
-
-## The pipeline, one picture
-
-```text
-  scene  ──►  camera &      ──►  rasterize  ──►  shade  ──►  framebuffer
-              projection
-  (objects,   3D → flat          which pixels    what color    the numbers
-   lights,    triangles          each triangle   each pixel    the monitor
-   camera)    on the image       covers          gets          shows
-```
-
-This assembly line is the **pipeline** — and a **GPU** is a machine *shaped like this picture*.
-
-<small>Utah worked out the stations in the 1970s; the machines shaped like them came two decades later — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a> · <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">§4</a></small>
+- the two classic smooth recipes are named **Gouraud** and **Phong** — both Utah students, both now common nouns
 
 ---
 
@@ -411,12 +438,12 @@ This assembly line is the **pipeline** — and a **GPU** is a machine *shaped li
 
 Every station at once, live: drag `stage` through the first three stops.
 
-- *wireframe* — Act 1's world: triangles, edges only
+- *wireframe* — the world as triangles, edges only
 - *flat* — lit, one color per triangle
 - *smooth* — the facets vanish
 - then slide `lightX` — the whole room answers the light
 
-<small>(the slider has two more stops — we haven't earned those acts yet)</small>
+<small>(the slider has two more stops — later eras earn those)</small>
 
 ---
 
@@ -427,36 +454,23 @@ Every station at once, live: drag `stage` through the first three stops.
 <div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  our scene — a small room: red wall left, green wall right, a brick
   pillar, a sphere, the rabbit on its pedestal, one ceiling light
   drag stage:  wireframe → flat → smooth  (→ textured → anti-aliased:
-               those two stops belong to Acts 3 and 4)
+               those two stops belong to later eras)
   drag lightX: slide the ceiling light — the whole room answers</pre></div>
 
 ---
 
-## Rendered — and yet
+### Utah, finished · surfaces that lie
 
-<img src="figures/scene-stage2.png" alt="our scene smooth-shaded: red and green walls, gray untextured pillar and pedestal, sphere and bunny — everything with the same shiny gray plastic look" style="max-height: 230px; width: auto;">
-
-- everything looks like **plastic** — the same shiny gray-ness everywhere
-- every edge is **jagged** — the raster demo's stair-steps, now on everything
-
-Two problems, two acts.
-
----
-
-### Act 3 · Surfaces that lie
-
-<small>(~12 min)</small>
+The geometry stays cheap. The *surface* pretends otherwise — and it's all Utah, mid-1970s.
 
 ---
 
 ## Paint by image: texture mapping
 
-**Texture mapping**: glue an *image* onto a mesh. The image is the **texture**.
+**Texture mapping** (Catmull, 1974): glue an *image* onto a mesh. The image is the **texture**.
 
 - brick photo on a flat face → instant masonry — our pillar is exactly this
 - detail is now *pixels in an image*, not triangles — enormously cheaper
-
-<small>The paint trick is 1974, Catmull; the groove lie two slides ahead is 1978, Blinn — the same Utah school — <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
 
 ---
 
@@ -484,7 +498,7 @@ Watch for: the image slides and repeats across the surface — the mesh never ch
 
 ## Bump mapping: fake the grooves
 
-**Bump mapping** (and its modern cousin **normal mapping**): the *lighting* lies about the geometry. Drag `lightAz`, then turn `bump` to zero.
+**Bump mapping** (Blinn, 1978; its modern cousin, **normal mapping**): the *lighting* lies about the geometry. Drag `lightAz`, then turn `bump` to zero.
 
 Watch for: the readout's triangle count — it never leaves 2.
 
@@ -502,43 +516,113 @@ Watch for: the readout's triangle count — it never leaves 2.
 
 ---
 
-## Textures without images
+## Our scene, after Utah
 
-- **procedural textures** — patterns *computed*, not photographed: wood rings, marble veins, noise
-- **solid textures** — the pattern fills 3D space; the object is *carved out of virtual marble*
-- no photo, no seams, endless variety from a small recipe
+<img src="figures/scene-stage3.png" alt="our scene with textures applied: the pillar wears brick, the floor is a checkerboard, the walls stay red, green, and white — same geometry as before" style="max-height: 320px; width: auto;">
 
----
-
-## Mirrors on a budget
-
-**Environment mapping**: reflect a *stored picture* of the surroundings.
-
-- shiny chrome, water glints, sunglasses — without simulating any actual light bouncing
-- the reflection is a lookup into a panorama photographed (or pre-rendered) once
-- close enough to fool almost everyone, almost always
+By 1980, one department gave us all of this: geometry, a lit picture, brick on the pillar — and not one extra triangle.
 
 ---
 
-## PBR: the modern package
+### Era 3 · Chasing the photograph
 
-- modern engines bundle this whole act into **PBR** — *physically based rendering* — materials
-- one standard recipe card: base color, roughness, metalness, bumps
-- recognize the term: it's on every engine's material panel, every asset store
+<small>1975–1990 · ~12 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-photograph">Chapter 1 §3</a></small>
 
 ---
 
-## Our scene, after the lies
+## What our lighting can't do
 
-<img src="figures/scene-stage3.png" alt="our scene with textures applied: the pillar wears brick, the floor is a checkerboard, the walls stay red, green, and white — same geometry as before" style="max-height: 380px; width: auto;">
+Utah's lighting is **local** — each point is lit *alone*, as if nothing else existed:
 
-Brick on the pillar, a checkered floor — and not one new triangle.
+- no **shadows** — the pillar casts nothing onto the floor
+- no **reflections** — the sphere doesn't truly mirror the room
+- no color bleeding — a red wall doesn't blush the white floor beside it
 
 ---
 
-### Act 4 · The jaggies problem
+## Global illumination
 
-<small>(~8 min)</small>
+<div style="display: flex; gap: 16px; justify-content: center; align-items: flex-start;">
+<div style="flex: 1 1 0; min-width: 0;"><img src="figures/scene-stage2.png" style="max-height: 210px; width: auto;" alt="our scene locally lit: red and green walls, gray pillar and pedestal, sphere and bunny — no shadows, no color bleeding"><small class="credit">our scene — the best local lighting can do</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 210px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light — soft shadows and color bleeding visible"><small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small></div>
+</div>
+
+Our scene copies a famous original: the **Cornell box** — a *real* box, built and photographed to test exactly this. **Global illumination (GI)**: let light *bounce*.
+
+---
+
+## Bounced light, isolated
+
+<img src="../../media/overview/gi-comparison.jpg" class="media-shot" style="max-height: 330px;" alt="the same simple scene rendered twice, stacked vertically: top is direct light only, with a hard black shadow; bottom is full radiosity, with soft filled shadows and light bleeding between surfaces">
+<small class="credit">KaiaVintr · CC BY-SA 4.0 · via Wikimedia Commons</small>
+
+Same room, same light. Top: **direct only** (Utah's world). Bottom: **radiosity** — light allowed to bounce.
+
+---
+
+## How: follow the light
+
+- **ray tracing** — trace lines of sight from the camera into the scene (Whitted, 1980)
+- **path tracing** — follow *many bounces* per ray; the film standard (Kajiya, 1986)
+- *radiosity* — let light diffuse between surface patches; soft, matte worlds (Cornell, 1984)
+
+One line each — these are *names to recognize*, not algorithms for tonight.
+
+---
+
+## What honest light buys
+
+<img src="../../media/overview/path-traced-room.jpg" class="media-shot" style="max-height: 330px;" alt="a path-traced render of three cow figurines — chrome, ceramic, and glass — on a glossy wooden table, each material's reflections and refractions honestly computed">
+<small class="credit">KaiaVintr · CC BY-SA 4.0 · via Wikimedia Commons</small>
+
+Not a photograph: chrome, ceramic, glass — all *followed light, honestly computed*.
+
+---
+
+## The price: real-time vs offline
+
+- a game must finish each frame in about **16 milliseconds** — that's **real-time** rendering
+- a film frame may take **minutes to hours** — that's **offline** rendering
+- same math, wildly different budgets — the field's permanent tension
+
+---
+
+### Era 4 · The raster machines
+
+<small>1980–2000 · ~12 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">Chapter 1 §4</a></small>
+
+---
+
+## The pipeline, frozen in silicon
+
+```text
+  scene  ──►  camera &      ──►  rasterize  ──►  shade  ──►  framebuffer
+              projection
+  (objects,   3D → flat          which pixels    what color    the numbers
+   lights,    triangles          each triangle   each pixel    the monitor
+   camera)    on the image       covers          gets          shows
+```
+
+Utah worked out these stations; this era **cast them into hardware**. A **GPU** is a machine *shaped like this picture*.
+
+---
+
+## The pipeline becomes a product
+
+<img src="../../media/overview/sgi-workstation.jpg" class="media-shot" style="max-height: 150px;" alt="an SGI Onyx deskside graphics workstation from the mid-1990s, a large deskside cabinet">
+<small class="credit">Dave Fischer · CC BY-SA 4.0 · via Wikimedia Commons</small>
+
+- **SGI** built the pipeline as hardware — mid-90s high end, at Ferrari prices
+- **1992**: SGI opens its control interface as a standard — **OpenGL**, whose calls name the pipeline's stages one for one
+
+---
+
+## The GPU is born
+
+<img src="../../media/overview/geforce256.jpg" class="media-shot" style="max-height: 250px;" alt="macro photograph of the NVIDIA GeForce 256 (NV10) graphics chip package on its circuit board">
+<small class="credit">Konstantin Lanzet · CC BY-SA 3.0 · via Wikimedia Commons</small>
+
+**1999**: NVIDIA's **GeForce 256** — the first consumer chip with the whole transform-and-light stage on board. Sold as *"the world's first GPU."*
 
 ---
 
@@ -572,6 +656,60 @@ Watch for: edge pixels taking in-between shades — the staircase dissolving.
 
 ---
 
+### Era 5 · The programmable era
+
+<small>2000–2015 · ~14 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-programmable">Chapter 1 §5</a></small>
+
+---
+
+## Shaders: the pipeline opens up
+
+A **shader** is a small program the GPU runs *per vertex* and *per pixel* — you write the shading stage yourself.
+
+- first written in raw GPU assembly; by ~2003 the C-like languages **HLSL** and **GLSL** arrive
+- shading becomes ordinary programming — any look, not a fixed menu
+- *this is what you'll write in this course* — Unity's shaders compile to exactly these
+
+---
+
+## Graphics cards escape graphics
+
+**2007**: NVIDIA's **CUDA** lets those thousands of shader processors run *non-graphics* programs.
+
+- a GPU is thousands of small arithmetic units — perfect for anything massively parallel
+- one-line answer to a famous question: **deep learning runs on graphics cards** because graphics spent thirty years building them
+- the pipeline's hardware outgrew the pipeline
+
+---
+
+## Surfaces that lie, everywhere
+
+Utah's texture and bump tricks, now written as **shaders** — so *every* surface can lie, cheaply, at once.
+
+- a texture lookup is a tiny program the GPU runs per pixel — millions of pixels, every frame
+- game skin, armor, fabric, dirt, signage: all shaders sampling images
+- and the tricks compound — next, fakes with no image at all
+
+---
+
+## Textures without images
+
+- **procedural textures** — patterns *computed*, not photographed: wood rings, marble veins, noise
+- **solid textures** — the pattern fills 3D space; the object is *carved out of virtual marble*
+- no photo, no seams, endless variety from a small recipe
+
+---
+
+## Mirrors on a budget
+
+**Environment mapping**: reflect a *stored picture* of the surroundings.
+
+- shiny chrome, water glints, sunglasses — without simulating any actual light bouncing
+- the reflection is a lookup into a panorama photographed (or pre-rendered) once
+- close enough to fool almost everyone, almost always
+
+---
+
 ## Textures alias too
 
 - a checkerboard walking into the distance: shimmer and moiré — many texture squares per pixel
@@ -580,84 +718,34 @@ Watch for: edge pixels taking in-between shades — the staircase dissolving.
 
 ---
 
-## Our scene, clean-edged
+## PBR: the modern package
 
-<img src="figures/scene-stage4.png" alt="our scene fully rendered with anti-aliasing: red and green walls, brick pillar, checkered floor, sphere, and bunny, every silhouette smooth" style="max-height: 250px; width: auto;">
-
-Compare any silhouette with the last checkpoint — the stair-steps are gone.
-
-<small>Rasterization's fixed recipe is why the GPU exists: hard-wired raster machines first, programmable at the shading stops later — <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">Chapter 1 §4</a></small>
+- the era's tricks converge into **PBR** — *physically based rendering* — materials
+- one standard recipe card: base color, roughness, metalness, bumps — grounded in real measurements
+- recognize the term: it's on every engine's material panel, every asset store
 
 ---
 
-### Act 5 · Chasing the photograph
+## Realism is a choice: NPR
 
-<small>(~10 min)</small>
-
----
-
-## What our lighting can't do
-
-Act 2's lighting is **local** — each point is lit *alone*, as if nothing else existed:
-
-- no **shadows** — the pillar casts nothing onto the floor
-- no **reflections** — the sphere doesn't truly mirror the room
-- no color bleeding — a red wall doesn't blush the white floor beside it
-
----
-
-## Global illumination
-
-<div style="display: flex; gap: 16px; justify-content: center; align-items: flex-start;">
-<div style="flex: 1 1 0; min-width: 0;"><img src="figures/scene-stage4.png" style="max-height: 210px; width: auto;" alt="our scene at its best: anti-aliased, textured, locally lit — no shadows, no color bleeding"><small class="credit">our scene — the best Act 4 can do</small></div>
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 210px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light — soft shadows and color bleeding visible"><small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small></div>
-</div>
-
-Our scene copies a famous original: the Cornell box — a *real* box, built and photographed to test exactly this. **Global illumination (GI)**: let light *bounce*.
-
-<small>The race to match the photograph began in the late 1970s — <a href="../../handouts/ch01-intro-3d-graphics.html#era-photograph">Chapter 1 §3</a></small>
-
----
-
-## How: follow the light
-
-- **ray tracing** — trace lines of sight from the camera into the scene
-- **path tracing** — follow *many bounces* per ray; the film standard
-- **radiosity** — let light diffuse between surface patches; soft, matte worlds
-
-One line each — these are *names to recognize*, not algorithms for tonight.
-
----
-
-## What honest light buys
-
-<img src="../../media/overview/path-traced-room.jpg" class="media-shot" style="max-height: 340px;" alt="a path-traced render of three cow figurines — chrome, ceramic, and glass — on a glossy wooden table, each material's reflections and refractions honestly computed">
-<small class="credit">KaiaVintr · CC BY-SA 4.0 · via Wikimedia Commons</small>
-
-Not a photograph: chrome, ceramic, glass — all *followed light, honestly computed*.
-
----
-
-## The price: real-time vs offline
-
-- a game must finish each frame in about **16 milliseconds** — that's **real-time** rendering
-- a film frame may take **minutes to hours** — that's **offline** rendering
-- same math, wildly different budgets — the field's permanent tension
-
----
-
-## Not chasing the photo: NPR
-
-<img src="../../media/overview/toon-shading.jpg" class="media-shot" style="max-height: 300px;" alt="the Utah teapot rendered three ways: wireframe, flat color, and cel-shaded with quantized color bands and bold outlines like a cartoon drawing">
+<img src="../../media/overview/toon-shading.jpg" class="media-shot" style="max-height: 260px;" alt="the Utah teapot rendered three ways: wireframe, flat color, and cel-shaded with quantized color bands and bold outlines like a cartoon drawing">
 <small class="credit">NicolasSourd · CC BY-SA 3.0 · via Wikimedia Commons</small>
 
-**Non-photorealistic rendering**: toon shading, sketch lines, painterly strokes — *realism is a choice, not the goal*.
+**Non-photorealistic rendering**: once shading is *programmable*, a shader can look drawn, painted, or printed — realism is one target among many.
 
 ---
 
-### Act 6 · Where worlds come from
+## Our scene, complete
 
-<small>(~14 min)</small>
+<img src="figures/scene-stage4.png" alt="our scene fully rendered: red and green walls, brick pillar, checkered floor, sphere, and bunny, every silhouette smooth" style="max-height: 250px; width: auto;">
+
+Textured (Utah's tricks, now shaders) **and** clean-edged (the raster machines' anti-aliasing). Same triangles as slide one.
+
+---
+
+### Era 6 · Capturing and simulating reality
+
+<small>1990–2010 · ~18 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
 
 ---
 
@@ -667,8 +755,6 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 <small class="credit">Daniel L. Lu · CC BY 4.0 · via Wikimedia Commons</small>
 
 **3D scanning**: **photogrammetry** (many photos → shape) or **LiDAR** (laser distances) → a **point cloud** → a mesh.
-
-<small>Capturing reality — shape first, then motion — became graphics' own project in the 1990s — <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
 
 ---
 
@@ -685,7 +771,7 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 ## Smooth from few numbers
 
-<img src="figures/bezier-spline.svg" alt="a Bézier curve steered by four control points, with the smooth curve threading near its control polygon" style="max-height: 310px; width: auto;">
+<img src="figures/bezier-spline.svg" alt="a Bézier curve steered by four control points, with the smooth curve threading near its control polygon" style="max-height: 300px; width: auto;">
 
 **Curves and surfaces**: a **Bézier** curve — *4 points steer a perfect curve*. Chains of them are **splines**; the surface version is **NURBS**.
 
@@ -722,8 +808,8 @@ Watch for: the distance where coarse and fine become indistinguishable — that'
 
 ## Mesh simplification
 
-- **mesh simplification**: *compute* the coarser rungs automatically
-- collapse the edges that matter least, one by one, until the budget fits
+- **mesh simplification**: *compute* the coarser rungs automatically, by **edge collapse**
+- merge the edges that matter least, one by one, until the budget fits
 - scans arrive with millions of triangles you don't need — this is the diet
 
 ---
@@ -738,16 +824,16 @@ Watch for: the distance where coarse and fine become indistinguishable — that'
 
 ## Volumes, not surfaces
 
-<img src="../../media/overview/ct-volume.jpg" class="media-shot" style="max-height: 300px;" alt="two renderings of the same whole-body CT scan side by side: classic volume rendering and modern cinematic rendering, muscle and blood vessels visible through the skin">
+<img src="../../media/overview/ct-volume.jpg" class="media-shot" style="max-height: 290px;" alt="two renderings of the same whole-body CT scan side by side: classic volume rendering and modern cinematic rendering, muscle and blood vessels visible through the skin">
 <small class="credit">Franz A. Fellner · CC BY 4.0 · via Wikimedia Commons</small>
 
 **Volumetric modeling**: fill space with **voxels** (3D pixels) — then **volume rendering** looks *inside*. Medicine's view of you.
 
 ---
 
-### Act 7 · Making it move
+### Capturing reality, continued · making it move
 
-<small>(~14 min)</small>
+A finished world is a postcard until its numbers **change over time**. Same era, second project: motion.
 
 ---
 
@@ -776,7 +862,7 @@ Watch for: the corner at the middle key — there with linear, gone with smooth.
                  scrub t →
   ease = linear : constant speed, mechanical corner at key B
   ease = smooth : the corner at key B vanishes — alive
-  (the smooth version is a spline — Act 6's 4 points, now in TIME)</pre></div>
+  (the smooth version is a spline — Bézier's 4 points, now in TIME)</pre></div>
 
 ---
 
@@ -790,12 +876,10 @@ Watch for: the corner at the middle key — there with linear, gone with smooth.
 
 ## Motion capture
 
-<img src="../../media/overview/mocap.jpg" class="media-shot" style="max-height: 250px;" alt="a motion-capture suit dotted with reflective markers, shown on a mannequin in a museum display case">
+<img src="../../media/overview/mocap.jpg" class="media-shot" style="max-height: 240px;" alt="a motion-capture suit dotted with reflective markers, shown on a mannequin in a museum display case">
 <small class="credit">Mbrickn · CC0 · via Wikimedia Commons</small>
 
-**Motion capture**: record a *real performer's* motion onto the rig.
-
-<small>Same era, same project as scanning: the 1990s capture wave, pointed at motion — <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
+**Motion capture**: record a *real performer's* motion onto the rig — *scanning, aimed at a performance.*
 
 ---
 
@@ -833,9 +917,9 @@ Watch for: the corner at the middle key — there with linear, gone with smooth.
 
 ---
 
-### Act 8 · Worlds you can enter
+### Era 7 · Real time catches film
 
-<small>(~8 min)</small>
+<small>2010–2018 · ~8 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-realtime">Chapter 1 §7</a></small>
 
 ---
 
@@ -858,17 +942,17 @@ Watch for: the corner at the middle key — there with linear, gone with smooth.
 
 A game is everything tonight, at once, at 60, forever:
 
-- a scene (Act 1) rendered (Act 2) with lying surfaces (Act 3), clean edges (Act 4)
-- budget lighting (Act 5), streamed LOD worlds (Act 6), animation and physics (Act 7)
+- a scene (Utah) rendered (Utah) with lying surfaces (programmable), clean edges (raster machines)
+- honest light where it fits the budget, streamed LOD worlds, animation and physics (capture era)
 - all inside the loop, answering *you*, every 16 milliseconds
 
-<small>Today's GPUs even trace true rays inside that budget — 1980's photograph-chasing, returned as silicon — <a href="../../handouts/ch01-intro-3d-graphics.html#era-realtime">Chapter 1 §7</a></small>
+<small>Today's GPUs even trace true rays inside that budget — 1980's photograph-chasing, returned as silicon.</small>
 
 ---
 
 ## VR & AR
 
-<img src="../../media/overview/vr-headset.jpg" class="media-shot" style="max-height: 280px;" alt="a person wearing a virtual reality headset, head tilted upward, immersed in an unseen world">
+<img src="../../media/overview/vr-headset.jpg" class="media-shot" style="max-height: 270px;" alt="a person wearing a virtual reality headset, head tilted upward, immersed in an unseen world">
 <small class="credit">MIKI Yoshihito · CC BY 2.0 · via Wikimedia Commons</small>
 
 - **virtual reality**: one image *per eye* + head tracking — **latency** is the enemy
@@ -876,13 +960,17 @@ A game is everything tonight, at once, at 60, forever:
 
 ---
 
+### Era 8 · The neural era
+
+<small>2020– · ~4 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
+
+---
+
 ## The frontier: neural rendering
 
 - **neural rendering**: scenes *learned from photographs* — walk a camera where no photo was taken
-- the names on every current paper: **NeRFs** and **Gaussian splatting**
+- the names on every current paper: **NeRF** (2020) and **Gaussian splatting** (2023)
 - next door: generative 3D — describe a scene in words, receive a model (week 10)
-
-<small>The newest era on the timeline — five years old and moving. Next slide: one, live — <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
 
 ---
 
@@ -901,18 +989,14 @@ A game is everything tonight, at once, at 60, forever:
 
 ---
 
-## The tour is the syllabus
+## The map of the field today
 
-| Tonight | The deep dive |
+| The era | Where the course goes deep |
 | --- | --- |
-| Act 1 · a world in numbers | S05 (scene graphs) · S07 (meshes) |
-| Act 2 · scene to image | S02–S04 (the math) · S06 · S09 |
-| Act 3 · surfaces that lie | S08 (texturing) |
-| Acts 4–5 · jaggies & the photo | S09 · S10 |
-| Act 6 · worlds' origins | S07 · S10 |
-| Act 8 · worlds you enter | S10 |
-
-<small>Act 7 (making it move) is woven through the machine problems.</small>
+| 2 · the Utah school | S02–S04 (the math) · S05 (scene graphs) · S06 (viewing) · S07 (meshes) · S09 (lighting) |
+| 3–4 · photograph & raster machines | S06 · S09 (the pipeline, aliasing) · S10 (rendering frontier) |
+| 5 · the programmable era | S08 (texturing) · S09–S10 (shaders, PBR) |
+| 6–8 · capture, real time, neural | S07 (modeling) · S10 |
 
 ---
 
