@@ -11,8 +11,9 @@
   in the era that made it the point; where a technique was invented earlier
   than it became ubiquitous, we teach it where the handout gives it weight and
   name its origin in passing. The running example is "our scene" — a modified
-  Cornell box (one red wall, one green, white elsewhere; a brick pillar, a
-  sphere, the Stanford bunny on a pedestal, one ceiling light) that threads
+  Cornell box (red left / green right / white elsewhere; a brick-textured tall
+  box topped by the Stanford bunny and a short box topped by the Newell teapot,
+  no sphere; a checker floor at the textured stage; one ceiling light) that threads
   through the eras: it renders LIVE in the Utah era (the our-scene demo) and
   checkpoints with pre-rendered stills as later eras add tricks. No math, no
   equations — scale facts (counts, times) are the only numbers. Every technical
@@ -171,9 +172,9 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 
 ## Meet tonight's scene
 
-<img src="figures/scene-hero.png" alt="our scene: a small room with white walls and a green wall, a brick pillar, a blue-gray sphere, and a rabbit statue on a white pedestal, lit by one square ceiling light" style="max-height: 260px; width: auto;">
+<img src="figures/scene-hero.png" alt="our scene: a Cornell box with a green wall, a brick-textured tall box topped by a silvery metallic Stanford bunny, and a shorter box topped by a gold teapot, on a checkered floor, lit by one square ceiling light" style="max-height: 260px; width: auto;">
 
-A room, two colored walls. A brick pillar, a sphere, a rabbit on a pedestal, one ceiling light.
+A Cornell box, two colored walls. A gold teapot and the Stanford bunny, each on its box, one ceiling light.
 
 **Watch it gain a trick every era — by the end you'll understand every choice in this picture.**
 
@@ -223,7 +224,7 @@ One department invented most of what a scene *is* — and how to take its pictur
 
 A scene is a cast list, not a picture:
 
-- **objects** — the walls, the pillar, the sphere, the rabbit
+- **objects** — the walls, the two boxes, the teapot, the bunny
 - a **camera** — the point of view the image will be made from
 - **lights** — the ceiling lamp, without which every pixel is black
 
@@ -262,8 +263,8 @@ Every model — hand-built cube or scanned rabbit — is *the same data*: vertic
 
 Every object carries a **transform**: *place it, orient it, size it.*
 
-- the pillar: stood upright, at the back of the room
-- the rabbit: scaled to size, set on its pedestal
+- the tall box: stood upright, rear-left in the room
+- the bunny: scaled to size, set on top of the tall box
 - one mesh, many placements — a forest is one tree transformed a hundred times
 
 ---
@@ -285,7 +286,7 @@ Watch for: turning the base carries everything above it — bending the arm neve
      └─ hand
   turn the base  → arm AND hand come along for the ride
   bend the arm   → only the hand follows; the base ignores it
-  same idea: a pedestal carries its rabbit</pre></div>
+  same idea: a box carries its bunny</pre></div>
 
 ---
 
@@ -294,7 +295,7 @@ Watch for: turning the base carries everything above it — bending the arm neve
 Each object also carries a **material** — its *surface recipe*:
 
 - base color — one wall painted red, one green, on an all-white room
-- shininess — the sphere glints, the walls don't
+- shininess — the gold teapot glints, the walls don't
 - much more later: whole eras are spent on materials alone
 
 ---
@@ -310,7 +311,7 @@ Each object also carries a **material** — its *surface recipe*:
 
 ## Our scene so far
 
-<img src="figures/scene-stage0.png" alt="our scene drawn as white wireframe on black: the room, the pillar, the pedestal, the sphere, and the bunny, every triangle's edges visible" style="max-height: 360px; width: auto;">
+<img src="figures/scene-stage0.png" alt="our scene drawn as white wireframe on black: the room, the two boxes, the teapot's regular quad-mesh, and the bunny, every triangle's edges visible" style="max-height: 360px; width: auto;">
 
 Our world exists — as triangles. Meshes, transforms, a graph, materials. No pixels of it yet.
 
@@ -451,8 +452,8 @@ Every station at once, live: drag `stage` through the first three stops.
 
 ## Our scene, live
 
-<div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  our scene — a small room: red wall left, green wall right, a brick
-  pillar, a sphere, the rabbit on its pedestal, one ceiling light
+<div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  our scene — a Cornell box: red wall left, green wall right, a tall box
+  topped by the bunny, a short box topped by the gold teapot, one ceiling light
   drag stage:  wireframe → flat → smooth  (→ textured → anti-aliased:
                those two stops belong to later eras)
   drag lightX: slide the ceiling light — the whole room answers</pre></div>
@@ -469,7 +470,7 @@ The geometry stays cheap. The *surface* pretends otherwise — and it's all Utah
 
 **Texture mapping** (Catmull, 1974): glue an *image* onto a mesh. The image is the **texture**.
 
-- brick photo on a flat face → instant masonry — our pillar is exactly this
+- brick photo on a flat face → instant masonry — our tall box is exactly this
 - detail is now *pixels in an image*, not triangles — enormously cheaper
 
 ---
@@ -518,9 +519,9 @@ Watch for: the readout's triangle count — it never leaves 2.
 
 ## Our scene, after Utah
 
-<img src="figures/scene-stage3.png" alt="our scene with textures applied: the pillar wears brick, the floor is a checkerboard, the walls stay red, green, and white — same geometry as before" style="max-height: 320px; width: auto;">
+<img src="figures/scene-stage3.png" alt="our scene with textures applied: the tall box wears brick, the floor is a checkerboard, the walls stay red, green, and white, the teapot stays gold — same geometry as before" style="max-height: 320px; width: auto;">
 
-By 1980, one department gave us all of this: geometry, a lit picture, brick on the pillar — and not one extra triangle.
+By 1980, one department gave us all of this: geometry, a lit picture, brick on the tall box, a checker floor — and not one extra triangle.
 
 ---
 
@@ -534,8 +535,8 @@ By 1980, one department gave us all of this: geometry, a lit picture, brick on t
 
 Utah's lighting is **local** — each point is lit *alone*, as if nothing else existed:
 
-- no **shadows** — the pillar casts nothing onto the floor
-- no **reflections** — the sphere doesn't truly mirror the room
+- no **shadows** — the tall box casts nothing onto the floor
+- no **reflections** — the gold teapot doesn't truly mirror the room
 - no color bleeding — a red wall doesn't blush the white floor beside it
 
 ---
@@ -543,7 +544,7 @@ Utah's lighting is **local** — each point is lit *alone*, as if nothing else e
 ## Global illumination
 
 <div style="display: flex; gap: 16px; justify-content: center; align-items: flex-start;">
-<div style="flex: 1 1 0; min-width: 0;"><img src="figures/scene-stage2.png" style="max-height: 210px; width: auto;" alt="our scene locally lit: red and green walls, gray pillar and pedestal, sphere and bunny — no shadows, no color bleeding"><small class="credit">our scene — the best local lighting can do</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="figures/scene-stage2.png" style="max-height: 210px; width: auto;" alt="our scene locally lit: red and green walls, two gray boxes, gold teapot and silvery bunny — no shadows, no color bleeding"><small class="credit">our scene — the best local lighting can do</small></div>
 <div style="flex: 1 1 0; min-width: 0;"><img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 210px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light — soft shadows and color bleeding visible"><small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small></div>
 </div>
 
@@ -737,7 +738,7 @@ Utah's texture and bump tricks, now written as **shaders** — so *every* surfac
 
 ## Our scene, complete
 
-<img src="figures/scene-stage4.png" alt="our scene fully rendered: red and green walls, brick pillar, checkered floor, sphere, and bunny, every silhouette smooth" style="max-height: 250px; width: auto;">
+<img src="figures/scene-stage4.png" alt="our scene fully rendered: red and green walls, brick-textured tall box, checkered floor, gold teapot, and silvery bunny, every silhouette smooth" style="max-height: 250px; width: auto;">
 
 Textured (Utah's tricks, now shaders) **and** clean-edged (the raster machines' anti-aliasing). Same triangles as slide one.
 
