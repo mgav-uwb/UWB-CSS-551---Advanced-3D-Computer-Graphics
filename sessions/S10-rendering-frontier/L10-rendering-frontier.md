@@ -260,13 +260,14 @@ Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full 
 
 ## The lobe, live
 
-<div class="cockpit" data-demo="brdf-lobe" data-controls="roughness"><pre class="viz-fallback">  reflectance lobe around the mirror direction; drag roughness to reshape it
+<div class="cockpit" data-demo="brdf-lobe" data-controls="roughness"><pre class="viz-fallback">  our Cornell scene, wearing ONE BRDF: gold metal teapot + aluminum box,
+  plastic bunny + glossy tall box; drag roughness to reshape every highlight
   -- roughness = 0.4 (default) ---------------------------------------------
      Phong:  s = 2/0.4² − 2 = 10.5      HWHM ≈ 21°
      GGX:    α = 0.4²       = 0.16      HWHM ≈  6°
      same roughness, narrower GGX core (shape, not calibrated units:
      no Fresnel, no geometry term, no solid-angle normalization)
-     drag roughness → 0.05 for a needle-thin mirror lobe; → 1 for a broad matte lobe</pre></div>
+     drag roughness → 0.05 for needle-thin mirror highlights; → 1 for broad matte</pre></div>
 
 ---
 
