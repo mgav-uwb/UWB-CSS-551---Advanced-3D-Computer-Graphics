@@ -489,6 +489,22 @@
         path-traced exhibit &mdash; the chrome, ceramic, and glass figurines
         &mdash; is this section&rsquo;s ideas computed to convergence.)
       </p>
+      <p>
+        One more number from this era belongs on the same page as its
+        pictures, because it explains the shape of the field ever since. An
+        interactive program must finish every frame in the time the monitor
+        gives it: at sixty frames per second, about
+        <strong>16 milliseconds</strong>, for everything, forever. That is
+        <strong>real-time rendering</strong>. A film frame has no viewer
+        waiting; it may take minutes or hours on a render farm and be played
+        back later. That is <strong>offline rendering</strong>. The two are the
+        same mathematics under budgets that differ by up to six orders of
+        magnitude, and in this era honest light transport sat entirely on the
+        offline side: one ray-traced frame took the overnight slot. Hold on to
+        the 16 ms figure. Section 4 is the story of the machines built to meet
+        it, and Section 7 is the story of the offline light finally being
+        dragged inside it.
+      </p>
 
       <!-- ============================================================ -->
       <h2 id="era-raster">4 &middot; The raster machines <span class="era">1980&ndash;2000</span></h2>
@@ -596,6 +612,65 @@
           via Wikimedia Commons
         </figcaption>
       </figure>
+      <p>
+        Two habits of the raster machine follow directly from having a
+        framebuffer, and both are still in every program you will write. The
+        first is <strong>double buffering</strong>. The monitor reads the
+        framebuffer top to bottom, sixty times a second, whether or not the
+        program has finished drawing into it; draw straight into the buffer
+        being scanned and the viewer sees a torn frame, new picture above the
+        scan line and old picture below it. So an interactive program keeps two
+        buffers: it shows the <em>front</em> buffer while it draws the next
+        frame into the hidden <em>back</em> buffer, then swaps the two in the
+        instant the monitor finishes a refresh. That timing is
+        <strong>v-sync</strong>, and it is why a program&rsquo;s frame rate is
+        quantized to the display&rsquo;s refresh rate: &ldquo;60 fps&rdquo; and
+        &ldquo;60 Hz&rdquo; are the same conversation. Every game, every
+        browser, and the interactive loop you build in Lab 01 rides on this one
+        trick.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (aliasing)</span>
+        A raster image <strong>samples</strong> the scene: each pixel asks one
+        question, at one point, and reports one answer. Whenever the thing
+        being sampled varies faster than the samples can follow, the samples
+        tell a false story. That false story is <strong>aliasing</strong>, and
+        the raster machine meets it three times: in space (a smooth edge, asked
+        pixel by pixel, answers in stair-steps), in time (a moving object, asked
+        frame by frame, strobes), and in texture space (a distant checkerboard,
+        asked one texel per pixel, shimmers).
+      </div>
+      <p>
+        The spatial case is the one everyone can see, the jagged edge, and it
+        was diagnosed as soon as framebuffers reached research labs: Franklin
+        Crow&rsquo;s 1977 paper named the problem, borrowed the word from signal
+        processing, and gave the cure that every later method refines
+        (<a href="https://doi.org/10.1145/359863.359869" target="_blank"
+           rel="noopener">Crow, &ldquo;The Aliasing Problem in
+        Computer-Generated Shaded Images,&rdquo; 1977</a>). More pixels shrink
+        the steps but never remove them, so the fix is more <em>samples</em>
+        per pixel, not more pixels: <strong>supersampling</strong> takes
+        several looks inside each pixel&rsquo;s square and averages them, so a
+        pixel half covered by a triangle honestly reports a half-shade. Four
+        samples cost four times the shading work, which is why
+        <strong>anti-aliasing</strong> waited for dedicated hardware; the
+        GPU&rsquo;s efficient version, <strong>multisample anti-aliasing
+        (MSAA)</strong>, spends the extra samples only where a triangle edge
+        crosses the pixel, and it is the &ldquo;MSAA 4x&rdquo; in every
+        game&rsquo;s settings menu. The temporal case has the same cure along a
+        different axis. A rendered frame is one frozen instant, but a film
+        camera&rsquo;s shutter stays open for a slice of time, so anything
+        moving smears; without that smear, fast motion in early computer
+        animation strobed unnaturally. <strong>Motion blur</strong> samples
+        several instants within a frame and averages them, supersampling in
+        time
+        (<a href="https://doi.org/10.1145/800059.801169" target="_blank"
+           rel="noopener">Potmesil &amp; Chakravarty, &ldquo;Modeling Motion
+        Blur in Computer-Generated Images,&rdquo; 1983</a>). Offline renderers
+        do it fully; real-time engines approximate it from each frame&rsquo;s
+        motion. The third case, texture aliasing, was solved by precomputation
+        rather than by extra samples, and it belongs to the next section.
+      </p>
       <div class="demo">
         <span class="tag">See it live</span>
         The stage this hardware race was fought over is in the sandbox:
@@ -603,7 +678,9 @@
            rel="noopener">Rasterization</a> &mdash; one triangle, a pixel grid
         you control. Drop the resolution to 8 and you are looking at what the
         silicon does, slowed down a billionfold: test each pixel center, write
-        the winners into the framebuffer.
+        the winners into the framebuffer. Then, still at a low resolution, turn
+        <code>aa</code> up: the edge pixels take in-between shades and the
+        staircase dissolves, at four to sixteen times the shading work.
       </div>
 
       <!-- ============================================================ -->
@@ -660,6 +737,71 @@
         needed (the 2012 AlexNet breakthrough was trained on two consumer
         gaming GPUs).
       </p>
+      <p>
+        The first thing programmers did with the open shading stage was make
+        Utah&rsquo;s surface tricks universal. Texture mapping and bump mapping
+        had been special features for twenty years; as a few lines in a fragment
+        shader they became the default for every surface in every frame, and
+        the plastic look of the 1990s vanished. The tricks that need no source
+        image at all followed, most of them older ideas waiting for
+        programmable hardware. <strong>Environment mapping</strong> fakes a
+        reflection by looking up the shiny pixel&rsquo;s mirror direction in a
+        stored panorama of the surroundings, no ray followed; Blinn and Newell
+        proposed it in 1976, and it is on screen in every car game&rsquo;s paint
+        and every game ocean&rsquo;s sparkle
+        (<a href="https://doi.org/10.1145/360349.360353" target="_blank"
+           rel="noopener">Blinn &amp; Newell, &ldquo;Texture and Reflection in
+        Computer Generated Images,&rdquo; 1976</a>). <strong>Procedural
+        textures</strong> replace the image with a function that computes the
+        pattern anywhere: Ken Perlin&rsquo;s <strong>noise</strong>, controlled
+        randomness stacked at several scales, gave wood, marble, clouds and fire
+        their natural signature, and Darwyn Peachey&rsquo;s <strong>solid
+        textures</strong> defined the pattern throughout 3D space, so a carved
+        bowl shows its grain on the inside too; both appeared at SIGGRAPH 1985
+        (<a href="https://doi.org/10.1145/325334.325247" target="_blank"
+           rel="noopener">Perlin, &ldquo;An Image Synthesizer&rdquo;</a>;
+        <a href="https://doi.org/10.1145/325334.325246" target="_blank"
+           rel="noopener">Peachey, &ldquo;Solid Texturing of Complex
+        Surfaces&rdquo;</a>). Noise returns in Section 6 with a promotion,
+        building whole terrains. And Section 4&rsquo;s third aliasing case, the
+        shimmering distant checkerboard, was cured in 1983 by Lance
+        Williams&rsquo;s <strong>mipmaps</strong>: store each texture with a
+        ladder of pre-shrunk copies (full size, half, quarter, down to one
+        pixel) and let each screen pixel read from the copy whose texels are
+        about pixel-sized, so the averaging is done once, ahead of time, instead
+        of per frame
+        (<a href="https://doi.org/10.1145/800059.801126" target="_blank"
+           rel="noopener">Williams, &ldquo;Pyramidal Parametrics,&rdquo;
+        1983</a>). Every GPU has generated mipmaps automatically since the
+        programmable era began.
+      </p>
+      <p>
+        Programmability also ended the assumption that the photograph was the
+        only target. If the shading stage runs any program, it can run one that
+        quantizes light into flat bands and draws a bold outline, and the same
+        pipeline manufactures a cartoon. <strong>Non-photorealistic rendering
+        (NPR)</strong> became a research area in its own right in the late
+        1990s, initially for technical illustration, where a drawn look
+        communicates shape better than a photograph does
+        (<a href="https://doi.org/10.1145/280814.280950" target="_blank"
+           rel="noopener">Gooch, Gooch, Shirley &amp; Cohen, &ldquo;A
+        Non-Photorealistic Lighting Model for Automatic Technical
+        Illustration,&rdquo; 1998</a>), and cel-shaded games and stylized
+        feature films followed. Rendering is picture-making; the photograph is
+        one target among many. The other consequence of programmable shading, a
+        standard material model grounded in measurement, is the first movement
+        of Section 7.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=our-scene" target="_blank"
+           rel="noopener">The pipeline</a> demo&rsquo;s <code>stage</code>
+        slider has a <em>textured</em> stop: the tall box turns to brick and the
+        floor to a checkerboard while the triangle count holds still. The
+        checkerboard is a procedural texture, computed in place from no image
+        file; drag on to the last stop and the textures&rsquo; own aliasing is
+        tamed by mipmaps.
+      </div>
       <p>
         The same fifteen years industrialized the software above the pipeline.
         id Software&rsquo;s <em>Quake</em> (1996) lineage established the
@@ -920,7 +1062,7 @@
       <table>
         <tr><th>era</th><th>what it left us</th><th>where it lives in this course</th></tr>
         <tr><td>1 &middot; the birth</td><td>interaction, the display loop, instancing</td><td>Lab 01&rsquo;s interactive loop &amp; MVC; S05 scene graphs</td></tr>
-        <tr><td>2 &middot; the Utah school</td><td>z-buffer, shading, texture &amp; bump mapping</td><td>S06 illumination &middot; S07 meshes &middot; S08 texturing</td></tr>
+        <tr><td>2 &middot; the Utah school</td><td>z-buffer, shading, texture &amp; bump mapping</td><td>S07 meshes &middot; S08 texturing &middot; S09 illumination</td></tr>
         <tr><td>3 &middot; chasing the photograph</td><td>ray tracing, physical materials, global illumination</td><td>S09&ndash;S10 advanced rendering</td></tr>
         <tr><td>4 &middot; the raster machines</td><td>the pipeline, and the math it runs on</td><td>S02&ndash;S04 vectors &amp; matrices &middot; S06 &middot; S09</td></tr>
         <tr><td>5 &middot; the programmable era</td><td>shaders, engines, GPU computing</td><td>S08&ndash;S09; every Unity shader you write</td></tr>
@@ -981,7 +1123,7 @@
       </p>
 
       <footer>
-        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 1 v1.0
+        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 1 v1.1
         &middot; prepared by Dr. Marcel Gavriliu. Image credits appear in each
         caption; interactive demos in the course library.
       </footer>

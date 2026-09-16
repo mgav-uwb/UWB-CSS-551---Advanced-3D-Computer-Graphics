@@ -39,17 +39,20 @@
   line; no <small> around math; this deck has NO math at all, on purpose —
   the informal register is the point. Verify every slide at 1280x620.
 
-  DEMOS (12 embeds, all registry slugs, embed stage; each a setup+demo-full
-  PAIR), now homed by era:
+  DEMOS (13 embeds, all registry slugs, embed stage; each a setup+demo-full
+  PAIR), homed by era:
    - Era 2 (Utah): data-demo="mesh-view"     data-controls="wire,spin"
                    data-demo="scene-graph"    data-controls="baseRy,armBend"
                    data-demo="projection"     data-controls="fov"
                    data-demo="raster"         data-controls="res,angle"
                    data-demo="illumination"   data-controls="lightAz,lightEl"
                    data-demo="our-scene"      data-controls="stage,lightX"
+                   data-demo="uv-placement"   data-controls="offU,tile"
+                   data-demo="bump-map"       data-controls="bump,lightAz"
    - Era 4 (raster machines): data-demo="raster"  data-controls="res,aa"
-   - Era 5 (programmable):    data-demo="uv-placement" data-controls="offU,tile"
-                              data-demo="bump-map"     data-controls="bump,lightAz"
+   - Era 5 (programmable):    data-demo="our-scene" data-controls="stage,lightX"
+                              (the SAME embed as Era 2, driven one stop further
+                               to stage 3 "textured": pays the Utah-era promise)
    - Era 6 (capture): data-demo="lod"       data-controls="level,dist"
                       data-demo="keyframe"   data-controls="t,ease"
    - Era 8 (neural):  data-demo="gsplat"    data-controls="fov"
@@ -93,7 +96,8 @@
                  that lie, mipmaps, PBR, NPR
     1:26  Era 6  Capturing & simulating (1990-2010) — scans, shapes,        18 min
                  LOD, motion & simulation
-    1:44  Era 7  Real time catches film (2010-18) — the loop, games, VR      8 min
+    1:44  Era 7  Real time catches film (2010-18) — the loop, games,        8 min
+                 honest light in 16 ms (RTX), VR
     1:52  Era 8  The neural era (2020-)                                      4 min
     1:56  Close  The map of the field / Thursday                            4 min
     2:00  end
@@ -105,7 +109,7 @@
 
 **Lecture 1 — 3D Computer Graphics: The Big Picture**
 
-*Seventy-five years, one scene, start to finish.*
+*Seventy-five years, eight eras, in order.*
 
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
@@ -152,7 +156,7 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 
 ## Tonight, in order
 
-**Eight eras, 1950 → today** — building **one small world**, a trick per era.
+**Eight eras, 1950 → today**, each idea taught in the era that made it the point.
 
 - **1950s–70s**: pictures born; Utah invents the pipeline
 - **1980s–2000s**: chase the photo; silicon; programmable
@@ -162,7 +166,7 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 
 ---
 
-## Eight eras, one timeline
+## The timeline
 
 <img src="../../handouts/figures/cg-timeline.svg" alt="timeline of computer graphics from 1950 to today: interactive pictures born, the Utah school, chasing the photograph, the raster machines, the programmable era, capturing reality, real time catches film, the neural era" style="max-height: 275px; width: 88%;">
 
@@ -179,7 +183,7 @@ Tonight is this bar, left to right — the bands **overlap on purpose**: researc
 ## Drawing at the speed of thought
 
 - **1951**: MIT's Whirlwind — the first computer fast enough to draw in *real time*, on a **vector display** (glowing lines, not filled shapes)
-- **1963**: Sketchpad adds the light pen and a solver — *interactive* graphics is born
+- **1963**: Sketchpad (the photo we opened on) adds the light pen and a solver: *interactive* graphics
 - the wall: hardware arithmetic — a few thousand line segments before flicker; **no filled, shaded surfaces yet**
 
 ---
@@ -301,7 +305,7 @@ Everything on the next slides, together, is **rendering** — the journey from d
 
 The camera makes a **projection**: the 3D scene squashed onto a flat image — near things big, far things small: **perspective**. Drag `fov`.
 
-Watch for: the pyramid is everything the camera can see; the picture-in-the-picture is what it sees right now.
+Watch for: the pyramid is everything the camera can see; the picture painted on its image plane is what it sees right now.
 
 ---
 
@@ -380,7 +384,7 @@ Watch for: the smooth color blend across the face — and the stair-steps on the
 
 ## Drive the light
 
-One light, one sphere — our scene's lamp, taken to the lab. Swing `lightAz` behind it; raise `lightEl` for overhead light.
+One light, one sphere: the smallest possible lighting laboratory. Swing `lightAz` behind it; raise `lightEl` for overhead light.
 
 Watch for: the lit/dark boundary, the white highlight tracking the light, and the dark side never reaching black.
 
@@ -418,7 +422,7 @@ Every station at once — the whole assembly line runs live next. Drag `stage` t
 - *smooth* — the facets vanish
 - then slide `lightX` — every surface answers the light
 
-<small>(the slider has two more stops — later eras earn those)</small>
+<small>(the slider has two more stops; the programmable era comes back for the textured one)</small>
 
 ---
 
@@ -427,8 +431,8 @@ Every station at once — the whole assembly line runs live next. Drag `stage` t
 ## The pipeline, live
 
 <div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  the whole pipeline, live on a demo Cornell box:
-  drag stage:  wireframe → flat → smooth  (→ textured → anti-aliased:
-               those two stops belong to later eras)
+  drag stage:  wireframe → flat → smooth  (textured and anti-aliased
+               wait for later eras)
   drag lightX: slide the ceiling light — every surface answers</pre></div>
 
 ---
@@ -676,13 +680,25 @@ A **shader** is a small program the GPU runs *per vertex* and *per pixel* — yo
 
 ---
 
-## Surfaces that lie, everywhere
+## Every surface lies
 
 Utah's texture and bump tricks, now written as **shaders** — so *every* surface can lie, cheaply, at once.
 
-- a texture lookup is a tiny program the GPU runs per pixel — millions of pixels, every frame
-- game skin, armor, fabric, dirt, signage: all shaders sampling images
-- and the tricks compound — next, fakes with no image at all
+- a texture lookup is a tiny per-pixel program: millions of pixels, every frame
+- skin, armor, fabric, signage: shaders sampling images
+- back to the pipeline demo: drag `stage` to *textured*; watch for brick, a checkerboard floor, an unchanged triangle count
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The pipeline, textured
+
+<div class="cockpit" data-demo="our-scene" data-controls="stage,lightX"><pre class="viz-fallback">  the same Cornell box as the Utah era, one stop further:
+  drag stage to 3 (textured): the tall box turns to brick, the floor
+               to a checkerboard, and the triangle count does not move
+  drag lightX: the brick still answers the light (it is a texture,
+               not geometry)</pre></div>
 
 ---
 
@@ -932,7 +948,14 @@ A game is everything tonight, at once, at 60, forever:
 - honest light where it fits the budget, streamed LOD worlds, animation and physics (capture era)
 - all inside the loop, answering *you*, every 16 milliseconds
 
-<small>Today's GPUs even trace true rays inside that budget — 1980's photograph-chasing, returned as silicon.</small>
+
+---
+
+## Honest light in 16 ms
+
+- **2018**: consumer GPUs ship dedicated **ray-tracing cores**: silicon whose one job is Whitted's 1980 ray-meets-triangle test
+- not a film-style path trace per frame: rasterize the picture, trace a few rays where only rays will do (reflections, shadows, bounced color), then **denoise** the sparse result
+- the offline light of Era 3, forty years later, inside the game's frame budget
 
 ---
 
