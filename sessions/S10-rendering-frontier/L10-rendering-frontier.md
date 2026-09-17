@@ -1,67 +1,46 @@
 <!--
-  CSS 551 · Lecture 10 (Session 10) — The rendering equation, PBR & neural
-  rendering. THE GRADUATE FINALE. Picks up S09's honest confession (local
-  shading ignores light BOUNCES — "its own large subject") and pays it off:
-  the rendering equation is that subject, the honest energy accounting Phong
-  only approximates. Then the modern GPU/API mental model (command buffers,
-  pipeline state objects, bind groups — the explicit successor to GL's global
-  state machine), a neural-rendering survey (NeRF → 3D Gaussian splatting,
-  with the LIVE gsplat viewer), the whole course assembled into one picture,
-  and a closing beat that ENDS the course.
+  CSS 551 · Lecture 10 (Session 10) — PBR, Diffusion Models & Learned Scenes.
+  THE GRADUATE FINALE, rebuilt 2026-09-16 (design: planning/css551-s10-
+  generative-rebuild-design-2026-09-16.md). Three beats: honest light (the
+  rendering equation and PBR, shortened), learned images (diffusion models,
+  conceptual, with a live toy demo), learned scenes (NeRF and 3D Gaussian
+  splatting, live). Then the course in one picture, and a closing beat that
+  ENDS the course. The former GPU/API-model segment is dropped by decision.
 
-  reveal.js: FLAT deck — every slide is a top-level "---" section (no vertical
-  "--" stacks), so verify-deck's "section.present [data-demo]" probe only
-  matches a demo when its slide is actually shown. Notes follow "Note:".
+  reveal.js: FLAT deck — every slide a top-level "---" section (no "--"
+  stacks). Notes follow "Note:". Math is plain unicode text or fenced ```text
+  blocks (no KaTeX plugin). Never two "_" on one markdown line outside a code
+  fence; backtick names with underscores. No <small> on math. No forward
+  references; the last slide ends the course.
 
-  TWO DEMO EMBEDS, each on its own flat slide, with the scoped-CSS cap:
-   - Part 1: data-demo="brdf-lobe" data-controls="roughness". Fallback carries
-     the HAND-VERIFIED r=0.4 pair (re-verified via node against the demo's own
-     formulas): Phong s = 2/0.4² − 2 = 10.5 → HWHM 21°; GGX α = 0.4² = 0.16 →
-     HWHM 6° (the GGX-flavored lobe is a NARROWER core than Phong at the same
-     roughness — the two roughness→param mappings are NOT calibrated to match;
-     the demo captions it "lobe SHAPE, not calibrated units").
-   - Part 3: data-demo="gsplat" data-controls="orbitAz,dist". Fallback is a
-     text description of the scene + the REQUIRED attribution (Mip-NeRF 360
-     "bonsai", Barron et al.; .splat reconstruction by dylanebert) — see
-     media/gsplat/ATTRIBUTION.md. gsplat loads an 8.7 MB .splat async and runs
-     its own rAF loop that PAUSES off-screen (data-gsplatRunning) — it renders
-     an AxesHelper immediately so the pixel probe passes on the camera orbit
-     even before the splats finish loading (same as tools/test-demos.mjs).
+  DEMO EMBEDS (four, each on its own flat slide; brdf-lobe and gsplat under the
+  scoped 210px crop, the two diffusion-2d exhibits on demo-full slides that
+  get the full ~500px viewport, as in S01):
+   - Part 1: data-demo="brdf-lobe"     data-controls="roughness"
+   - Part 2: data-demo="diffusion-2d"  data-controls="t"                (forward)
+             data-demo="diffusion-2d"  data-controls="steps,stochastic" (reverse)
+   - Part 3: data-demo="gsplat"        data-controls="fov"
+  diffusion-2d is deterministic (seeded); its denoiser is the exact posterior
+  mean for the point cloud (lib/core/diffusion.js), which the caption says.
 
-  MATH IS PLAIN TEXT ON PURPOSE. This shell loads NO KaTeX plugin (only
-  markdown/highlight/notes), so "$...$" would render literally. All formulas
-  are unicode plain text (·, ×, →, ², ⁻¹, θ, ω, Ω, ∫, π, ≤, ≥, ∝, ∞) or fenced
-  ```text blocks, like S01-S09. Never two "_" on one markdown line OUTSIDE a
-  code fence (they pair into <em> and shred the line): in prose AND speaker
-  notes ALWAYS backtick names with underscores (`data-demo`, `data-controls`,
-  `k_d`, `k_s`, `k_a`, `Cook-Torrance`, `glEnable`, `glBindTexture`,
-  `glDrawArrays`, `gsplatRunning`, ...). Code inside ```text fences is safe.
-  No <small> on math.
+  MEDIA: ../../media/generative/*.jpg, license-verified; credit lines copied
+  VERBATIM from media/generative/CREDITS.md.
 
-  NO forward / "next time" references anywhere — this is the LAST session,
-  nothing to forward-reference. NEVER name the later graphics course; NEVER
-  mention shadow maps, multipass, or tessellation (out of scope by design).
-  References to PAST sessions (S02 dot/projection, S03 rotation/reflection,
-  S04 matrices, S05 scene graphs, S06 view/projection, S07 mesh, S08 texture,
-  S09 illumination) are the whole point of Part 4. The wrap previews only the
-  FIXED Thursday FP studio + the finals-week demo, and mentions course evals.
-  The last slide ENDS the course — a closing beat, not a preview.
-
-  Session plan (110 min, Tue 5:45-7:45 PM synchronous online). ~111 + buffer.
-    0:00  Intro (title + tonight)                    ~3 min
-    0:03  Part 1  From Phong to the rendering equation  35 min  (what Phong gets wrong: energy, reciprocity, no bounces; radiometry-lite: radiance/irradiance/solid angle, worked 0.25 sr; the rendering equation term-by-term; BRDF; microfacets; metallic/roughness = Unity's sliders; the brdf-lobe demo)
-    0:38  Part 2  The modern GPU/API model             25 min  (the old GL state machine; command buffers; pipeline state objects; bind groups; what Unity does with your scene per frame — the draw-call walk)
-    1:03  Part 3  Neural rendering survey              30 min  (inverse rendering; NeRF = a learned field + volume rendering; 3D Gaussian splatting = back to primitives, differentiable rasterization; the LIVE gsplat demo; what transfers, what changes)
-    1:33  Part 4  The course in one picture            15 min  (the full pipeline assembled from the quarter's pieces; FP final-demo logistics)
-    1:48  Wrap                                         ~3 min  (Thu FP studio + course wrap; course evaluations; the closing beat)
-    1:51  end (+ buffer)
+  Session plan (120 min, Tue 5:45-7:45 PM synchronous online):
+    0:00  Intro                                   3 min
+    0:03  Part 1  From Phong to PBR              20 min
+    0:23  Part 2  Learned images: diffusion      60 min
+    1:23  Part 3  Learned scenes: NeRF and 3DGS  20 min
+    1:43  Part 4  The course in one picture      12 min
+    1:55  Wrap                                    5 min
+    2:00  end
 -->
 
 ## CSS 551
 
 ### Advanced 3D Computer Graphics
 
-**Lecture 10 — The Rendering Equation, PBR & Neural Rendering**
+**Lecture 10 — PBR, Diffusion Models & Learned Scenes**
 
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
@@ -69,16 +48,16 @@
 
 ## Tonight
 
-- **From Phong to the rendering equation** — the honest energy accounting Phong approximates; **BRDFs**, microfacets, and the **metallic/roughness** material model
-- **The modern GPU/API model** — how a modern graphics API actually draws your scene: **command buffers**, **pipeline state objects**, **bind groups**
-- **Neural rendering** — scenes learned from photographs: **NeRF** and **3D Gaussian splatting**, one running live
-- **The course in one picture** — every piece you built this quarter, assembled into the whole pipeline
+- **From Phong to PBR** — the honest energy accounting Phong approximates; **BRDFs**, microfacets, the **metallic/roughness** model
+- **Learned images: diffusion** — destroy an image with noise, learn to undo it, sample; text, control, video; a toy you can drive
+- **Learned scenes: NeRF and 3DGS** — one scene learned from photographs, rendered live; where learned images and learned scenes meet
+- **The course in one picture** — every piece you built this quarter, assembled
 
 ---
 
 ### Part 1 · From Phong to the rendering equation
 
-<small>(~35 min)</small>
+<small>(~20 min)</small>
 
 ---
 
@@ -106,50 +85,14 @@ None of these is a bug to patch — they are **symptoms of the same gap**: Phong
 
 ---
 
-## Radiometry-lite: solid angle
+## Light as energy, in one slide
 
-To balance light at a point we must measure "how much light, from which directions." The direction bookkeeping is the **solid angle** — the 2D angle's 3D cousin, measured in **steradians (sr)**:
+Phong's numbers are **brightness fudge**; the honest currency is energy.
 
-```text
-   plane angle           solid angle
-   arc / radius          area / radius²          (a patch on a unit sphere)
-
-   full circle = 2π rad   full sphere    = 4π sr
-                          hemisphere      = 2π sr   ← the sky above a surface
-```
-
-A surface patch of area **A** seen from distance **r** subtends about `Ω ≈ A / r²` steradians — a directions-worth of "how big it looks," independent of how far away it is scaled out.
-
----
-
-## A solid angle, worked (and its honest small print)
-
-A **1 m²** flat panel viewed **head-on** from **2 m** away:
-
-```text
-   Ω ≈ A / r² = 1 / 2² = 1 / 4 = 0.25 sr
-```
-
-- **0.25 sr** out of the **2π ≈ 6.28 sr** hemisphere — the panel fills about **4%** of your sky
-- **honest small print:** `A / r²` is the **small-angle** approximation — exact only for a patch that is **small** relative to `r` and **square-on** to the line of sight. Tilt it (foreshortening) or bring it close and the true solid angle differs; here the panel is a fair bit of the distance, so `0.25 sr` is a **good estimate**, not an identity
-
-Move the panel to **4 m** and it subtends `1/16 = 0.0625 sr` — **four times** smaller, the inverse-square shrink you already met in S09's attenuation.
-
----
-
-## Radiance and irradiance
-
-Two quantities do all the work — keep them straight:
-
-- **radiance** `L` — brightness **along a single ray**: power per unit **projected** area per unit **solid angle**. It is what a **pixel measures** and what stays **constant along a ray** through empty space. Directions in, directions out — all in radiance
-- **irradiance** `E` — total power **landing on a patch** from the **whole hemisphere** of directions above it: `E = ∫ L·cosθ dω` over the hemisphere
-
-```text
-   radiance   L(p, ω)   — one point, one direction     (a ray's brightness)
-   irradiance E(p)      — one point, all directions     (the patch's total dose)
-```
-
-Diffuse shading last week was really "**irradiance** in, times albedo" — the `cosθ` in that integral is our old friend **N·L**.
+- **radiance** — how much light travels along a ray, per unit area, per unit direction; the quantity a pixel measures
+- **irradiance** — how much light lands on a surface point from all directions together
+- a surface turns arriving irradiance into leaving radiance; the rule for how is the **material**
+- everything else in Part 1 is bookkeeping in these two units
 
 ---
 
@@ -173,22 +116,6 @@ Every symbol:
 
 ---
 
-## Why it is hard: the light bounces
-
-The catch hides in one symbol: `Li(p, ωi)` — the light **arriving** at `p` from direction `ωi` — is itself the **outgoing** radiance `Lo` of **whatever surface** `p` sees in that direction:
-
-```text
-   Li(p, ωi)  =  Lo( other surface, toward p )
-```
-
-- so the equation is **recursive** — to shade `p` you must first shade everything `p` can see, which needs everything **they** can see …
-- that recursion **is** the bounced light: the red wall's `Lo` becomes the white floor's `Li`, and the floor picks up a pink tint — **color bleeding**, for free
-- solving it fully is **global illumination**: an enormous computation, approximated by many methods, each its **own large subject**
-
-Phong, in this light, is the **crudest** approximation: keep only **direct** lights, drop the recursion, and add a **constant** (ambient) where the bounces should be.
-
----
-
 ## The BRDF: the material's answer
 
 Pull one factor out of the integral: `f(p, ωi, ωo)`, the **BRDF** — **B**idirectional **R**eflectance **D**istribution **F**unction. Given light from `ωi`, it returns the fraction that leaves toward `ωo`. It **is** the material:
@@ -208,9 +135,9 @@ Phong and Blinn from S09 **are** BRDFs — just crude ones that break the last t
 
 ---
 
-## Microfacets: a surface of tiny mirrors
+## Microfacets, and the two sliders
 
-The modern physical specular BRDF models a rough surface as a dense field of microscopic **perfect mirrors** — **microfacets** — each too small to see. A pixel's highlight is the **statistical fraction** of them angled to bounce the light straight into your eye:
+The physical specular BRDF models a rough surface as a field of microscopic **perfect mirrors**, the **microfacets**; a highlight is the **statistical fraction** angled to bounce the light into your eye.
 
 ```text
    smooth surface            rough surface
@@ -218,23 +145,9 @@ The modern physical specular BRDF models a rough surface as a dense field of mic
    → tight, bright highlight   → broad, dim highlight
 ```
 
-The **Cook-Torrance** specular BRDF assembles three physical factors:
-
-- **D** — the **normal distribution**: how many microfacets point the right way (**roughness** lives here — `GGX` is today's standard `D`)
-- **G** — **geometry / shadowing-masking**: facets **block** each other at grazing angles
-- **F** — **Fresnel**: reflectance **rises toward 1** at grazing angles (every surface is mirror-like edge-on)
-
----
-
-## The metallic / roughness workflow
-
-Microfacet BRDFs have many physical inputs — but modern engines expose just **two** artist sliders that cover most real materials. This is the **metallic/roughness** (PBR) workflow, and you have already seen it in **Unity's Standard Shader**:
-
-- **Metallic** — **dielectric** or **metal**? A **dielectric** shows a **colored diffuse** + a **weak white** specular (~**4%**) — plastic, wood, skin; a **metal** has **no diffuse**, its specular **tinted** by the base color — gold, copper, steel
-- **Smoothness** (Unity's slider = **1 − roughness**) — high → **tight** highlight (aligned facets); low → **broad** sheen
-- **Albedo / Base Color** — **diffuse color** for a dielectric, **specular tint** for a metal
-
-The same `D`/`G`/`F` machinery underneath — the model glTF and every modern engine share.
+- **Cook-Torrance** assembles three factors: **D** (how many facets point the right way; **roughness** lives here), **G** (facets shadow each other at grazing angles), **F** (**Fresnel**: every surface is mirror-like edge-on)
+- engines expose two artist sliders on top: **metallic** (dielectric: colored diffuse + weak white specular; metal: no diffuse, tinted specular) and **smoothness** (Unity's name for 1 − roughness)
+- the same machinery under Unity's Standard Shader, glTF and every modern renderer
 
 ---
 
@@ -271,138 +184,223 @@ Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full 
 
 ---
 
-### Part 2 · The modern GPU/API model
+### Part 2 · Learned images: diffusion
 
-<small>(~25 min)</small>
+<small>(~60 min)</small>
 
 ---
 
-## The old way: one giant state machine
+## The other direction
 
-For its first two decades, the graphics API (**OpenGL**) was one enormous **global state machine**. You **mutated** hidden global state one call at a time, then said "draw":
+Night one, slide three: **synthesize** a 2D image of a 3D scene. Computer vision runs the arrow backwards.
 
 ```text
-   glEnable(GL_DEPTH_TEST);          // flip a global flag
-   glBindTexture(GL_TEXTURE_2D, id); // set the "current" texture
-   glUniform3f(loc, r, g, b);        // poke one shader input
-   ...  (dozens–hundreds of such calls)
-   glDrawArrays(...);                // NOW draw with whatever state is current
+   graphics:   scene  ──render──▶   image
+   vision:     image  ──analyze─▶   scene (or a label, a depth map, ...)
+   generation: (no scene)  ──sample──▶   image   ...from what was learned by analyzing millions
 ```
 
-The costs:
-
-- **hidden global state** — the result depends on **every** prior call; forget one `glEnable` and the bug is invisible
-- **per-draw validation** — the driver **re-checks and re-compiles** state on every draw call — slow
-- **single-threaded** — one global machine, so you **cannot** record draw work across threads
+- a **generative model** draws a plausible picture with **no scene at all**
+- it can, because it has analyzed more images than any artist will ever see
+- the question of the hour: what does a machine have to **learn** to draw a plausible picture?
 
 ---
 
-## Command buffers: record, then submit
+## What "generate" means
 
-Modern APIs (WebGPU, Vulkan, Metal) **separate recording from execution**. You **record** a list of GPU commands into a **command buffer**, then **submit** the whole buffer to the GPU's **queue**:
+An image is a **point** in a huge space: one coordinate per RGB number (night one: a grid of numbers).
+
+- real photographs fill a thin, tangled region of that space; random points are static
+- **generating** = drawing a new point from inside that region
+- the direct route (write down the region) fails; nobody can describe "all plausible images"
+- the trick that works is indirect: **destroy** structure with a process you understand, then **learn to undo it**
+
+---
+
+## Forward: add noise, step by step
+
+A schedule of small noising steps turns **any** image into pure noise; by the end, every image looks the same.
 
 ```text
-   record  (on any thread, ahead of time):
-      encoder.setPipeline(...)          // which shaders + fixed state
-      encoder.setBindGroup(0, ...)      // which resources
-      encoder.draw(...)                 //  draw
-      encoder.draw(...)                 //  draw
-   → finish() → a command buffer
-
-   submit  (once per frame):
-      queue.submit([ commandBuffer ])   // hand the whole list to the GPU
+   x(0) = the image        x(t) = mostly image + a little noise
+   ...                     x(1) = pure noise, no trace of the image
+   the schedule says how much noise at each t; nothing is learned here
 ```
 
-- recording touches **no** global state — a command buffer is a **self-contained** list
-- so **many threads** can record **many** buffers in parallel, then submit them together — the multi-core win
-- the GPU consumes a **pre-built** list instead of reacting to a live stream of mutations
+- the **forward process** is bookkeeping: pick `t`, mix in the scheduled amount of noise
+- exhibit A next: a 2D point cloud in the shape of a spiral stands in for "all images"; `t` is the schedule
+- watch for: the spiral **dissolving** into one Gaussian blob, and the signal-to-noise ratio falling
 
 ---
 
-## Pipeline state objects: bake the state once
+<!-- .slide: class="demo-full" -->
 
-The old per-draw state — shaders, blend mode, depth test, vertex layout — is **frozen** ahead of time into one **immutable** object: a **pipeline state object (PSO)**. Validate and compile it **once**, at creation; then **switch** PSOs instead of toggling flags:
+## Exhibit A: forward, live
+
+<div class="cockpit" data-demo="diffusion-2d" data-controls="t"><pre class="viz-fallback">  400 points on a spiral = "all images"; the plane around them = static
+  drag t from 0 to 1: the scheduled noise grows and the spiral dissolves
+  into one Gaussian blob; the readout's SNR (dB) falls below zero
+  t = 0: the data   t = 1: pure noise, every dataset looks the same</pre></div>
+
+---
+
+## Reverse: a denoiser
+
+The learned part. Given a noisy point and its `t`, predict the noise that was added (equivalently: where the clean point was).
+
+- the network's job in one sentence: **"from here, which way is the data?"**
+- that answer is a **vector field** over the whole space: at every noisy point, a pull toward the sheet
+- exhibit B next: the demo's denoiser is the **exact** optimal answer for its 400 points (an average of them, weighted by how close each could be); a real network **learns** an approximation of this for images
+- watch for: the spiral **reassembling** from noise, and how few steps it takes
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit B: reverse, live
+
+<div class="cockpit" data-demo="diffusion-2d" data-controls="steps,stochastic"><pre class="viz-fallback">  start from pure noise; ask the denoiser "which way is the data?"
+  steps times, moving a little each time: the spiral reassembles
+  drag steps:  3 (coarse, points land between arms) → 20 → 80 (crisp)
+  stochastic:  DDIM (deterministic: same start, same landing) vs
+               DDPM (a little fresh noise each step: the same start wanders)
+  readout: nearest-data distance falls as the shape comes back</pre></div>
+
+---
+
+## Training, in one line
 
 ```text
-   at load time (once):
-      pso = createRenderPipeline({
-         vertexShader, fragmentShader,      // the programs
-         vertexLayout,                       // how vertices are read
-         blend, depthTest, cullMode          // the fixed-function state
-      })                                     // ← driver validates + compiles HERE
-
-   per draw:
-      encoder.setPipeline(pso)               // one cheap switch, no re-validation
+   pick an image, pick a random t, add that much noise,
+   ask the network for the noise, compare, nudge the weights.   repeat, billions of times.
 ```
 
-- all the state that used to be **scattered** across many `glEnable`/`glBind…` calls is **one** object
-- the expensive **validation/compilation** happens **once up front**, never per-draw — predictable frame times
-- you cannot end up in an **invalid** half-configured state — the object is **complete** or it does not exist
+- **denoising diffusion** (Ho, Jain & Abbeel, 2020): the recipe above, and nothing else
+- every step is a small, well-posed regression: predict a known noise vector
+- that is why it trains stably where earlier generative methods fought their own training
 
 ---
 
-## Bind groups: the resources, in one bundle
+## Samplers are the speed knob
 
-A shader needs **resources** — textures, buffers, samplers. The old way bound each to a numbered slot, one call at a time. The modern way bundles them into a **bind group**: a pre-validated **set** you attach in **one** command:
+- **DDPM**: a thousand small stochastic steps, each adding a little fresh noise; faithful, slow
+- **DDIM** (Song, Meng & Ermon, 2021): the same trained network, run **deterministically** in 20 to 50 larger steps
+- **few-step** models: distill the long walk into a handful of jumps; what is traded is detail and diversity
+- exhibit B's `steps` slider is this knob; its `stochastic` toggle is the DDPM/DDIM choice
+
+---
+
+## Latent diffusion: why it got cheap
+
+A 512×512 RGB image is 786,432 numbers; denoising that a thousand times per picture is unaffordable.
 
 ```text
-   at load time:
-      bindGroup = createBindGroup({
-         0: cameraUniforms,      // the view/projection matrices
-         1: material.baseColor,  // a texture
-         2: material.sampler     // how to sample it
-      })
-
-   per draw:
-      encoder.setBindGroup(0, bindGroup)   // the shader's whole resource set, at once
+   image (512×512×3)  ──encoder──▶  latent (64×64×4)  ──diffuse here──▶  ──decoder──▶  image
+   a learned, lossy compression: 48× fewer numbers to denoise
 ```
 
-- resources are grouped by **how often they change** — a **per-frame** group (camera), a **per-material** group (textures) — so you **rebind only what changed**, validated **once**
-- together: **PSO** (shaders + fixed state) + **bind group** (resources) + a **draw** = one complete, self-contained unit of GPU work
+- a **variational autoencoder** learns the compression once; diffusion runs in the small space
+- decode once at the end; the decoder restores the fine texture the latent left out
+- this is **Stable Diffusion** (Rombach et al., 2022), and it is why the method left the lab
 
 ---
 
-## The old vs the new, side by side
+## Conditioning: telling it what to draw
+
+Unconditional sampling gives *a* picture. A prompt needs the denoiser to **see the text**.
+
+- **CLIP** (2021): a joint embedding trained so an image and its caption land near each other; words become vectors the network reads
+- the denoiser attends to those vectors at every step (**cross-attention**): "which way is the data, *given this caption*?"
+- the same slot takes anything you can embed: a class label, a sketch, another image
+
+---
+
+## Classifier-free guidance
+
+Train the denoiser both **with** and **without** the caption; at sampling time, **exaggerate the difference**.
 
 ```text
-   OLD (OpenGL state machine)        NEW (WebGPU / Vulkan / Metal)
-   ───────────────────────────       ─────────────────────────────
-   mutate hidden global state        record explicit command buffers
-   validate on every draw            validate ONCE (PSO + bind group)
-   bind resources one slot at a time bind a whole set (bind group)
-   single global context             many threads record in parallel
-   "draw with whatever is current"   "submit a pre-built list of work"
+   pull = pull(no caption) + w · [ pull(with caption) − pull(no caption) ]
+   w = 1: plain conditioning     w ≈ 7: the usual default     w = 15+: saturated, over-literal
 ```
 
-Same GPU, same triangles, same shaders — a **more explicit, pre-validated, parallel** way to feed them. The cost is **more up-front code**; the win is **speed and predictability**.
+<img src="../../media/generative/cfg-row.jpg" class="media-shot" style="max-height: 200px;" alt="the same prompt and seed at guidance scales 2.5, 7.5, 12.5, 20 and 30: a couple in a wood-paneled room, growing more saturated and stylized to the right">
+<small class="credit">MrAlanKoh · CC BY-SA 4.0 · via Wikimedia Commons (one row of the original grid)</small>
 
 ---
 
-## What an engine does with your scene, per frame
+## The network is whatever scales
 
-Conceptually, every frame Unity (or any engine) walks your scene and turns it into submitted GPU work:
+- 2020 to 2022: the denoiser is a **U-Net**, a convolutional encoder-decoder with skip connections (born in medical image segmentation)
+- 2023: the **diffusion transformer** (DiT, Peebles & Xie) replaces it with the same architecture as language models, on image patches
+- the recipe (noise, learn to undo, sample) did not change; the network got bigger and simpler, and quality followed
+
+---
+
+## Gallery: prompt to image
+
+<div style="display: flex; gap: 12px; justify-content: center; align-items: flex-start;">
+<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-1.jpg" class="media-shot" style="max-height: 230px;" alt="a generated solarpunk city street: trees on terraced towers, a small tram, a lake, warm daylight"><small class="credit">Prototyperspective · CC0 · via Wikimedia Commons</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-2.jpg" class="media-shot" style="max-height: 230px;" alt="a generated cyberpunk tower in the rain, red neon on dark glass"><small class="credit">CC0 · via Wikimedia Commons</small></div>
+<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-3.jpg" class="media-shot" style="max-height: 230px;" alt="a generated landscape painting: a red Shinto shrine gate among forested mountains"><small class="credit">Benlisquare · Public domain · via Wikimedia Commons</small></div>
+</div>
+
+<small>Prompts, left to right: "utopia at street level in city … solarpunk, green trees, matte painting" · "Cyberpunk, Tower of Babel, in the rain, highly detailed, illustration" · "Hakurei Shrine in distance … forests, mountains, rivers" (Stable Diffusion, 2022–23)</small>
+
+---
+
+## Graphics-flavored control
+
+**ControlNet** (Zhang, Rao & Agrawala, 2023): condition the denoiser on a **depth map**, a **normal map**, or an edge image, and it keeps that structure.
+
+<img src="../../media/generative/controlnet-depth.jpg" class="media-shot" style="max-height: 250px;" alt="left: the estimated depth map of a toy robot at a lectern; right: a generated stormtrooper figure at the same lectern in the same pose">
+<small class="credit">lllyasviel/ControlNet README, depth example · Apache-2.0 · github.com/lllyasviel/ControlNet</small>
+
+- a depth buffer (S06) and normals (S07) are exactly what **our pipeline produces**
+- render the geometry you control, let diffusion paint the appearance
+
+---
+
+## Text to 3D: the two halves meet
+
+**Score distillation** (DreamFusion, Poole et al., 2022): optimize a 3D scene so that **renders of it** score well under a text-conditioned image model.
 
 ```text
-   1. CULL      drop objects outside the camera frustum (S06's clip test)
-   2. SORT      opaque front-to-back (early-Z); transparent back-to-front (blending)
-   3. BATCH     group draws that share a material / PSO, to switch state less
-   4. for each batch:
-        set PSO         (the material's shaders + fixed state)
-        set bind groups (per-frame camera, per-material textures)
-        set per-object  (the model matrix — S04's makeTRS)
-        DRAW            (issue the draw; GPU runs vertex → fragment shaders)
-   5. present   the finished framebuffer to the screen
+   3D scene (a NeRF or Gaussians)  ──render from a random view──▶  image
+   image diffusion model: "does this look like <prompt>? push it this way"
+   the push flows back through the renderer into the 3D scene; repeat
 ```
 
-- **cull** and **sort** reuse the **frustum** and **depth** ideas from S06's viewing pipeline
-- the per-object step is **your** model matrix; the per-material state is **your** BRDF from Part 1
-- the engine records all of this into **command buffers** and **submits** them — Part 2, applied
+- diffusion **judges**, the pipeline **renders**, gradients flow through both
+- the result is a real 3D asset: a camera you can move, geometry you can export
+- this is where learned images meet learned scenes, Part 3's subject
 
 ---
 
-### Part 3 · Neural rendering survey
+## Video: add a time axis
 
-<small>(~30 min)</small>
+A clip is a **3D block of latents** (x, y, t). Frames must see each other; the rest of the recipe is unchanged.
+
+<img src="../../media/generative/video-strip.jpg" class="media-shot" style="max-height: 120px;" alt="six frames of a generated clip: a white dragon in a snowy scene, its pose changing across frames">
+<small class="credit">prompted by Lumi's AI Dreams · Public domain · via Wikimedia Commons (six frames)</small>
+
+- **temporal attention**: each frame's denoiser attends to its neighbors in time, so motion is consistent
+- **video diffusion** (Ho et al., 2022) to Sora-class models (2024): the same noise-and-undo recipe on space-time patches
+
+---
+
+## What still breaks, and what graphics keeps
+
+- **object permanence, physics, counting, text**: no scene exists inside the model, so nothing enforces them
+- **no camera to move, no light to change, no edit that keeps everything else fixed**
+- graphics keeps: **control**, **consistency**, **real time**
+- the two are merging: generated textures and assets in engines; learned rendering of authored scenes; **world models** that predict the next frame from an action
+
+---
+
+### Part 3 · Learned scenes: NeRF and 3DGS
+
+<small>(~20 min)</small>
 
 ---
 
@@ -477,7 +475,7 @@ To make a pixel, **march a ray** from the camera through the field and **accumul
 
 <div class="cockpit" data-demo="gsplat" data-controls="fov"><pre class="viz-fallback">  a real 3D Gaussian Splatting scene, rendered live: ~240,000 translucent
   3D Gaussians, projected and blended back-to-front — a rasterizer, in your
-  browser. Drag orbitAz to orbit; dist to move in/out. Notice the soft,
+  browser. Drag fov, the lens; click to explore and fly. Notice the soft,
   translucent edges — no triangle mesh, no textures; just fuzzy blobs.
 
   Scene: the "bonsai" scene from the Mip-NeRF 360 dataset (Barron et al.,
@@ -486,28 +484,28 @@ To make a pixel, **march a ray** from the camera through the field and **accumul
 
 ---
 
-## What changes, what does not
-
-Neural rendering upends the **representation** — but not the **pipeline foundations** you built this quarter:
+## Learned scene, learned image
 
 ```text
-   CHANGES                              STAYS THE SAME
-   ─────────────────────────────        ─────────────────────────────
-   scene = a network / Gaussians        cameras: a view matrix V (S06)
-   authored by OPTIMIZATION             projection: a matrix P (S06)
-   appearance baked in (no relight)     "render = accumulate light along rays / onto pixels"
-   photos in, 3D out                    homogeneous coords, the divide, the pipeline
+   LEARNED SCENE (NeRF, 3DGS)              LEARNED IMAGE (diffusion)
+   ────────────────────────────            ─────────────────────────
+   one scene, from its own photos          all images, from an archive
+   a camera you can move                   no camera, no scene
+   renders new VIEWS of the same thing     samples NEW things
+   trained through a differentiable        trained by predicting noise;
+   renderer (your V and P inside it)       renders nothing itself
+   meet: score distillation (Part 2)       meet: ControlNet on your depth buffer
 ```
 
-- 3D Gaussian splatting literally **rasterizes with a projection matrix** — it **needs** your **V** and **P**
-- "shade a point, accumulate along a ray, composite front-to-back" is **the same idea**, whether the primitive is a **triangle**, a **network sample**, or a **Gaussian**
-- what you built is the **substrate** these run on — the frontier **stands on** the pipeline, it does not **erase** it
+- 3D Gaussian splatting literally **rasterizes with a projection matrix**: it needs your **V** and **P**
+- "shade a point, accumulate along a ray, composite front-to-back" is the same idea with a triangle, a network sample, or a Gaussian
+- neither half erases the pipeline; both stand on it
 
 ---
 
 ### Part 4 · The course in one picture
 
-<small>(~15 min)</small>
+<small>(~12 min)</small>
 
 ---
 
@@ -550,7 +548,7 @@ Thursday's studio (`lab10`) is your **last work session** before the demo: a che
 
 ### Wrap
 
-<small>(~3 min)</small>
+<small>(~5 min)</small>
 
 ---
 
@@ -562,7 +560,7 @@ You learned to build a **3D renderer's pipeline from first principles** — ever
 - **three matrices** carry a vertex to the screen: model/world **W**, view **V**, projection **P** — each derivable from scratch
 - a **surface** is a mesh (S07) dressed by a texture (S08) and lit by a shading model (S09)
 - **lighting** is really an **energy balance** — the rendering equation — that Phong approximates and PBR pursues
-- the **frontier** (neural rendering) changes the **representation**, not these **foundations**
+- the **frontier**, learned scenes and learned images, changes the **representation** (and who authors it), not these **foundations**
 
 You can now read the pipeline in any engine — or any research paper — and **recognize every piece**, because you built them.
 

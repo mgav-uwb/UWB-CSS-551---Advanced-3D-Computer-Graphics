@@ -1023,12 +1023,83 @@
         shape, color, and opacity, optimized until, splatted onto the screen
         back-to-front, they reproduce the photographs. Splatting is
         <em>rasterization</em> &mdash; Section 4&rsquo;s machinery, drawing the
-        field&rsquo;s newest scene representation at real-time rates. Next door, generative models now produce 3D content
-        from text prompts, and the boundary between computer graphics and
+        field&rsquo;s newest scene representation at real-time rates. Next door, generative image models now train 3D content
+        from text prompts (the subsection below), and the boundary between computer graphics and
         computer vision &mdash; the mirror-twin field that analyzes images
         instead of synthesizing them &mdash; is dissolving into a shared
         question: what is a scene, if not the thing that explains its
         photographs?
+      </p>
+      <h3 id="era-neural-images">Learned images: diffusion models</h3>
+      <p>
+        The neural era has a second half, and it runs the course&rsquo;s first
+        definition backwards. Graphics synthesizes an image from a scene;
+        vision analyzes an image; a <strong>generative model</strong> produces
+        an image from no scene at all, from what it learned by analyzing an
+        archive of millions. The method that made this practical is the
+        <strong>diffusion model</strong>, and its idea is indirect: destroy an
+        image with a noise process you fully control, one small step at a time,
+        and train a network to undo each step. Run that network from pure noise
+        and it walks back to a plausible picture
+        (<a href="https://arxiv.org/abs/2006.11239" target="_blank"
+           rel="noopener">Ho, Jain &amp; Abbeel, &ldquo;Denoising Diffusion
+        Probabilistic Models,&rdquo; 2020</a>; the same mechanism reached from
+        the &ldquo;vector field&rdquo; side in
+        <a href="https://arxiv.org/abs/2011.13456" target="_blank"
+           rel="noopener">Song et al., 2021</a>). Training is a regression
+        against a noise vector the trainer generated itself, which is why it is
+        stable where earlier generative methods fought their own training.
+        Sampling is a walk: a thousand small stochastic steps in the original
+        formulation, a few dozen deterministic ones in
+        <a href="https://arxiv.org/abs/2010.02502" target="_blank"
+           rel="noopener">DDIM</a>, a handful after distillation.
+      </p>
+      <p>
+        Three engineering steps turned the idea into the tools everyone now
+        uses. <strong>Latent diffusion</strong> runs the process not on pixels
+        but on a learned, lossy compression of the image (a 64&times;64&times;4
+        latent for a 512&times;512 picture), decoding once at the end; this is
+        what Stable Diffusion is
+        (<a href="https://arxiv.org/abs/2112.10752" target="_blank"
+           rel="noopener">Rombach et al., 2022</a>). <strong>Conditioning</strong>
+        lets a prompt steer the walk: a joint text&ndash;image embedding
+        (<a href="https://arxiv.org/abs/2103.00020" target="_blank"
+           rel="noopener">CLIP, 2021</a>) turns words into vectors the denoiser
+        reads at every step, and <strong>classifier-free guidance</strong>
+        exaggerates the caption&rsquo;s pull by a scale the user sets
+        (<a href="https://arxiv.org/abs/2207.12598" target="_blank"
+           rel="noopener">Ho &amp; Salimans, 2022</a>). And the denoising
+        network itself went from a U-Net to a transformer on image patches
+        (<a href="https://arxiv.org/abs/2212.09748" target="_blank"
+           rel="noopener">Peebles &amp; Xie, &ldquo;Scalable Diffusion Models
+        with Transformers,&rdquo; 2023</a>), the recipe unchanged, the quality
+        following scale.
+      </p>
+      <p>
+        Two of the developments matter most to a graphics course. Diffusion
+        can be conditioned on the pipeline&rsquo;s own by-products, a depth
+        buffer, a normal map, an edge image, and made to keep that structure
+        while painting the appearance
+        (<a href="https://arxiv.org/abs/2302.05543" target="_blank"
+           rel="noopener">ControlNet: Zhang, Rao &amp; Agrawala, 2023</a>); geometry
+        and camera from the renderer, appearance from the model. And an image
+        model can train a 3D scene: optimize a NeRF or a set of Gaussians so
+        that its renders, from random viewpoints, satisfy a text-conditioned
+        image model, with the gradients flowing back through the differentiable
+        renderer (<strong>score distillation</strong>,
+        <a href="https://arxiv.org/abs/2209.14988" target="_blank"
+           rel="noopener">DreamFusion: Poole et al., 2022</a>). That is where
+        the era&rsquo;s two halves meet: learned scenes are one place learned
+        from its photographs and re-rendered from anywhere; learned images are
+        the whole archive, sampled but never entered. Video is the same recipe
+        with a time axis, a block of latents attended across frames
+        (<a href="https://arxiv.org/abs/2204.03458" target="_blank"
+           rel="noopener">Ho et al., &ldquo;Video Diffusion Models,&rdquo;
+        2022</a>), scaled by 2024 to minute-long clips. What still breaks is
+        exactly what a scene would enforce: object permanence, physics,
+        counting, legible text, a camera you can move. The field is merging the
+        two from both sides, and the last lecture of this course takes both
+        apart.
       </p>
       <p>
         What does &ldquo;rendering&rdquo; even mean when the scene is learned?
@@ -1068,7 +1139,7 @@
         <tr><td>5 &middot; the programmable era</td><td>shaders, engines, GPU computing</td><td>S08&ndash;S09; every Unity shader you write</td></tr>
         <tr><td>6 &middot; capture &amp; simulation</td><td>scanning, subdivision, simulation, LOD</td><td>S07 &middot; S10; animation woven through the MPs</td></tr>
         <tr><td>7 &middot; real time catches film</td><td>PBR, hardware rays, VR&rsquo;s frame budget</td><td>S09 &middot; S10</td></tr>
-        <tr><td>8 &middot; the neural era</td><td>learned scenes, splatting, generative 3D</td><td>S10, and wherever you go next</td></tr>
+        <tr><td>8 &middot; the neural era</td><td>learned scenes, splatting; learned images (diffusion), text-to-3D</td><td>S10, and wherever you go next</td></tr>
       </table>
       <p>
         The people and places roll up just as cleanly. <strong>Utah</strong>
@@ -1123,7 +1194,7 @@
       </p>
 
       <footer>
-        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 1 v1.1
+        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 1 v1.2
         &middot; prepared by Dr. Marcel Gavriliu. Image credits appear in each
         caption; interactive demos in the course library.
       </footer>

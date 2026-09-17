@@ -98,7 +98,8 @@
                  LOD, motion & simulation
     1:44  Era 7  Real time catches film (2010-18) — the loop, games,        8 min
                  honest light in 16 ms (RTX), VR
-    1:52  Era 8  The neural era (2020-)                                      4 min
+    1:52  Era 8  The neural era (2020-), incl. learned images (diffusion)     7 min
+                 (+3 min over the 120 plan; to absorb in the pacing pass)
     1:56  Close  The map of the field / Thursday                            4 min
     2:00  end
 -->
@@ -971,7 +972,7 @@ A game is everything tonight, at once, at 60, forever:
 
 ### Era 8 · The neural era
 
-<small>2020– · ~4 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
+<small>2020– · ~7 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
 
 ---
 
@@ -979,7 +980,16 @@ A game is everything tonight, at once, at 60, forever:
 
 - **neural rendering**: scenes *learned from photographs* — walk a camera where no photo was taken
 - the names on every current paper: **NeRF** (2020) and **Gaussian splatting** (2023)
-- next door: generative 3D — describe a scene in words, receive a model (week 10)
+- next door: **learned images**, the era's other half; one slide, then week 10
+
+---
+
+## Learned images
+
+- **diffusion models**: destroy an image with noise, one small step at a time; train a network to undo each step; start from noise and walk back
+- text-to-image (Stable Diffusion, 2022) and video (2024) are this recipe, scaled
+- next door: an image model can *train* a 3D scene, where the era's two halves meet
+- week 10 takes both apart (<a href="../../handouts/ch01-intro-3d-graphics.html#era-neural-images">Chapter 1 §8</a>)
 
 ---
 
@@ -1005,7 +1015,7 @@ A game is everything tonight, at once, at 60, forever:
 | 2 · the Utah school | S02–S04 (the math) · S05 (scene graphs) · S06 (viewing) · S07 (meshes) · S09 (lighting) |
 | 3–4 · photograph & raster machines | S06 · S09 (the pipeline, aliasing) · S10 (rendering frontier) |
 | 5 · the programmable era | S08 (texturing) · S09–S10 (shaders, PBR) |
-| 6–8 · capture, real time, neural | S07 (modeling) · S10 |
+| 6–8 · capture, real time, neural | S07 (modeling) · S10 (learned scenes, learned images) |
 
 ---
 

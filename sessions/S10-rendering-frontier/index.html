@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L10 — The Rendering Equation, PBR &amp; Neural Rendering</title>
+  <title>CSS 551 · L10 — PBR, Diffusion Models &amp; Learned Scenes</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -35,9 +35,9 @@
        + readout panel side by side and CROP the viewport so the slide stays
        inside reveal's 700px height budget. The canvas pixel buffer is
        untouched, so the harness probe still reads a full-resolution render;
-       only the on-slide footprint shrinks. Both S10 embeds (brdf-lobe, gsplat)
-       use a 400x300 viewport + a ValueTable (.mat-panel), so ONE set of scoped
-       rules caps both. */
+       only the on-slide footprint shrinks. All S10 embeds (brdf-lobe, diffusion-2d, gsplat) use a
+       ~4:3 viewport + a ValueTable (.mat-panel), so ONE set of scoped rules
+       caps all of them. */
     [data-demo] { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; justify-content: center; }
     [data-demo] .demo-controls { flex: 1 1 100%; max-width: 460px; margin: 0 auto; }
     [data-demo] .demo-viewport { height: 210px !important; overflow: hidden; }
@@ -46,6 +46,22 @@
     [data-demo] .demo-panel .mat-panel td { padding: 1.5px 6px; }
     [data-demo] .demo-panel .demo-hint { font-size: 10px !important; margin: 6px 0 0 !important; }
     [data-demo] .demo-panel p { font-size: 11px !important; margin: 4px 0 0 !important; }
+    /* Full-slide exhibits (the two diffusion-2d slides), same treatment as
+       S01's demo-full slides: the slide holds ONLY a short ## title + the
+       embed, so override the 210px teaser crop above (same !important,
+       higher specificity): viewport ~500px tall, rail full height beside it,
+       whole exhibit capped at 540px so title + demo stay inside reveal's
+       700px budget. Any embed NOT on a demo-full slide keeps the crop. */
+    .reveal section.demo-full h2 { font-size: 1.1em; margin-bottom: 8px; }
+    section.demo-full [data-demo] { display: block; }
+    section.demo-full [data-demo] .demo-shell-root--embed { max-width: 96%; max-height: 540px; }
+    section.demo-full [data-demo] .demo-shell-scene--embed { min-height: 500px; }
+    section.demo-full [data-demo] .demo-shell-rail--embed { max-height: 500px; flex: 0 0 230px; }
+    section.demo-full [data-demo] .demo-viewport,
+    section.demo-full [data-demo] canvas { height: 500px !important; width: auto !important; }
+    /* curated media slides */
+    .reveal .media-shot { max-height: 420px; width: auto; }
+    .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
   </style>
