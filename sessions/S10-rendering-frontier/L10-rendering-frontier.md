@@ -13,15 +13,20 @@
   fence; backtick names with underscores. No <small> on math. No forward
   references; the last slide ends the course.
 
-  DEMO EMBEDS (four, each on its own flat slide; brdf-lobe and gsplat under the
-  scoped 210px crop, the two diffusion-2d exhibits on demo-full slides that
-  get the full ~500px viewport, as in S01):
-   - Part 1: data-demo="brdf-lobe"     data-controls="roughness"
-   - Part 2: data-demo="diffusion-2d"  data-controls="t"                (forward)
-             data-demo="diffusion-2d"  data-controls="steps,stochastic" (reverse)
-   - Part 3: data-demo="gsplat"        data-controls="fov"
-  diffusion-2d is deterministic (seeded); its denoiser is the exact posterior
-  mean for the point cloud (lib/core/diffusion.js), which the caption says.
+  DEMO EMBEDS (seven, each on its own flat slide; brdf-lobe and gsplat under
+  the scoped 210px crop, the five Part-2 exhibits on demo-full slides that get
+  the full ~500px viewport, as in S01). Part 2 is a LADDER of exhibits:
+   - Part 1: data-demo="brdf-lobe"        data-controls="roughness"
+   - Part 2: A data-demo="diffusion-image"  data-controls="t"      (a real render dissolving)
+             B data-demo="diffusion-2d"     data-controls="steps,stochastic" (the mechanism on dots)
+             C data-demo="diffusion-digits" data-controls="steps"  (exact denoiser on MNIST: memorizes)
+             D data-demo="diffusion-digits" data-controls="smooth" (kernel bandwidth: novel digits)
+             E data-demo="diffusion-net"    data-controls="guide,steps" (a TRAINED MLP denoiser, in-browser)
+   - Part 3: data-demo="gsplat"           data-controls="fov"
+  All exact-denoiser demos are deterministic (seeded); every caption says the
+  denoiser is the exact posterior mean for the finite set, the function a
+  network approximates. diffusion-net's weights: lib/assets/mnist/
+  mlp-denoiser.{bin,json}, trained by tools/train-mlp.py (10 min, CPU).
 
   MEDIA: ../../media/generative/*.jpg, license-verified; credit lines copied
   VERBATIM from media/generative/CREDITS.md.
@@ -29,9 +34,9 @@
   Session plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Intro                                   3 min
     0:03  Part 1  From Phong to PBR              20 min
-    0:23  Part 2  Learned images: diffusion      60 min
-    1:23  Part 3  Learned scenes: NeRF and 3DGS  20 min
-    1:43  Part 4  The course in one picture      12 min
+    0:23  Part 2  Learned images: diffusion      66 min  (five exhibits)
+    1:29  Part 3  Learned scenes: NeRF and 3DGS  16 min
+    1:45  Part 4  The course in one picture      10 min
     1:55  Wrap                                    5 min
     2:00  end
 -->
@@ -186,61 +191,43 @@ Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full 
 
 ### Part 2 · Learned images: diffusion
 
-<small>(~60 min)</small>
-
----
-
-## The other direction
-
-Night one, slide three: **synthesize** a 2D image of a 3D scene. Computer vision runs the arrow backwards.
-
-```text
-   graphics:   scene  ──render──▶   image
-   vision:     image  ──analyze─▶   scene (or a label, a depth map, ...)
-   generation: (no scene)  ──sample──▶   image   ...from what was learned by analyzing millions
-```
-
-- a **generative model** draws a plausible picture with **no scene at all**
-- it can, because it has analyzed more images than any artist will ever see
-- the question of the hour: what does a machine have to **learn** to draw a plausible picture?
+<small>(~66 min)</small>
 
 ---
 
 ## What "generate" means
 
-An image is a **point** in a huge space: one coordinate per RGB number (night one: a grid of numbers).
+Night one, slide three: **synthesize** an image of a scene. Vision runs the arrow backwards. A **generative model** runs it from nothing.
 
-- real photographs fill a thin, tangled region of that space; random points are static
-- **generating** = drawing a new point from inside that region
-- the direct route (write down the region) fails; nobody can describe "all plausible images"
-- the trick that works is indirect: **destroy** structure with a process you understand, then **learn to undo it**
+- an image is a **point** in a huge space: one coordinate per RGB number (128×128 pixels: 49,152 coordinates)
+- real photographs fill a thin, tangled region of that space; almost every other point is static
+- **generating** = drawing a new point from inside that region, with no scene, from what was learned by analyzing millions of images
+- nobody can write the region down; the trick that works is indirect: **destroy** structure with a process you control, then **learn to undo it**
 
 ---
 
-## Forward: add noise, step by step
+## Forward: add noise, on schedule
 
 A schedule of small noising steps turns **any** image into pure noise; by the end, every image looks the same.
 
 ```text
-   x(0) = the image        x(t) = mostly image + a little noise
-   ...                     x(1) = pure noise, no trace of the image
-   the schedule says how much noise at each t; nothing is learned here
+   x(0) = the image        x(t) = √ᾱ(t) · image  +  √(1−ᾱ(t)) · noise
+   x(1) = pure noise, no trace of the image;  nothing is learned here
 ```
 
-- the **forward process** is bookkeeping: pick `t`, mix in the scheduled amount of noise
-- exhibit A next: a 2D point cloud in the shape of a spiral stands in for "all images"; `t` is the schedule
-- watch for: the spiral **dissolving** into one Gaussian blob, and the signal-to-noise ratio falling
+- exhibit A next: the course's Cornell render, 49,152 numbers, dissolving as `t` moves
+- watch for: the `t` where you stop recognizing a room, and where the signal-to-noise ratio crosses 0 dB
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit A: forward, live
+## Exhibit A: a real picture, dissolving
 
-<div class="cockpit" data-demo="diffusion-2d" data-controls="t"><pre class="viz-fallback">  400 points on a spiral = "all images"; the plane around them = static
-  drag t from 0 to 1: the scheduled noise grows and the spiral dissolves
-  into one Gaussian blob; the readout's SNR (dB) falls below zero
-  t = 0: the data   t = 1: pure noise, every dataset looks the same</pre></div>
+<div class="cockpit" data-demo="diffusion-image" data-controls="t"><pre class="viz-fallback">  left: x(0), the Cornell render (128×128×3 = 49,152 numbers)
+  right: x(t) = √ᾱ · x(0) + √(1−ᾱ) · noise, for the t on the slider
+  drag t: around 0.5 the room is still there; around 0.7 it is gone;
+  at 1 nothing remains. Readout: ᾱ(t), SNR in dB, PSNR vs the original.</pre></div>
 
 ---
 
@@ -250,14 +237,14 @@ The learned part. Given a noisy point and its `t`, predict the noise that was ad
 
 - the network's job in one sentence: **"from here, which way is the data?"**
 - that answer is a **vector field** over the whole space: at every noisy point, a pull toward the sheet
-- exhibit B next: the demo's denoiser is the **exact** optimal answer for its 400 points (an average of them, weighted by how close each could be); a real network **learns** an approximation of this for images
-- watch for: the spiral **reassembling** from noise, and how few steps it takes
+- exhibit B next: 400 points on a spiral stand in for "all images", so the field can be drawn; the demo's denoiser is the **exact** optimal answer for those 400 points, the thing a network approximates
+- watch for: the spiral **reassembling** from noise, and how few `steps` it takes
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit B: reverse, live
+## Exhibit B: the mechanism, on dots
 
 <div class="cockpit" data-demo="diffusion-2d" data-controls="steps,stochastic"><pre class="viz-fallback">  start from pure noise; ask the denoiser "which way is the data?"
   steps times, moving a little each time: the spiral reassembles
@@ -281,12 +268,71 @@ The learned part. Given a noisy point and its `t`, predict the noise that was ad
 
 ---
 
-## Samplers are the speed knob
+## From dots to digits
 
-- **DDPM**: a thousand small stochastic steps, each adding a little fresh noise; faithful, slow
-- **DDIM** (Song, Meng & Ermon, 2021): the same trained network, run **deterministically** in 20 to 50 larger steps
-- **few-step** models: distill the long walk into a handful of jumps; what is traded is detail and diversity
-- exhibit B's `steps` slider is this knob; its `stochastic` toggle is the DDPM/DDIM choice
+Same mechanism, real images: **2,000 handwritten digits**, 20×20 pixels, so each image is a point in a **400-dimensional** space.
+
+- the denoiser is still the **exact** best answer for that finite set: an average of the training digits, weighted by how likely each was the origin
+- exhibit C next: start from noise, walk back; a digit appears
+- watch for the panel on the right: every sample lands **exactly on a training digit**. An exact denoiser for a finite set can only **memorize**
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit C: digits, the exact denoiser
+
+<div class="cockpit" data-demo="diffusion-digits" data-controls="steps"><pre class="viz-fallback">  2,000 MNIST digits (20×20) = the training set; a digit is a 400-vector
+  start from noise; the exact posterior-mean denoiser walks back `steps` times
+  the panel shows the selected sample beside its nearest training digit:
+  distance 0.000, verdict "memorized": an exact denoiser only returns the set
+  buttons pick the digit (conditioning); click a sample to inspect it
+  MNIST (LeCun, Cortes, Burges) · CC BY-SA 3.0</pre></div>
+
+---
+
+## The leap: from lookup to generalization
+
+A network cannot store the training set; it learns a **smooth** function that agrees with it. Exhibit D fakes that with one knob.
+
+- `smooth` widens the denoiser's kernel: it keeps **blending neighbors** all the way to the end instead of snapping to one training digit
+- watch for: the nearest-digit distance jumping above the threshold, and digits **nobody wrote**
+- too smooth, and every sample collapses to one blurry average: the other failure
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit D: digits nobody wrote
+
+<div class="cockpit" data-demo="diffusion-digits" data-controls="smooth"><pre class="viz-fallback">  same 2,000 digits, same walk; drag smooth:
+    exact   → every sample is a training digit (distance 0.000, memorized)
+    h ≈ 3   → blends of neighbors: new digits, distance ≈ 0.2, "novel"
+    h = 5   → one blurry average: too smooth
+  the network in the next exhibit learns the middle regime by itself</pre></div>
+
+---
+
+## A real learned denoiser
+
+Exhibit E replaces the exact answer with a **trained network**: a small MLP, about a million weights, trained for fifteen minutes on a laptop CPU on 60,000 digits, running in your browser now.
+
+- at sampling time it never sees the training set; it only remembers what it learned about digits
+- the digit buttons are **conditioning** (a class embedding, the slot text goes into later); `guide` is **classifier-free guidance**: exaggerate what the class adds
+- watch for: the nearest-digit distance, well above the threshold for every sample, and what `guide` does to the strokes
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit E: the network draws
+
+<div class="cockpit" data-demo="diffusion-net" data-controls="guide,steps"><pre class="viz-fallback">  a trained class-conditional MLP denoiser (≈1,000,000 weights, 15 minutes
+  of CPU training on 60,000 MNIST digits) samples 12 digits from noise
+  buttons: which digit (conditioning)   guide: classifier-free guidance w
+  the panel: nearest training digit, distance well above the memorization
+  threshold for every sample: these digits were learned, not looked up
+  MNIST (LeCun, Cortes, Burges) · CC BY-SA 3.0</pre></div>
 
 ---
 
@@ -305,35 +351,24 @@ A 512×512 RGB image is 786,432 numbers; denoising that a thousand times per pic
 
 ---
 
-## Conditioning: telling it what to draw
+## Text in the class slot
 
-Unconditional sampling gives *a* picture. A prompt needs the denoiser to **see the text**.
+Exhibit E's digit button was a **class embedding**. A prompt is the same slot, filled by text.
 
 - **CLIP** (2021): a joint embedding trained so an image and its caption land near each other; words become vectors the network reads
 - the denoiser attends to those vectors at every step (**cross-attention**): "which way is the data, *given this caption*?"
-- the same slot takes anything you can embed: a class label, a sketch, another image
+- **classifier-free guidance** (Ho & Salimans, 2022) is exhibit E's `guide`: train with and without the caption, exaggerate the difference by `w`
 
----
-
-## Classifier-free guidance
-
-Train the denoiser both **with** and **without** the caption; at sampling time, **exaggerate the difference**.
-
-```text
-   pull = pull(no caption) + w · [ pull(with caption) − pull(no caption) ]
-   w = 1: plain conditioning     w ≈ 7: the usual default     w = 15+: saturated, over-literal
-```
-
-<img src="../../media/generative/cfg-row.jpg" class="media-shot" style="max-height: 200px;" alt="the same prompt and seed at guidance scales 2.5, 7.5, 12.5, 20 and 30: a couple in a wood-paneled room, growing more saturated and stylized to the right">
+<img src="../../media/generative/cfg-row.jpg" class="media-shot" style="max-height: 170px;" alt="the same prompt and seed at guidance scales 2.5, 7.5, 12.5, 20 and 30: a couple in a wood-paneled room, growing more saturated and stylized to the right">
 <small class="credit">MrAlanKoh · CC BY-SA 4.0 · via Wikimedia Commons (one row of the original grid)</small>
 
 ---
 
 ## The network is whatever scales
 
-- 2020 to 2022: the denoiser is a **U-Net**, a convolutional encoder-decoder with skip connections (born in medical image segmentation)
-- 2023: the **diffusion transformer** (DiT, Peebles & Xie) replaces it with the same architecture as language models, on image patches
-- the recipe (noise, learn to undo, sample) did not change; the network got bigger and simpler, and quality followed
+- ours: an MLP, a million weights, fifteen minutes; theirs: a **U-Net** (2020–22), then a **diffusion transformer** (DiT, Peebles & Xie 2023) with billions, on image patches
+- the recipe (noise, learn to undo, sample) did not change from exhibit E to the frontier; the network and the data got bigger
+- gallery next: what the recipe draws at that scale
 
 ---
 
@@ -400,7 +435,7 @@ A clip is a **3D block of latents** (x, y, t). Frames must see each other; the r
 
 ### Part 3 · Learned scenes: NeRF and 3DGS
 
-<small>(~20 min)</small>
+<small>(~16 min)</small>
 
 ---
 
@@ -505,7 +540,7 @@ To make a pixel, **march a ray** from the camera through the field and **accumul
 
 ### Part 4 · The course in one picture
 
-<small>(~12 min)</small>
+<small>(~10 min)</small>
 
 ---
 

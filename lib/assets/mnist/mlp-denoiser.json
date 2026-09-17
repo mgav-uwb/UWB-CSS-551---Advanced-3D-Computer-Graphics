@@ -1,0 +1,75 @@
+{
+ "d": 400,
+ "temb": 64,
+ "cemb": 64,
+ "hidden": 512,
+ "classes": 11,
+ "null_class": 10,
+ "tscale": 1000.0,
+ "layout": [
+  {
+   "name": "cemb.weight",
+   "shape": [
+    11,
+    64
+   ]
+  },
+  {
+   "name": "l1.weight",
+   "shape": [
+    512,
+    528
+   ]
+  },
+  {
+   "name": "l1.bias",
+   "shape": [
+    512
+   ]
+  },
+  {
+   "name": "l2.weight",
+   "shape": [
+    512,
+    512
+   ]
+  },
+  {
+   "name": "l2.bias",
+   "shape": [
+    512
+   ]
+  },
+  {
+   "name": "l3.weight",
+   "shape": [
+    512,
+    512
+   ]
+  },
+  {
+   "name": "l3.bias",
+   "shape": [
+    512
+   ]
+  },
+  {
+   "name": "out.weight",
+   "shape": [
+    400,
+    512
+   ]
+  },
+  {
+   "name": "out.bias",
+   "shape": [
+    400
+   ]
+  }
+ ],
+ "params": 1002064,
+ "schedule": "cosine s=0.008 (same as lib/core/diffusion.js)",
+ "predicts": "x0",
+ "steps_trained": 41210,
+ "budget_s": 900.0
+}

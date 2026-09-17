@@ -1,0 +1,8 @@
+{
+  "n": 2000,
+  "w": 20,
+  "h": 20,
+  "perClass": 200,
+  "source": "MNIST training set, first PER_CLASS per digit, cropped 28x28 -> centered 20x20",
+  "license": "CC BY-SA 3.0 (LeCun, Cortes, Burges)"
+}
