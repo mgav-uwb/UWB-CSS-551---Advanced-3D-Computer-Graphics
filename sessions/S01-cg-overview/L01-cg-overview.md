@@ -1,7 +1,7 @@
 <!--
   CSS 551 · Lecture 1 (Session 1) — 3D Computer Graphics: The Big Picture.
   A story-driven, informal overview of the WHOLE field. v3 restructure: the
-  deck now walks the SAME historic spine as the Chapter 1 handout — seventy-
+  deck now walks the SAME historic spine as the course text's history chapter — seventy-
   five years in eight overlapping eras, 1950 → today, in chronological order:
       1 interactive pictures born (1950-68)   5 the programmable era (2000-15)
       2 the Utah school (1968-80)             6 capturing & simulating (1990-2010)
@@ -78,7 +78,8 @@
   lines are copied VERBATIM from media/overview/CREDITS.md — edit there first.
   The four history-era media (sketchpad, utah-teapot, sgi-workstation,
   geforce256) + gi-comparison anchor the era slides they belong to.
-  READING: ../../handouts/ch01-intro-3d-graphics.html is the primary reading
+  READING: ../../textbook/history-of-graphics.html (the course text's history
+  chapter; chapters are topic-based, not week-based) is the primary reading
   and the deck's spine — the era dividers deep-link its section ids
   (#era-birth, #era-utah, #era-photograph, #era-raster, #era-programmable,
   #era-capture, #era-realtime, #era-neural, #era-map). The opening timeline
@@ -163,7 +164,7 @@ Games · film & VFX · CAD & engineering · medical imaging · scientific visual
 - **1980s–2000s**: chase the photo; silicon; programmable
 - **1990s–now**: capture, simulate, real time, neural
 
-<small>Thursday = studio (Unity). Reading: <a href="../../handouts/ch01-intro-3d-graphics.html">Chapter 1</a>.</small>
+<small>Thursday = studio (Unity). Reading: <a href="../../textbook/history-of-graphics.html">the history chapter</a> of the course text.</small>
 
 ---
 
@@ -177,7 +178,7 @@ Tonight is this bar, left to right — the bands **overlap on purpose**: researc
 
 ### Era 1 · Interactive pictures are born
 
-<small>1950–1968 · ~6 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-birth">Chapter 1 §1</a></small>
+<small>1950–1968 · ~6 min · <a href="../../textbook/history-of-graphics.html#era-birth">History §1</a></small>
 
 ---
 
@@ -201,7 +202,7 @@ Tonight is this bar, left to right — the bands **overlap on purpose**: researc
 
 ### Era 2 · The Utah school
 
-<small>1968–1980 · ~30 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-utah">Chapter 1 §2</a></small>
+<small>1968–1980 · ~30 min · <a href="../../textbook/history-of-graphics.html#era-utah">History §2</a></small>
 
 One department invented most of what a scene *is* — and how to take its picture.
 
@@ -497,7 +498,7 @@ Watch for: the readout's triangle count — it never leaves 2.
 
 ### Era 3 · Chasing the photograph
 
-<small>1975–1990 · ~12 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-photograph">Chapter 1 §3</a></small>
+<small>1975–1990 · ~12 min · <a href="../../textbook/history-of-graphics.html#era-photograph">History §3</a></small>
 
 ---
 
@@ -558,7 +559,7 @@ Not a photograph: chrome, ceramic, glass — all *followed light, honestly compu
 
 ### Era 4 · The raster machines
 
-<small>1980–2000 · ~12 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-raster">Chapter 1 §4</a></small>
+<small>1980–2000 · ~12 min · <a href="../../textbook/history-of-graphics.html#era-raster">History §4</a></small>
 
 ---
 
@@ -657,7 +658,7 @@ Anti-aliasing smooths sampling in *space*. **Motion blur** smooths it in *time*.
 
 ### Era 5 · The programmable era
 
-<small>2000–2015 · ~14 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-programmable">Chapter 1 §5</a></small>
+<small>2000–2015 · ~14 min · <a href="../../textbook/history-of-graphics.html#era-programmable">History §5</a></small>
 
 ---
 
@@ -748,7 +749,7 @@ Utah's texture and bump tricks, now written as **shaders** — so *every* surfac
 
 ### Era 6 · Capturing and simulating reality
 
-<small>1990–2010 · ~18 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-capture">Chapter 1 §6</a></small>
+<small>1990–2010 · ~18 min · <a href="../../textbook/history-of-graphics.html#era-capture">History §6</a></small>
 
 ---
 
@@ -922,7 +923,7 @@ Watch for: the corner at the middle key — there with linear, gone with smooth.
 
 ### Era 7 · Real time catches film
 
-<small>2010–2018 · ~8 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-realtime">Chapter 1 §7</a></small>
+<small>2010–2018 · ~8 min · <a href="../../textbook/history-of-graphics.html#era-realtime">History §7</a></small>
 
 ---
 
@@ -972,7 +973,7 @@ A game is everything tonight, at once, at 60, forever:
 
 ### Era 8 · The neural era
 
-<small>2020– · ~7 min · <a href="../../handouts/ch01-intro-3d-graphics.html#era-neural">Chapter 1 §8</a></small>
+<small>2020– · ~7 min · <a href="../../textbook/history-of-graphics.html#era-neural">History §8</a></small>
 
 ---
 
@@ -989,7 +990,7 @@ A game is everything tonight, at once, at 60, forever:
 - **diffusion models**: destroy an image with noise, one small step at a time; train a network to undo each step; start from noise and walk back
 - text-to-image (Stable Diffusion, 2022) and video (2024) are this recipe, scaled
 - next door: an image model can *train* a 3D scene, where the era's two halves meet
-- week 10 takes both apart (<a href="../../handouts/ch01-intro-3d-graphics.html#era-neural-images">Chapter 1 §8</a>)
+- the last lecture takes both apart (<a href="../../textbook/history-of-graphics.html#era-neural-images">History §8</a>)
 
 ---
 
@@ -1025,5 +1026,5 @@ A game is everything tonight, at once, at 60, forever:
 - you will implement the engine's math yourself, then check it against the engine
 - **Thursday**: Unity install · the interactive loop · MVC — bring a laptop
 - **MP1 is out this week** — *details on Canvas*
-- **Read Chapter 1** — the field's history, the papers, the people (linked from the course site)
+- **Read the history chapter** of the course text — the field's story, the papers, the people (linked from the course site)
 

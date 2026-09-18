@@ -8,7 +8,8 @@
   handouts in the middle, its interactive demos on the right.
   TO ADD A SESSION: fill in its dir/deck/lab under the SESSIONS array below
   (deck/lab stay null until that session's files exist — null renders unlinked,
-  exactly like 343's exam rows). handouts/demos = keys into the HANDOUTS/DEMOS maps.
+  exactly like 343's exam rows). handouts/demos = keys into the HANDOUTS/DEMOS maps; HANDOUTS
+  are the topic chapters of textbook/ (offering-independent), attached per session HERE.
 -->
 <html lang="en">
 <head>
@@ -115,6 +116,7 @@
 // ───────── course-wide quick links (bar under the header) ─────────
 // href:null renders as an unlinked (dashed) chip until that page exists.
 const QUICKLINKS = [
+  { href:"textbook/index.html", title:"Course text", desc:"topic chapters, independent of the week schedule" },
   { href:null, title:"Schedule", desc:"session-by-session plan" },
   { href:null, title:"Syllabus", desc:"policies & grading" },
   { href:null, title:"Assignments", desc:"studio labs & projects" },
@@ -122,12 +124,24 @@ const QUICKLINKS = [
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
 const HANDOUTS = {
-  ch01: { href:"handouts/ch01-intro-3d-graphics.html",
-          title:"Ch. 1 · Intro to 3D Computer Graphics",
-          desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
-  ch10: { href:"handouts/ch10-learned-images-and-scenes.html",
-          title:"Ch. 10 · Learned Images and Learned Scenes",
-          desc:"the rendering equation and PBR; networks, embeddings, the space of images (as vectors and as functions); diffusion written out; NeRF and splats; the papers" },
+  history:  { href:"textbook/history-of-graphics.html",
+              title:"Text · A History of Computer Graphics",
+              desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
+  pbr:      { href:"textbook/light-transport-pbr.html",
+              title:"Text · Light Transport and PBR",
+              desc:"the rendering equation term by term; the BRDF; microfacets and the metallic/roughness model" },
+  nets:     { href:"textbook/neural-nets-embeddings.html",
+              title:"Text · Neural Networks and Embeddings",
+              desc:"a network as a function and approximator; embeddings; encoders/decoders; two encoders, one space (CLIP)" },
+  images:   { href:"textbook/image-space.html",
+              title:"Text · The Space of Images",
+              desc:"images as vectors and as functions; sampling, bases, aliasing revisited; the thin sheet; the non-invertible concept map" },
+  diffusion:{ href:"textbook/diffusion-models.html",
+              title:"Text · Diffusion Models",
+              desc:"destroy, learn to undo, sample — the exact denoiser and Tweedie, DDPM/DDIM, guidance, the scalings, what still breaks, the papers" },
+  scenes:   { href:"textbook/learned-scenes.html",
+              title:"Text · Learned Scenes",
+              desc:"NeRF and its volume-rendering integral; 3D Gaussian splatting; learned scenes against learned images" },
 };
 
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
@@ -177,7 +191,7 @@ const SESSIONS = [
   { id:"S01", title:"3D Computer Graphics: The Big Picture",
     deck:"sessions/S01-cg-overview/index.html",
     lab:"sessions/S01-cg-overview/lab01/index.html",
-    handouts:["ch01"],
+    handouts:["history"],
     demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map","mvc-transform"] },
   { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
     deck:"sessions/S02-vectors-dot-cross/index.html",
@@ -214,7 +228,7 @@ const SESSIONS = [
   { id:"S10", title:"PBR, Diffusion Models &amp; Learned Scenes",
     deck:"sessions/S10-rendering-frontier/index.html",
     lab:"sessions/S10-rendering-frontier/lab10/index.html",
-    handouts:["ch10"],
+    handouts:["pbr","nets","images","diffusion","scenes"],
     demos:["brdf-lobe","mlp-fit","embed-map","diffusion-image","diffusion-2d","diffusion-digits","diffusion-net","gsplat"] },
 ];
 

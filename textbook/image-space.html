@@ -1,0 +1,252 @@
+<!doctype html>
+<!-- CSS 551 course text: The Space of Images. Topic chapter, independent of any offering's schedule;
+     the course hub says which session assigns it. Shared stylesheet: textbook.css. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Space of Images - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math. <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>The Space of Images</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Course text &middot; images as vectors, images as functions, and why generation is a sampling problem. Assigned by your offering&rsquo;s course site; the vector view is one slide of the lecture on learned images, the function view is treated here only.
+      </div>
+
+      <p class="lead">
+        An image is a point. That sentence can be made precise in two ways, as a point of a finite-dimensional vector space with one axis per number, or as a function from the picture plane to color, and this chapter does both, shows how sampling connects them, and uses the function view to revisit aliasing and to introduce neural fields. It then states the fact that makes generation a sampling problem: the map from images to concepts is many-to-one, so its inverse is a distribution, and something must supply the missing choices.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="image-space">The space of images: vectors, functions, and the thin sheet</h2>
+      <h3>1.1 The finite-dimensional view</h3>
+      <div class="def">
+        <span class="tag">Definition (image as a vector)</span>
+        An \(m\times n\) RGB image is a point of the vector space
+        \(\mathbb{R}^{3mn}\): list its numbers in a fixed order,
+        \(\mathbf{x} = (r_{11}, g_{11}, b_{11}, r_{12}, \dots, b_{mn})\), and it
+        is one point, or equivalently the vector from the origin to that point.
+        Displayable images occupy the cube \([0,1]^{3mn}\). A \(128\times128\)
+        RGB image has \(49{,}152\) coordinates; a \(512\times512\) one has
+        \(786{,}432\).
+      </div>
+      <p>
+        Everything the pipeline does to images is now linear algebra on that
+        vector. Averaging two images is adding two vectors and halving; a blur is
+        a linear operator; the difference between two frames is a vector whose
+        length is a measure of how much moved; the mean squared error between an
+        image and its noisy version is \(\|\mathbf{x} - \mathbf{y}\|^2 / 3mn\),
+        which is what the forward-process demo&rsquo;s PSNR readout is built from.
+        The picture to keep is that this space is enormous and almost entirely
+        empty of meaning: draw a point uniformly at random from the cube and you
+        get static, every time, because the set of images that look like anything
+        is a thin, folded, low-dimensional sheet inside it. Generation is the
+        problem of landing a new point on the sheet on purpose.
+      </p>
+
+      <h3>1.2 The function-space view</h3>
+      <p>
+        The vector view has a resolution baked in. A cleaner object is the image
+        as a <em>function</em>: a rule that assigns a color to every point of
+        the picture plane.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (image as a function)</span>
+        A continuous image is a function \(f : [0,1]^2 \to [0,1]^3\), from the
+        unit square to RGB. The set of all such functions with finite energy,
+        \[
+          \mathcal{I} \;=\; \Big\{ f : [0,1]^2 \to \mathbb{R}^3 \;\Big|\; \int_{[0,1]^2} \|f(u,v)\|^2\, du\, dv < \infty \Big\},
+        \]
+        is a vector space (the sum of two images and a scalar multiple of an
+        image are images), with the inner product and norm
+        \[
+          \langle f, g\rangle = \int_{[0,1]^2} f(u,v)\cdot g(u,v)\, du\, dv, \qquad
+          \|f\| = \sqrt{\langle f, f\rangle}.
+        \]
+        It is infinite-dimensional: no finite list of numbers pins down an
+        arbitrary \(f\).
+      </div>
+      <p>
+        The two views are related by <strong>sampling</strong>. An \(m\times n\)
+        raster is the function evaluated on a grid,
+        \(\mathbf{x}_{ij} = f(u_i, v_j)\) with \(u_i = (i - \tfrac12)/m\) and
+        \(v_j = (j-\tfrac12)/n\); this is the &ldquo;one look per pixel at its
+        center&rdquo; of <a href="history-of-graphics.html#era-raster">the history chapter&rsquo;s</a> rasterization demo. Going the other
+        way, a raster defines a function by <strong>reconstruction</strong>: the
+        nearest-neighbor rule gives a piecewise-constant \(f\) (a mosaic of
+        \(3mn\) little box functions with the pixel values as coefficients),
+        bilinear interpolation gives a continuous one, and a band-limited
+        reconstruction gives the smoothest. In that language the vector
+        \(\mathbf{x}\in\mathbb{R}^{3mn}\) is the list of <em>coefficients</em> of
+        \(f\) in the box-function basis, and choosing a resolution is choosing
+        how many basis functions to keep. Other bases exist and matter: the
+        Fourier basis (sines and cosines of increasing frequency), in which JPEG
+        stores images by keeping the low-frequency coefficients and discarding
+        the rest, and wavelet bases, in which detail is organized by scale. An
+        image is the same function in every basis; only the numbers change.
+      </p>
+      <div class="aside">
+        <span class="tag">Aliasing, revisited</span>
+        Sampling is a linear map from \(\mathcal{I}\) to \(\mathbb{R}^{3mn}\)
+        and it throws information away: two different functions can produce the
+        same raster. When the discarded part matters (a checkerboard finer than
+        the pixel grid, an edge crossing pixels at an angle) the samples tell a
+        false story. That is <strong>aliasing</strong>, the disease of Chapter
+        1&rsquo;s raster-machines era, and the sampling theorem says exactly when
+        it cannot happen: a function with no frequencies above \(B\) is recovered
+        perfectly from samples spaced closer than \(1/2B\). Supersampling,
+        mipmaps, and motion blur are all ways of removing frequencies the grid
+        cannot carry <em>before</em> sampling, which is why they work.
+      </div>
+      <p>
+        Why bother with the function view in a course that renders rasters?
+        Three reasons that pay off within this chapter. First, several of the
+        pipeline&rsquo;s operations are stated most honestly on functions:
+        anti-aliasing is filtering before sampling; a texture is a function on
+        \([0,1]^2\) that the UV map pulls onto a surface (the texturing lecture), and a
+        mipmap is that function at several bandwidths. Second, a scene can be a
+        function too: <a href="learned-scenes.html">the learned-scenes chapter</a>&rsquo;s NeRF is a network standing in for
+        \(F : \mathbb{R}^3\times S^2 \to \mathbb{R}^3\times\mathbb{R}_{\ge 0}\),
+        color and density at every point and viewing direction, with no mesh
+        anywhere, and the same idea (a network as a coordinate-to-value
+        function, an <em>implicit</em> or <em>neural field</em> representation)
+        now represents images, shapes, and volumes at any resolution. Third, the
+        generative models of <a href="diffusion-models.html">the diffusion chapter</a> are stated on vectors of a fixed
+        size, but what they learn is resolution-agnostic in spirit: the sheet of
+        natural images is a property of the functions, and a model trained at
+        one raster size is approximating the same sheet a model at another size
+        approximates. Diffusion in the continuous setting (on function space
+        directly) is an active research direction; this course stays in
+        \(\mathbb{R}^{3mn}\), where every statement below is literal.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (two images, one distance)</span>
+        Let \(f\) be uniform mid-gray, \(f(u,v) = (\tfrac12,\tfrac12,\tfrac12)\),
+        and \(g\) a vertical black-to-white ramp, \(g(u,v) = (u,u,u)\). Then
+        \(\|f - g\|^2 = 3\int_0^1\!\!\int_0^1 (\tfrac12 - u)^2\, du\, dv = 3\cdot\tfrac{1}{12} = \tfrac14\),
+        so \(\|f-g\| = \tfrac12\). Sample both on an \(m\times n\) grid and the
+        per-pixel mean squared error of the rasters converges to the same
+        \(\tfrac{1}{4}\) as \(m\to\infty\): the finite-dimensional distance is
+        the Riemann sum of the function-space one. Resolution changes the count
+        of numbers, not the geometry.
+      </div>
+
+      <h3>1.3 The thin sheet, and what it is made of</h3>
+      <p>
+        Whatever the view, the images that mean something form a small region:
+        a curved, low-dimensional set often called the <em>manifold of natural
+        images</em>, though it is neither smooth nor a single piece. Two facts
+        about it make generation possible. It is <em>thin</em>: nearly every
+        direction away from a photograph leads immediately to something that is
+        not a photograph, which is why random points are static. And it is
+        <em>structured</em>: moving along it changes content in ways that have
+        names (a cat turns its head, the light warms, the lens zooms), so the
+        sheet has coordinates you can say in words, which is exactly what the
+        encoder of <a href="neural-nets-embeddings.html">the networks chapter</a> computes.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="concept-map">The concept map is not invertible</h2>
+      <p>
+        Let \(E\) be the image encoder. It is <strong>many-to-one</strong> by
+        design: thousands of cat photographs land on one &ldquo;cat&rdquo;
+        embedding, because throwing away which cat, which pose, and which light
+        is the whole point of a concept. So \(E\) has no inverse function. The
+        honest inverse of a concept is a <em>conditional distribution</em>
+        \(p(\mathbf{x}\mid c)\) over images, and a generator has to draw from it.
+        A decoder that took only the concept would be forced to return one image
+        per caption forever (which is what early text-to-image systems did);
+        something must supply the missing choices. Diffusion (<a href="diffusion-models.html">its own chapter</a>) supplies them as
+        noise: every sample starts from a different random point
+        \(\mathbf{x}_T \sim \mathcal{N}(0, I)\), which contains more than enough
+        arbitrary information, and the model spends its steps turning that noise
+        into a specific image consistent with \(c\). Different noise, different
+        cat; the caption steers, the noise decides. A one-to-many problem becomes
+        a sequence of one-to-one steps, each of which a network can learn.
+      </p>
+
+            <!-- ============================================================ -->
+      <h2 id="exercises">3 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (dimension)</span>
+        A 1080p RGB frame is \(1920\times1080\). What is the dimension of the
+        vector space it lives in? If a video is 30 frames per second, what is the
+        dimension of one second of video?
+        <details><summary>Solution</summary>
+          \(3\cdot1920\cdot1080 = 6{,}220{,}800\). One second is 30 such vectors
+          stacked, \(186{,}624{,}000\) coordinates: the &ldquo;3D block of
+          latents&rdquo; of video diffusion is a block of exactly this shape,
+          before the autoencoder shrinks it.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (function space)</span>
+        Let \(f(u,v) = (u, 0, 0)\) and \(g(u,v) = (0, v, 0)\) on \([0,1]^2\).
+        Compute \(\langle f, g\rangle\), \(\|f\|\), and \(\|f - g\|\).
+        <details><summary>Solution</summary>
+          \(\langle f,g\rangle = \int\!\!\int (u\cdot0 + 0\cdot v + 0)\,du\,dv = 0\): the
+          images are orthogonal (no channel overlaps).
+          \(\|f\|^2 = \int_0^1\!\!\int_0^1 u^2\,du\,dv = \tfrac13\), so
+          \(\|f\| = 1/\sqrt3\); by symmetry \(\|g\| = 1/\sqrt3\), and
+          \(\|f-g\|^2 = \|f\|^2 + \|g\|^2 = \tfrac23\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (sampling and aliasing)</span>
+        A gray image is \(f(u,v) = \tfrac12 + \tfrac12\cos(2\pi k u)\), a vertical
+        stripe pattern with \(k\) periods across the picture. You sample it on an
+        \(m\times m\) grid at pixel centers. For \(m = 8\), what do the samples
+        look like when \(k = 8\)? When \(k = 4\)?
+        <details><summary>Solution</summary>
+          With \(u_i = (i-\tfrac12)/8\) and \(k=8\), \(2\pi k u_i = 2\pi(i-\tfrac12)\),
+          so \(\cos = \cos(\pi(2i-1)) = -1\) for every \(i\): the raster is uniformly
+          black, and the stripes have vanished. Eight periods across eight
+          pixels is exactly at the sampling rate, past the Nyquist limit of four,
+          so the samples alias to a constant. With \(k = 4\), the samples
+          all sit at zero crossings: \(\cos(\pi(i-\tfrac12)) = 0\) for every
+          \(i\), a uniform mid gray, again losing the pattern (four periods on
+          eight pixels is exactly the Nyquist limit). Any \(k < 4\) survives:
+          \(k = 2\) gives the sample pattern \(+,-,-,+,+,-,-,+\) at amplitude
+          \(0.707\), two periods, visibly stripes. Supersampling or a blur before sampling would remove the
+          frequencies the grid cannot carry instead of letting them masquerade
+          as something else.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (non-invertibility)</span>
+        Explain in two sentences why a network that maps a caption directly to an
+        image (no noise, no sampling) cannot produce two different cats for
+        &ldquo;a cat&rdquo;, and where a diffusion model gets the difference.
+        <details><summary>Solution</summary>
+          A network is a function: the same input gives the same output, so a
+          caption-to-image network returns one image per caption. A diffusion
+          model starts each sample from a different random noise vector, which
+          supplies the choices the caption does not specify; the caption steers,
+          the noise decides.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; The Space of Images v1.0 &middot; prepared by Dr. Marcel
+        Gavriliu. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

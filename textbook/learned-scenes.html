@@ -1,0 +1,100 @@
+<!doctype html>
+<!-- CSS 551 course text: Learned Scenes. Topic chapter, independent of any offering's schedule;
+     the course hub says which session assigns it. Shared stylesheet: textbook.css. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learned Scenes - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math. <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Learned Scenes</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Course text &middot; one scene learned from its own photographs: NeRF and 3D Gaussian splatting. Assigned by your offering&rsquo;s course site; pairs with the live splat exhibit.
+      </div>
+
+      <p class="lead">
+        Rather than learn the distribution of all images, a learned scene learns one place from its photographs and renders it from viewpoints the camera never saw. This chapter states the neural radiance field and its volume-rendering integral, explains why Gaussian splatting replaced the network with explicit primitives and got real-time rates, and sets both against <a href="diffusion-models.html">diffusion models</a>, which they meet in score distillation and ControlNet.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="learned-scenes">Learned scenes: NeRF and Gaussian splatting</h2>
+      <p>
+        The other half of the neural era learns one scene from its own
+        photographs and renders it from viewpoints the camera never saw. A
+        <strong>neural radiance field</strong> (NeRF, Mildenhall et al. 2020)
+        represents the scene as a function, a small network
+        \(F_\theta : (\mathbf{p}, \mathbf{d}) \mapsto (\mathbf{c}, \sigma)\)
+        from a 3D point and a viewing direction to a color and a density, with
+        no mesh anywhere. A pixel is made by marching a camera ray
+        \(\mathbf{r}(s) = \mathbf{o} + s\,\mathbf{d}\) through it and
+        compositing front to back:
+      </p>
+      \[
+        C(\mathbf{r}) \;=\; \int_{s_n}^{s_f} T(s)\, \sigma(\mathbf{r}(s))\, \mathbf{c}(\mathbf{r}(s), \mathbf{d})\, ds,
+        \qquad T(s) = \exp\!\Big(-\int_{s_n}^{s} \sigma(\mathbf{r}(u))\, du\Big),
+      \]
+      <p>
+        where \(T\) is how much of the ray survives to depth \(s\). The integral
+        is estimated by sampling points along the ray, and the whole march is
+        differentiable, so training is the march run backwards: gradient descent
+        on \(\theta\) until rendered rays match the training photographs. It is
+        slow, hundreds of network evaluations per ray, which is why
+        <strong>3D Gaussian splatting</strong> (Kerbl et al. 2023) keeps the
+        learn-from-photos idea and replaces the network with millions of explicit
+        primitives, anisotropic Gaussians with position, covariance,
+        view-dependent color and opacity, rendered by projecting each onto the
+        screen and blending back to front. That is a rasterizer, so it runs in
+        real time, and it needs the course&rsquo;s view and projection matrices
+        to do it; it is still trained by gradient descent through a
+        differentiable renderer.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=gsplat" target="_blank" rel="noopener">A real splat scene</a>:
+        the &ldquo;bonsai&rdquo; capture from the Mip-NeRF 360 dataset, about
+        240,000 Gaussians rendered live in the browser (attribution in
+        <code>media/gsplat/ATTRIBUTION.md</code>).
+      </div>
+      <table>
+        <tr><th>Learned scene (NeRF, 3DGS)</th><th>Learned image (diffusion)</th></tr>
+        <tr><td>one scene, from its own photos</td><td>all images, from an archive</td></tr>
+        <tr><td>a camera you can move</td><td>no camera, no scene</td></tr>
+        <tr><td>renders new views of the same thing</td><td>samples new things</td></tr>
+        <tr><td>trained through a differentiable renderer (your \(V\) and \(P\) inside it)</td><td>trained by predicting noise; renders nothing itself</td></tr>
+        <tr><td>meets diffusion in score distillation</td><td>meets the pipeline in ControlNet on your depth buffer</td></tr>
+      </table>
+
+            <!-- ============================================================ -->
+      <h2 id="papers">2 &middot; The papers</h2>
+      <table>
+        <tr><th>Year</th><th>Paper</th><th>What it added</th></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2003.08934" target="_blank" rel="noopener">Mildenhall et al., NeRF</a></td><td>a scene as a learned field</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2209.14988" target="_blank" rel="noopener">Poole et al., DreamFusion</a></td><td>text-to-3D by score distillation</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2308.04079" target="_blank" rel="noopener">Kerbl et al., 3D Gaussian splatting</a></td><td>learned scenes at real-time rates</td></tr>
+      </table>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Learned Scenes v1.0 &middot; prepared by Dr. Marcel
+        Gavriliu. The bonsai scene per <code>media/gsplat/ATTRIBUTION.md</code>. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

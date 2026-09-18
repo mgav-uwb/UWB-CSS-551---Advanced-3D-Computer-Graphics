@@ -1,0 +1,168 @@
+<!doctype html>
+<!-- CSS 551 course text: Neural Networks and Embeddings. Topic chapter, independent of any offering's schedule;
+     the course hub says which session assigns it. Shared stylesheet: textbook.css. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Neural Networks and Embeddings - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math. <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Neural Networks and Embeddings</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Course text &middot; a network as a function, and the vectors it learns to think in. Assigned by your offering&rsquo;s course site; the two live exhibits it cites are in the lecture on learned images.
+      </div>
+
+      <p class="lead">
+        Three ideas underlie every model in the chapters that follow: a neural network is a function whose weights are set by examples; an embedding is a learned vector that stands for a concept, placed so that similar concepts are near; and an encoder and a decoder move between things and their embeddings, with two encoders trained side by side making words and pictures one coordinate system. Each is stated here with the papers that introduced it.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="networks">A network is a function</h2>
+      <div class="def">
+        <span class="tag">Definition (neural network)</span>
+        A <strong>neural network</strong> is a function \(f_\theta : \mathbb{R}^{n} \to \mathbb{R}^{m}\)
+        built from alternating linear maps and fixed nonlinearities, whose
+        behavior is set by a vector of <strong>weights</strong> \(\theta\). The
+        two-layer perceptron of the lecture&rsquo;s exhibit A is
+        \[
+          f_\theta(x) \;=\; b_2 + \sum_{h=1}^{H} w^{(2)}_h \,\tanh\!\big(w^{(1)}_h x + b^{(1)}_h\big),
+          \qquad \theta = (w^{(1)}, b^{(1)}, w^{(2)}, b_2) \in \mathbb{R}^{3H+1}.
+        \]
+      </div>
+      <p>
+        <strong>Training</strong> is not programming. Given examples
+        \((x_i, y_i)\), define a loss such as the mean squared error
+        \(\mathcal{L}(\theta) = \frac{1}{N}\sum_i (f_\theta(x_i) - y_i)^2\), and
+        repeat: compute the gradient \(\nabla_\theta \mathcal{L}\) (by the chain
+        rule, organized as <strong>backpropagation</strong>,
+        <a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart,
+        Hinton &amp; Williams 1986</a>), and move every weight a little against it,
+        \(\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}\). Two facts
+        carry the rest of the chapter. First, capacity: a network with enough
+        hidden units can approximate any continuous function on a bounded domain
+        to any accuracy (<a href="https://doi.org/10.1007/BF02551274" target="_blank" rel="noopener">Cybenko 1989</a>,
+        <a href="https://doi.org/10.1016/0893-6080(91)90009-T" target="_blank" rel="noopener">Hornik 1991</a>).
+        Second, and more important for what follows, <em>between</em> the
+        examples a trained network is smooth: it interpolates rather than
+        snapping to the nearest data point. A lookup table has the first property
+        trivially and the second not at all.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=mlp-fit" target="_blank" rel="noopener">A network that learns</a>:
+        the 37-weight perceptron above is trained in your browser by gradient
+        descent on twelve points of a hidden curve. Drag <code>epochs</code>
+        from 0 and watch the curve bend a few steps per frame while the loss
+        plot falls; try 2 hidden units (it cannot bend enough) and 40 (it fits a
+        step with a smooth ramp).
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example</span>
+        With \(H = 12\) the perceptron has \(3\cdot 12 + 1 = 37\) weights. Full-batch
+        gradient descent on twelve points at learning rate \(0.05\) takes the
+        error from about \(1.7\) (random weights) to \(8\times10^{-3}\) after 400
+        steps and \(8\times10^{-4}\) after 3000; you can read those numbers off
+        the demo. Each step costs one forward and one backward pass over twelve
+        points, a few thousand multiplications, which is why it runs at frame
+        rate. The million-weight network of <a href="diffusion-models.html">the diffusion chapter</a> trains by the same loop on
+        sixty thousand images; only the sizes change.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="embeddings">Embeddings, encoders, decoders, and one shared space</h2>
+      <div class="def">
+        <span class="tag">Definition (embedding)</span>
+        An <strong>embedding</strong> of a set of things (words, digits, images)
+        is a map from each thing to a vector in \(\mathbb{R}^d\), learned so that
+        things which behave alike land near each other. Similarity is measured
+        by distance or, more often, by the cosine of the angle between vectors,
+        \(\cos(u, v) = \frac{u\cdot v}{\|u\|\,\|v\|}\).
+      </div>
+      <p>
+        Nobody places the points. A network puts them where its task goes better;
+        the famous 2013 result was that word vectors trained only to predict
+        neighboring words end up supporting arithmetic, with &ldquo;king&rdquo;
+        minus &ldquo;man&rdquo; plus &ldquo;woman&rdquo; landing near
+        &ldquo;queen&rdquo; (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al.</a>).
+        The lecture&rsquo;s exhibit B is a smaller and more honest version: the
+        digit-drawing network of <a href="diffusion-models.html">the diffusion chapter</a> carries a table of eleven
+        64-dimensional class vectors it learned only from denoising, and digits
+        that share strokes ended up as neighbors (4 nearest 9 with cosine
+        \(0.54\), 3 nearest 5 with \(0.52\), 7 nearest 9 with \(0.48\)).
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=embed-map" target="_blank" rel="noopener">Embeddings, read from the weights</a>:
+        the class table of the trained denoiser projected to its two principal
+        axes (which keep about a third of the variance; the readout&rsquo;s
+        cosines use all 64 dimensions).
+      </div>
+      <p>
+        An <strong>encoder</strong> is a network that maps a thing to its
+        embedding, \(E : \text{thing} \to \mathbb{R}^d\); a <strong>decoder</strong>
+        maps back, \(D : \mathbb{R}^d \to \text{thing}\). Trained together to
+        reproduce their input through a narrow middle,
+        \(\min_{E,D} \sum_i \|D(E(x_i)) - x_i\|^2\), they form an
+        <strong>autoencoder</strong>, and the middle is forced to keep only what
+        matters (<a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov 2006</a>).
+        Stable Diffusion&rsquo;s autoencoder is exactly this, with a variational
+        twist that keeps the latent well behaved: a \(512\times512\times3\) image
+        becomes a \(64\times64\times4\) latent, 48 times fewer numbers.
+      </p>
+      <p>
+        <strong>Two encoders, one space.</strong> Train an image encoder
+        \(E_I\) and a text encoder \(E_T\) side by side on hundreds of millions of
+        (image, caption) pairs with a <em>contrastive</em> objective: for each
+        batch, a matching pair must have a higher cosine than every mismatched
+        pair,
+      </p>
+      \[
+        \mathcal{L} \;=\; -\sum_{i} \log
+        \frac{\exp\big(\cos(E_I(x_i), E_T(t_i))/\tau\big)}
+             {\sum_{j} \exp\big(\cos(E_I(x_i), E_T(t_j))/\tau\big)} ,
+      \]
+      <p>
+        with a temperature \(\tau\). After training, a sentence and a photograph
+        are vectors in the same space, so &ldquo;aim the picture at this
+        caption&rdquo; becomes geometry. This is
+        <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP (Radford et al. 2021)</a>,
+        and every concept you can say in words is now a coordinate.
+      </p>
+
+            <!-- ============================================================ -->
+      <h2 id="papers">3 &middot; The papers</h2>
+      <table>
+        <tr><th>Year</th><th>Paper</th><th>What it added</th></tr>
+        <tr><td>1986</td><td><a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart, Hinton &amp; Williams</a></td><td>backpropagation</td></tr>
+        <tr><td>1989 / 1991</td><td><a href="https://doi.org/10.1007/BF02551274" target="_blank" rel="noopener">Cybenko</a>; <a href="https://doi.org/10.1016/0893-6080(91)90009-T" target="_blank" rel="noopener">Hornik</a></td><td>universal approximation</td></tr>
+        <tr><td>2006</td><td><a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov</a></td><td>deep autoencoders</td></tr>
+        <tr><td>2013</td><td><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al., word2vec</a></td><td>embeddings that support arithmetic</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho, Jain &amp; Abbeel, DDPM</a></td><td>predict the noise; it works at scale</td></tr>
+        <tr><td>2021</td><td><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., CLIP</a></td><td>text and images, one space</td></tr>
+      </table>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v1.0 &middot; prepared by Dr. Marcel
+        Gavriliu. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

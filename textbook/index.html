@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- CSS 551 course text: topic-based chapters, independent of any offering's week schedule.
+     The offering's course hub says which chapters a given week assigns. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Course Text - CSS 551 Advanced 3D Computer Graphics</title>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <h1>CSS 551 &middot; Course Text</h1>
+      <div class="subtitle">Advanced 3D Computer Graphics &mdash; topic chapters</div>
+      <div class="src">
+        Chapters are organized by <em>topic</em>, not by week. Each stands on its
+        own, links the interactive demos it needs, and cites its papers. Your
+        offering&rsquo;s course site says which chapters go with which session.
+      </div>
+
+      <p class="lead">
+        Read the history first; it gives every later topic an address. The five
+        chapters that follow it are the mathematics behind the course&rsquo;s
+        last lecture, written out: honest light, then the machinery of models
+        that learn images and scenes.
+      </p>
+
+      <table>
+        <tr><th>Chapter</th><th>What it covers</th><th>Needs</th></tr>
+        <tr><td><a href="history-of-graphics.html">A History of Computer Graphics</a></td><td>seventy-five years in eight overlapping eras; the seminal papers, people and places; the hardware pipelines; how to read a SIGGRAPH paper</td><td>nothing</td></tr>
+        <tr><td><a href="light-transport-pbr.html">Light Transport and PBR</a></td><td>the rendering equation term by term; the BRDF; microfacets and the metallic/roughness model</td><td>a local illumination model (Phong)</td></tr>
+        <tr><td><a href="neural-nets-embeddings.html">Neural Networks and Embeddings</a></td><td>a network as a function and an approximator; training; embeddings; encoders and decoders; two encoders trained into one space (CLIP)</td><td>vectors and dot products</td></tr>
+        <tr><td><a href="image-space.html">The Space of Images</a></td><td>images as vectors and as functions; sampling, bases, and aliasing revisited; the thin sheet of natural images; why the concept map is not invertible</td><td>the two chapters above</td></tr>
+        <tr><td><a href="diffusion-models.html">Diffusion Models</a></td><td>destroy, learn to undo, sample: the forward process, the exact denoiser and Tweedie, the DDPM objective, DDIM and guidance, the scalings to Stable Diffusion, ControlNet, text-to-3D, video, and what still breaks</td><td>the three chapters above</td></tr>
+        <tr><td><a href="learned-scenes.html">Learned Scenes</a></td><td>NeRF and its volume-rendering integral; 3D Gaussian splatting; learned scenes against learned images</td><td>viewing and projection; the diffusion chapter for the contrast</td></tr>
+      </table>
+
+      <p class="note">
+        Chapters use MathJax for formulas and link to the course&rsquo;s demo
+        library; read them through the course site or download and open in a
+        browser. Older links to <code>handouts/ch01-&hellip;</code> and
+        <code>handouts/ch10-&hellip;</code> redirect here.
+      </p>
+
+      <footer>CSS 551 &middot; course text index v1.0 &middot; prepared by Dr. Marcel Gavriliu.</footer>
+    </div>
+  </body>
+</html>

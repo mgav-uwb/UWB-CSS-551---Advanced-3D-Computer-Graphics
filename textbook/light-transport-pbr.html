@@ -1,0 +1,104 @@
+<!doctype html>
+<!-- CSS 551 course text: Light Transport and PBR. Topic chapter, independent of any offering's schedule;
+     the course hub says which session assigns it. Shared stylesheet: textbook.css. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Light Transport and PBR - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math. <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Light Transport and PBR</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Course text &middot; the rendering equation and physically based materials. Assigned by your offering&rsquo;s course site; pairs with the lecture that finishes the illumination story.
+      </div>
+
+      <p class="lead">
+        A local illumination model computes a point&rsquo;s color from the lights, the normal, and the eye, and nothing else in the scene. This chapter writes down the equation that balances the light energy instead, the rendering equation, and rebuilds the material term on physical foundations: the BRDF, microfacets, and the two sliders every modern engine exposes. Its history, from Whitted&rsquo;s rays to Kajiya&rsquo;s equation, is in <a href="history-of-graphics.html#era-photograph">the history chapter</a>.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="honest-light">Honest light: the rendering equation and PBR</h2>
+      <p>
+        A local illumination model (Phong, as the course builds it) lights a
+        point from the lights, the normal, and the eye, and nothing else in the
+        scene; the ambient constant stood in for all the
+        light that bounces. Three things follow that no patch can fix: the model
+        can reflect more light than arrives, it does not promise that swapping
+        the light and the eye leaves the picture unchanged, and it has no
+        indirect light at all. They are one gap: the local model never balances
+        the light energy at a point. The equation that does was written down by
+        Kajiya in 1986 (<a href="history-of-graphics.html#era-photograph">the history chapter, section 3</a>). With \(\omega_o\) the direction
+        toward the eye, \(\omega_i\) a direction light arrives from, and
+        \(\mathbf{n}\) the surface normal,
+      </p>
+      \[
+        L_o(\mathbf{x}, \omega_o) \;=\; L_e(\mathbf{x}, \omega_o) \;+\;
+        \int_{\Omega} f_r(\mathbf{x}, \omega_i, \omega_o)\, L_i(\mathbf{x}, \omega_i)\,
+        (\mathbf{n}\cdot\omega_i)\, d\omega_i .
+      \]
+      <p>
+        Read it in words: the radiance leaving a point toward the eye is what
+        the point emits, plus the sum over every incoming direction of the
+        arriving radiance, weighted by the material&rsquo;s answer \(f_r\) (the
+        <strong>bidirectional reflectance distribution function</strong>, BRDF)
+        and by the cosine of the arrival angle. It is hard because \(L_i\) on the
+        right is some other point&rsquo;s \(L_o\): light bounces, and the equation
+        refers to itself. Path tracing estimates the integral by following random
+        paths; real-time engines approximate it with a local term plus tricks.
+      </p>
+      <p>
+        The material term is where <strong>physically based rendering</strong>
+        (PBR) lives. A rough surface is modeled as a field of microscopic mirrors
+        (microfacets); the Cook&ndash;Torrance specular BRDF is a product of a
+        normal-distribution term \(D\) (what fraction of facets face the
+        half-vector; roughness lives here, and GGX is the modern default shape),
+        a shadowing-masking term \(G\), and a Fresnel term \(F\), over a
+        normalization:
+      </p>
+      \[
+        f_r^{\text{spec}} \;=\; \frac{D(\mathbf{h})\, G(\omega_i,\omega_o)\, F(\omega_i,\mathbf{h})}
+        {4\, (\mathbf{n}\cdot\omega_i)(\mathbf{n}\cdot\omega_o)} .
+      \]
+      <p>
+        On top of it, every engine exposes two artist sliders: <em>metallic</em>
+        (a dielectric shows a colored diffuse term under a weak white specular;
+        a metal has no diffuse term and a specular tinted by its base color) and
+        <em>roughness</em> (Unity&rsquo;s smoothness is \(1 - \) roughness). Those
+        are the sliders in the Standard Shader, and the same parameterization is
+        what glTF and every modern renderer exchange.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=brdf-lobe" target="_blank" rel="noopener">BRDF lobes</a>:
+        the specular lobe of the course&rsquo;s Cornell scene as roughness
+        changes, Phong beside a GGX-shaped distribution. The two mappings from
+        roughness to lobe width are not calibrated to each other; the demo shows
+        shape, not units.
+      </div>
+
+      
+      <footer>
+        CSS 551 &middot; course text &middot; Light Transport and PBR v1.0 &middot; prepared by Dr. Marcel
+        Gavriliu. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

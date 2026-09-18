@@ -1,0 +1,301 @@
+<!doctype html>
+<!-- CSS 551 course text: Diffusion Models. Topic chapter, independent of any offering's schedule;
+     the course hub says which session assigns it. Shared stylesheet: textbook.css. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diffusion Models - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math. <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Diffusion Models</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Course text &middot; destroy, learn to undo, sample: the mechanism, the sampler, the knobs, and the scalings to Stable Diffusion. Assigned by your offering&rsquo;s course site; pairs with the lecture&rsquo;s exhibit ladder.
+      </div>
+
+      <p class="lead">
+        A diffusion model answers the one-to-many problem of <a href="image-space.html">the space of images</a> with noise: walk real images into noise on a schedule you control, train a network to undo one small step, then start from fresh noise and undo all the way. This chapter writes the recipe out, derives the exact denoiser that the course&rsquo;s demos compute, states the training objective and the samplers, explains guidance, and follows the three scalings that turn a digit-drawing network into Stable Diffusion. It closes with what still breaks and the papers.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="diffusion">Diffusion: destroy, learn to undo, sample</h2>
+      <h3>1.1 The forward process</h3>
+      <p>
+        Fix a schedule \(\bar\alpha(t)\) that falls from \(1\) at \(t=0\) to \(0\)
+        at \(t=1\) (the course&rsquo;s demos use the cosine schedule of
+        <a href="https://arxiv.org/abs/2102.09672" target="_blank" rel="noopener">Nichol &amp; Dhariwal 2021</a>).
+        The forward process mixes a clean image with Gaussian noise in a
+        proportion set by \(t\):
+      </p>
+      \[
+        \mathbf{x}_t \;=\; \sqrt{\bar\alpha(t)}\;\mathbf{x}_0 \;+\; \sqrt{1-\bar\alpha(t)}\;\boldsymbol{\epsilon},
+        \qquad \boldsymbol{\epsilon}\sim\mathcal{N}(0, I).
+      \]
+      <p>
+        Nothing is learned here. At \(t=1\) every image has become the same
+        standard Gaussian, which is the whole point: that is the one
+        distribution we can sample from trivially. The signal-to-noise ratio is
+        \(\bar\alpha/(1-\bar\alpha)\); the forward-process demo reports it in
+        decibels as it dissolves the course&rsquo;s Cornell render.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-image" target="_blank" rel="noopener">A real picture, dissolving</a>:
+        the render as \(\mathbf{x}_0\) beside \(\mathbf{x}_t\) for the \(t\) on the
+        slider, with \(\bar\alpha\), SNR and PSNR.
+      </div>
+
+      <h3>1.2 The reverse process and the exact denoiser</h3>
+      <p>
+        The learned part answers a local question: given \(\mathbf{x}_t\) and
+        \(t\), where was \(\mathbf{x}_0\)? For a <em>finite</em> dataset
+        \(\{\mathbf{x}^{(i)}\}\) the best possible answer is computable in closed
+        form. Since \(\mathbf{x}_t\) given \(\mathbf{x}_0=\mathbf{x}^{(i)}\) is
+        Gaussian with mean \(\sqrt{\bar\alpha}\,\mathbf{x}^{(i)}\) and variance
+        \(1-\bar\alpha\), Bayes&rsquo; rule gives the posterior mean
+      </p>
+      \[
+        \hat{\mathbf{x}}_0(\mathbf{x}_t, t) \;=\; \mathbb{E}[\mathbf{x}_0\mid\mathbf{x}_t]
+        \;=\; \sum_i w_i\, \mathbf{x}^{(i)}, \qquad
+        w_i \;\propto\; \exp\!\Big(-\frac{\|\mathbf{x}_t - \sqrt{\bar\alpha}\,\mathbf{x}^{(i)}\|^2}{2(1-\bar\alpha)}\Big),
+      \]
+      <p>
+        a softmax-weighted average of the training points. This is what the
+        spiral demo and the digits demo compute, exactly, and it is what a
+        network is trained to approximate for datasets too large or too
+        high-dimensional to average over. It is also, by <strong>Tweedie&rsquo;s
+        formula</strong>, the same thing as the <em>score</em>: the gradient of
+        the log density of the noised data,
+        \(\nabla_{\mathbf{x}_t}\log p_t(\mathbf{x}_t) = \big(\sqrt{\bar\alpha}\,\hat{\mathbf{x}}_0 - \mathbf{x}_t\big)/(1-\bar\alpha)\),
+        which is the vector field the spiral demo draws as arrows. Predicting the
+        clean image, predicting the noise
+        \(\hat{\boldsymbol\epsilon} = (\mathbf{x}_t - \sqrt{\bar\alpha}\,\hat{\mathbf{x}}_0)/\sqrt{1-\bar\alpha}\),
+        and predicting the score are three parameterizations of one function.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-2d" target="_blank" rel="noopener">The mechanism, on dots</a>
+        (400 points on a spiral, the exact denoiser, arrows for the score field,
+        DDIM versus DDPM stepping), then
+        <a href="../lib/demo.html?demo=diffusion-digits" target="_blank" rel="noopener">real digits, the exact denoiser</a>
+        (2,000 MNIST digits as points of \(\mathbb{R}^{400}\)). In the second,
+        every sample lands exactly on a training digit: the panel that compares
+        each sample with its nearest training digit reads distance \(0.000\),
+        &ldquo;memorized&rdquo;. An exact denoiser for a finite set can only
+        return the set.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (two training points)</span>
+        Let the dataset be two scalars, \(x^{(1)} = -1\) and \(x^{(2)} = +1\), and
+        take a time where \(\bar\alpha = \tfrac14\), so
+        \(\sqrt{\bar\alpha} = \tfrac12\) and \(1-\bar\alpha = \tfrac34\). At
+        \(x_t = 0.3\) the two logits are
+        \(-\tfrac{(0.3+0.5)^2}{1.5} = -0.4267\) and
+        \(-\tfrac{(0.3-0.5)^2}{1.5} = -0.0267\); the softmax weights are
+        \(0.401\) and \(0.599\), and the posterior mean is
+        \(\hat x_0 = -0.401 + 0.599 = 0.197\): a pull toward the nearer point,
+        not a jump onto it. As \(t\to0\), \(1-\bar\alpha\to0\), the weights become
+        one-hot, and \(\hat x_0\) becomes exactly the nearest training point,
+        which is the memorization the digits demo shows. Keeping the kernel
+        variance from vanishing (the demo&rsquo;s <code>smooth</code> knob adds
+        \(h^2\) to \(1-\bar\alpha\)) keeps the average going to the end, and the
+        samples land between training points.
+      </div>
+
+      <h3>1.3 Training</h3>
+      <p>
+        The training loop is one line: pick an image \(\mathbf{x}_0\) and a
+        random \(t\), draw \(\boldsymbol\epsilon\), form \(\mathbf{x}_t\), ask the
+        network \(\boldsymbol\epsilon_\theta(\mathbf{x}_t, t)\) for the noise (or
+        \(\hat{\mathbf{x}}_\theta\) for the image), and minimize the squared
+        error,
+      </p>
+      \[
+        \mathcal{L}(\theta) \;=\; \mathbb{E}_{\mathbf{x}_0,\, t,\, \boldsymbol\epsilon}
+        \Big[\, \big\|\boldsymbol\epsilon - \boldsymbol\epsilon_\theta(\mathbf{x}_t, t)\big\|^2 \Big].
+      \]
+      <p>
+        Every step is a small, well-posed regression against a target the
+        trainer generated itself, which is why diffusion trains stably where
+        adversarial models fought their own training. This is
+        <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">DDPM (Ho, Jain &amp; Abbeel 2020)</a>;
+        the idea comes from
+        <a href="https://arxiv.org/abs/1503.03585" target="_blank" rel="noopener">Sohl-Dickstein et al. 2015</a>,
+        who borrowed it from nonequilibrium thermodynamics, and the same
+        function was reached from the score side by
+        <a href="https://arxiv.org/abs/1907.05600" target="_blank" rel="noopener">Song &amp; Ermon 2019</a>.
+        The course&rsquo;s own network (exhibit G) is a class-conditional
+        perceptron with about a million weights, trained by exactly this loop
+        on 60,000 digits for fifteen minutes on a laptop CPU, predicting the
+        clean image (<code>tools/train-mlp.py</code>).
+      </p>
+
+      <h3>1.4 Sampling</h3>
+      <p>
+        Start from \(\mathbf{x}_T\sim\mathcal{N}(0,I)\) and step \(t\) down a
+        chosen sequence \(t_K > \dots > t_0 = 0\). At each step form
+        \(\hat{\mathbf{x}}_0\) from the network, recover the implied noise
+        \(\hat{\boldsymbol\epsilon}\), and move to the next time. The
+        <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">DDIM family (Song, Meng &amp; Ermon 2021)</a>
+        writes the update as
+      </p>
+      \[
+        \mathbf{x}_{t'} \;=\; \sqrt{\bar\alpha(t')}\;\hat{\mathbf{x}}_0 \;+\;
+        \sqrt{1-\bar\alpha(t') - \sigma^2}\;\hat{\boldsymbol\epsilon} \;+\; \sigma\,\mathbf{z},
+        \qquad \mathbf{z}\sim\mathcal{N}(0,I),
+      \]
+      <p>
+        with \(\sigma = 0\) giving the deterministic DDIM sampler (same start,
+        same landing, a few dozen steps) and \(\sigma\) at its DDPM value giving
+        the original stochastic one (fresh noise each step, many steps). Fewer
+        steps trade detail and diversity for speed; distillation trains a
+        student to jump where the teacher walked, down to a handful of steps.
+        <strong>Classifier-free guidance</strong>
+        (<a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans 2022</a>)
+        trains the network both with and without its condition \(c\) and, at
+        sampling time, exaggerates the difference by a scale \(w\):
+        \(\hat{\mathbf{x}}_0 \leftarrow \hat{\mathbf{x}}_0(\varnothing) + w\,\big(\hat{\mathbf{x}}_0(c) - \hat{\mathbf{x}}_0(\varnothing)\big)\).
+        Around \(w \approx 7\) prompts are followed closely; too high and images
+        saturate and repeat.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-digits" target="_blank" rel="noopener">Digits nobody wrote</a>
+        (the <code>smooth</code> knob: exact is memorization, \(h\approx3\) makes
+        novel blends, \(h=5\) collapses to one blurry average), then
+        <a href="../lib/demo.html?demo=diffusion-net" target="_blank" rel="noopener">the network draws</a>:
+        the trained million-weight denoiser samples digits it never saw, with
+        the class buttons as conditioning and <code>guide</code> as \(w\). Every
+        sample&rsquo;s distance to the nearest training digit is far above the
+        memorization threshold.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="scaling">From digits to Stable Diffusion: the three scalings</h2>
+      <p>
+        Nothing in the recipe changes between the digit network and the largest
+        image models; three things scale. <strong>The point gets bigger, so
+        diffuse a latent.</strong> A \(512\times512\) image is 786,432 numbers;
+        denoising that a thousand times per picture is unaffordable. Latent
+        diffusion runs the whole process on the autoencoder&rsquo;s
+        \(64\times64\times4\) latent and decodes once at the end
+        (<a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al. 2022</a>);
+        that is Stable Diffusion, and it is why the method fits on a gaming GPU.
+        <strong>The condition gets richer, so put text in the class slot.</strong>
+        The class embedding the digit network reads becomes a CLIP text
+        embedding consulted at every layer through cross-attention; guidance is
+        unchanged. <strong>The network gets bigger.</strong> U-Nets in 2020 to
+        2022, then transformers over image patches
+        (<a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noopener">DiT, Peebles &amp; Xie 2023</a>);
+        quality followed scale. The two text-to-image systems that made the
+        public notice in 2022 took different routes to the same place,
+        <a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">DALL&middot;E 2</a>
+        diffusing in CLIP&rsquo;s embedding space and
+        <a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Imagen</a>
+        conditioning on a large language model&rsquo;s text embedding.
+      </p>
+      <p>
+        Two developments matter most to a graphics course.
+        <a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">ControlNet (Zhang, Rao &amp; Agrawala 2023)</a>
+        conditions the denoiser on a structural image, a depth map, a normal map
+        or an edge image, and makes it keep that structure while painting the
+        appearance; depth and normals are the pipeline&rsquo;s own by-products
+        (the viewing and modeling lectures), so geometry and camera come from the renderer, where
+        you have control, and appearance from the model. And an image model can
+        train a 3D scene:
+        <a href="https://arxiv.org/abs/2209.14988" target="_blank" rel="noopener">DreamFusion (Poole et al. 2022)</a>
+        optimizes a NeRF so that its renders, from random viewpoints, score well
+        under a text-conditioned image model, with the gradients flowing back
+        through the differentiable renderer (<strong>score distillation</strong>).
+        Video is the same recipe with a time axis: a block of latents attended
+        across frames
+        (<a href="https://arxiv.org/abs/2204.03458" target="_blank" rel="noopener">Ho et al. 2022</a>),
+        scaled by 2024 to minute-long clips.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="limits">What still breaks, and what graphics keeps</h2>
+      <p>
+        A diffusion model has no scene, so nothing in it enforces that the cup on
+        frame one is the cup on frame sixty, that objects fall, that hands have
+        five fingers, or that a sign spells a word; it has no camera to move an
+        inch and no edit that leaves everything else fixed. Graphics has exactly
+        those things and lacks the model&rsquo;s taste for appearance. The field
+        is merging them from both sides: engines that ship generated textures
+        and assets, differentiable renderers that let images train scenes, and
+        world models that generate the next frame in response to a controller
+        input. Neither half erases the pipeline you built; both stand on it.
+      </p>
+
+            <!-- ============================================================ -->
+      <h2 id="papers">4 &middot; The papers</h2>
+      <table>
+        <tr><th>Year</th><th>Paper</th><th>What it added</th></tr>
+        <tr><td>2015</td><td><a href="https://arxiv.org/abs/1503.03585" target="_blank" rel="noopener">Sohl-Dickstein et al.</a></td><td>diffusion probabilistic models: destroy, learn to undo</td></tr>
+        <tr><td>2019</td><td><a href="https://arxiv.org/abs/1907.05600" target="_blank" rel="noopener">Song &amp; Ermon</a></td><td>the score (vector field) view</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho, Jain &amp; Abbeel, DDPM</a></td><td>predict the noise; it works at scale</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song, Meng &amp; Ermon, DDIM</a></td><td>deterministic, few-step sampling</td></tr>
+        <tr><td>2021</td><td><a href="https://arxiv.org/abs/2105.05233" target="_blank" rel="noopener">Dhariwal &amp; Nichol</a></td><td>guidance; quality past GANs</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans</a></td><td>classifier-free guidance</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., latent diffusion</a></td><td>Stable Diffusion: diffuse in a latent</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">Ramesh et al., DALL&middot;E 2</a>; <a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Saharia et al., Imagen</a></td><td>text-to-image at scale, two routes</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2209.14988" target="_blank" rel="noopener">Poole et al., DreamFusion</a></td><td>text-to-3D by score distillation</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">Zhang, Rao &amp; Agrawala, ControlNet</a></td><td>conditioning on depth, normals, edges</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noopener">Peebles &amp; Xie, DiT</a></td><td>the network is whatever scales</td></tr>
+      </table>
+      <!-- ============================================================ -->
+      <h2 id="exercises">5 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (the exact denoiser)</span>
+        Repeat the worked example of Section 1.2 with three training scalars
+        \(\{-1, 0, +1\}\), \(\bar\alpha = \tfrac14\), and \(x_t = 0.3\). Which point
+        gets the largest weight, and what is \(\hat x_0\)? Then argue, without
+        computing, what \(\hat x_0\) becomes as \(\bar\alpha \to 0\).
+        <details><summary>Solution</summary>
+          Logits \(-\frac{(x_t - \tfrac12 x^{(i)})^2}{1.5}\): for \(-1, 0, +1\) they
+          are \(-0.4267, -0.0600, -0.0267\). Softmax weights \(0.254, 0.367, 0.379\);
+          the \(+1\) point wins narrowly over \(0\). \(\hat x_0 = -0.254 + 0 + 0.379 = 0.125\).
+          As \(\bar\alpha \to 0\) the logits all tend to \(-x_t^2/2\), the weights
+          become equal, and \(\hat x_0\) tends to the data mean, \(0\): at high
+          noise the best guess is the average image, which is why the first
+          steps of every sampling run look like a grey blur.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (guidance)</span>
+        With \(\hat{\mathbf{x}}_0(\varnothing) = (0.2, 0.2)\) and
+        \(\hat{\mathbf{x}}_0(c) = (0.5, 0.1)\), compute the guided estimate for
+        \(w = 1\), \(w = 3\), and \(w = 0\). What does \(w = 0\) mean?
+        <details><summary>Solution</summary>
+          \(w=1\): \((0.5, 0.1)\), plain conditioning. \(w=3\):
+          \((0.2, 0.2) + 3\,(0.3, -0.1) = (1.1, -0.1)\), the class direction
+          exaggerated (and clamped to the valid range in practice, which is where
+          saturation comes from). \(w=0\): \((0.2, 0.2)\), the unconditional
+          estimate; the condition is ignored.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Diffusion Models v1.0 &middot; prepared by Dr. Marcel
+        Gavriliu. MNIST (LeCun, Cortes, Burges) CC BY-SA 3.0 for the digit demos. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>
