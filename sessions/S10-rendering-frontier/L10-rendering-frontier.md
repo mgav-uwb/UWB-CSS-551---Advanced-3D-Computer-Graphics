@@ -181,8 +181,8 @@ A **neural network** is a function with knobs: inputs in, numbers out, and thous
 
 - **training**: show it examples, measure how wrong it is, nudge every weight a little to be less wrong; repeat (**backpropagation**, Rumelhart, Hinton & Williams 1986)
 - with enough units it can fit almost any function (the **universal approximation** theorems, Cybenko 1989, Hornik 1991)
-- exhibit A next: twelve points, a network with 37 weights, trained in front of you
-- watch for: what it does **between** the points
+- exhibit A next: twelve points, a network with 37 weights, trained **live** in front of you, step by step
+- watch for: the curve bending as the epoch counter ticks, and what it does **between** the points
 
 ---
 
@@ -192,9 +192,11 @@ A **neural network** is a function with knobs: inputs in, numbers out, and thous
 
 <div class="cockpit" data-demo="mlp-fit" data-controls="epochs,hidden"><pre class="viz-fallback">  twelve (x, y) points from a hidden curve; a two-layer network
   f(x) = Σ w2·tanh(w1·x + b1) + b2 with 3·hidden + 1 weights
-  drag epochs from 0: a random wiggle bends until it passes through the points
+  drag epochs up from 0: training runs LIVE, a few gradient steps per frame;
+  the random wiggle bends until it passes through the points, the epoch
+  counter ticks, and a loss-vs-epoch plot grows in the corner. Drag down: reset.
   drag hidden to 2: it cannot bend enough; to 40: it fits, smoothly
-  buttons: wave · step · bump.  Readout: weights, epochs, mean squared error</pre></div>
+  buttons: wave · step · bump.  Readout: weights, epochs run, error, state</pre></div>
 
 ---
 
