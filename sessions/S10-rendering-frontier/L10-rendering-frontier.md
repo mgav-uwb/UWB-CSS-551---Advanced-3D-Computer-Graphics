@@ -256,7 +256,12 @@ Train an **image encoder** and a **text encoder** in parallel so that a photo an
 
 ## The space of images
 
-An image is a **point**: one coordinate per number (128×128 pixels: 49,152). Night one called it a grid; tonight it is a location.
+An **m × n RGB image is a point** in a vector space of dimension **3·m·n**: one axis per number, three numbers per pixel. Equally, it is the **vector** from the origin to that point.
+
+```text
+   image  =  (r₁₁, g₁₁, b₁₁,  r₁₂, g₁₂, b₁₂,  ...,  r_mn, g_mn, b_mn)  ∈  [0,1]^(3·m·n)
+   128 × 128 RGB  →  49,152 coordinates;   512 × 512 RGB  →  786,432
+```
 
 - almost every point in that space is **static**; the meaningful images are a thin, tangled region
 - every meaningful image carries **concepts you can say in words**: the encoder maps it to a concept embedding
