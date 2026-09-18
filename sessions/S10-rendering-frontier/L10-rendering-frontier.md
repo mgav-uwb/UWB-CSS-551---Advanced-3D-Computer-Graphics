@@ -13,15 +13,18 @@
   fence; backtick names with underscores. No <small> on math. No forward
   references; the last slide ends the course.
 
-  DEMO EMBEDS (seven, each on its own flat slide; brdf-lobe and gsplat under
-  the scoped 210px crop, the five Part-2 exhibits on demo-full slides that get
-  the full ~500px viewport, as in S01). Part 2 is a LADDER of exhibits:
+  DEMO EMBEDS (nine, each on its own flat slide; brdf-lobe and gsplat under
+  the scoped 210px crop, the seven Part-2 exhibits on demo-full slides that
+  get the full ~500px viewport, as in S01). Part 2 opens with two exhibits on
+  networks and embeddings, then a LADDER of five on diffusion:
    - Part 1: data-demo="brdf-lobe"        data-controls="roughness"
-   - Part 2: A data-demo="diffusion-image"  data-controls="t"      (a real render dissolving)
-             B data-demo="diffusion-2d"     data-controls="steps,stochastic" (the mechanism on dots)
-             C data-demo="diffusion-digits" data-controls="steps"  (exact denoiser on MNIST: memorizes)
-             D data-demo="diffusion-digits" data-controls="smooth" (kernel bandwidth: novel digits)
-             E data-demo="diffusion-net"    data-controls="guide,steps" (a TRAINED MLP denoiser, in-browser)
+   - Part 2: A data-demo="mlp-fit"          data-controls="epochs,hidden" (a network is a function; trained live)
+             B data-demo="embed-map"        data-controls="highlight" (class embeddings read from the trained denoiser)
+             C data-demo="diffusion-image"  data-controls="t"      (a real render dissolving)
+             D data-demo="diffusion-2d"     data-controls="steps,stochastic" (the mechanism on dots)
+             E data-demo="diffusion-digits" data-controls="steps"  (exact denoiser on MNIST: memorizes)
+             F data-demo="diffusion-digits" data-controls="smooth" (kernel bandwidth: novel digits)
+             G data-demo="diffusion-net"    data-controls="guide,steps" (a TRAINED MLP denoiser, in-browser)
    - Part 3: data-demo="gsplat"           data-controls="fov"
   All exact-denoiser demos are deterministic (seeded); every caption says the
   denoiser is the exact posterior mean for the finite set, the function a
@@ -33,10 +36,10 @@
 
   Session plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Intro                                   3 min
-    0:03  Part 1  From Phong to PBR              20 min
-    0:23  Part 2  Learned images: diffusion      66 min  (five exhibits)
-    1:29  Part 3  Learned scenes: NeRF and 3DGS  16 min
-    1:45  Part 4  The course in one picture      10 min
+    0:03  Part 1  From Phong to PBR              12 min  (two Phong slides merged; radiometry cut)
+    0:15  Part 2  Learned images: diffusion      81 min  (networks, embeddings, the space of images; seven exhibits; the papers)
+    1:36  Part 3  Learned scenes: NeRF and 3DGS  12 min  (NeRF pair merged)
+    1:48  Part 4  The course in one picture       7 min
     1:55  Wrap                                    5 min
     2:00  end
 -->
@@ -62,42 +65,19 @@
 
 ### Part 1 · From Phong to the rendering equation
 
-<small>(~20 min)</small>
+<small>(~12 min)</small>
 
 ---
 
-## Where we left off: Phong's confession
+## Phong's confession, and what it gets wrong
 
-Last week's local model shaded each point from the lights, the normal, and the eye — and **nothing else in the scene**. We named the cost honestly:
+Last week's local model shaded each point from the lights, the normal and the eye, and **nothing else in the scene**. Three departures from physics:
 
-- **no bounces** — a red wall does not tint the white floor beside it
-- **ambient** was a single **constant** standing in for all that missing bounced light
-- a **fudge**, we said — with no physical justification beyond "shadows should not be pure black"
+- **energy** — Phong can reflect **more** light than arrives; a real surface reflects **at most** what hits it
+- **reciprocity** — swap the light and the eye and a real surface looks identical; Phong's terms carry no such guarantee
+- **no bounces** — the scene's **indirect** light (color bleeding, soft shadows) is absent, faked by the **ambient** constant
 
-Tonight we replace the fudge with the **honest accounting**. Three specific things Phong gets **wrong** — and the one equation that gets them **right**.
-
----
-
-## What Phong gets wrong
-
-Three honest departures from physics:
-
-- **energy** — Phong can reflect **more** light than arrives. Crank shininess or pile on lights and a surface can glow **brighter than its illumination** — a real surface reflects **at most** what hits it (some is absorbed)
-- **reciprocity** — swap the **light** and the **eye** and a real surface looks **identical** (Helmholtz reciprocity). Phong's terms carry **no** guarantee of that symmetry
-- **no bounces** — the whole scene's **indirect** light (color bleeding, soft shadows, a room reflected in a floor) is simply **absent**, faked by the ambient constant
-
-None of these is a bug to patch — they are **symptoms of the same gap**: Phong never **balances the light energy** at a point.
-
----
-
-## Light as energy, in one slide
-
-Phong's numbers are **brightness fudge**; the honest currency is energy.
-
-- **radiance** — how much light travels along a ray, per unit area, per unit direction; the quantity a pixel measures
-- **irradiance** — how much light lands on a surface point from all directions together
-- a surface turns arriving irradiance into leaving radiance; the rule for how is the **material**
-- everything else in Part 1 is bookkeeping in these two units
+Not three bugs but one gap: Phong never **balances the light energy** at a point. Tonight, the honest accounting.
 
 ---
 
@@ -191,18 +171,124 @@ Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full 
 
 ### Part 2 · Learned images: diffusion
 
-<small>(~66 min)</small>
+<small>(~81 min)</small>
 
 ---
 
-## What "generate" means
+## A network is a function
 
-Night one, slide three: **synthesize** an image of a scene. Vision runs the arrow backwards. A **generative model** runs it from nothing.
+A **neural network** is a function with knobs: inputs in, numbers out, and thousands to billions of **weights** that shape it.
 
-- an image is a **point** in a huge space: one coordinate per RGB number (128×128 pixels: 49,152 coordinates)
-- real photographs fill a thin, tangled region of that space; almost every other point is static
-- **generating** = drawing a new point from inside that region, with no scene, from what was learned by analyzing millions of images
-- nobody can write the region down; the trick that works is indirect: **destroy** structure with a process you control, then **learn to undo it**
+- **training**: show it examples, measure how wrong it is, nudge every weight a little to be less wrong; repeat (**backpropagation**, Rumelhart, Hinton & Williams 1986)
+- with enough units it can fit almost any function (the **universal approximation** theorems, Cybenko 1989, Hornik 1991)
+- exhibit A next: twelve points, a network with 37 weights, trained in front of you
+- watch for: what it does **between** the points
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit A: a function that learns
+
+<div class="cockpit" data-demo="mlp-fit" data-controls="epochs,hidden"><pre class="viz-fallback">  twelve (x, y) points from a hidden curve; a two-layer network
+  f(x) = Σ w2·tanh(w1·x + b1) + b2 with 3·hidden + 1 weights
+  drag epochs from 0: a random wiggle bends until it passes through the points
+  drag hidden to 2: it cannot bend enough; to 40: it fits, smoothly
+  buttons: wave · step · bump.  Readout: weights, epochs, mean squared error</pre></div>
+
+---
+
+## Embeddings: a vector for a concept
+
+An **embedding** is a learned vector that stands for a thing, placed so that **similar things are near**.
+
+- words (word2vec, Mikolov et al. 2013): "king" near "queen", far from "carburetor"; arithmetic in the space works
+- nobody places the points; a network puts them where its job goes better
+- exhibit B next: the digit-drawing network you will meet later carries ten such vectors, one per digit; we read them out of its weights and map them
+- watch for: which digits end up as neighbors, and why
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Exhibit B: embeddings, read from the weights
+
+<div class="cockpit" data-demo="embed-map" data-controls="highlight"><pre class="viz-fallback">  the ten class embeddings (64 numbers each) inside the trained digit
+  denoiser, projected to their two principal axes (36% of the variance)
+  drag highlight: lines to the digit's three nearest classes, cosines in
+  the readout. 4 is nearest 9 (0.54), 3 nearest 5 (0.52), 7 nearest 9 (0.48):
+  digits that share strokes were placed near each other by training alone</pre></div>
+
+---
+
+## Encoders and decoders
+
+An **encoder** maps a thing to its embedding; a **decoder** maps an embedding back to a thing.
+
+```text
+   image  ──encoder──▶  a few thousand numbers  ──decoder──▶  image (nearly)
+   train both together to reproduce the input: an autoencoder
+```
+
+- the middle is a **compressed** description: only what matters survives (Hinton & Salakhutdinov 2006)
+- the Cornell render you will see in exhibit C is 49,152 numbers; its latent in Stable Diffusion would be 16,384
+- keep the two names apart: **encoder** = thing to vector, **decoder** = vector to thing
+
+---
+
+## Two encoders, one space
+
+Train an **image encoder** and a **text encoder** in parallel so that a photo and its caption land on the **same point**.
+
+```text
+   "a tabby cat on a sofa"  ──text encoder──▶   ●
+   [photo of that cat]      ──image encoder─▶   ● ← pulled together
+   [photo of a truck]       ──image encoder─▶       ● ← pushed apart
+```
+
+- **contrastive** training on hundreds of millions of (image, caption) pairs: **CLIP** (Radford et al. 2021)
+- afterwards, words and pictures are the same kind of vector; a caption is a point you can aim at
+- this is the "concept" coordinate system the rest of the night uses
+
+---
+
+## The space of images
+
+An image is a **point**: one coordinate per number (128×128 pixels: 49,152). Night one called it a grid; tonight it is a location.
+
+- almost every point in that space is **static**; the meaningful images are a thin, tangled region
+- every meaningful image carries **concepts you can say in words**: the encoder maps it to a concept embedding
+- **generating** = landing a new point inside the thin region, on purpose
+
+---
+
+## The concept map is not invertible
+
+The encoder is **many-to-one**: thousands of cat photographs land on one "cat" embedding. Its inverse is **one-to-many**: a caption does not pick an image, it picks a **distribution** of images.
+
+```text
+   images  ──encoder──▶  concept        (many → one: fine)
+   concept ──?──▶  which image?          (one → many: no function can do it)
+```
+
+- a generator cannot be a plain decoder of the caption: it would have to return one image for "cat", forever
+- something must supply the **missing choices**: which cat, which pose, which light
+
+---
+
+## Noise is the choice
+
+Diffusion supplies the missing information as **random noise**, then spends its steps turning that noise into a picture that fits the concept.
+
+```text
+   destroy:   walk real images into noise on a schedule        (no learning)
+   learn:     a network that undoes one small step, given the concept
+   sample:    start from fresh noise, undo step by step        (one image per noise)
+```
+
+- a different starting noise gives a different cat; the caption steers, the noise decides
+- one-to-many, solved: the recipe is Sohl-Dickstein et al. 2015, made practical by Ho, Jain & Abbeel 2020
+- the exhibits that follow do each line of the recipe where you can see it
 
 ---
 
@@ -215,14 +301,14 @@ A schedule of small noising steps turns **any** image into pure noise; by the en
    x(1) = pure noise, no trace of the image;  nothing is learned here
 ```
 
-- exhibit A next: the course's Cornell render, 49,152 numbers, dissolving as `t` moves
+- exhibit C next: the course's Cornell render, 49,152 numbers, dissolving as `t` moves
 - watch for: the `t` where you stop recognizing a room, and where the signal-to-noise ratio crosses 0 dB
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit A: a real picture, dissolving
+## Exhibit C: a real picture, dissolving
 
 <div class="cockpit" data-demo="diffusion-image" data-controls="t"><pre class="viz-fallback">  left: x(0), the Cornell render (128×128×3 = 49,152 numbers)
   right: x(t) = √ᾱ · x(0) + √(1−ᾱ) · noise, for the t on the slider
@@ -237,14 +323,14 @@ The learned part. Given a noisy point and its `t`, predict the noise that was ad
 
 - the network's job in one sentence: **"from here, which way is the data?"**
 - that answer is a **vector field** over the whole space: at every noisy point, a pull toward the sheet
-- exhibit B next: 400 points on a spiral stand in for "all images", so the field can be drawn; the demo's denoiser is the **exact** optimal answer for those 400 points, the thing a network approximates
+- exhibit D next: 400 points on a spiral stand in for "all images", so the field can be drawn; the demo's denoiser is the **exact** optimal answer for those 400 points, the thing a network approximates
 - watch for: the spiral **reassembling** from noise, and how few `steps` it takes
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit B: the mechanism, on dots
+## Exhibit D: the mechanism, on dots
 
 <div class="cockpit" data-demo="diffusion-2d" data-controls="steps,stochastic"><pre class="viz-fallback">  start from pure noise; ask the denoiser "which way is the data?"
   steps times, moving a little each time: the spiral reassembles
@@ -273,14 +359,14 @@ The learned part. Given a noisy point and its `t`, predict the noise that was ad
 Same mechanism, real images: **2,000 handwritten digits**, 20×20 pixels, so each image is a point in a **400-dimensional** space.
 
 - the denoiser is still the **exact** best answer for that finite set: an average of the training digits, weighted by how likely each was the origin
-- exhibit C next: start from noise, walk back; a digit appears
+- exhibit E next: start from noise, walk back; a digit appears
 - watch for the panel on the right: every sample lands **exactly on a training digit**. An exact denoiser for a finite set can only **memorize**
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit C: digits, the exact denoiser
+## Exhibit E: digits, the exact denoiser
 
 <div class="cockpit" data-demo="diffusion-digits" data-controls="steps"><pre class="viz-fallback">  2,000 MNIST digits (20×20) = the training set; a digit is a 400-vector
   start from noise; the exact posterior-mean denoiser walks back `steps` times
@@ -293,7 +379,7 @@ Same mechanism, real images: **2,000 handwritten digits**, 20×20 pixels, so eac
 
 ## The leap: from lookup to generalization
 
-A network cannot store the training set; it learns a **smooth** function that agrees with it. Exhibit D fakes that with one knob.
+A network cannot store the training set; it learns a **smooth** function that agrees with it. Exhibit F fakes that with one knob.
 
 - `smooth` widens the denoiser's kernel: it keeps **blending neighbors** all the way to the end instead of snapping to one training digit
 - watch for: the nearest-digit distance jumping above the threshold, and digits **nobody wrote**
@@ -303,7 +389,7 @@ A network cannot store the training set; it learns a **smooth** function that ag
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit D: digits nobody wrote
+## Exhibit F: digits nobody wrote
 
 <div class="cockpit" data-demo="diffusion-digits" data-controls="smooth"><pre class="viz-fallback">  same 2,000 digits, same walk; drag smooth:
     exact   → every sample is a training digit (distance 0.000, memorized)
@@ -315,7 +401,7 @@ A network cannot store the training set; it learns a **smooth** function that ag
 
 ## A real learned denoiser
 
-Exhibit E replaces the exact answer with a **trained network**: a small MLP, about a million weights, trained for fifteen minutes on a laptop CPU on 60,000 digits, running in your browser now.
+Exhibit G replaces the exact answer with a **trained network**: a small MLP, about a million weights, trained for fifteen minutes on a laptop CPU on 60,000 digits, running in your browser now.
 
 - at sampling time it never sees the training set; it only remembers what it learned about digits
 - the digit buttons are **conditioning** (a class embedding, the slot text goes into later); `guide` is **classifier-free guidance**: exaggerate what the class adds
@@ -325,7 +411,7 @@ Exhibit E replaces the exact answer with a **trained network**: a small MLP, abo
 
 <!-- .slide: class="demo-full" -->
 
-## Exhibit E: the network draws
+## Exhibit G: the network draws
 
 <div class="cockpit" data-demo="diffusion-net" data-controls="guide,steps"><pre class="viz-fallback">  a trained class-conditional MLP denoiser (≈1,000,000 weights, 15 minutes
   of CPU training on 60,000 MNIST digits) samples 12 digits from noise
@@ -353,11 +439,11 @@ A 512×512 RGB image is 786,432 numbers; denoising that a thousand times per pic
 
 ## Text in the class slot
 
-Exhibit E's digit button was a **class embedding**. A prompt is the same slot, filled by text.
+Exhibit G's digit button was a **class embedding**. A prompt is the same slot, filled by text.
 
 - **CLIP** (2021): a joint embedding trained so an image and its caption land near each other; words become vectors the network reads
 - the denoiser attends to those vectors at every step (**cross-attention**): "which way is the data, *given this caption*?"
-- **classifier-free guidance** (Ho & Salimans, 2022) is exhibit E's `guide`: train with and without the caption, exaggerate the difference by `w`
+- **classifier-free guidance** (Ho & Salimans, 2022) is exhibit G's `guide`: train with and without the caption, exaggerate the difference by `w`
 
 <img src="../../media/generative/cfg-row.jpg" class="media-shot" style="max-height: 170px;" alt="the same prompt and seed at guidance scales 2.5, 7.5, 12.5, 20 and 30: a couple in a wood-paneled room, growing more saturated and stylized to the right">
 <small class="credit">MrAlanKoh · CC BY-SA 4.0 · via Wikimedia Commons (one row of the original grid)</small>
@@ -367,8 +453,32 @@ Exhibit E's digit button was a **class embedding**. A prompt is the same slot, f
 ## The network is whatever scales
 
 - ours: an MLP, a million weights, fifteen minutes; theirs: a **U-Net** (2020–22), then a **diffusion transformer** (DiT, Peebles & Xie 2023) with billions, on image patches
-- the recipe (noise, learn to undo, sample) did not change from exhibit E to the frontier; the network and the data got bigger
+- the recipe (noise, learn to undo, sample) did not change from exhibit G to the frontier; the network and the data got bigger
 - gallery next: what the recipe draws at that scale
+
+---
+
+## Where it came from: the papers (2015–2020)
+
+| Year | Paper | What it added |
+| ---- | ----- | ------------- |
+| 2015 | Sohl-Dickstein, Weiss, Maheswaranathan & Ganguli, *Deep Unsupervised Learning using Nonequilibrium Thermodynamics* | **diffusion probabilistic models**: destroy, learn to undo |
+| 2019 | Song & Ermon, *Generative Modeling by Estimating Gradients of the Data Distribution* | the **score** (vector field) view |
+| 2020 | Ho, Jain & Abbeel, *Denoising Diffusion Probabilistic Models* | **DDPM**: predict the noise; it works at scale |
+| 2020 | Song, Meng & Ermon, *Denoising Diffusion Implicit Models* | **DDIM**: deterministic, few-step sampling |
+
+---
+
+## Where it came from: the papers (2021–2023)
+
+| Year | Paper | What it added |
+| ---- | ----- | ------------- |
+| 2021 | Dhariwal & Nichol, *Diffusion Models Beat GANs on Image Synthesis* | guidance; quality past GANs |
+| 2021 | Radford et al., *Learning Transferable Visual Models from Natural Language Supervision* | **CLIP**: text and images, one space |
+| 2022 | Ho & Salimans, *Classifier-Free Diffusion Guidance* | the `guide` knob |
+| 2022 | Rombach et al., *High-Resolution Image Synthesis with Latent Diffusion Models* | **Stable Diffusion**: diffuse in a latent |
+| 2022 | Ramesh et al. (DALL·E 2); Saharia et al. (Imagen) | text-to-image at scale, two routes |
+| 2023 | Peebles & Xie, *Scalable Diffusion Models with Transformers* | **DiT**: the network is whatever scales |
 
 ---
 
@@ -435,7 +545,7 @@ A clip is a **3D block of latents** (x, y, t). Frames must see each other; the r
 
 ### Part 3 · Learned scenes: NeRF and 3DGS
 
-<small>(~16 min)</small>
+<small>(~12 min)</small>
 
 ---
 
@@ -454,38 +564,19 @@ Everything so far is **forward** rendering: **you build** the geometry and mater
 
 ---
 
-## NeRF: the scene as a learned field
+## NeRF: a learned field, rendered by marching rays
 
-**NeRF** (Neural Radiance Fields, Mildenhall et al. 2020): represent the **entire scene** as a single continuous **function** — a small neural network — with **no mesh and no triangles**:
-
-```text
-   MLP:   (x, y, z,  view direction)  ──▶  (color,  density)
-          a 3D point + where you look     what it emits + how opaque it is
-```
-
-- the scene **is** the network's **weights** — a "**learned field**" filling all of space, not a surface
-- color depends on **view direction**, so it captures **shiny, view-dependent** appearance (glints, reflections) automatically
-- **density** at a point says how much the point **blocks / emits** light — the hook for rendering it
-
-The network is small; the scene lives entirely in what it **learned** from the training photos.
-
----
-
-## NeRF: rendered by marching rays
-
-To make a pixel, **march a ray** from the camera through the field and **accumulate** color, weighted by density — the same "**integrate along a ray**" idea, now through a **volume** instead of onto a surface:
+**NeRF** (Mildenhall et al. 2020): the **entire scene** is one small network, **no mesh**: `(x, y, z, view direction) → (color, density)`. A pixel is made by **marching a ray** through it:
 
 ```text
-   for each pixel:
-      shoot a ray from the camera (S06's un-project) into the scene
-      sample the MLP at many points along the ray → (color_i, density_i)
-      composite front-to-back:  denser points contribute more, and
-         occlude points behind them   (alpha-compositing along the ray)
+   shoot a ray from the camera (S06's un-project) into the scene
+   sample the network at many points along it → (color_i, density_i)
+   composite front-to-back: denser points contribute more and occlude what is behind
 ```
 
-- **training** is the inverse loop: the whole march is **differentiable**, so gradient descent tunes the weights until the **rendered** rays match the **training photos**
-- **cost:** hundreds of network evaluations **per ray**, millions of rays — NeRF is **slow** to train (hours) and slow to render
-- but the **camera ray** you march is S06's projection **run backwards** — the viewing pipeline, reused
+- the scene **is** the weights: a learned field filling space, view-dependent color for free
+- **training** runs the march backwards: it is differentiable, so gradient descent tunes the weights until rendered rays match the **training photos**
+- **cost**: hundreds of network evaluations per ray; slow to train and to render
 
 ---
 
@@ -540,7 +631,7 @@ To make a pixel, **march a ray** from the camera through the field and **accumul
 
 ### Part 4 · The course in one picture
 
-<small>(~10 min)</small>
+<small>(~7 min)</small>
 
 ---
 
