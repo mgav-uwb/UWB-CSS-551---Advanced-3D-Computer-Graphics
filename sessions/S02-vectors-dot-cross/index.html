@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L02 — Vector Math I: Dot &amp; Cross</title>
+  <title>CSS 551 · L2&amp;3 — Vectors and Rotations</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -14,11 +14,15 @@
 
   <style>
     :root { --accent: #00b46e; }
-    .reveal h2 { color: #1c2530; }
+    .reveal { font-size: 32px; }
+    .reveal h2 { color: #1c2530; font-size: 1.42em; margin-bottom: 0.3em; }
     .reveal h3 { color: var(--accent); }
     .reveal section small { color: #66708a; }
+    .reveal section p { margin: 0.34em 0; }
+    .reveal section ul { margin: 0.22em 0; }
+    .reveal section li { margin: 0.07em 0; line-height: 1.26; }
     .reveal table { font-size: 0.78em; }
-    .reveal pre { width: 100%; box-shadow: none; font-size: 0.44em; }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.40em; margin: 0.36em auto; }
     .reveal pre code { border-radius: 8px; }
     .reveal blockquote { width: 92%; }
 
@@ -38,8 +42,22 @@
 <body>
   <div class="reveal">
     <div class="slides">
-      <section
-        data-markdown="L02-vectors-dot-cross.md"
+      <section data-markdown="L02-vectors-rotations.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/vectors-dot-cross.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/rotation-quaternions.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="L02-close.md"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">

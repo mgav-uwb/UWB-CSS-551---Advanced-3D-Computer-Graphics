@@ -1,13 +1,13 @@
 <!--
-  CSS 551 · TOPIC DECK — Learned images: the diffusion ladder (~55 min).
+  CSS 551 · TOPIC DECK — Learned images: the diffusion ladder (~42 min).
   A topic is a reusable stretch of slides that a session page mounts as one
   <section data-markdown="../../topics/diffusion-ladder.md"> among others; it carries no
   session logistics (no title, Thursday, MP, wrap) and no "Part N" numbering.
   Sessions compose topics in their index.html; see sessions/README.md.
 
-  TEACHES: forward process on a real render (C); the mechanism on dots (D); the exact denoiser on MNIST, which memorizes (E); a smoothing knob that generalizes (F); a trained network drawing digits with conditioning and guidance (G); latent diffusion; text in the class slot; the network is whatever scales; the papers (two slides); gallery; ControlNet; text-to-3D; video; what still breaks.
+  TEACHES: forward process on a real render (C); the mechanism on dots (D); the exact denoiser on MNIST, which memorizes (E); a smoothing knob that generalizes (F); a trained network drawing digits with conditioning and guidance (G); latent diffusion; text in the class slot; the network is whatever scales; the papers (two slides). The gallery, ControlNet, text-to-3D, video and "what still breaks" slides moved to topics/graphics-meets-generative.md (2026-09-18).
   NEEDS:   the learned-images-foundations topic (exhibit letters continue from it: A, B there; C–G here).
-  DEMOS:   data-demo="diffusion-image" (t); "diffusion-2d" (steps,stochastic); "diffusion-digits" (steps) and (smooth); "diffusion-net" (guide,steps); all demo-full. Media: ../../media/generative/*.jpg, credits verbatim from media/generative/CREDITS.md.
+  DEMOS:   data-demo="diffusion-image" (t); "diffusion-2d" (steps,stochastic); "diffusion-digits" (steps) and (smooth); "diffusion-net" (guide,steps); all demo-full. No media (the generative gallery lives in graphics-meets-generative.md).
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -20,9 +20,9 @@
 
 ### Learned images: the diffusion ladder
 
-<small>(~55 min)</small>
+<small>(~42 min)</small>
 
-Note: The ladder: five live exhibits, each answering "but how do you get from that to any picture?" a little further. A real picture dissolving; the mechanism on dots; the exact denoiser on real digits, which can only memorize; a smoothing knob that turns it into a generator; then a network that was actually trained, drawing digits it never saw. Then the three scalings to Stable Diffusion, the papers, and what still breaks. The galleries at the end are the designated cut if we run long.
+Note: The ladder: five live exhibits, each answering "but how do you get from that to any picture?" a little further. A real picture dissolving; the mechanism on dots; the exact denoiser on real digits, which can only memorize; a smoothing knob that turns it into a generator; then a network that was actually trained, drawing digits it never saw. Then the three scalings to Stable Diffusion and the papers. Exhibit G is the one slide not to rush.
 
 ---
 
@@ -244,75 +244,4 @@ Note: Provenance, first half, so the names on the previous slides have papers at
 | 2022 | Ramesh et al. (DALL·E 2); Saharia et al. (Imagen) | text-to-image at scale, two routes |
 | 2023 | Peebles & Xie, *Scalable Diffusion Models with Transformers* | **DiT**: the network is whatever scales |
 
-Note: Second half. Guidance in 2021 and its classifier-free form in 2022, the guide slider; CLIP as the shared space of the "two encoders" slide; latent diffusion as the reason it fits on a gaming GPU; the two 2022 text-to-image systems, one diffusing in CLIP's space and one conditioning on a language model; and the transformer denoiser. The two on-ramps for a graduate student are the 2020 DDPM paper and the 2022 latent diffusion paper; both are in Chapter 1.
-
----
-
-## Gallery: prompt to image
-
-<div style="display: flex; gap: 12px; justify-content: center; align-items: flex-start;">
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-1.jpg" class="media-shot" style="max-height: 230px;" alt="a generated solarpunk city street: trees on terraced towers, a small tram, a lake, warm daylight"><small class="credit">Prototyperspective · CC0 · via Wikimedia Commons</small></div>
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-2.jpg" class="media-shot" style="max-height: 230px;" alt="a generated cyberpunk tower in the rain, red neon on dark glass"><small class="credit">CC0 · via Wikimedia Commons</small></div>
-<div style="flex: 1 1 0; min-width: 0;"><img src="../../media/generative/gallery-3.jpg" class="media-shot" style="max-height: 230px;" alt="a generated landscape painting: a red Shinto shrine gate among forested mountains"><small class="credit">Benlisquare · Public domain · via Wikimedia Commons</small></div>
-</div>
-
-<small>Prompts, left to right: "utopia at street level in city … solarpunk, green trees, matte painting" · "Cyberpunk, Tower of Babel, in the rain, highly detailed, illustration" · "Hakurei Shrine in distance … forests, mountains, rivers" (Stable Diffusion, 2022–23)</small>
-
-Note: Let the images sit for a moment, then read the prompts. Point at what the model gets right (lighting, materials, composition, all learned from photographs, none simulated) and at one thing it gets wrong in each, if visible. Then the graphics question: none of this has a scene, a camera, or a light you could move. That is the next slide's opening.
-
----
-
-## Graphics-flavored control
-
-**ControlNet** (Zhang, Rao & Agrawala, 2023): condition the denoiser on a **depth map**, a **normal map**, or an edge image, and it keeps that structure.
-
-<img src="../../media/generative/controlnet-depth.jpg" class="media-shot" style="max-height: 250px;" alt="left: the estimated depth map of a toy robot at a lectern; right: a generated stormtrooper figure at the same lectern in the same pose">
-<small class="credit">lllyasviel/ControlNet README, depth example · Apache-2.0 · github.com/lllyasviel/ControlNet</small>
-
-- a depth buffer (S06) and normals (S07) are exactly what **our pipeline produces**
-- render the geometry you control, let diffusion paint the appearance
-
-Note: The bridge back to this course. ControlNet adds a side network that reads a structural image, a depth map, a normal map, an edge drawing, and steers the denoiser to respect it. Depth and normals are the pipeline's own by-products: every frame you rendered this quarter had a depth buffer and could write normals. So a practical division of labor appears: geometry and camera from the pipeline, where you have control; appearance from diffusion, where it has taste. Production pipelines already do this for concept art and texturing.
-
----
-
-## Text to 3D: the two halves meet
-
-**Score distillation** (DreamFusion, Poole et al., 2022): optimize a 3D scene so that **renders of it** score well under a text-conditioned image model.
-
-```text
-   3D scene (a NeRF or Gaussians)  ──render from a random view──▶  image
-   image diffusion model: "does this look like <prompt>? push it this way"
-   the push flows back through the renderer into the 3D scene; repeat
-```
-
-- diffusion **judges**, the pipeline **renders**, gradients flow through both
-- the result is a real 3D asset: a camera you can move, geometry you can export
-- this is where learned images meet learned scenes, the next topic's subject
-
-Note: The slide that pays the chapter's promise about generative 3D. No 3D training data is needed: the image model already knows what a "ceramic teapot" looks like from any angle, so optimize a 3D representation until its renders satisfy the image model from every random viewpoint. The renderer has to be differentiable so the image model's push can flow back into the scene, which NeRF and splats both are. That is the same machinery Part 3 uses to learn a scene from photographs, aimed at a prompt instead of at photos. Quality lags dedicated 3D methods and takes hours per asset, and it is improving fast.
-
----
-
-## Video: add a time axis
-
-A clip is a **3D block of latents** (x, y, t). Frames must see each other; the rest of the recipe is unchanged.
-
-<img src="../../media/generative/video-strip.jpg" class="media-shot" style="max-height: 120px;" alt="six frames of a generated clip: a white dragon in a snowy scene, its pose changing across frames">
-<small class="credit">prompted by Lumi's AI Dreams · Public domain · via Wikimedia Commons (six frames)</small>
-
-- **temporal attention**: each frame's denoiser attends to its neighbors in time, so motion is consistent
-- **video diffusion** (Ho et al., 2022) to Sora-class models (2024): the same noise-and-undo recipe on space-time patches
-
-Note: Video is diffusion with one more axis. The latent is now a block, width by height by time; the network attends across frames as well as within them so that a moving object stays the same object. The 2022 paper by Ho and colleagues established it; the 2024 generation (Sora and its open successors) scaled it on space-time patches with transformers. The strip is six frames of one generated clip; ask the room to watch for what breaks across them, which is the next slide.
-
----
-
-## What still breaks, and what graphics keeps
-
-- **object permanence, physics, counting, text**: no scene exists inside the model, so nothing enforces them
-- **no camera to move, no light to change, no edit that keeps everything else fixed**
-- graphics keeps: **control**, **consistency**, **real time**
-- the two are merging: generated textures and assets in engines; learned rendering of authored scenes; **world models** that predict the next frame from an action
-
-Note: The honest slide, and the one that justifies the rest of the quarter. A diffusion model has no scene, so it has nothing that enforces that the cup on frame one is the cup on frame sixty, that objects fall, that there are five fingers, that a sign spells a word. It has no camera you can move an inch. Graphics has exactly those things and lacks the model's taste for appearance. The field is merging them from both sides: engines that ship generated textures and assets, differentiable renderers that let images train scenes, and world models that generate the next frame in response to a controller input. Transition to Part 3: the other half of the era, one scene learned from its own photographs.
+Note: Second half. Guidance in 2021 and its classifier-free form in 2022, the guide slider; CLIP as the shared space of the "two encoders" slide; latent diffusion as the reason it fits on a gaming GPU; the two 2022 text-to-image systems, one diffusing in CLIP's space and one conditioning on a language model; and the transformer denoiser. The two on-ramps for a graduate student are the 2020 DDPM paper and the 2022 latent diffusion paper; both are in the diffusion chapter of the course text.

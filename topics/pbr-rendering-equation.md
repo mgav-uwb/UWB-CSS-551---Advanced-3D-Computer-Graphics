@@ -1,11 +1,12 @@
 <!--
-  CSS 551 · TOPIC DECK — Honest light: from Phong to the rendering equation and PBR (~12 min).
+  CSS 551 · TOPIC DECK — Honest light: from Phong to the rendering equation and PBR (~20 min).
   A topic is a reusable stretch of slides that a session page mounts as one
   <section data-markdown="../../topics/pbr-rendering-equation.md"> among others; it carries no
   session logistics (no title, Thursday, MP, wrap) and no "Part N" numbering.
   Sessions compose topics in their index.html; see sessions/README.md.
 
-  TEACHES: why a local model is wrong (energy, reciprocity, bounces); the rendering equation term by term; the BRDF; microfacets and the metallic/roughness sliders; the lobe live.
+  TEACHES: why a local model is wrong (energy, reciprocity, bounces); the rendering equation term by term; the BRDF; microfacets, D/G/F evaluated once by hand; the metallic/roughness sliders on a computed sphere grid; the lobe live.
+  FIGURES: ../../textbook/figures/pbr-sphere-grid.svg (tools/gen-textbook-figures.mjs); worked numbers from figures/numbers.json.
   NEEDS:   a local illumination model (Phong) taught earlier; the history chapter's era 3.
   DEMOS:   data-demo="brdf-lobe" data-controls="roughness" (under the 210px crop, not demo-full)
 
@@ -20,7 +21,7 @@
 
 ### Honest light: from Phong to the rendering equation
 
-<small>(~12 min)</small>
+<small>(~20 min)</small>
 
 ---
 
@@ -95,7 +96,37 @@ The physical specular BRDF models a rough surface as a field of microscopic **pe
 - engines expose two artist sliders on top: **metallic** (dielectric: colored diffuse + weak white specular; metal: no diffuse, tinted specular) and **smoothness** (Unity's name for 1 − roughness)
 - the same machinery under Unity's Standard Shader, glTF and every modern renderer
 
-Note: Microfacet theory at concept depth, then the two knobs artists touch, in one slide. Zoom into any surface and it is a rugged landscape of tiny facets, each a perfect mirror; a pixel covers millions, so what you see is the fraction whose orientation reflects the light toward your eye, which is where roughness enters: aligned facets give a tight bright highlight, scattered facets a broad dim one. Cook-Torrance multiplies three physical factors, D for the distribution of facet orientations (GGX is the modern default), G for facets shadowing each other at grazing angles, F for the Fresnel rise of reflectance toward one at the edges; name what each does, not its formula. On top of that machinery the industry exposes two sliders: metallic decides whether the base color is a diffuse color under a weak white specular (plastic, wood, skin) or a tint on the specular with no diffuse at all (gold, copper, steel), and smoothness is one minus roughness. Those are the sliders in Unity's Standard Shader, and the same parameterization moves a material between glTF, Unreal and every modern engine. Next: watch roughness reshape the lobe, live.
+Note: Microfacet theory at concept depth, then the two knobs artists touch, in one slide. Zoom into any surface and it is a rugged landscape of tiny facets, each a perfect mirror; a pixel covers millions, so what you see is the fraction whose orientation reflects the light toward your eye, which is where roughness enters: aligned facets give a tight bright highlight, scattered facets a broad dim one. Cook-Torrance multiplies three physical factors, D for the distribution of facet orientations (GGX is the modern default), G for facets shadowing each other at grazing angles, F for the Fresnel rise of reflectance toward one at the edges; name what each does, not its formula. On top of that machinery the industry exposes two sliders: metallic decides whether the base color is a diffuse color under a weak white specular (plastic, wood, skin) or a tint on the specular with no diffuse at all (gold, copper, steel), and smoothness is one minus roughness. Those are the sliders in Unity's Standard Shader, and the same parameterization moves a material between glTF, Unreal and every modern engine. Next: the three factors as numbers.
+
+---
+
+## One evaluation, by hand
+
+Normal up, light at 30° on one side, eye at 30° on the other, plastic (`F0 = 0.04`), roughness α = 0.3:
+
+```text
+   n·ωi = n·ωo = 0.866          h = normalize(ωi + ωo) = n   →  n·h = 1,  ωo·h = 0.866
+   D = α² / π                  = 0.09 / π                         = 3.537   (the peak of the α = 0.3 curve)
+   G = G₁(ωi)·G₁(ωo),  G₁ = 2(n·x) / ((n·x) + √(α² + (1−α²)(n·x)²))  = 0.9926² = 0.985
+   F = F0 + (1 − F0)(1 − ωo·h)⁵ = 0.04 + 0.96 × 4.3e−5                 = 0.0400
+   f_spec = D·G·F / (4 (n·ωi)(n·ωo)) = 3.537 × 0.985 × 0.040 / 3.0     = 0.0465
+```
+
+- against a mid-gray diffuse term `0.6/π = 0.191`: the highlight adds a quarter of the diffuse value at the mirror direction
+- move the light to 45°: `h` tilts 7.5°, `D` drops to 2.57, `f_spec = 0.041`; make it rougher (α = 0.6): `D = 0.884`, `f_spec = 0.011`
+- the highlight got **dimmer as it got wider** with no separate brightness knob: energy conservation doing the bookkeeping
+
+Note: One full evaluation, so that the three letters are numbers and not names. Set the geometry so the eye is exactly in the mirror direction: the half-vector is the normal, D is at its peak, G is nearly one because nothing is grazing, and Fresnel adds nothing at 30 degrees. Multiply and divide: 0.0465, about a quarter of a mid-gray Lambertian term. Then two perturbations from the course text: tilt the light and D falls off the peak; roughen the surface and D falls to a quarter, so the highlight dims as it widens without anyone setting a brightness. That coupling is what Phong lacked; the course-text chapter shows the same lobe over-reflecting by a factor of two at low exponents. Next: the two sliders, rendered.
+
+---
+
+## The two sliders, rendered
+
+<img src="../../textbook/figures/pbr-sphere-grid.svg" class="media-shot" style="max-height: 400px;" alt="a five by five grid of shaded spheres: roughness increasing left to right, metallic increasing top to bottom; the plastic row keeps its color in shadow, the metal row goes dark except for tinted reflections">
+
+<small>Computed by the course-text figure generator: one directional light plus a two-tone sky/ground, Lambert + GGX D + Smith G + Schlick F. Across: roughness 0.1 to 0.9. Down: metallic 0 to 1.</small>
+
+Note: The whole model in one picture, computed from the formulas on the previous slides by a forty-line ray marcher in the course-text figure generator, so it and the equations cannot disagree. Read it two ways. Across a row, roughness widens and dims the highlight, the coupling just computed. Down a column, metallic removes the diffuse term, so the shadow side goes dark, and tints the specular with the base color, so the reflections of the sky and the light turn red. The faint horizon line on the plastic spheres is real: Fresnel makes even plastic a weak mirror, strongest at the rim. Next: the lobe itself, live.
 
 ---
 

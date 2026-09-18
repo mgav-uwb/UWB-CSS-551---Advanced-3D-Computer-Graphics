@@ -478,19 +478,20 @@ Details, requirements, and grading are **on Canvas** — the single source of tr
 
 ## The plan for Thursday
 
-The SceneNode studio — walk and poke the real hierarchy projects:
+The **matrix studio**, last week's block formulas poked live:
 
-- **5.1.SceneNode+PrimitiveList** — trace `CompositeXform`; add a node; predict the composite
-- **5.2.SceneNodeControl** — re-pivot a joint; move a parent and confirm the subtree follows
+- **TSvsST** — flip the order; predict the divergence
+- **PivotedScaleRotate** — change the pivot; predict the fixed point
+- **InverseTransform** — watch `M⁻¹·M` snap a copy back
 
-Plus **MP4 lab time** — start the four-generation hierarchy with the instructor circulating.
+Plus **MP3 lab time**; **MP3a** goes out. The SceneNode studio (5.1, 5.2) and MP4 are the Thursday after.
 
 ---
 
 ## Wrap
 
-- **Thursday studio** — SceneNode CDP: **5.1.SceneNode+PrimitiveList**, **5.2.SceneNodeControl**, plus **MP4 lab time**
-- **MP3 + MP3a due**; **MP4 goes out** — the four-generation hierarchy. *Details on Canvas.*
+- **Thursday studio** — the Topic4 matrix studio: **TSvsST**, **PivotedScaleRotate**, **InverseTransform**, plus **MP3 lab time**
+- **MP3a goes out** — the next deliverable. *Details on Canvas.* The SceneNode studio and **MP4** follow the Thursday after.
 
 A scene graph is a tree of local transforms. A child's world matrix is its parent's, times its own — composed all the way down.
 

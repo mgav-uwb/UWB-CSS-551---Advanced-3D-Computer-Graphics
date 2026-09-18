@@ -518,18 +518,20 @@ Requirements, deliverables, due date, and points are **on Canvas** — the singl
 
 ## Thursday: the studio
 
-The **CameraMatrices studio** — poke `6.8.OurOwnProjMatrix`, all **five** view-matrix modes live:
+The **SceneNode studio**, last week's hierarchy poked live:
 
-- switch the four correct modes and predict each — same view, four routes
-- break it: flip to **`ViewMatrixWrong`** and predict what "wrong" looks like first
-- **MP5 kickoff** — start the camera-manipulation machine, instructor circulating
+- **5.1** — trace `CompositeXform`; add a node; predict the composite
+- **5.2** — re-pivot a joint; move a parent, confirm the subtree follows
+- **MP4 kickoff** — the four-generation hierarchy
+
+The CameraMatrices studio (all five modes) and MP5 are the Thursday after.
 
 ---
 
 ## Wrap
 
-- **Thursday studio** — CameraMatrices CDP: all five `ViewMatrixMode` modes live (incl. breaking it with `ViewMatrixWrong`)
-- **MP4 due**; **MP5 goes out** — the camera-manipulation machine. *Details on Canvas.*
+- **Thursday studio** — SceneNode CDP (**5.1**, **5.2**) plus **MP4 lab time**
+- **MP3 + MP3a due**; **MP4 goes out** — the four-generation hierarchy. *Details on Canvas.* The CameraMatrices studio and **MP5** follow the Thursday after.
 
 A camera is a frame plus a lens. The view matrix puts the world in the frame; projection divides by depth. Both are matrices you built yourself tonight.
 

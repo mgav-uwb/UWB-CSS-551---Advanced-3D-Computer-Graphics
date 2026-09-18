@@ -456,9 +456,9 @@ The proposal **template and requirements are on Canvas** (the single source of t
 
 ---
 
-## Thursday's proposal workshop
+## The proposal workshop
 
-The second half of Thursday — come with a rough idea, leave with a peer-reviewed pitch:
+The second half of the MyMesh studio, a week from Thursday — come with a rough idea, leave with a peer-reviewed pitch:
 
 - **brainstorm (timeboxed)** — list candidate ideas, no filtering; then pick one
 - **one-paragraph pitch** — the idea, the core technique, the minimal deliverable (template on Canvas)
@@ -479,18 +479,18 @@ Bring a laptop and a half-formed idea.
 
 ---
 
-## Thursday: the studio + FP workshop
+## Thursday: the camera studio
 
-- **MyMesh studio** — run `7.3.Simple2x2Mesh`, `7.5.NormalAverageSupport`, `7.4.SimpleAttemptAtMaipulation`: read the arrays, toggle averaged normals, drag a vertex
-- **FP proposal workshop** — timeboxed brainstorm → one-paragraph pitch → peer feedback → revise
-- bring a **laptop** and a **half-formed project idea**
+- **CameraMatrices studio** — poke `6.8.OurOwnProjMatrix`, all **five** view-matrix modes: the four correct routes give one view; **`ViewMatrixWrong`** shows what wrong looks like
+- **MP5 kickoff** — start the camera-manipulation machine, instructor circulating
+- the **MyMesh studio** (`7.3`/`7.5`/`7.4`) and the **FP proposal workshop** are the Thursday after: bring a **laptop** and a **half-formed project idea** then
 
 ---
 
 ## Wrap
 
-- **Thursday** — MyMesh CDP studio (`7.3`/`7.5`/`7.4`) + the Final Project proposal workshop
-- **MP5 due**; **MP6 goes out** — the polygonal-modeling editor (planar mesh, vertex manipulation, general cylinder); **FP proposal due**. *Details on Canvas.*
+- **Thursday** — the CameraMatrices studio (all five modes, incl. `ViewMatrixWrong`) + the MP5 kickoff
+- **MP4 due**; **MP5 goes out**. *Details on Canvas.* The MyMesh studio, the FP proposal workshop and **MP6** follow the Thursday after.
 
 A surface is data: vertices and index triples you build, normals you compute from cross products, deformations you apply. You can make geometry now — not just place it and view it.
 

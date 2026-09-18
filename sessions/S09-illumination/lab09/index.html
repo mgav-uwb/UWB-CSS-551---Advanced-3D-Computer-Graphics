@@ -187,6 +187,32 @@ into shader globals via <code>LoadLightToShader()</code>; <code>LoadLight.cs</co
   <code>= 0.879^30 = 0.021</code> at the default light).</p>
 </div>
 
+<h3>4 &middot; Two texture items (the texture studio folded in)</h3>
+<p><b>Goal.</b> The Thanksgiving Thursday took the texture studio, so its two highest-value pokes live here.
+Open <code>8.2.OurOwnTexturePlacement</code> and <code>8.7.SynthesizedTextures</code> from
+<code>Topic8-TextureMapping</code> on Canvas.</p>
+
+<div class="step">
+  <span class="tag">POKE 4a &middot; PLACE THE IMAGE BY HAND</span>
+  <h3>Slide, repeat, spin</h3>
+  <p>In <code>8.2</code>, find where the C# builds the <code>3&times;3</code> texture matrix from
+  <code>Scale</code>, <code>Offset</code> and the rotation, and uploads it to the shader.</p>
+  <div class="predict"><b>Predict first:</b> set <code>Offset = (0.25, 0)</code> and say which way the image
+  slides on the quad before pressing Play (the matrix moves the <i>lookup</i>, so the picture moves the other
+  way). Then <code>Scale = (2, 2)</code>: how many copies appear? Then rotate 45&deg; about the center: which
+  corner of the image sits at the quad's center?</div>
+</div>
+
+<div class="step">
+  <span class="tag">POKE 4b &middot; THE PROCEDURAL CHECKER</span>
+  <h3>Predict the checker from the math</h3>
+  <p>In <code>8.7</code>, read the fragment code that computes the checker from <code>uv</code> (the floor of
+  <code>uv &times; n</code>, summed, mod 2).</p>
+  <div class="predict"><b>Predict first:</b> with <code>n = 4</code>, how many squares across the quad, and what
+  color is the square containing <code>uv = (0.3, 0.6)</code>? Work it out on paper, then check on screen. Change
+  <code>n</code> to 6 and predict again before you look.</div>
+</div>
+
 <h2>Part B · Final Project progress demos <span class="time">~50 min</span></h2>
 
 <div class="box">

@@ -188,48 +188,52 @@ const DEMOS = {
 
 // ───────── one row per session: card + its handouts + its demos ─────────
 const SESSIONS = [
-  { id:"S01", title:"3D Computer Graphics: The Big Picture",
+  // One row per Tuesday lecture, paired with the Thursday studio that follows it under
+  // the AU26 calendar (planning/css551-au26-schedule-2026-09-18.md): from week 3 on the
+  // studio runs one week behind its lecture, so the lab chip names the lab explicitly.
+  { id:"W1–2", title:"3D Computer Graphics: The Big Picture",
     deck:"sessions/S01-cg-overview/index.html",
-    lab:"sessions/S01-cg-overview/lab01/index.html",
+    lab:"sessions/S01-cg-overview/lab01/index.html", labTitle:"Lab 01 · Unity, the loop &amp; MVC",
     handouts:["history"],
     demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map","mvc-transform"] },
-  { id:"S02", title:"Vector Math I: Dot &amp; Cross Products, Lines, Planes",
+  { id:"W3", title:"Vectors and Rotations: Dot &amp; Cross, Lines, Planes; Axis-Angle, Quaternions",
     deck:"sessions/S02-vectors-dot-cross/index.html",
-    lab:"sessions/S02-vectors-dot-cross/lab02/index.html",
-    demos:["dot-cross"] },
-  { id:"S03", title:"Rotation: Axis-Angle, Quaternions, Gimbal Lock",
-    deck:"sessions/S03-rotation-quaternions/index.html",
-    lab:"sessions/S03-rotation-quaternions/lab03/index.html",
-    demos:["axis-angle"] },
-  { id:"S04", title:"Matrices &amp; Coordinate Spaces",
+    lab:"sessions/S02-vectors-dot-cross/lab02/index.html", labTitle:"Lab 02 · Vectors EX1–EX3",
+    demos:["dot-cross","axis-angle"] },
+  { id:"W4", title:"Affine Transformations over Homogeneous Coordinates",
     deck:"sessions/S04-matrices-spaces/index.html",
-    lab:"sessions/S04-matrices-spaces/lab04/index.html",
+    lab:"sessions/S03-rotation-quaternions/lab03/index.html", labTitle:"Lab 03 · Projection EX4–EX6",
     demos:["trs-order"] },
-  { id:"S05", title:"Scene Graphs &amp; Hierarchical Modeling",
+  { id:"W5", title:"Scene Graphs &amp; Hierarchical Modeling",
     deck:"sessions/S05-scene-graphs/index.html",
-    lab:"sessions/S05-scene-graphs/lab05/index.html",
+    lab:"sessions/S04-matrices-spaces/lab04/index.html", labTitle:"Lab 04 · Matrix studio + MP3 lab",
     demos:["scene-graph"] },
-  { id:"S06", title:"3D Viewing: View &amp; Projection Matrices",
+  { id:"W6", title:"3D Viewing: View &amp; Projection Matrices",
     deck:"sessions/S06-3d-viewing/index.html",
-    lab:"sessions/S06-3d-viewing/lab06/index.html",
+    lab:"sessions/S05-scene-graphs/lab05/index.html", labTitle:"Lab 05 · SceneNode studio + MP4",
     demos:["view-matrix","projection"] },
-  { id:"S07", title:"Polygonal Modeling",
+  { id:"W7", title:"Polygonal Modeling",
     deck:"sessions/S07-polygonal-modeling/index.html",
-    lab:"sessions/S07-polygonal-modeling/lab07/index.html",
+    lab:"sessions/S06-3d-viewing/lab06/index.html", labTitle:"Lab 06 · CameraMatrices + MP5",
     demos:["mesh-grid","simplify-compare"] },
-  { id:"S08", title:"Texture Mapping",
+  { id:"W8", title:"Texture Mapping",
     deck:"sessions/S08-texture-mapping/index.html",
-    lab:"sessions/S08-texture-mapping/lab08/index.html",
+    lab:"sessions/S07-polygonal-modeling/lab07/index.html", labTitle:"Lab 07 · MyMesh + FP proposal workshop",
     demos:["uv-placement"] },
-  { id:"S09", title:"Illumination",
+  { id:"W9", title:"Illumination",
     deck:"sessions/S09-illumination/index.html",
-    lab:"sessions/S09-illumination/lab09/index.html",
+    lab:null, labTitle:null,   // Thanksgiving Thursday; the texture items fold into Lab 09
     demos:["illumination"] },
-  { id:"S10", title:"PBR, Diffusion Models &amp; Learned Scenes",
+  { id:"W10", title:"Light &amp; Learned Images: PBR, Networks, Diffusion",
     deck:"sessions/S10-rendering-frontier/index.html",
-    lab:"sessions/S10-rendering-frontier/lab10/index.html",
-    handouts:["pbr","nets","images","diffusion","scenes"],
-    demos:["brdf-lobe","mlp-fit","embed-map","diffusion-image","diffusion-2d","diffusion-digits","diffusion-net","gsplat"] },
+    lab:"sessions/S09-illumination/lab09/index.html", labTitle:"Lab 09 · Shader studio + FP progress demos",
+    handouts:["pbr","nets","images","diffusion"],
+    demos:["brdf-lobe","mlp-fit","embed-map","diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
+  { id:"W11", title:"Learned Scenes, and Where the Field Is Going",
+    deck:"sessions/S11-learned-scenes/index.html",
+    lab:"sessions/S11-learned-scenes/lab10/index.html", labTitle:"Lab 10 · Final Project studio",
+    handouts:["scenes"],
+    demos:["gsplat"] },
 ];
 
 const quickCell = q => q.href ? `
@@ -249,7 +253,7 @@ const sessionCell = s => {
   const primary = s.deck || s.lab;
   const primaryLabel = s.deck ? "Open deck →" : "Open lab →";
   const labChip = (s.deck && s.lab) ? `
-    <a class="chip lab" href="${s.lab}"><span class="t">Lab</span></a>` : "";
+    <a class="chip lab" href="${s.lab}"><span class="t">${s.labTitle || "Lab"}</span></a>` : "";
   return `
   <div class="card-wrap">
     <a class="card" href="${primary}">
@@ -281,7 +285,7 @@ const demoCell = s => {
 document.getElementById("quick").innerHTML = QUICKLINKS.map(quickCell).join("");
 
 document.getElementById("sessions").innerHTML =
-  `<div class="colhead">Sessions</div>
+  `<div class="colhead">Weeks: Tuesday deck · Thursday studio</div>
    <div class="colhead">Handouts</div>
    <div class="colhead">Demos</div>` +
   SESSIONS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");

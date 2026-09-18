@@ -542,18 +542,18 @@ Implement-and-replace (S05): you build the UVs and the placement yourself.
 
 ---
 
-## Thursday: texture studio + MP6 lab
+## Thursday: MyMesh studio + FP proposal workshop
 
-- **Texture studio** — run `8.1.UVOnVertices`, `8.2.OurOwnTexturePlacement`, `8.6.MultiTexturing`, `8.7.SynthesizedTextures`: read the UVs, place the image by hand, blend two textures, and see the procedural checker
-- **MP6 lab time** — hands-on work on the polygonal-modeling editor, including its **texture-placement** part
-- bring a **laptop**; the projects are on **Canvas**
+- **MyMesh studio** — run `7.3.Simple2x2Mesh`, `7.5.NormalAverageSupport`, `7.4.SimpleAttemptAtMaipulation`: read the arrays, toggle averaged normals, drag a vertex
+- **FP proposal workshop** — timeboxed brainstorm → one-paragraph pitch → peer feedback → revise; bring a **laptop** and a **half-formed project idea**
+- the **texture studio** (`8.1`/`8.2`/`8.6`/`8.7`) folds into the shader studio two weeks from Thursday (the Thursday between is Thanksgiving); its projects are on **Canvas** now
 
 ---
 
 ## Wrap
 
-- **Thursday** — the texture CDP studio (`8.1`/`8.2`/`8.6`/`8.7`) + MP6 lab time
-- **MP6 continues** — its texture-placement part is tonight's Part 3, applied to your own mesh. *Details on Canvas.*
+- **Thursday** — MyMesh studio + the Final Project proposal workshop
+- **MP5 due**; **MP6 goes out** — its texture-placement part is tonight's Part 3, applied to your own mesh; **FP proposal due**. *Details on Canvas.*
 
 A texture is a **lookup**: a coordinate in, a color out. Author a `(u,v)` per vertex, **place** it with a 3×3 matrix, **sample** it with a filter — or skip the image and **compute** the color from math. Detail without geometry.
 

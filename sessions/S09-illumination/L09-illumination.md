@@ -600,9 +600,11 @@ Implement-and-replace (S05): you read and modify the shading math yourself — n
 
 ---
 
-## Thursday: shader studio + FP progress demos
+## A week from Thursday: shader studio + FP progress demos
 
-- **Shader studio** — run `9.2.AnalyzingTheNormal`, `9.3.DiffuseIllumination`, `9.4.PointLightSource`: visualize normals, read the diffuse `N·L`, tweak the spot cone
+This Thursday is Thanksgiving; the studio is the Thursday after:
+
+- **Shader studio** — run `9.2.AnalyzingTheNormal`, `9.3.DiffuseIllumination`, `9.4.PointLightSource`: visualize normals, read the diffuse `N·L`, tweak the spot cone; plus the texture items (`8.2` placement by hand, `8.7` the procedural checker)
 - **FP progress demos** — each team shows current progress on the **Final Project**, in a short **timed** slot, and gets quick feedback
 - bring a **laptop**; the projects are on **Canvas**, and the FP demo running order + feedback form are on **Canvas** too
 
@@ -620,7 +622,7 @@ Implement-and-replace (S05): you read and modify the shading math yourself — n
 
 ## Wrap
 
-- **Thursday** — the illumination CDP studio (`9.2`/`9.3`/`9.4`) + Final Project progress demos (timed slots, feedback on Canvas)
+- **No class Thursday** (Thanksgiving); **a week from Thursday** — the illumination CDP studio (`9.2`/`9.3`/`9.4`, with the texture items folded in) + Final Project progress demos (timed slots, feedback on Canvas)
 - **MP6 is due** — *details on Canvas.*
 
 Shading is **local**: at each point, one soft **diffuse** cosine `N·L`, one sharp **specular** `R·V^s`, a constant **ambient** floor — summed per light, tone-mapped to the screen. Three dot products make a flat mesh read as a lit, solid surface.
