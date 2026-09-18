@@ -1,0 +1,845 @@
+<!doctype html>
+<!-- CSS 551 course chapter - Learned Images and Learned Scenes.
+     Primary reading for Week 10 (S10). Uses MathJax 3 (jsdelivr) for the
+     function-space and diffusion sections; everything else is prose. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chapter 10: Learned Images and Learned Scenes - CSS 551</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <style>
+      :root {
+        --ink: #1a1c22; --dim: #5c6270; --line: #d7dbe3; --bg: #ffffff;
+        --accent: #0a7d5a; --accentbg: #e9f5f0; --box: #f6f8fb;
+        --warn: #9a5b00; --warnbg: #fff5e6; --demo: #6b40d8; --demobg: #f3efff;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; background: #eef0f4; color: var(--ink);
+        font: 16px/1.62 "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+      }
+      .page {
+        max-width: 820px; margin: 28px auto; background: var(--bg);
+        padding: 48px clamp(20px, 6vw, 64px) 64px;
+        box-shadow: 0 1px 4px #0002; border-radius: 4px;
+      }
+      h1 { font-size: 27px; line-height: 1.25; margin: 0 0 4px; }
+      .subtitle { color: var(--dim); font-size: 15.5px; margin: 0 0 4px; }
+      .src {
+        color: var(--dim); font-size: 13.5px; font-style: italic; margin: 0 0 26px;
+        border-bottom: 1px solid var(--line); padding-bottom: 18px;
+      }
+      h2 { font-size: 20px; margin: 34px 0 10px; padding-top: 6px; }
+      h3 { font-size: 16.5px; margin: 22px 0 6px; color: #2a2d36; }
+      p { margin: 10px 0; }
+      a { color: var(--accent); }
+      code, .mono {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.92em;
+        background: #f1f3f7; border-radius: 4px; padding: 0.5px 4px;
+      }
+      pre {
+        font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px;
+        line-height: 1.5; background: #f6f8fb; border: 1px solid var(--line);
+        border-left: 3px solid #b9c0d0; border-radius: 6px; padding: 12px 14px;
+        margin: 14px 0; overflow-x: auto;
+      }
+      .lead { font-size: 16.5px; color: #33363f; }
+      .def, .thm, .ex, .aside, .demo {
+        border: 1px solid var(--line); border-radius: 8px;
+        padding: 13px 16px; margin: 16px 0; background: var(--box);
+      }
+      .def { border-left: 4px solid var(--accent); background: var(--accentbg); }
+      .thm { border-left: 4px solid #1f5fb0; background: #eef4fc; }
+      .ex { border-left: 4px solid #777; background: #f6f7f9; }
+      .aside { border-left: 4px solid var(--warn); background: var(--warnbg); }
+      .demo { border-left: 4px solid var(--demo); background: var(--demobg); }
+      .tag {
+        font-variant: small-caps; letter-spacing: 0.4px; font-weight: 700;
+        font-family: system-ui, sans-serif; font-size: 13px; margin-right: 8px;
+      }
+      .def .tag { color: var(--accent); } .thm .tag { color: #1f5fb0; }
+      .ex .tag { color: #555; } .aside .tag { color: var(--warn); }
+      .demo .tag { color: var(--demo); } .demo a { color: var(--demo); font-weight: 600; }
+      table { border-collapse: collapse; width: 100%; margin: 14px 0; font-family: system-ui, sans-serif; font-size: 14.5px; }
+      th, td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; vertical-align: top; }
+      th { background: #f0f2f6; }
+      details { margin: 8px 0 8px 2px; font-size: 15px; }
+      summary { cursor: pointer; color: var(--accent); font-family: system-ui, sans-serif; font-size: 14px; }
+      details[open] summary { margin-bottom: 6px; }
+      ul, ol { margin: 8px 0; padding-left: 24px; } li { margin: 5px 0; }
+      footer { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 14px; color: var(--dim); font-size: 13px; font-family: system-ui, sans-serif; }
+      .toc { font-family: system-ui, sans-serif; font-size: 14.5px; background: var(--box); border: 1px solid var(--line); border-radius: 8px; padding: 12px 18px; margin: 18px 0; }
+      .toc ol { margin: 4px 0; padding-left: 22px; } .toc a { text-decoration: none; }
+      .note { font-size: 13.5px; color: var(--dim); }
+      mjx-container[display="true"] { margin: 10px 0 !important; overflow-x: auto; }
+      @media print {
+        body { background: #fff; }
+        .page { box-shadow: none; margin: 0; max-width: none; }
+        details { display: block; } details summary { display: none; }
+        .demo { break-inside: avoid; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and to original
+        papers on the open web, and it uses MathJax for its formulas. Read it
+        through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the
+        math.
+      </p>
+
+      <h1>Chapter 10 &middot; Learned Images and Learned Scenes</h1>
+      <div class="subtitle">
+        CSS 551 &middot; Advanced 3D Computer Graphics &mdash; course text
+      </div>
+      <div class="src">
+        Primary reading for Week 10. Pairs with the L10 lecture (&ldquo;PBR,
+        Diffusion Models &amp; Learned Scenes&rdquo;) and the Final Project studio.
+      </div>
+
+      <p class="lead">
+        Nine weeks of this course built a renderer from first principles: a
+        scene is data, three matrices carry a vertex to the screen, a surface is
+        a mesh dressed by a texture and lit by a local model. This chapter is
+        about the two things that renderer cannot do, and about the machinery
+        that does them. It cannot balance the light energy at a point, so we
+        finish the illumination story with the rendering equation. And it cannot
+        draw a picture from nothing: it needs a scene. The second half of the
+        chapter is about models that <em>learn</em>, either an image-generating
+        function from an archive of photographs (diffusion models) or one
+        scene from its own photographs (neural radiance fields and Gaussian
+        splatting). The lecture keeps the mathematics to one line at a time and
+        shows everything on live exhibits; this chapter is where the lines are
+        written out, including a treatment of images as functions that the
+        lecture only mentions in passing.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#honest-light">Honest light: the rendering equation and PBR</a></li>
+          <li><a href="#networks">A network is a function</a></li>
+          <li><a href="#embeddings">Embeddings, encoders, decoders, and one shared space</a></li>
+          <li><a href="#image-space">The space of images: vectors, functions, and the thin sheet</a></li>
+          <li><a href="#concept-map">The concept map is not invertible</a></li>
+          <li><a href="#diffusion">Diffusion: destroy, learn to undo, sample</a></li>
+          <li><a href="#scaling">From digits to Stable Diffusion: the three scalings</a></li>
+          <li><a href="#learned-scenes">Learned scenes: NeRF and Gaussian splatting</a></li>
+          <li><a href="#limits">What still breaks, and what graphics keeps</a></li>
+          <li><a href="#papers">The papers</a></li>
+          <li><a href="#exercises">Exercises</a></li>
+        </ol>
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="honest-light">1 &middot; Honest light: the rendering equation and PBR</h2>
+      <p>
+        Session 9 lit a point from the lights, the normal, and the eye, and
+        nothing else in the scene; the ambient constant stood in for all the
+        light that bounces. Three things follow that no patch can fix: the model
+        can reflect more light than arrives, it does not promise that swapping
+        the light and the eye leaves the picture unchanged, and it has no
+        indirect light at all. They are one gap: the local model never balances
+        the light energy at a point. The equation that does was written down by
+        Kajiya in 1986 (Chapter 1, Section 3). With \(\omega_o\) the direction
+        toward the eye, \(\omega_i\) a direction light arrives from, and
+        \(\mathbf{n}\) the surface normal,
+      </p>
+      \[
+        L_o(\mathbf{x}, \omega_o) \;=\; L_e(\mathbf{x}, \omega_o) \;+\;
+        \int_{\Omega} f_r(\mathbf{x}, \omega_i, \omega_o)\, L_i(\mathbf{x}, \omega_i)\,
+        (\mathbf{n}\cdot\omega_i)\, d\omega_i .
+      \]
+      <p>
+        Read it in words: the radiance leaving a point toward the eye is what
+        the point emits, plus the sum over every incoming direction of the
+        arriving radiance, weighted by the material&rsquo;s answer \(f_r\) (the
+        <strong>bidirectional reflectance distribution function</strong>, BRDF)
+        and by the cosine of the arrival angle. It is hard because \(L_i\) on the
+        right is some other point&rsquo;s \(L_o\): light bounces, and the equation
+        refers to itself. Path tracing estimates the integral by following random
+        paths; real-time engines approximate it with a local term plus tricks.
+      </p>
+      <p>
+        The material term is where <strong>physically based rendering</strong>
+        (PBR) lives. A rough surface is modeled as a field of microscopic mirrors
+        (microfacets); the Cook&ndash;Torrance specular BRDF is a product of a
+        normal-distribution term \(D\) (what fraction of facets face the
+        half-vector; roughness lives here, and GGX is the modern default shape),
+        a shadowing-masking term \(G\), and a Fresnel term \(F\), over a
+        normalization:
+      </p>
+      \[
+        f_r^{\text{spec}} \;=\; \frac{D(\mathbf{h})\, G(\omega_i,\omega_o)\, F(\omega_i,\mathbf{h})}
+        {4\, (\mathbf{n}\cdot\omega_i)(\mathbf{n}\cdot\omega_o)} .
+      \]
+      <p>
+        On top of it, every engine exposes two artist sliders: <em>metallic</em>
+        (a dielectric shows a colored diffuse term under a weak white specular;
+        a metal has no diffuse term and a specular tinted by its base color) and
+        <em>roughness</em> (Unity&rsquo;s smoothness is \(1 - \) roughness). Those
+        are the sliders in the Standard Shader, and the same parameterization is
+        what glTF and every modern renderer exchange.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=brdf-lobe" target="_blank" rel="noopener">BRDF lobes</a>:
+        the specular lobe of the course&rsquo;s Cornell scene as roughness
+        changes, Phong beside a GGX-shaped distribution. The two mappings from
+        roughness to lobe width are not calibrated to each other; the demo shows
+        shape, not units.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="networks">2 &middot; A network is a function</h2>
+      <div class="def">
+        <span class="tag">Definition (neural network)</span>
+        A <strong>neural network</strong> is a function \(f_\theta : \mathbb{R}^{n} \to \mathbb{R}^{m}\)
+        built from alternating linear maps and fixed nonlinearities, whose
+        behavior is set by a vector of <strong>weights</strong> \(\theta\). The
+        two-layer perceptron of the lecture&rsquo;s exhibit A is
+        \[
+          f_\theta(x) \;=\; b_2 + \sum_{h=1}^{H} w^{(2)}_h \,\tanh\!\big(w^{(1)}_h x + b^{(1)}_h\big),
+          \qquad \theta = (w^{(1)}, b^{(1)}, w^{(2)}, b_2) \in \mathbb{R}^{3H+1}.
+        \]
+      </div>
+      <p>
+        <strong>Training</strong> is not programming. Given examples
+        \((x_i, y_i)\), define a loss such as the mean squared error
+        \(\mathcal{L}(\theta) = \frac{1}{N}\sum_i (f_\theta(x_i) - y_i)^2\), and
+        repeat: compute the gradient \(\nabla_\theta \mathcal{L}\) (by the chain
+        rule, organized as <strong>backpropagation</strong>,
+        <a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart,
+        Hinton &amp; Williams 1986</a>), and move every weight a little against it,
+        \(\theta \leftarrow \theta - \eta \nabla_\theta \mathcal{L}\). Two facts
+        carry the rest of the chapter. First, capacity: a network with enough
+        hidden units can approximate any continuous function on a bounded domain
+        to any accuracy (<a href="https://doi.org/10.1007/BF02551274" target="_blank" rel="noopener">Cybenko 1989</a>,
+        <a href="https://doi.org/10.1016/0893-6080(91)90009-T" target="_blank" rel="noopener">Hornik 1991</a>).
+        Second, and more important for what follows, <em>between</em> the
+        examples a trained network is smooth: it interpolates rather than
+        snapping to the nearest data point. A lookup table has the first property
+        trivially and the second not at all.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=mlp-fit" target="_blank" rel="noopener">A network that learns</a>:
+        the 37-weight perceptron above is trained in your browser by gradient
+        descent on twelve points of a hidden curve. Drag <code>epochs</code>
+        from 0 and watch the curve bend a few steps per frame while the loss
+        plot falls; try 2 hidden units (it cannot bend enough) and 40 (it fits a
+        step with a smooth ramp).
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example</span>
+        With \(H = 12\) the perceptron has \(3\cdot 12 + 1 = 37\) weights. Full-batch
+        gradient descent on twelve points at learning rate \(0.05\) takes the
+        error from about \(1.7\) (random weights) to \(8\times10^{-3}\) after 400
+        steps and \(8\times10^{-4}\) after 3000; you can read those numbers off
+        the demo. Each step costs one forward and one backward pass over twelve
+        points, a few thousand multiplications, which is why it runs at frame
+        rate. The million-weight network of Section 6 trains by the same loop on
+        sixty thousand images; only the sizes change.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="embeddings">3 &middot; Embeddings, encoders, decoders, and one shared space</h2>
+      <div class="def">
+        <span class="tag">Definition (embedding)</span>
+        An <strong>embedding</strong> of a set of things (words, digits, images)
+        is a map from each thing to a vector in \(\mathbb{R}^d\), learned so that
+        things which behave alike land near each other. Similarity is measured
+        by distance or, more often, by the cosine of the angle between vectors,
+        \(\cos(u, v) = \frac{u\cdot v}{\|u\|\,\|v\|}\).
+      </div>
+      <p>
+        Nobody places the points. A network puts them where its task goes better;
+        the famous 2013 result was that word vectors trained only to predict
+        neighboring words end up supporting arithmetic, with &ldquo;king&rdquo;
+        minus &ldquo;man&rdquo; plus &ldquo;woman&rdquo; landing near
+        &ldquo;queen&rdquo; (<a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al.</a>).
+        The lecture&rsquo;s exhibit B is a smaller and more honest version: the
+        digit-drawing network of Section 6 carries a table of eleven
+        64-dimensional class vectors it learned only from denoising, and digits
+        that share strokes ended up as neighbors (4 nearest 9 with cosine
+        \(0.54\), 3 nearest 5 with \(0.52\), 7 nearest 9 with \(0.48\)).
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=embed-map" target="_blank" rel="noopener">Embeddings, read from the weights</a>:
+        the class table of the trained denoiser projected to its two principal
+        axes (which keep about a third of the variance; the readout&rsquo;s
+        cosines use all 64 dimensions).
+      </div>
+      <p>
+        An <strong>encoder</strong> is a network that maps a thing to its
+        embedding, \(E : \text{thing} \to \mathbb{R}^d\); a <strong>decoder</strong>
+        maps back, \(D : \mathbb{R}^d \to \text{thing}\). Trained together to
+        reproduce their input through a narrow middle,
+        \(\min_{E,D} \sum_i \|D(E(x_i)) - x_i\|^2\), they form an
+        <strong>autoencoder</strong>, and the middle is forced to keep only what
+        matters (<a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov 2006</a>).
+        Stable Diffusion&rsquo;s autoencoder is exactly this, with a variational
+        twist that keeps the latent well behaved: a \(512\times512\times3\) image
+        becomes a \(64\times64\times4\) latent, 48 times fewer numbers.
+      </p>
+      <p>
+        <strong>Two encoders, one space.</strong> Train an image encoder
+        \(E_I\) and a text encoder \(E_T\) side by side on hundreds of millions of
+        (image, caption) pairs with a <em>contrastive</em> objective: for each
+        batch, a matching pair must have a higher cosine than every mismatched
+        pair,
+      </p>
+      \[
+        \mathcal{L} \;=\; -\sum_{i} \log
+        \frac{\exp\big(\cos(E_I(x_i), E_T(t_i))/\tau\big)}
+             {\sum_{j} \exp\big(\cos(E_I(x_i), E_T(t_j))/\tau\big)} ,
+      \]
+      <p>
+        with a temperature \(\tau\). After training, a sentence and a photograph
+        are vectors in the same space, so &ldquo;aim the picture at this
+        caption&rdquo; becomes geometry. This is
+        <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP (Radford et al. 2021)</a>,
+        and every concept you can say in words is now a coordinate.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="image-space">4 &middot; The space of images: vectors, functions, and the thin sheet</h2>
+      <h3>4.1 The finite-dimensional view</h3>
+      <div class="def">
+        <span class="tag">Definition (image as a vector)</span>
+        An \(m\times n\) RGB image is a point of the vector space
+        \(\mathbb{R}^{3mn}\): list its numbers in a fixed order,
+        \(\mathbf{x} = (r_{11}, g_{11}, b_{11}, r_{12}, \dots, b_{mn})\), and it
+        is one point, or equivalently the vector from the origin to that point.
+        Displayable images occupy the cube \([0,1]^{3mn}\). A \(128\times128\)
+        RGB image has \(49{,}152\) coordinates; a \(512\times512\) one has
+        \(786{,}432\).
+      </div>
+      <p>
+        Everything the pipeline does to images is now linear algebra on that
+        vector. Averaging two images is adding two vectors and halving; a blur is
+        a linear operator; the difference between two frames is a vector whose
+        length is a measure of how much moved; the mean squared error between an
+        image and its noisy version is \(\|\mathbf{x} - \mathbf{y}\|^2 / 3mn\),
+        which is what the forward-process demo&rsquo;s PSNR readout is built from.
+        The picture to keep is that this space is enormous and almost entirely
+        empty of meaning: draw a point uniformly at random from the cube and you
+        get static, every time, because the set of images that look like anything
+        is a thin, folded, low-dimensional sheet inside it. Generation is the
+        problem of landing a new point on the sheet on purpose.
+      </p>
+
+      <h3>4.2 The function-space view</h3>
+      <p>
+        The vector view has a resolution baked in. A cleaner object is the image
+        as a <em>function</em>: a rule that assigns a color to every point of
+        the picture plane.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (image as a function)</span>
+        A continuous image is a function \(f : [0,1]^2 \to [0,1]^3\), from the
+        unit square to RGB. The set of all such functions with finite energy,
+        \[
+          \mathcal{I} \;=\; \Big\{ f : [0,1]^2 \to \mathbb{R}^3 \;\Big|\; \int_{[0,1]^2} \|f(u,v)\|^2\, du\, dv < \infty \Big\},
+        \]
+        is a vector space (the sum of two images and a scalar multiple of an
+        image are images), with the inner product and norm
+        \[
+          \langle f, g\rangle = \int_{[0,1]^2} f(u,v)\cdot g(u,v)\, du\, dv, \qquad
+          \|f\| = \sqrt{\langle f, f\rangle}.
+        \]
+        It is infinite-dimensional: no finite list of numbers pins down an
+        arbitrary \(f\).
+      </div>
+      <p>
+        The two views are related by <strong>sampling</strong>. An \(m\times n\)
+        raster is the function evaluated on a grid,
+        \(\mathbf{x}_{ij} = f(u_i, v_j)\) with \(u_i = (i - \tfrac12)/m\) and
+        \(v_j = (j-\tfrac12)/n\); this is the &ldquo;one look per pixel at its
+        center&rdquo; of Chapter 1&rsquo;s rasterization slides. Going the other
+        way, a raster defines a function by <strong>reconstruction</strong>: the
+        nearest-neighbor rule gives a piecewise-constant \(f\) (a mosaic of
+        \(3mn\) little box functions with the pixel values as coefficients),
+        bilinear interpolation gives a continuous one, and a band-limited
+        reconstruction gives the smoothest. In that language the vector
+        \(\mathbf{x}\in\mathbb{R}^{3mn}\) is the list of <em>coefficients</em> of
+        \(f\) in the box-function basis, and choosing a resolution is choosing
+        how many basis functions to keep. Other bases exist and matter: the
+        Fourier basis (sines and cosines of increasing frequency), in which JPEG
+        stores images by keeping the low-frequency coefficients and discarding
+        the rest, and wavelet bases, in which detail is organized by scale. An
+        image is the same function in every basis; only the numbers change.
+      </p>
+      <div class="aside">
+        <span class="tag">Aliasing, revisited</span>
+        Sampling is a linear map from \(\mathcal{I}\) to \(\mathbb{R}^{3mn}\)
+        and it throws information away: two different functions can produce the
+        same raster. When the discarded part matters (a checkerboard finer than
+        the pixel grid, an edge crossing pixels at an angle) the samples tell a
+        false story. That is <strong>aliasing</strong>, the disease of Chapter
+        1&rsquo;s raster-machines era, and the sampling theorem says exactly when
+        it cannot happen: a function with no frequencies above \(B\) is recovered
+        perfectly from samples spaced closer than \(1/2B\). Supersampling,
+        mipmaps, and motion blur are all ways of removing frequencies the grid
+        cannot carry <em>before</em> sampling, which is why they work.
+      </div>
+      <p>
+        Why bother with the function view in a course that renders rasters?
+        Three reasons that pay off within this chapter. First, several of the
+        pipeline&rsquo;s operations are stated most honestly on functions:
+        anti-aliasing is filtering before sampling; a texture is a function on
+        \([0,1]^2\) that the UV map pulls onto a surface (Session 8), and a
+        mipmap is that function at several bandwidths. Second, a scene can be a
+        function too: Section 8&rsquo;s NeRF is a network standing in for
+        \(F : \mathbb{R}^3\times S^2 \to \mathbb{R}^3\times\mathbb{R}_{\ge 0}\),
+        color and density at every point and viewing direction, with no mesh
+        anywhere, and the same idea (a network as a coordinate-to-value
+        function, an <em>implicit</em> or <em>neural field</em> representation)
+        now represents images, shapes, and volumes at any resolution. Third, the
+        generative models of Sections 6 and 7 are stated on vectors of a fixed
+        size, but what they learn is resolution-agnostic in spirit: the sheet of
+        natural images is a property of the functions, and a model trained at
+        one raster size is approximating the same sheet a model at another size
+        approximates. Diffusion in the continuous setting (on function space
+        directly) is an active research direction; this course stays in
+        \(\mathbb{R}^{3mn}\), where every statement below is literal.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (two images, one distance)</span>
+        Let \(f\) be uniform mid-gray, \(f(u,v) = (\tfrac12,\tfrac12,\tfrac12)\),
+        and \(g\) a vertical black-to-white ramp, \(g(u,v) = (u,u,u)\). Then
+        \(\|f - g\|^2 = 3\int_0^1\!\!\int_0^1 (\tfrac12 - u)^2\, du\, dv = 3\cdot\tfrac{1}{12} = \tfrac14\),
+        so \(\|f-g\| = \tfrac12\). Sample both on an \(m\times n\) grid and the
+        per-pixel mean squared error of the rasters converges to the same
+        \(\tfrac{1}{4}\) as \(m\to\infty\): the finite-dimensional distance is
+        the Riemann sum of the function-space one. Resolution changes the count
+        of numbers, not the geometry.
+      </div>
+
+      <h3>4.3 The thin sheet, and what it is made of</h3>
+      <p>
+        Whatever the view, the images that mean something form a small region:
+        a curved, low-dimensional set often called the <em>manifold of natural
+        images</em>, though it is neither smooth nor a single piece. Two facts
+        about it make generation possible. It is <em>thin</em>: nearly every
+        direction away from a photograph leads immediately to something that is
+        not a photograph, which is why random points are static. And it is
+        <em>structured</em>: moving along it changes content in ways that have
+        names (a cat turns its head, the light warms, the lens zooms), so the
+        sheet has coordinates you can say in words, which is exactly what the
+        encoder of Section 3 computes.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="concept-map">5 &middot; The concept map is not invertible</h2>
+      <p>
+        Let \(E\) be the image encoder. It is <strong>many-to-one</strong> by
+        design: thousands of cat photographs land on one &ldquo;cat&rdquo;
+        embedding, because throwing away which cat, which pose, and which light
+        is the whole point of a concept. So \(E\) has no inverse function. The
+        honest inverse of a concept is a <em>conditional distribution</em>
+        \(p(\mathbf{x}\mid c)\) over images, and a generator has to draw from it.
+        A decoder that took only the concept would be forced to return one image
+        per caption forever (which is what early text-to-image systems did);
+        something must supply the missing choices. Diffusion supplies them as
+        noise: every sample starts from a different random point
+        \(\mathbf{x}_T \sim \mathcal{N}(0, I)\), which contains more than enough
+        arbitrary information, and the model spends its steps turning that noise
+        into a specific image consistent with \(c\). Different noise, different
+        cat; the caption steers, the noise decides. A one-to-many problem becomes
+        a sequence of one-to-one steps, each of which a network can learn.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="diffusion">6 &middot; Diffusion: destroy, learn to undo, sample</h2>
+      <h3>6.1 The forward process</h3>
+      <p>
+        Fix a schedule \(\bar\alpha(t)\) that falls from \(1\) at \(t=0\) to \(0\)
+        at \(t=1\) (the course&rsquo;s demos use the cosine schedule of
+        <a href="https://arxiv.org/abs/2102.09672" target="_blank" rel="noopener">Nichol &amp; Dhariwal 2021</a>).
+        The forward process mixes a clean image with Gaussian noise in a
+        proportion set by \(t\):
+      </p>
+      \[
+        \mathbf{x}_t \;=\; \sqrt{\bar\alpha(t)}\;\mathbf{x}_0 \;+\; \sqrt{1-\bar\alpha(t)}\;\boldsymbol{\epsilon},
+        \qquad \boldsymbol{\epsilon}\sim\mathcal{N}(0, I).
+      \]
+      <p>
+        Nothing is learned here. At \(t=1\) every image has become the same
+        standard Gaussian, which is the whole point: that is the one
+        distribution we can sample from trivially. The signal-to-noise ratio is
+        \(\bar\alpha/(1-\bar\alpha)\); the forward-process demo reports it in
+        decibels as it dissolves the course&rsquo;s Cornell render.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-image" target="_blank" rel="noopener">A real picture, dissolving</a>:
+        the render as \(\mathbf{x}_0\) beside \(\mathbf{x}_t\) for the \(t\) on the
+        slider, with \(\bar\alpha\), SNR and PSNR.
+      </div>
+
+      <h3>6.2 The reverse process and the exact denoiser</h3>
+      <p>
+        The learned part answers a local question: given \(\mathbf{x}_t\) and
+        \(t\), where was \(\mathbf{x}_0\)? For a <em>finite</em> dataset
+        \(\{\mathbf{x}^{(i)}\}\) the best possible answer is computable in closed
+        form. Since \(\mathbf{x}_t\) given \(\mathbf{x}_0=\mathbf{x}^{(i)}\) is
+        Gaussian with mean \(\sqrt{\bar\alpha}\,\mathbf{x}^{(i)}\) and variance
+        \(1-\bar\alpha\), Bayes&rsquo; rule gives the posterior mean
+      </p>
+      \[
+        \hat{\mathbf{x}}_0(\mathbf{x}_t, t) \;=\; \mathbb{E}[\mathbf{x}_0\mid\mathbf{x}_t]
+        \;=\; \sum_i w_i\, \mathbf{x}^{(i)}, \qquad
+        w_i \;\propto\; \exp\!\Big(-\frac{\|\mathbf{x}_t - \sqrt{\bar\alpha}\,\mathbf{x}^{(i)}\|^2}{2(1-\bar\alpha)}\Big),
+      \]
+      <p>
+        a softmax-weighted average of the training points. This is what the
+        spiral demo and the digits demo compute, exactly, and it is what a
+        network is trained to approximate for datasets too large or too
+        high-dimensional to average over. It is also, by <strong>Tweedie&rsquo;s
+        formula</strong>, the same thing as the <em>score</em>: the gradient of
+        the log density of the noised data,
+        \(\nabla_{\mathbf{x}_t}\log p_t(\mathbf{x}_t) = \big(\sqrt{\bar\alpha}\,\hat{\mathbf{x}}_0 - \mathbf{x}_t\big)/(1-\bar\alpha)\),
+        which is the vector field the spiral demo draws as arrows. Predicting the
+        clean image, predicting the noise
+        \(\hat{\boldsymbol\epsilon} = (\mathbf{x}_t - \sqrt{\bar\alpha}\,\hat{\mathbf{x}}_0)/\sqrt{1-\bar\alpha}\),
+        and predicting the score are three parameterizations of one function.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-2d" target="_blank" rel="noopener">The mechanism, on dots</a>
+        (400 points on a spiral, the exact denoiser, arrows for the score field,
+        DDIM versus DDPM stepping), then
+        <a href="../lib/demo.html?demo=diffusion-digits" target="_blank" rel="noopener">real digits, the exact denoiser</a>
+        (2,000 MNIST digits as points of \(\mathbb{R}^{400}\)). In the second,
+        every sample lands exactly on a training digit: the panel that compares
+        each sample with its nearest training digit reads distance \(0.000\),
+        &ldquo;memorized&rdquo;. An exact denoiser for a finite set can only
+        return the set.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (two training points)</span>
+        Let the dataset be two scalars, \(x^{(1)} = -1\) and \(x^{(2)} = +1\), and
+        take a time where \(\bar\alpha = \tfrac14\), so
+        \(\sqrt{\bar\alpha} = \tfrac12\) and \(1-\bar\alpha = \tfrac34\). At
+        \(x_t = 0.3\) the two logits are
+        \(-\tfrac{(0.3+0.5)^2}{1.5} = -0.4267\) and
+        \(-\tfrac{(0.3-0.5)^2}{1.5} = -0.0267\); the softmax weights are
+        \(0.401\) and \(0.599\), and the posterior mean is
+        \(\hat x_0 = -0.401 + 0.599 = 0.197\): a pull toward the nearer point,
+        not a jump onto it. As \(t\to0\), \(1-\bar\alpha\to0\), the weights become
+        one-hot, and \(\hat x_0\) becomes exactly the nearest training point,
+        which is the memorization the digits demo shows. Keeping the kernel
+        variance from vanishing (the demo&rsquo;s <code>smooth</code> knob adds
+        \(h^2\) to \(1-\bar\alpha\)) keeps the average going to the end, and the
+        samples land between training points.
+      </div>
+
+      <h3>6.3 Training</h3>
+      <p>
+        The training loop is one line: pick an image \(\mathbf{x}_0\) and a
+        random \(t\), draw \(\boldsymbol\epsilon\), form \(\mathbf{x}_t\), ask the
+        network \(\boldsymbol\epsilon_\theta(\mathbf{x}_t, t)\) for the noise (or
+        \(\hat{\mathbf{x}}_\theta\) for the image), and minimize the squared
+        error,
+      </p>
+      \[
+        \mathcal{L}(\theta) \;=\; \mathbb{E}_{\mathbf{x}_0,\, t,\, \boldsymbol\epsilon}
+        \Big[\, \big\|\boldsymbol\epsilon - \boldsymbol\epsilon_\theta(\mathbf{x}_t, t)\big\|^2 \Big].
+      \]
+      <p>
+        Every step is a small, well-posed regression against a target the
+        trainer generated itself, which is why diffusion trains stably where
+        adversarial models fought their own training. This is
+        <a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">DDPM (Ho, Jain &amp; Abbeel 2020)</a>;
+        the idea comes from
+        <a href="https://arxiv.org/abs/1503.03585" target="_blank" rel="noopener">Sohl-Dickstein et al. 2015</a>,
+        who borrowed it from nonequilibrium thermodynamics, and the same
+        function was reached from the score side by
+        <a href="https://arxiv.org/abs/1907.05600" target="_blank" rel="noopener">Song &amp; Ermon 2019</a>.
+        The course&rsquo;s own network (exhibit G) is a class-conditional
+        perceptron with about a million weights, trained by exactly this loop
+        on 60,000 digits for fifteen minutes on a laptop CPU, predicting the
+        clean image (<code>tools/train-mlp.py</code>).
+      </p>
+
+      <h3>6.4 Sampling</h3>
+      <p>
+        Start from \(\mathbf{x}_T\sim\mathcal{N}(0,I)\) and step \(t\) down a
+        chosen sequence \(t_K > \dots > t_0 = 0\). At each step form
+        \(\hat{\mathbf{x}}_0\) from the network, recover the implied noise
+        \(\hat{\boldsymbol\epsilon}\), and move to the next time. The
+        <a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">DDIM family (Song, Meng &amp; Ermon 2021)</a>
+        writes the update as
+      </p>
+      \[
+        \mathbf{x}_{t'} \;=\; \sqrt{\bar\alpha(t')}\;\hat{\mathbf{x}}_0 \;+\;
+        \sqrt{1-\bar\alpha(t') - \sigma^2}\;\hat{\boldsymbol\epsilon} \;+\; \sigma\,\mathbf{z},
+        \qquad \mathbf{z}\sim\mathcal{N}(0,I),
+      \]
+      <p>
+        with \(\sigma = 0\) giving the deterministic DDIM sampler (same start,
+        same landing, a few dozen steps) and \(\sigma\) at its DDPM value giving
+        the original stochastic one (fresh noise each step, many steps). Fewer
+        steps trade detail and diversity for speed; distillation trains a
+        student to jump where the teacher walked, down to a handful of steps.
+        <strong>Classifier-free guidance</strong>
+        (<a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans 2022</a>)
+        trains the network both with and without its condition \(c\) and, at
+        sampling time, exaggerates the difference by a scale \(w\):
+        \(\hat{\mathbf{x}}_0 \leftarrow \hat{\mathbf{x}}_0(\varnothing) + w\,\big(\hat{\mathbf{x}}_0(c) - \hat{\mathbf{x}}_0(\varnothing)\big)\).
+        Around \(w \approx 7\) prompts are followed closely; too high and images
+        saturate and repeat.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=diffusion-digits" target="_blank" rel="noopener">Digits nobody wrote</a>
+        (the <code>smooth</code> knob: exact is memorization, \(h\approx3\) makes
+        novel blends, \(h=5\) collapses to one blurry average), then
+        <a href="../lib/demo.html?demo=diffusion-net" target="_blank" rel="noopener">the network draws</a>:
+        the trained million-weight denoiser samples digits it never saw, with
+        the class buttons as conditioning and <code>guide</code> as \(w\). Every
+        sample&rsquo;s distance to the nearest training digit is far above the
+        memorization threshold.
+      </div>
+
+      <!-- ============================================================ -->
+      <h2 id="scaling">7 &middot; From digits to Stable Diffusion: the three scalings</h2>
+      <p>
+        Nothing in the recipe changes between the digit network and the largest
+        image models; three things scale. <strong>The point gets bigger, so
+        diffuse a latent.</strong> A \(512\times512\) image is 786,432 numbers;
+        denoising that a thousand times per picture is unaffordable. Latent
+        diffusion runs the whole process on the autoencoder&rsquo;s
+        \(64\times64\times4\) latent and decodes once at the end
+        (<a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al. 2022</a>);
+        that is Stable Diffusion, and it is why the method fits on a gaming GPU.
+        <strong>The condition gets richer, so put text in the class slot.</strong>
+        The class embedding the digit network reads becomes a CLIP text
+        embedding consulted at every layer through cross-attention; guidance is
+        unchanged. <strong>The network gets bigger.</strong> U-Nets in 2020 to
+        2022, then transformers over image patches
+        (<a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noopener">DiT, Peebles &amp; Xie 2023</a>);
+        quality followed scale. The two text-to-image systems that made the
+        public notice in 2022 took different routes to the same place,
+        <a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">DALL&middot;E 2</a>
+        diffusing in CLIP&rsquo;s embedding space and
+        <a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Imagen</a>
+        conditioning on a large language model&rsquo;s text embedding.
+      </p>
+      <p>
+        Two developments matter most to a graphics course.
+        <a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">ControlNet (Zhang, Rao &amp; Agrawala 2023)</a>
+        conditions the denoiser on a structural image, a depth map, a normal map
+        or an edge image, and makes it keep that structure while painting the
+        appearance; depth and normals are the pipeline&rsquo;s own by-products
+        (Sessions 6 and 7), so geometry and camera come from the renderer, where
+        you have control, and appearance from the model. And an image model can
+        train a 3D scene:
+        <a href="https://arxiv.org/abs/2209.14988" target="_blank" rel="noopener">DreamFusion (Poole et al. 2022)</a>
+        optimizes a NeRF so that its renders, from random viewpoints, score well
+        under a text-conditioned image model, with the gradients flowing back
+        through the differentiable renderer (<strong>score distillation</strong>).
+        Video is the same recipe with a time axis: a block of latents attended
+        across frames
+        (<a href="https://arxiv.org/abs/2204.03458" target="_blank" rel="noopener">Ho et al. 2022</a>),
+        scaled by 2024 to minute-long clips.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="learned-scenes">8 &middot; Learned scenes: NeRF and Gaussian splatting</h2>
+      <p>
+        The other half of the neural era learns one scene from its own
+        photographs and renders it from viewpoints the camera never saw. A
+        <strong>neural radiance field</strong> (NeRF, Mildenhall et al. 2020)
+        represents the scene as a function, a small network
+        \(F_\theta : (\mathbf{p}, \mathbf{d}) \mapsto (\mathbf{c}, \sigma)\)
+        from a 3D point and a viewing direction to a color and a density, with
+        no mesh anywhere. A pixel is made by marching a camera ray
+        \(\mathbf{r}(s) = \mathbf{o} + s\,\mathbf{d}\) through it and
+        compositing front to back:
+      </p>
+      \[
+        C(\mathbf{r}) \;=\; \int_{s_n}^{s_f} T(s)\, \sigma(\mathbf{r}(s))\, \mathbf{c}(\mathbf{r}(s), \mathbf{d})\, ds,
+        \qquad T(s) = \exp\!\Big(-\int_{s_n}^{s} \sigma(\mathbf{r}(u))\, du\Big),
+      \]
+      <p>
+        where \(T\) is how much of the ray survives to depth \(s\). The integral
+        is estimated by sampling points along the ray, and the whole march is
+        differentiable, so training is the march run backwards: gradient descent
+        on \(\theta\) until rendered rays match the training photographs. It is
+        slow, hundreds of network evaluations per ray, which is why
+        <strong>3D Gaussian splatting</strong> (Kerbl et al. 2023) keeps the
+        learn-from-photos idea and replaces the network with millions of explicit
+        primitives, anisotropic Gaussians with position, covariance,
+        view-dependent color and opacity, rendered by projecting each onto the
+        screen and blending back to front. That is a rasterizer, so it runs in
+        real time, and it needs the course&rsquo;s view and projection matrices
+        to do it; it is still trained by gradient descent through a
+        differentiable renderer.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=gsplat" target="_blank" rel="noopener">A real splat scene</a>:
+        the &ldquo;bonsai&rdquo; capture from the Mip-NeRF 360 dataset, about
+        240,000 Gaussians rendered live in the browser (attribution in
+        <code>media/gsplat/ATTRIBUTION.md</code>).
+      </div>
+      <table>
+        <tr><th>Learned scene (NeRF, 3DGS)</th><th>Learned image (diffusion)</th></tr>
+        <tr><td>one scene, from its own photos</td><td>all images, from an archive</td></tr>
+        <tr><td>a camera you can move</td><td>no camera, no scene</td></tr>
+        <tr><td>renders new views of the same thing</td><td>samples new things</td></tr>
+        <tr><td>trained through a differentiable renderer (your \(V\) and \(P\) inside it)</td><td>trained by predicting noise; renders nothing itself</td></tr>
+        <tr><td>meets diffusion in score distillation</td><td>meets the pipeline in ControlNet on your depth buffer</td></tr>
+      </table>
+
+      <!-- ============================================================ -->
+      <h2 id="limits">9 &middot; What still breaks, and what graphics keeps</h2>
+      <p>
+        A diffusion model has no scene, so nothing in it enforces that the cup on
+        frame one is the cup on frame sixty, that objects fall, that hands have
+        five fingers, or that a sign spells a word; it has no camera to move an
+        inch and no edit that leaves everything else fixed. Graphics has exactly
+        those things and lacks the model&rsquo;s taste for appearance. The field
+        is merging them from both sides: engines that ship generated textures
+        and assets, differentiable renderers that let images train scenes, and
+        world models that generate the next frame in response to a controller
+        input. Neither half erases the pipeline you built; both stand on it.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="papers">10 &middot; The papers</h2>
+      <table>
+        <tr><th>Year</th><th>Paper</th><th>What it added</th></tr>
+        <tr><td>1986</td><td><a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart, Hinton &amp; Williams</a></td><td>backpropagation</td></tr>
+        <tr><td>1989 / 1991</td><td><a href="https://doi.org/10.1007/BF02551274" target="_blank" rel="noopener">Cybenko</a>; <a href="https://doi.org/10.1016/0893-6080(91)90009-T" target="_blank" rel="noopener">Hornik</a></td><td>universal approximation</td></tr>
+        <tr><td>2006</td><td><a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov</a></td><td>deep autoencoders</td></tr>
+        <tr><td>2013</td><td><a href="https://arxiv.org/abs/1301.3781" target="_blank" rel="noopener">Mikolov et al., word2vec</a></td><td>embeddings that support arithmetic</td></tr>
+        <tr><td>2015</td><td><a href="https://arxiv.org/abs/1503.03585" target="_blank" rel="noopener">Sohl-Dickstein et al.</a></td><td>diffusion probabilistic models: destroy, learn to undo</td></tr>
+        <tr><td>2019</td><td><a href="https://arxiv.org/abs/1907.05600" target="_blank" rel="noopener">Song &amp; Ermon</a></td><td>the score (vector field) view</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho, Jain &amp; Abbeel, DDPM</a></td><td>predict the noise; it works at scale</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2010.02502" target="_blank" rel="noopener">Song, Meng &amp; Ermon, DDIM</a></td><td>deterministic, few-step sampling</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2003.08934" target="_blank" rel="noopener">Mildenhall et al., NeRF</a></td><td>a scene as a learned field</td></tr>
+        <tr><td>2021</td><td><a href="https://arxiv.org/abs/2105.05233" target="_blank" rel="noopener">Dhariwal &amp; Nichol</a></td><td>guidance; quality past GANs</td></tr>
+        <tr><td>2021</td><td><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., CLIP</a></td><td>text and images, one space</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2207.12598" target="_blank" rel="noopener">Ho &amp; Salimans</a></td><td>classifier-free guidance</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2112.10752" target="_blank" rel="noopener">Rombach et al., latent diffusion</a></td><td>Stable Diffusion: diffuse in a latent</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2204.06125" target="_blank" rel="noopener">Ramesh et al., DALL&middot;E 2</a>; <a href="https://arxiv.org/abs/2205.11487" target="_blank" rel="noopener">Saharia et al., Imagen</a></td><td>text-to-image at scale, two routes</td></tr>
+        <tr><td>2022</td><td><a href="https://arxiv.org/abs/2209.14988" target="_blank" rel="noopener">Poole et al., DreamFusion</a></td><td>text-to-3D by score distillation</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2302.05543" target="_blank" rel="noopener">Zhang, Rao &amp; Agrawala, ControlNet</a></td><td>conditioning on depth, normals, edges</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2212.09748" target="_blank" rel="noopener">Peebles &amp; Xie, DiT</a></td><td>the network is whatever scales</td></tr>
+        <tr><td>2023</td><td><a href="https://arxiv.org/abs/2308.04079" target="_blank" rel="noopener">Kerbl et al., 3D Gaussian splatting</a></td><td>learned scenes at real-time rates</td></tr>
+      </table>
+      <p>
+        The two on-ramps for a graduate student are the 2020 DDPM paper and the
+        2022 latent-diffusion paper; read them the way Chapter 1 describes
+        (figures first, then results, then the method with a pencil).
+      </p>
+
+      <!-- ============================================================ -->
+      <h2 id="exercises">11 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (dimension)</span>
+        A 1080p RGB frame is \(1920\times1080\). What is the dimension of the
+        vector space it lives in? If a video is 30 frames per second, what is the
+        dimension of one second of video?
+        <details><summary>Solution</summary>
+          \(3\cdot1920\cdot1080 = 6{,}220{,}800\). One second is 30 such vectors
+          stacked, \(186{,}624{,}000\) coordinates: the &ldquo;3D block of
+          latents&rdquo; of video diffusion is a block of exactly this shape,
+          before the autoencoder shrinks it.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (function space)</span>
+        Let \(f(u,v) = (u, 0, 0)\) and \(g(u,v) = (0, v, 0)\) on \([0,1]^2\).
+        Compute \(\langle f, g\rangle\), \(\|f\|\), and \(\|f - g\|\).
+        <details><summary>Solution</summary>
+          \(\langle f,g\rangle = \int\!\!\int (u\cdot0 + 0\cdot v + 0)\,du\,dv = 0\): the
+          images are orthogonal (no channel overlaps).
+          \(\|f\|^2 = \int_0^1\!\!\int_0^1 u^2\,du\,dv = \tfrac13\), so
+          \(\|f\| = 1/\sqrt3\); by symmetry \(\|g\| = 1/\sqrt3\), and
+          \(\|f-g\|^2 = \|f\|^2 + \|g\|^2 = \tfrac23\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (sampling and aliasing)</span>
+        A gray image is \(f(u,v) = \tfrac12 + \tfrac12\cos(2\pi k u)\), a vertical
+        stripe pattern with \(k\) periods across the picture. You sample it on an
+        \(m\times m\) grid at pixel centers. For \(m = 8\), what do the samples
+        look like when \(k = 8\)? When \(k = 4\)?
+        <details><summary>Solution</summary>
+          With \(u_i = (i-\tfrac12)/8\) and \(k=8\), \(2\pi k u_i = 2\pi(i-\tfrac12)\),
+          so \(\cos = \cos(\pi(2i-1)) = -1\) for every \(i\): the raster is uniformly
+          black, and the stripes have vanished. Eight periods across eight
+          pixels is exactly at the sampling rate, past the Nyquist limit of four,
+          so the samples alias to a constant. With \(k = 4\), the samples
+          all sit at zero crossings: \(\cos(\pi(i-\tfrac12)) = 0\) for every
+          \(i\), a uniform mid gray, again losing the pattern (four periods on
+          eight pixels is exactly the Nyquist limit). Any \(k < 4\) survives:
+          \(k = 2\) gives the sample pattern \(+,-,-,+,+,-,-,+\) at amplitude
+          \(0.707\), two periods, visibly stripes. Supersampling or a blur before sampling would remove the
+          frequencies the grid cannot carry instead of letting them masquerade
+          as something else.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (the exact denoiser)</span>
+        Repeat the worked example of Section 6.2 with three training scalars
+        \(\{-1, 0, +1\}\), \(\bar\alpha = \tfrac14\), and \(x_t = 0.3\). Which point
+        gets the largest weight, and what is \(\hat x_0\)? Then argue, without
+        computing, what \(\hat x_0\) becomes as \(\bar\alpha \to 0\).
+        <details><summary>Solution</summary>
+          Logits \(-\frac{(x_t - \tfrac12 x^{(i)})^2}{1.5}\): for \(-1, 0, +1\) they
+          are \(-0.4267, -0.0600, -0.0267\). Softmax weights \(0.254, 0.367, 0.379\);
+          the \(+1\) point wins narrowly over \(0\). \(\hat x_0 = -0.254 + 0 + 0.379 = 0.125\).
+          As \(\bar\alpha \to 0\) the logits all tend to \(-x_t^2/2\), the weights
+          become equal, and \(\hat x_0\) tends to the data mean, \(0\): at high
+          noise the best guess is the average image, which is why the first
+          steps of every sampling run look like a grey blur.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 5 (guidance)</span>
+        With \(\hat{\mathbf{x}}_0(\varnothing) = (0.2, 0.2)\) and
+        \(\hat{\mathbf{x}}_0(c) = (0.5, 0.1)\), compute the guided estimate for
+        \(w = 1\), \(w = 3\), and \(w = 0\). What does \(w = 0\) mean?
+        <details><summary>Solution</summary>
+          \(w=1\): \((0.5, 0.1)\), plain conditioning. \(w=3\):
+          \((0.2, 0.2) + 3\,(0.3, -0.1) = (1.1, -0.1)\), the class direction
+          exaggerated (and clamped to the valid range in practice, which is where
+          saturation comes from). \(w=0\): \((0.2, 0.2)\), the unconditional
+          estimate; the condition is ignored.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 6 (non-invertibility)</span>
+        Explain in two sentences why a network that maps a caption directly to an
+        image (no noise, no sampling) cannot produce two different cats for
+        &ldquo;a cat&rdquo;, and where a diffusion model gets the difference.
+        <details><summary>Solution</summary>
+          A network is a function: the same input gives the same output, so a
+          caption-to-image network returns one image per caption. A diffusion
+          model starts each sample from a different random noise vector, which
+          supplies the choices the caption does not specify; the caption steers,
+          the noise decides.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; Autumn 2026 &middot; course text, Chapter 10 v1.0
+        &middot; prepared by Dr. Marcel Gavriliu. Interactive demos in the course
+        library; MNIST (LeCun, Cortes, Burges) CC BY-SA 3.0; the bonsai scene per
+        <code>media/gsplat/ATTRIBUTION.md</code>.
+      </footer>
+    </div>
+  </body>
+</html>

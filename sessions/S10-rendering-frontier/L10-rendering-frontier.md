@@ -33,6 +33,8 @@
 
   MEDIA: ../../media/generative/*.jpg, license-verified; credit lines copied
   VERBATIM from media/generative/CREDITS.md.
+  READING: ../../handouts/ch10-learned-images-and-scenes.html (Chapter 10, with
+  MathJax) is linked from the Tonight and Wrap slides.
 
   Session plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Intro                                   3 min
@@ -60,6 +62,8 @@
 - **Learned images: diffusion** — destroy an image with noise, learn to undo it, sample; text, control, video; a toy you can drive
 - **Learned scenes: NeRF and 3DGS** — one scene learned from photographs, rendered live; where learned images and learned scenes meet
 - **The course in one picture** — every piece you built this quarter, assembled
+
+<small>Reading: <a href="../../handouts/ch10-learned-images-and-scenes.html">Chapter 10</a>, where tonight's lines are written out (the rendering equation, the exact denoiser, images as functions).</small>
 
 ---
 
@@ -704,6 +708,7 @@ You can now read the pipeline in any engine — or any research paper — and **
 - **Thursday** — the Final Project **studio** (`lab10`): per-team checkpoint + last work session with the instructor in the room, before the finals-week demo
 - **Final Project** — due and demoed in **finals week**; *format and dates on Canvas*
 - **Course evaluations** — please fill out the **course evaluation** for CSS 551; your candid feedback shapes how this course is taught next — it genuinely matters, and it is anonymous
+- **Read Chapter 10** — tonight's equations, the exact denoiser worked by hand, images as functions, and the papers
 
 Ten weeks ago a triangle on a screen was somebody else's magic. Now it is **yours** — placed by **W**, viewed by **V**, projected by **P**, and lit by a model you can **derive**. Go build something with it.
 

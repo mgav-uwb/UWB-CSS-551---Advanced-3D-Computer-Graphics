@@ -125,6 +125,9 @@ const HANDOUTS = {
   ch01: { href:"handouts/ch01-intro-3d-graphics.html",
           title:"Ch. 1 · Intro to 3D Computer Graphics",
           desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
+  ch10: { href:"handouts/ch10-learned-images-and-scenes.html",
+          title:"Ch. 10 · Learned Images and Learned Scenes",
+          desc:"the rendering equation and PBR; networks, embeddings, the space of images (as vectors and as functions); diffusion written out; NeRF and splats; the papers" },
 };
 
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
@@ -211,6 +214,7 @@ const SESSIONS = [
   { id:"S10", title:"PBR, Diffusion Models &amp; Learned Scenes",
     deck:"sessions/S10-rendering-frontier/index.html",
     lab:"sessions/S10-rendering-frontier/lab10/index.html",
+    handouts:["ch10"],
     demos:["brdf-lobe","mlp-fit","embed-map","diffusion-image","diffusion-2d","diffusion-digits","diffusion-net","gsplat"] },
 ];
 
