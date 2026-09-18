@@ -70,3 +70,12 @@
         .demo { break-inside: avoid; }
       }
     
+      /* figures (added with the illustrated chapters) */
+      figure { margin: 20px 0; }
+      figure img { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+      figure img.pix { image-rendering: pixelated; image-rendering: crisp-edges; }
+      figcaption { font-family: system-ui, sans-serif; font-size: 13.5px; color: var(--dim); margin-top: 8px; line-height: 1.5; }
+      figcaption mjx-container { font-size: 0.95em; }
+      .ex ol li, .ex ul li { margin: 4px 0; }
+      .ex table { font-size: 14px; }
+      .steps td:first-child { white-space: nowrap; font-weight: 600; color: #444; }
