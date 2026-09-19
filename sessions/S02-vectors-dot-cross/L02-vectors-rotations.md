@@ -43,3 +43,5 @@
 
 <small>Thursday's studio builds EX1–EX3 from the first hour. MP1 is due this week; MP2 goes out.</small>
 
+<small>Reading: the course text, <a href="../../textbook/vectors.html">Vectors</a> and <a href="../../textbook/rotation.html">Rotation</a>, where tonight's numbers are worked with figures and exercises.</small>
+

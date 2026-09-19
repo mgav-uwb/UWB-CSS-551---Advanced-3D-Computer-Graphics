@@ -19,10 +19,12 @@
       </div>
 
       <p class="lead">
-        Read the history first; it gives every later topic an address. The five
-        chapters that follow it are the mathematics behind the course&rsquo;s
-        last lecture, written out: honest light, then the machinery of models
-        that learn images and scenes. Each states its definitions, evaluates
+        Read the history first; it gives every later topic an address. The three
+        foundations chapters (vectors, rotation, affine transformations) are the
+        mathematics every later chapter stands on. The five that follow are the
+        mathematics behind the course&rsquo;s last two lectures: honest light,
+        then the machinery of models that learn images and scenes. More chapters
+        are being added in blocks of three. Each states its definitions, evaluates
         every formula by hand at least once in a worked example, and draws its
         figures from the same library the course&rsquo;s demos run, so a figure
         and the demo beside it cannot disagree.
@@ -31,6 +33,9 @@
       <table>
         <tr><th>Chapter</th><th>What it covers</th><th>Needs</th></tr>
         <tr><td><a href="history-of-graphics.html">A History of Computer Graphics</a></td><td>seventy-five years in eight overlapping eras; the seminal papers, people and places; the hardware pipelines; how to read a SIGGRAPH paper</td><td>nothing</td></tr>
+        <tr><td><a href="vectors.html">Vectors: Dot and Cross Products, Lines and Planes</a></td><td>vectors as displacements; the dot product (angle, projection, which side) and the cross product (normal, area, a frame) worked on one pair; lines, segments and the clamp; planes and signed distance</td><td>nothing</td></tr>
+        <tr><td><a href="rotation.html">Rotation: Axis-Angle, Quaternions, Euler Angles</a></td><td>columns are where the axes land; Rodrigues derived from the projection split; quaternions with the sandwich verified by hand; composition and slerp; gimbal lock shown; drift measured in single precision</td><td>the vectors chapter</td></tr>
+        <tr><td><a href="affine-transforms.html">Affine Transformations over Homogeneous Coordinates</a></td><td>the affine family and what it preserves; the homogeneous lift; composition and inverse as block formulas; a matrix as a frame; TRS and the shear it cannot store; normals by the inverse transpose; pivots; where affine ends</td><td>the two chapters above</td></tr>
         <tr><td><a href="light-transport-pbr.html">Light Transport and PBR</a></td><td>the rendering equation term by term; the BRDF and energy conservation; microfacets (D, G, F) with a full evaluation by hand; the metallic/roughness model on a computed sphere grid; path tracing versus real time</td><td>a local illumination model (Phong)</td></tr>
         <tr><td><a href="neural-nets-embeddings.html">Neural Networks and Embeddings</a></td><td>a network as a function, with a forward pass and a gradient step by hand; capacity and smoothness between examples; embeddings read from the course&rsquo;s trained network; encoders, decoders, and two encoders trained into one space (CLIP) with the contrastive loss worked</td><td>vectors and dot products</td></tr>
         <tr><td><a href="image-space.html">The Space of Images</a></td><td>images as vectors and as functions; sampling, the cosine basis, and aliasing unrolled; the thin sheet of natural images measured on 2,000 digits; why the concept map is not invertible</td><td>the two chapters above</td></tr>
@@ -45,7 +50,7 @@
         <code>handouts/ch10-&hellip;</code> redirect here.
       </p>
 
-      <footer>CSS 551 &middot; course text index v2.0 &middot; prepared by Dr. Marcel Gavriliu.</footer>
+      <footer>CSS 551 &middot; course text index v2.1 &middot; prepared by Dr. Marcel Gavriliu.</footer>
     </div>
   </body>
 </html>

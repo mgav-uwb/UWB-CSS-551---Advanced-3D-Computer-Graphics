@@ -46,3 +46,5 @@
 
 <small>Thursday's studio is the projection trio (EX4–EX6). MP2 is due this week; MP3 goes out.</small>
 
+<small>Reading: the course text, <a href="../../textbook/affine-transforms.html">Affine Transformations over Homogeneous Coordinates</a>, where every block formula of tonight is worked with figures and exercises.</small>
+

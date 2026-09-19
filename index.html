@@ -124,6 +124,15 @@ const QUICKLINKS = [
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
 const HANDOUTS = {
+  vectors:  { href:"textbook/vectors.html",
+              title:"Text · Vectors",
+              desc:"dot and cross products worked on one pair; lines, segments, planes and signed distance" },
+  rotation: { href:"textbook/rotation.html",
+              title:"Text · Rotation",
+              desc:"columns are where the axes land; Rodrigues; quaternions verified by hand; slerp; gimbal lock; drift measured" },
+  affine:   { href:"textbook/affine-transforms.html",
+              title:"Text · Affine Transformations",
+              desc:"the affine family; the homogeneous lift; block formulas for composition and inverse; frames; TRS vs shear; normals; pivots; where affine ends" },
   history:  { href:"textbook/history-of-graphics.html",
               title:"Text · A History of Computer Graphics",
               desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
@@ -199,10 +208,12 @@ const SESSIONS = [
   { id:"W3", title:"Vectors and Rotations: Dot &amp; Cross, Lines, Planes; Axis-Angle, Quaternions",
     deck:"sessions/S02-vectors-dot-cross/index.html",
     lab:"sessions/S02-vectors-dot-cross/lab02/index.html", labTitle:"Lab 02 · Vectors EX1–EX3",
+    handouts:["vectors","rotation"],
     demos:["dot-cross","axis-angle"] },
   { id:"W4", title:"Affine Transformations over Homogeneous Coordinates",
     deck:"sessions/S04-matrices-spaces/index.html",
     lab:"sessions/S03-rotation-quaternions/lab03/index.html", labTitle:"Lab 03 · Projection EX4–EX6",
+    handouts:["affine"],
     demos:["trs-order"] },
   { id:"W5", title:"Scene Graphs &amp; Hierarchical Modeling",
     deck:"sessions/S05-scene-graphs/index.html",
