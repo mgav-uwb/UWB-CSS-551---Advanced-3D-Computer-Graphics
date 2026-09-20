@@ -1,0 +1,539 @@
+{
+ "col": {
+  "cmf": {
+   "fit": "Wyman, Sloan and Shirley 2013",
+   "ybarPeak": {
+    "nm": 555,
+    "value": 0.998
+   },
+   "at": [
+    {
+     "nm": 450,
+     "x": 0.344,
+     "y": 0.033,
+     "z": 1.782
+    },
+    {
+     "nm": 500,
+     "x": 0.002,
+     "y": 0.327,
+     "z": 0.271
+    },
+    {
+     "nm": 555,
+     "x": 0.517,
+     "y": 0.998,
+     "z": 0.006
+    },
+    {
+     "nm": 600,
+     "x": 1.056,
+     "y": 0.634,
+     "z": 0
+    },
+    {
+     "nm": 650,
+     "x": 0.285,
+     "y": 0.11,
+     "z": 0
+    }
+   ]
+  },
+  "chromaticity": {
+   "sRGB": [
+    [
+     0.64,
+     0.33
+    ],
+    [
+     0.3,
+     0.6
+    ],
+    [
+     0.15,
+     0.06
+    ]
+   ],
+   "D65": [
+    0.3127,
+    0.329
+   ],
+   "planck": [
+    {
+     "T": 2000,
+     "xy": [
+      0.5243,
+      0.4157
+     ]
+    },
+    {
+     "T": 2700,
+     "xy": [
+      0.4587,
+      0.4118
+     ]
+    },
+    {
+     "T": 4000,
+     "xy": [
+      0.38,
+      0.3773
+     ]
+    },
+    {
+     "T": 6500,
+     "xy": [
+      0.3136,
+      0.3238
+     ]
+    },
+    {
+     "T": 10000,
+     "xy": [
+      0.2808,
+      0.2884
+     ]
+    }
+   ],
+   "efficacyLmPerW": {
+    "2700": 12.4,
+    "6500": 95.8
+   },
+   "locusEnds": {
+    "nm400": [
+     0.1569,
+     0.0172
+    ],
+    "nm700": [
+     0.5684,
+     0.4316
+    ]
+   },
+   "greenTip": [
+    0.0813,
+    0.8197
+   ],
+   "coverage": 0.434
+  },
+  "convert": {
+   "srgb": [
+    0.5,
+    0.2,
+    0.8
+   ],
+   "codes": [
+    128,
+    51,
+    204
+   ],
+   "linear": [
+    0.214,
+    0.0331,
+    0.6038
+   ],
+   "XYZ": [
+    0.2091,
+    0.1128,
+    0.582
+   ],
+   "xy": [
+    0.2313,
+    0.1248
+   ],
+   "luminance": 0.1128,
+   "backToLinear": [
+    0.2141,
+    0.0331,
+    0.6038
+   ],
+   "gray50": {
+    "code": 128,
+    "linear": 0.2159
+   },
+   "linearHalf": {
+    "linear": 0.5,
+    "code": 188,
+    "encoded": 0.7354
+   }
+  },
+  "steps": {
+   "srgb8": {
+    "code0to1": 0.0003035,
+    "code127to128": 0.00363,
+    "code254to255": 0.008898
+   },
+   "linear8": 0.003922,
+   "codesBelow1pct": {
+    "srgb": 25,
+    "linear": 3
+   },
+   "ratioAtBlack": 12.9
+  },
+  "ramps": {
+   "strips": [
+    "sRGB codes 0..255 evenly",
+    "linear light 0..1 evenly, encoded",
+    "32 levels quantized in linear light",
+    "32 levels quantized in sRGB"
+   ],
+   "levels": 32,
+   "linearFirstStepAsCode": 50,
+   "srgbFirstStepLinear": 0.0025
+  },
+  "blend": {
+   "inCodes": {
+    "codes": [
+     128,
+     128,
+     0
+    ],
+    "linear": [
+     0.214,
+     0.214,
+     0
+    ],
+    "Y": 0.1986
+   },
+   "inLinear": {
+    "linear": [
+     0.5,
+     0.5,
+     0
+    ],
+    "codes": [
+     188,
+     188,
+     0
+    ],
+    "Y": 0.4639
+   },
+   "checkerAverageY": 0.4639
+  },
+  "photometry": {
+   "lmPerW555": 683,
+   "sunLuminanceCdM2": 1600000000,
+   "sdrDisplayCdM2": 300,
+   "hdrDisplayCdM2": 1000,
+   "paperUnderOffice": 100,
+   "ratioSunToDisplay": 5300000
+  }
+ },
+ "aa": {
+  "reconstruction": {
+   "signal": "sin(2π·1.5x) + 0.5 sin(2π·4x)",
+   "highestHz": 4,
+   "sampleRate": 10,
+   "nyquist": 5,
+   "rmsError": {
+    "box": 0.308,
+    "tent": 0.182,
+    "lanczos3": 0.0897
+   },
+   "signalRms": 0.791
+  },
+  "alias": {
+   "signalHz": 4.5,
+   "sampleRate": 6,
+   "nyquist": 3,
+   "aliasHz": 1.5,
+   "rule": "|f - k fs| for the k that lands in [0, fs/2]"
+  },
+  "zonePlate": {
+   "size": 200,
+   "samplesPerPixel": [
+    1,
+    16,
+    256
+   ],
+   "nyquistRadiusPx": 60.4,
+   "note": "beyond that radius the true pattern is finer than a pixel; the point-sampled panel shows false rings there"
+  },
+  "filters": {
+   "lanczosMinimum": -0.147
+  },
+  "msaa": {
+   "edge": "y = 0.3x + 0.2, inside above",
+   "pattern4": [
+    [
+     0.375,
+     0.125
+    ],
+    [
+     0.875,
+     0.375
+    ],
+    [
+     0.125,
+     0.625
+    ],
+    [
+     0.625,
+     0.875
+    ]
+   ],
+   "rows": [
+    {
+     "pixel": [
+      0,
+      0
+     ],
+     "exact": 0.65,
+     "one": 1,
+     "four": 0.5,
+     "sixteen": 0.625
+    },
+    {
+     "pixel": [
+      1,
+      0
+     ],
+     "exact": 0.35,
+     "one": 0,
+     "four": 0.5,
+     "sixteen": 0.375
+    },
+    {
+     "pixel": [
+      2,
+      0
+     ],
+     "exact": 0.067,
+     "one": 0,
+     "four": 0,
+     "sixteen": 0.063
+    },
+    {
+     "pixel": [
+      3,
+      1
+     ],
+     "exact": 0.75,
+     "one": 1,
+     "four": 0.75,
+     "sixteen": 0.75
+    },
+    {
+     "pixel": [
+      4,
+      1
+     ],
+     "exact": 0.45,
+     "one": 0,
+     "four": 0.5,
+     "sixteen": 0.438
+    },
+    {
+     "pixel": [
+      5,
+      1
+     ],
+     "exact": 0.15,
+     "one": 0,
+     "four": 0,
+     "sixteen": 0.125
+    }
+   ],
+   "levels": {
+    "one": 2,
+    "four": 5,
+    "eight": 9,
+    "sixteen": 17
+   },
+   "shadingCost": {
+    "ssaa4": "4 shades per pixel",
+    "msaa4": "1 shade per pixel, 4 depth/coverage samples"
+   }
+  },
+  "stratified": {
+   "exactCoverage": 0.5,
+   "samples": 16,
+   "trials": 2000,
+   "rmsRandom": 0.127,
+   "rmsStratified": 0.0541,
+   "ratio": 2.35,
+   "binomialPrediction": 0.125
+  },
+  "temporal": {
+   "wagonWheel": {
+    "spokes": 12,
+    "fps": 24,
+    "spokeAngle": 30,
+    "revPerSecStationary": 2
+   },
+   "taa": "jitter the sample position by a sub-pixel offset each frame and blend the reprojected history"
+  }
+ },
+ "ui": {
+  "pick": {
+   "camera": [
+    3,
+    3,
+    6
+   ],
+   "fov": 28,
+   "near": 1,
+   "far": 20,
+   "pixel": [
+    89,
+    62
+   ],
+   "ndc": [
+    0.1933,
+    0.1667
+   ],
+   "nearPoint": [
+    2.627,
+    2.63,
+    5.147
+   ],
+   "farPoint": [
+    -4.454,
+    -4.406,
+    -11.065
+   ],
+   "nearDistance": 1.002,
+   "farDistance": 20.04,
+   "direction": [
+    -0.372,
+    -0.3696,
+    -0.8515
+   ],
+   "directionByBasis": [
+    -0.372,
+    -0.3696,
+    -0.8515
+   ],
+   "sphereHit": {
+    "t": 6.228,
+    "point": [
+     0.683,
+     0.698,
+     0.697
+    ]
+   },
+   "drag": {
+    "pixel": [
+     60,
+     110
+    ],
+    "ndc": [
+     -0.1933,
+     -0.4733
+    ],
+    "direction": [
+     -0.4264,
+     -0.5118,
+     -0.7458
+    ],
+    "t": 5.861,
+    "groundPoint": [
+     0.501,
+     0,
+     1.629
+    ]
+   }
+  },
+  "idBuffer": {
+   "objects": [
+    {
+     "id": 1,
+     "depth": 2
+    },
+    {
+     "id": 2,
+     "depth": 1
+    },
+    {
+     "id": 3,
+     "depth": 3
+    }
+   ],
+   "probe": [
+    100,
+    70
+   ],
+   "probeId": 1,
+   "probeReadback": [
+    255,
+    0,
+    0
+   ],
+   "encoding": "id 1 = (255,0,0), id 2 = (0,255,0), id 3 = (0,0,255); 24 bits allow 16.7 million ids"
+  },
+  "arcball": {
+   "mouse1": [
+    0.2,
+    0.1
+   ],
+   "mouse2": [
+    0.5,
+    0.3
+   ],
+   "p1": [
+    0.2,
+    0.1,
+    0.9747
+   ],
+   "p2": [
+    0.5,
+    0.3,
+    0.8124
+   ],
+   "axis": [
+    -0.5448,
+    0.8382,
+    0.0258
+   ],
+   "angleDeg": 22.8,
+   "quaternion": [
+    -0.1077,
+    0.1657,
+    0.0051,
+    0.9803
+   ],
+   "outside": {
+    "mouse": [
+     1.3,
+     0.2
+    ],
+    "p": [
+     0.9884,
+     0.1521,
+     0
+    ]
+   },
+   "orbitAlternative": {
+    "orbitSpeedDegPerPx": 0.4,
+    "drag90px": 36,
+    "zoomPerNotch": 1.12,
+    "fiveNotchesOut": 1.762,
+    "fiveNotchesIn": 0.528
+   }
+  },
+  "latency": {
+   "hz": 60,
+   "frameMs": 16.67,
+   "events": [
+    {
+     "ms": 3,
+     "what": "button press"
+    },
+    {
+     "ms": 16.7,
+     "what": "frame 1 starts: input read, model updated"
+    },
+    {
+     "ms": 33.3,
+     "what": "frame 1 presented at v-sync; GPU had rendered it during frame 1"
+    },
+    {
+     "ms": 41.7,
+     "what": "the row halfway down the screen is scanned out"
+    }
+   ],
+   "inputToPhotonMs": 38.7,
+   "at120Hz": 17.8,
+   "tripleBufferingAddsMs": 16.7
+  }
+ }
+}
