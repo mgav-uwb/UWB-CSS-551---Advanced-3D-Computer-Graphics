@@ -1,0 +1,1089 @@
+{
+ "crv": {
+  "bezier": {
+   "P": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "t": 0.5,
+   "bernstein": [
+    0.125,
+    0.375,
+    0.375,
+    0.125
+   ],
+   "levels": [
+    [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      2
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      4,
+      0
+     ]
+    ],
+    [
+     [
+      0.5,
+      1
+     ],
+     [
+      2,
+      2.5
+     ],
+     [
+      3.5,
+      1.5
+     ]
+    ],
+    [
+     [
+      1.25,
+      1.75
+     ],
+     [
+      2.75,
+      2
+     ]
+    ],
+    [
+     [
+      2,
+      1.875
+     ]
+    ]
+   ],
+   "point": [
+    2,
+    1.875
+   ],
+   "tangent": [
+    4.5,
+    0.75
+   ],
+   "at025": {
+    "bernstein": [
+     0.4219,
+     0.4219,
+     0.1406,
+     0.0156
+    ],
+    "point": [
+     0.9063,
+     1.2656
+    ]
+   },
+   "derivativeEnds": {
+    "start": [
+     3,
+     6
+    ],
+    "end": [
+     3,
+     -9
+    ]
+   }
+  },
+  "continuity": {
+   "firstEndTangent": [
+    3,
+    -9
+   ],
+   "cases": [
+    {
+     "name": "C⁰: a corner",
+     "Q1": [
+      5,
+      1
+     ],
+     "secondStartTangent": [
+      3,
+      3
+     ]
+    },
+    {
+     "name": "G¹: same direction",
+     "Q1": [
+      4.5,
+      -1.5
+     ],
+     "secondStartTangent": [
+      1.5,
+      -4.5
+     ]
+    },
+    {
+     "name": "C¹: same tangent vector",
+     "Q1": [
+      5,
+      -3
+     ],
+     "secondStartTangent": [
+      3,
+      -9
+     ]
+    }
+   ]
+  },
+  "bspline": {
+   "P": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "at0": [
+    1.167,
+    1.833
+   ],
+   "at1": [
+    2.833,
+    2.333
+   ],
+   "atHalf": [
+    2,
+    2.396
+   ],
+   "weightsAt0": [
+    0.1667,
+    0.6667,
+    0.1667,
+    0
+   ],
+   "weightsAtHalf": [
+    0.0208,
+    0.4792,
+    0.4792,
+    0.0208
+   ]
+  },
+  "rational": {
+   "C": [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "weights": [
+    1,
+    0.7071,
+    1
+   ],
+   "atHalf": {
+    "basis": [
+     0.25,
+     0.5,
+     0.25
+    ],
+    "numerator": [
+     0.6036,
+     0.6036
+    ],
+    "denominator": 0.8536,
+    "point": [
+     0.7071,
+     0.7071
+    ],
+    "radius": 1
+   },
+   "at025": {
+    "point": [
+     0.9298,
+     0.3681
+    ],
+    "radius": 1
+   },
+   "unweighted": [
+    0.75,
+    0.75
+   ]
+  },
+  "chaikin": {
+   "Q0": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "step1": [
+    [
+     0,
+     0
+    ],
+    [
+     0.25,
+     0.75
+    ],
+    [
+     0.75,
+     2.25
+    ],
+    [
+     1.5,
+     3
+    ],
+    [
+     2.5,
+     3
+    ],
+    [
+     3.25,
+     2.25
+    ],
+    [
+     3.75,
+     0.75
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   "counts": [
+    4,
+    8,
+    16,
+    32,
+    64
+   ],
+   "limitCheck": {
+    "bsplineAtKnot": [
+     0.5,
+     1.5
+    ]
+   }
+  },
+  "patch": {
+   "heights": [
+    [
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     1.5,
+     1.5,
+     0
+    ],
+    [
+     0,
+     1.5,
+     1.5,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "center": [
+    1.5,
+    0.844,
+    1.5
+   ],
+   "centerHeightByHand": 0.8438,
+   "tangents": {
+    "u": [
+     3,
+     0,
+     0
+    ],
+    "v": [
+     0,
+     0,
+     3
+    ]
+   },
+   "normal": [
+    0,
+    1,
+    0
+   ],
+   "at025": {
+    "point": [
+     0.75,
+     0.633,
+     1.5
+    ],
+    "tu": [
+     3,
+     1.687,
+     0
+    ],
+    "tv": [
+     0,
+     0,
+     3
+    ],
+    "normal": [
+     -0.49,
+     0.872,
+     0
+    ]
+   }
+  },
+  "catmullClark": {
+   "cube": {
+    "V": 8,
+    "F": 6,
+    "E": 12
+   },
+   "step1": {
+    "V": 26,
+    "F": 24,
+    "E": 48,
+    "cornerNew": [
+     0.5556,
+     0.5556,
+     0.5556
+    ],
+    "edge01New": [
+     0.75,
+     0.75,
+     0
+    ],
+    "facePoint": [
+     0,
+     1,
+     0
+    ]
+   },
+   "step2": {
+    "V": 98,
+    "F": 96,
+    "E": 192
+   },
+   "step3": {
+    "V": 386,
+    "F": 384
+   },
+   "byHand": {
+    "F": [
+     0.3333,
+     0.3333,
+     0.3333
+    ],
+    "R": [
+     0.6667,
+     0.6667,
+     0.6667
+    ],
+    "formula": "(F + 2R + (n-3)V)/n with n = 3"
+   }
+  }
+ },
+ "anim": {
+  "keys": {
+   "KEYS": [
+    [
+     -2.2,
+     0.5,
+     0
+    ],
+    [
+     0,
+     1.9,
+     -0.6
+    ],
+    [
+     2.2,
+     0.7,
+     0
+    ]
+   ],
+   "t": 0.35,
+   "linear": {
+    "segment": 0,
+    "local": 0.7,
+    "point": [
+     -0.66,
+     1.48,
+     -0.42
+    ]
+   },
+   "catmullRom": {
+    "p0": [
+     -4.4,
+     -0.9,
+     0.6
+    ],
+    "p3": [
+     2.2,
+     0.7,
+     0
+    ],
+    "m1": [
+     2.2,
+     1.4,
+     -0.6
+    ],
+    "m2": [
+     2.2,
+     0.1,
+     0
+    ],
+    "basis": {
+     "h00": 0.216,
+     "h10": 0.063,
+     "h01": 0.784,
+     "h11": -0.147
+    },
+    "point": [
+     -0.66,
+     1.671,
+     -0.508
+    ]
+   },
+   "velocityAtMiddleKey": {
+    "linearBefore": [
+     4.4,
+     2.8,
+     -1.2
+    ],
+    "linearAfter": [
+     4.4,
+     -2.4,
+     1.2
+    ],
+    "snapDeg": 66,
+    "spline": [
+     4.4,
+     0.2,
+     0
+    ]
+   },
+   "midKeyCheck": [
+    0,
+    1.9,
+    -0.6
+   ]
+  },
+  "easing": {
+   "t": 0.35,
+   "linear": 0.35,
+   "smoothstep": 0.2817,
+   "smootherstep": 0.2352,
+   "easeInOutCubic": 0.1715,
+   "cssEaseInOut": 0.2555,
+   "smoothstepByHand": {
+    "t2": 0.1225,
+    "t3": 0.042875,
+    "value": 0.28175
+   },
+   "linearPointAtEasedT": [
+    -0.96,
+    1.289,
+    -0.338
+   ]
+  },
+  "slerp": {
+   "q1": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "q2": [
+    0,
+    0.866,
+    0,
+    0.5
+   ],
+   "dot": 0.5,
+   "Omega": 60,
+   "at025": {
+    "weights": [
+     0.8165,
+     0.2989
+    ],
+    "slerp": [
+     0,
+     0.2588,
+     0,
+     0.9659
+    ],
+    "slerpAngle": 30,
+    "nlerpRaw": [
+     0,
+     0.2165,
+     0,
+     0.875
+    ],
+    "nlerp": [
+     0,
+     0.2402,
+     0,
+     0.9707
+    ],
+    "nlerpAngle": 27.8
+   },
+   "at05": {
+    "slerp": [
+     0,
+     0.5,
+     0,
+     0.866
+    ],
+    "angle": 60
+   },
+   "negated": {
+    "dot": -0.5,
+    "OmegaDeg": 120,
+    "rotationDeg": 240
+   },
+   "maxSpeedRatio": 1.1
+  },
+  "matrixLerp": {
+   "half90": {
+    "M": [
+     [
+      0.5,
+      -0.5
+     ],
+     [
+      0.5,
+      0.5
+     ]
+    ],
+    "det": 0.5,
+    "columnLength": 0.707,
+    "angleDeg": 45
+   },
+   "half180": {
+    "M": [
+     [
+      0,
+      0
+     ],
+     [
+      0,
+      0
+     ]
+    ],
+    "det": 0
+   }
+  },
+  "skinning": {
+   "vertex": [
+    2,
+    0.4
+   ],
+   "weight": 0.5,
+   "boneB": {
+    "pivot": [
+     2,
+     0
+    ],
+    "angle": 90
+   },
+   "boneBImage": [
+    1.6,
+    0
+   ],
+   "blended": [
+    1.8,
+    0.2
+   ],
+   "distanceFromPivot": {
+    "before": 0.4,
+    "after": 0.283
+   },
+   "at180": {
+    "boneBImage": [
+     2,
+     -0.4
+    ],
+    "blended": [
+     2,
+     0
+    ]
+   }
+  },
+  "ik": {
+   "l1": 1,
+   "l2": 0.8,
+   "target": [
+    1.2,
+    0.9
+   ],
+   "d": 1.5,
+   "cos2": 0.3812,
+   "theta2": 67.6,
+   "atan2Target": 36.87,
+   "atan2Inner": 29.54,
+   "elbowDown": {
+    "t1": 7.3,
+    "t2": 67.6,
+    "elbow": [
+     0.992,
+     0.128
+    ],
+    "tip": [
+     1.2,
+     0.9
+    ]
+   },
+   "elbowUp": {
+    "t1": 66.4,
+    "t2": -67.6,
+    "elbow": [
+     0.4,
+     0.916
+    ],
+    "tip": [
+     1.2,
+     0.9
+    ]
+   },
+   "reach": 1.8,
+   "unreachable": [
+    2,
+    0.5
+   ],
+   "unreachableD": 2.062
+  },
+  "integrators": {
+   "k": 1,
+   "dt": 0.1,
+   "steps": 126,
+   "explicit": {
+    "step1": {
+     "x": 1,
+     "v": -0.1
+    },
+    "step2": {
+     "x": 0.99,
+     "v": -0.2
+    },
+    "final": [
+     12.6,
+     1.8717
+    ],
+    "amplitudeGrowth": 1.872
+   },
+   "semiImplicit": {
+    "step1": {
+     "v": -0.1,
+     "x": 0.99
+    },
+    "step2": {
+     "v": -0.199,
+     "x": 0.9701
+    },
+    "final": [
+     12.6,
+     0.9973
+    ]
+   },
+   "exactFinal": 0.9994
+  }
+ },
+ "rt": {
+  "camera": {
+   "eye": [
+    3,
+    3,
+    6
+   ],
+   "fov": 28,
+   "size": 150,
+   "basis": {
+    "u": [
+     0.894,
+     0,
+     -0.447
+    ],
+    "v": [
+     -0.183,
+     0.913,
+     -0.365
+    ],
+    "w": [
+     0.408,
+     0.408,
+     0.816
+    ]
+   },
+   "tanHalf": 0.2493,
+   "markedPixel": [
+    89,
+    62
+   ],
+   "ndc": [
+    0.1933,
+    0.1667
+   ],
+   "dir": [
+    -0.372,
+    -0.3696,
+    -0.8515
+   ],
+   "sphere": {
+    "b": -7.3336,
+    "c": 52.56,
+    "disc": 1.2222,
+    "tNear": 6.2281,
+    "tFar": 8.4391,
+    "hit": [
+     0.683,
+     0.698,
+     0.697
+    ],
+    "normal": [
+     0.569,
+     0.582,
+     0.581
+    ],
+    "markedPoint": [
+     0.693,
+     0.693,
+     0.693
+    ],
+    "distanceToMarked": 0.012
+   },
+   "miss": {
+    "pixel": [
+     20,
+     20
+    ],
+    "b": -7.1185,
+    "disc": -1.887
+   }
+  },
+  "triangle": {
+   "A": [
+    0,
+    0,
+    0
+   ],
+   "B": [
+    2,
+    0,
+    0
+   ],
+   "C": [
+    0,
+    2,
+    0
+   ],
+   "o": [
+    0.5,
+    0.5,
+    1
+   ],
+   "d": [
+    0,
+    0,
+    -1
+   ],
+   "normal": [
+    0,
+    0,
+    1
+   ],
+   "t": 1,
+   "hit": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bary": [
+    0.5,
+    0.25,
+    0.25
+   ],
+   "miss": {
+    "o": [
+     1.5,
+     1.5,
+     1
+    ],
+    "hit": [
+     1.5,
+     1.5,
+     0
+    ],
+    "edgeFunctions": [
+     -2,
+     3,
+     3
+    ]
+   }
+  },
+  "box": {
+   "o": [
+    -1,
+    0.5,
+    0.5
+   ],
+   "d": [
+    0.9806,
+    0.1961,
+    0
+   ],
+   "tx": [
+    1.02,
+    2.04
+   ],
+   "ty": [
+    -2.55,
+    2.55
+   ],
+   "tz": "parallel: inside the slab, no constraint",
+   "tEnter": 1.02,
+   "tExit": 2.04,
+   "hit": [
+    0,
+    0.7,
+    0.5
+   ]
+  },
+  "refraction": {
+   "eta": 1.5,
+   "at30": 19.47,
+   "at60": 35.26,
+   "critical": 41.81,
+   "F0": 0.04,
+   "schlick": [
+    {
+     "deg": 0,
+     "F": 0.04
+    },
+    {
+     "deg": 45,
+     "F": 0.042
+    },
+    {
+     "deg": 60,
+     "F": 0.07
+    },
+    {
+     "deg": 80,
+     "F": 0.41
+    },
+    {
+     "deg": 89,
+     "F": 0.919
+    }
+   ]
+  },
+  "whitted2d": {
+   "segments": 13,
+   "kinds": {
+    "primary": 2,
+    "shadow-blocked": 5,
+    "reflect": 3,
+    "refract": 2,
+    "shadow": 1
+   }
+  },
+  "whittedRender": {
+   "size": [
+    320,
+    200
+   ],
+   "primaryRays": 64000,
+   "maxDepth": 4,
+   "spheres": [
+    {
+     "kind": "mirror",
+     "c": [
+      -1.1,
+      0,
+      -0.3
+     ],
+     "r": 1
+    },
+    {
+     "kind": "glass",
+     "c": [
+      1.2,
+      -0.2,
+      0.6
+     ],
+     "r": 0.8
+    },
+    {
+     "kind": "diffuse",
+     "c": [
+      0.2,
+      -0.55,
+      -2
+     ],
+     "r": 0.45
+    }
+   ],
+   "light": [
+    2,
+    5,
+    4
+   ],
+   "eye": [
+    0,
+    0.8,
+    5.5
+   ]
+  },
+  "bvh": {
+   "triangles": 14,
+   "nodes": 15,
+   "maxDepth": 3,
+   "ray": {
+    "o": [
+     0,
+     0.8
+    ],
+    "d": [
+     0.922,
+     0.387
+    ]
+   },
+   "boxTests": 15,
+   "triTests": 7,
+   "bruteForceTests": 14,
+   "closestBVH": 7.093,
+   "closestBrute": 7.093,
+   "bigScene": {
+    "triangles": 69451,
+    "pixels": 2073600,
+    "raysPerPixel": 3,
+    "bruteTests": 432040780800,
+    "log2": 16.1,
+    "bvhTestsApprox": 211507200
+   }
+  },
+  "monteCarlo": {
+   "exact": 3.141592653589793,
+   "four": {
+    "cosines": [
+     0.72,
+     0.456,
+     0.763,
+     0.487
+    ],
+    "sum": 2.426,
+    "estimate": 3.811
+   },
+   "cosineWeighted": {
+    "estimate": 3.141593,
+    "note": "every sample contributes exactly pi"
+   },
+   "convergence": [
+    {
+     "N": 1,
+     "rmsRelError": 0.5846
+    },
+    {
+     "N": 4,
+     "rmsRelError": 0.2998
+    },
+    {
+     "N": 16,
+     "rmsRelError": 0.1358
+    },
+    {
+     "N": 64,
+     "rmsRelError": 0.073
+    },
+    {
+     "N": 256,
+     "rmsRelError": 0.0356
+    },
+    {
+     "N": 1024,
+     "rmsRelError": 0.0181
+    },
+    {
+     "N": 4096,
+     "rmsRelError": 0.0094
+    }
+   ]
+  },
+  "cornell": {
+   "size": [
+    96,
+    72
+   ],
+   "panels": [
+    {
+     "mode": "direct light only",
+     "spp": 256
+    },
+    {
+     "mode": "path traced",
+     "spp": 8
+    },
+    {
+     "mode": "path traced",
+     "spp": 512
+    }
+   ],
+   "seconds": 59.9,
+   "walls": "red left, green right, white floor, ceiling and back; two white spheres; a spherical emitter in the ceiling",
+   "maxDepth": 6,
+   "russianRoulette": {
+    "afterDepth": 2,
+    "continueProbability": 0.7
+   }
+  }
+ }
+}
