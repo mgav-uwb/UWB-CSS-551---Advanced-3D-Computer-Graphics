@@ -1,0 +1,191 @@
+{
+ "lags": [
+  {
+   "idea": "head-mounted display",
+   "from": 1968,
+   "to": 2016,
+   "arrival": "consumer VR headsets ship",
+   "years": 48
+  },
+  {
+   "idea": "z-buffer",
+   "from": 1974,
+   "to": 1996,
+   "arrival": "3dfx Voodoo, a consumer card with a depth buffer",
+   "years": 22
+  },
+  {
+   "idea": "texture mapping",
+   "from": 1974,
+   "to": 1996,
+   "arrival": "the same card, texturing in silicon",
+   "years": 22
+  },
+  {
+   "idea": "bump mapping",
+   "from": 1978,
+   "to": 2004,
+   "arrival": "per-pixel normal mapping on every surface (Doom 3)",
+   "years": 26
+  },
+  {
+   "idea": "Catmull–Clark subdivision",
+   "from": 1978,
+   "to": 1997,
+   "arrival": "Geri’s Game, the first subdivision character",
+   "years": 19
+  },
+  {
+   "idea": "recursive ray tracing",
+   "from": 1980,
+   "to": 2018,
+   "arrival": "ray-tracing cores in a consumer GPU",
+   "years": 38
+  },
+  {
+   "idea": "mipmaps",
+   "from": 1983,
+   "to": 1996,
+   "arrival": "mipmapped texturing on a consumer card",
+   "years": 13
+  },
+  {
+   "idea": "path tracing",
+   "from": 1986,
+   "to": 2013,
+   "arrival": "a feature film lit entirely by path tracing (Monsters University)",
+   "years": 27
+  },
+  {
+   "idea": "programmable shading (REYES)",
+   "from": 1987,
+   "to": 2001,
+   "arrival": "GeForce 3, the first consumer shader hardware",
+   "years": 14
+  },
+  {
+   "idea": "radiance fields (NeRF)",
+   "from": 2020,
+   "to": 2023,
+   "arrival": "real-time splatting of captured scenes",
+   "years": 3
+  }
+ ],
+ "lagStats": {
+  "mean": 23.2,
+  "min": 3,
+  "max": 48,
+  "median": 22
+ },
+ "budgets": [
+  {
+   "name": "VR headset, 90 Hz",
+   "seconds": 0.011111111111111112,
+   "kind": "real time",
+   "log10": -1.95
+  },
+  {
+   "name": "game or demo, 60 Hz",
+   "seconds": 0.016666666666666666,
+   "kind": "real time",
+   "log10": -1.78
+  },
+  {
+   "name": "film, 24 frames per second (playback)",
+   "seconds": 0.041666666666666664,
+   "kind": "real time",
+   "log10": -1.38
+  },
+  {
+   "name": "Whitted’s 1980 image, VAX-11/780",
+   "seconds": 4440,
+   "kind": "offline",
+   "log10": 3.65
+  },
+  {
+   "name": "a feature-film frame, 1990s to today",
+   "seconds": 14400,
+   "kind": "offline",
+   "log10": 4.16
+  }
+ ],
+ "budgetRatio": {
+  "filmOverGame": 860000,
+  "whittedOverGame": 270000,
+  "ordersOfMagnitude": 5.9
+ },
+ "map": {
+  "eras": [
+   {
+    "era": "1 birth",
+    "chapters": [
+     "interaction",
+     "scene-graphs"
+    ]
+   },
+   {
+    "era": "2 Utah",
+    "chapters": [
+     "rasterization",
+     "meshes",
+     "texture-mapping",
+     "illumination",
+     "curves-surfaces"
+    ]
+   },
+   {
+    "era": "3 photograph",
+    "chapters": [
+     "ray-tracing",
+     "light-transport-pbr",
+     "color"
+    ]
+   },
+   {
+    "era": "4 raster machines",
+    "chapters": [
+     "vectors",
+     "affine-transforms",
+     "viewing",
+     "rasterization",
+     "antialiasing"
+    ]
+   },
+   {
+    "era": "5 programmable",
+    "chapters": [
+     "texture-mapping",
+     "illumination",
+     "rotation"
+    ]
+   },
+   {
+    "era": "6 capture",
+    "chapters": [
+     "meshes",
+     "curves-surfaces",
+     "animation"
+    ]
+   },
+   {
+    "era": "7 real time",
+    "chapters": [
+     "light-transport-pbr",
+     "antialiasing",
+     "interaction"
+    ]
+   },
+   {
+    "era": "8 neural",
+    "chapters": [
+     "neural-nets-embeddings",
+     "image-space",
+     "diffusion-models",
+     "learned-scenes"
+    ]
+   }
+  ],
+  "chapters": 20,
+  "edges": 28
+ }
+}

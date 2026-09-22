@@ -216,6 +216,407 @@
    "hdrDisplayCdM2": 1000,
    "paperUnderOffice": 100,
    "ratioSunToDisplay": 5300000
+  },
+  "lab": {
+   "XYZ": [
+    0.2098,
+    0.1132,
+    0.5821
+   ],
+   "ratios": [
+    0.2208,
+    0.1132,
+    0.5346
+   ],
+   "f": [
+    0.6044,
+    0.4837,
+    0.8116
+   ],
+   "Lab": [
+    40.11,
+    60.35,
+    -65.58
+   ],
+   "chroma": 89.1,
+   "hueDeg": 312.6,
+   "plus12red": {
+    "codes": [
+     140,
+     51,
+     204
+    ],
+    "Lab": [
+     41.69,
+     62.44,
+     -62.93
+    ],
+    "dE": 3.73
+   },
+   "plus12green": {
+    "codes": [
+     128,
+     63,
+     204
+    ],
+    "Lab": [
+     42.01,
+     55,
+     -62.49
+    ],
+    "dE": 6.47
+   },
+   "white": [
+    100,
+    0,
+    0
+   ],
+   "black": [
+    0,
+    0,
+    0
+   ],
+   "midGrayCode": {
+    "code": 119,
+    "L": 50
+   },
+   "gray50L": {
+    "Y": 0.1842,
+    "L": 50
+   }
+  },
+  "hsv": {
+   "srgb": [
+    0.5,
+    0.2,
+    0.8
+   ],
+   "hsv": [
+    270,
+    0.75,
+    0.8
+   ],
+   "hsl": [
+    270,
+    0.6,
+    0.5
+   ],
+   "hsvOfPureYellow": [
+    60,
+    1,
+    1
+   ],
+   "hsvOfDarkYellow": [
+    60,
+    1,
+    0.5
+   ],
+   "Yyellow": 0.928,
+   "Yblue": 0.072
+  },
+  "adaptation": {
+   "D65": [
+    0.95047,
+    1,
+    1.08883
+   ],
+   "D50": [
+    0.96422,
+    1,
+    0.82521
+   ],
+   "A": [
+    1.0985,
+    1,
+    0.35585
+   ],
+   "coneD65": [
+    0.9414,
+    1.0404,
+    1.0895
+   ],
+   "coneD50": [
+    0.9963,
+    1.0204,
+    0.8186
+   ],
+   "coneA": [
+    1.1922,
+    0.9025,
+    0.3406
+   ],
+   "gainsD50": [
+    1.0583,
+    0.9808,
+    0.7514
+   ],
+   "gainsA": [
+    1.2664,
+    0.8674,
+    0.3126
+   ],
+   "violetXYZ": [
+    0.2098,
+    0.1132,
+    0.5821
+   ],
+   "violetToD50": [
+    0.1933,
+    0.1084,
+    0.4375
+   ],
+   "violetToA": [
+    0.1777,
+    0.1032,
+    0.1822
+   ],
+   "whiteCheck": [
+    0.9642,
+    1,
+    0.8252
+   ],
+   "vonKriesNote": "the same three gains applied to XYZ directly, without the Bradford sharpening, is von Kries"
+  },
+  "cvd": {
+   "source": "Machado, Oliveira and Fernandes 2009, severity 1.0, applied in linear RGB",
+   "palette": {
+    "blue": "#1f5fb0",
+    "red": "#c0392b",
+    "accent": "#0a7d5a",
+    "orange": "#d98c1f",
+    "purple": "#6b40d8",
+    "teal": "#128a8a",
+    "pink": "#c2468a",
+    "gray": "#8a8f9a"
+   },
+   "redVsAccent": {
+    "normal": 95.2,
+    "protan": 16.8,
+    "deutan": 35.9,
+    "tritan": 114.6
+   },
+   "blueVsOrange": {
+    "normal": 115.8,
+    "deutan": 119.6
+   },
+   "redDeutanCodes": [
+    130,
+    117,
+    37
+   ],
+   "accentDeutanCodes": [
+    109,
+    106,
+    92
+   ],
+   "prevalence": "about 8 % of men and 0.5 % of women, mostly deutan and protan"
+  },
+  "p3": {
+   "primaries": [
+    [
+     0.68,
+     0.32
+    ],
+    [
+     0.265,
+     0.69
+    ],
+    [
+     0.15,
+     0.06
+    ]
+   ],
+   "sRGBredInP3": [
+    0.8225,
+    0.0331,
+    0.017
+   ],
+   "sRGBredInP3codes": [
+    234,
+    51,
+    35
+   ],
+   "p3RedInSRGB": [
+    1.2249,
+    -0.0419,
+    -0.0196
+   ],
+   "p3GreenInSRGB": [
+    -0.2247,
+    1.0419,
+    -0.0786
+   ],
+   "p3RedClipped": [
+    1,
+    0,
+    0
+   ],
+   "areaRatio": 1.36,
+   "rec2020": [
+    [
+     0.708,
+     0.292
+    ],
+    [
+     0.17,
+     0.797
+    ],
+    [
+     0.131,
+     0.046
+    ]
+   ]
+  },
+  "hdr": {
+   "pq": {
+    "nits100": {
+     "e": 0.5081,
+     "code10": 520
+    },
+    "nits1000": {
+     "e": 0.7518,
+     "code10": 769
+    },
+    "nits10000": {
+     "e": 1
+    },
+    "nits1": {
+     "e": 0.1499,
+     "code10": 153
+    },
+    "stepAt100nits": 0.978,
+    "stepAt1000nits": 9.01,
+    "stepAt1nit": 0.0193
+   },
+   "hlg": {
+    "at1over12": 0.5,
+    "at0_5": 0.8716,
+    "at1": 1
+   },
+   "sdrWhiteNits": 100,
+   "sdr8bitStepAt100nits": 0.367
+  },
+  "dither": {
+   "levels": 8,
+   "strips": [
+    "continuous (linear ramp, encoded)",
+    "nearest of 8 levels",
+    "ordered dither, Bayer 4x4",
+    "Floyd-Steinberg error diffusion"
+   ],
+   "bayer": [
+    [
+     0,
+     8,
+     2,
+     10
+    ],
+    [
+     12,
+     4,
+     14,
+     6
+    ],
+    [
+     3,
+     11,
+     1,
+     9
+    ],
+    [
+     15,
+     7,
+     13,
+     5
+    ]
+   ],
+   "workedPixel": {
+    "x": 100,
+    "y": 2,
+    "value": 0.3922,
+    "scaled": 2.745,
+    "floor": 2,
+    "frac": 0.745,
+    "threshold": 0.2188,
+    "result": 3
+   },
+   "fsWeights": [
+    0.4375,
+    0.1875,
+    0.3125,
+    0.0625
+   ]
+  },
+  "ycbcr": {
+   "srgbCodes": [
+    128,
+    51,
+    204
+   ],
+   "Yp": 0.3075,
+   "Cb": 0.2654,
+   "Cr": 0.1235,
+   "video8": [
+    83,
+    187,
+    156
+   ],
+   "full8": [
+    78,
+    196,
+    159
+   ],
+   "note": "computed on encoded (gamma) values, hence Y prime: video luma, not luminance",
+   "subsampling420": {
+    "bytesPerPixel444": 3,
+    "bytesPerPixel420": 1.5,
+    "savings": "50 %"
+   }
+  },
+  "alpha": {
+   "overWhiteLinear": [
+    1,
+    0.5,
+    0.5
+   ],
+   "overWhiteCodes": [
+    255,
+    188,
+    188
+   ],
+   "overWhiteInCodeSpace": [
+    1,
+    0.214,
+    0.214
+   ],
+   "straightFilter": {
+    "color": [
+     0.5,
+     0,
+     0
+    ],
+    "alpha": 0.5,
+    "note": "averaging a (1,0,0,1) texel with a transparent (0,0,0,0) texel in straight alpha"
+   },
+   "premultipliedFilter": {
+    "rgba": [
+     0.5,
+     0,
+     0,
+     0.5
+    ],
+    "unpremul": [
+     1,
+     0,
+     0
+    ]
+   },
+   "straightHaloColor": [
+    0.5,
+    0,
+    0
+   ],
+   "Yover": 0.606
   }
  },
  "aa": {
@@ -361,6 +762,208 @@
     "revPerSecStationary": 2
    },
    "taa": "jitter the sample position by a sub-pixel offset each frame and blend the reprojected history"
+  },
+  "spectra": {
+   "atNyquist": {
+    "box": 0.637,
+    "tent": 0.405,
+    "gaussian05": 0.291
+   },
+   "atOnePerPixel": {
+    "box": 0,
+    "tent": 0,
+    "gaussian05": 0.0072
+   },
+   "at1_5": {
+    "box": 0.212,
+    "tent": 0.045
+   },
+   "note": "frequency in cycles per pixel; the sampling rate is 1"
+  },
+  "mitchell": {
+   "at0": {
+    "Mitchell (1/3, 1/3)": 0.8889,
+    "cubic B-spline (1, 0)": 0.6667,
+    "Catmull-Rom (0, 1/2)": 1,
+    "sharp (0, 1)": 1
+   },
+   "at05": {
+    "Mitchell (1/3, 1/3)": 0.5347,
+    "cubic B-spline (1, 0)": 0.4792,
+    "Catmull-Rom (0, 1/2)": 0.5625,
+    "sharp (0, 1)": 0.625
+   },
+   "at1": {
+    "Mitchell (1/3, 1/3)": 0.0556,
+    "cubic B-spline (1, 0)": 0.1667,
+    "Catmull-Rom (0, 1/2)": 0,
+    "sharp (0, 1)": 0
+   },
+   "at15": {
+    "Mitchell (1/3, 1/3)": -0.0347,
+    "cubic B-spline (1, 0)": 0.0208,
+    "Catmull-Rom (0, 1/2)": -0.0625,
+    "sharp (0, 1)": -0.125
+   },
+   "mitchellByHand": {
+    "B": "1/3",
+    "C": "1/3",
+    "x": 0.5,
+    "cubic": 0.875,
+    "quad": -3,
+    "const": 5.3333,
+    "sum": 0.5347
+   }
+  },
+  "mip": {
+   "texels": 256,
+   "derivatives": {
+    "dudx": 0.0125,
+    "dvdx": 0.002,
+    "dudy": 0.001,
+    "dvdy": 0.009
+   },
+   "footprintX": 3.241,
+   "footprintY": 2.318,
+   "rho": 3.241,
+   "lambda": 1.696,
+   "levels": [
+    1,
+    2
+   ],
+   "blend": 0.696,
+   "texelsPerPixelAtLevel": [
+    1.62,
+    0.81
+   ],
+   "anisotropy": 1.4,
+   "anisoLambda": 1.213
+  },
+  "wu": {
+   "from": [
+    1,
+    1
+   ],
+   "to": [
+    6,
+    3
+   ],
+   "gradient": 0.4,
+   "columns": [
+    {
+     "x": 1,
+     "y": 1,
+     "lower": 1,
+     "upper": 2,
+     "wLower": 1,
+     "wUpper": 0
+    },
+    {
+     "x": 2,
+     "y": 1.4,
+     "lower": 1,
+     "upper": 2,
+     "wLower": 0.6,
+     "wUpper": 0.4
+    },
+    {
+     "x": 3,
+     "y": 1.8,
+     "lower": 1,
+     "upper": 2,
+     "wLower": 0.2,
+     "wUpper": 0.8
+    },
+    {
+     "x": 4,
+     "y": 2.2,
+     "lower": 2,
+     "upper": 3,
+     "wLower": 0.8,
+     "wUpper": 0.2
+    },
+    {
+     "x": 5,
+     "y": 2.6,
+     "lower": 2,
+     "upper": 3,
+     "wLower": 0.4,
+     "wUpper": 0.6
+    },
+    {
+     "x": 6,
+     "y": 3,
+     "lower": 3,
+     "upper": 4,
+     "wLower": 1,
+     "wUpper": 0
+    }
+   ],
+   "pixelsTouched": 10,
+   "bresenhamPixels": 6
+  },
+  "toksvig": {
+   "table": [
+    {
+     "normalLength": 1,
+     "s": 64,
+     "sEffective": 64
+    },
+    {
+     "normalLength": 0.98,
+     "s": 64,
+     "sEffective": 27.8
+    },
+    {
+     "normalLength": 0.9,
+     "s": 64,
+     "sEffective": 7.9
+    },
+    {
+     "normalLength": 0.7,
+     "s": 64,
+     "sEffective": 2.3
+    },
+    {
+     "normalLength": 0.9,
+     "s": 256,
+     "sEffective": 8.7
+    }
+   ],
+   "byHand": {
+    "len": 0.9,
+    "s": 64,
+    "num": 57.6,
+    "den": 7.3,
+    "result": 7.9
+   },
+   "averageOfTwoNormals": {
+    "angleDeg": 30,
+    "length": 0.9659
+   }
+  },
+  "cost": {
+   "base": {
+    "fragments": 4000000,
+    "instr": 300,
+    "total": 1200000000
+   },
+   "ssaa4": {
+    "fragments": 16000000,
+    "total": 4800000000
+   },
+   "msaa4": {
+    "fragments": 4000000,
+    "total": 1200000000
+   },
+   "memory1080p": {
+    "colorMB": 7.9,
+    "msaa4ColorMB": 31.6
+   },
+   "taaBlend": {
+    "alpha": 0.1,
+    "framesTo90pct": 22
+   }
   }
  },
  "ui": {
@@ -534,6 +1137,262 @@
    "inputToPhotonMs": 38.7,
    "at120Hz": 17.8,
    "tripleBufferingAddsMs": 16.7
+  },
+  "dpr": {
+   "cssSize": [
+    800,
+    500
+   ],
+   "dpr": 2,
+   "bufferSize": [
+    1600,
+    1000
+   ],
+   "mouseCss": [
+    300,
+    200
+   ],
+   "mouseBuffer": [
+    600,
+    400
+   ],
+   "ndcFromCss": [
+    -0.2488,
+    0.198
+   ],
+   "ndcFromBufferWrongly": [
+    -0.6244,
+    0.599
+   ],
+   "libraryCap": 2
+  },
+  "hit": {
+   "polygon": [
+    [
+     1,
+     1
+    ],
+    [
+     5,
+     0.5
+    ],
+    [
+     6,
+     3
+    ],
+    [
+     3.5,
+     5
+    ],
+    [
+     0.5,
+     3.5
+    ]
+   ],
+   "A": {
+    "p": [
+     3,
+     2.5
+    ],
+    "crossings": [
+     {
+      "edge": "4-0",
+      "xAtRay": 0.7,
+      "toTheRight": false
+     },
+     {
+      "edge": "1-2",
+      "xAtRay": 5.8,
+      "toTheRight": true
+     }
+    ],
+    "count": 1,
+    "inside": true
+   },
+   "B": {
+    "p": [
+     5.5,
+     4.5
+    ],
+    "crossings": [
+     {
+      "edge": "2-3",
+      "xAtRay": 4.125,
+      "toTheRight": false
+     },
+     {
+      "edge": "3-4",
+      "xAtRay": 2.5,
+      "toTheRight": false
+     }
+    ],
+    "count": 0,
+    "inside": false
+   },
+   "circle": {
+    "c": [
+     2,
+     2
+    ],
+    "r": 1.2,
+    "p": [
+     2.8,
+     2.9
+    ],
+    "d2": 1.45,
+    "r2": 1.44,
+    "inside": false
+   }
+  },
+  "gesture": {
+   "threshold": 4,
+   "states": [
+    "idle",
+    "pressed",
+    "dragging",
+    "clicked"
+   ],
+   "sample": {
+    "moves": [
+     [
+      1,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      1
+     ]
+    ],
+    "distances": [
+     1,
+     2.24,
+     3.16
+    ],
+    "verdict": "click"
+   },
+   "sample2": {
+    "move": [
+     3,
+     3
+    ],
+    "distance": 4.24,
+    "verdict": "drag"
+   }
+  },
+  "snap": {
+   "grid": 0.25,
+   "values": [
+    {
+     "v": 1.37,
+     "snapped": 1.25
+    },
+    {
+     "v": 1.13,
+     "snapped": 1.25
+    },
+    {
+     "v": 2.5,
+     "snapped": 2.5
+    }
+   ],
+   "angle": {
+    "step": 15,
+    "values": [
+     {
+      "a": 37,
+      "snapped": 30
+     },
+     {
+      "a": 52.4,
+      "snapped": 45
+     },
+     {
+      "a": 97,
+      "snapped": 90
+     }
+    ]
+   },
+   "softSnap": {
+    "radius": 0.05,
+    "v": 1.28,
+    "nearest": 1.25,
+    "distance": 0.03,
+    "snapped": true,
+    "v2": 1.37,
+    "distance2": 0.12,
+    "snapped2": false
+   }
+  },
+  "timestep": {
+   "dt": 10,
+   "frames": [
+    16,
+    20,
+    33,
+    8,
+    17
+   ],
+   "rows": [
+    {
+     "frameMs": 16,
+     "steps": 1,
+     "leftoverMs": 6,
+     "alpha": 0.6
+    },
+    {
+     "frameMs": 20,
+     "steps": 2,
+     "leftoverMs": 6,
+     "alpha": 0.6
+    },
+    {
+     "frameMs": 33,
+     "steps": 3,
+     "leftoverMs": 9,
+     "alpha": 0.9
+    },
+    {
+     "frameMs": 8,
+     "steps": 1,
+     "leftoverMs": 7,
+     "alpha": 0.7
+    },
+    {
+     "frameMs": 17,
+     "steps": 2,
+     "leftoverMs": 4,
+     "alpha": 0.4
+    }
+   ],
+   "totalSteps": 9,
+   "totalMs": 94,
+   "spiralNote": "clamp the frame time (e.g. at 250 ms) so a stall cannot demand hundreds of steps"
+  },
+  "vr": {
+   "hz": 90,
+   "frameMs": 11.11,
+   "pipelineLatencyMs": 27.8,
+   "headSpeedDegPerSec": 100,
+   "errorDegNoReprojection": 2.78,
+   "errorCmAt1m": 4.9,
+   "reprojectionResidualMs": 5.56,
+   "errorDegReprojected": 0.56,
+   "errorCmReprojected": 0.97,
+   "pixelsPerDegree": 20,
+   "errorPixelsNoReprojection": 55.6
+  },
+  "undo": {
+   "modelBytes": 24,
+   "snapshots": 1000,
+   "snapshotBytes": 24000,
+   "meshVertices": 35947,
+   "meshBytes": 431364,
+   "meshSnapshots100MB": 243,
+   "commandBytes": 28
   }
  }
 }

@@ -189,7 +189,454 @@
      0.9
     ]
    }
-  ]
+  ],
+  "stack": {
+   "trace": [
+    {
+     "op": "push",
+     "node": "base",
+     "depth": 1,
+     "origin": [
+      0,
+      0.2,
+      0
+     ]
+    },
+    {
+     "op": "push",
+     "node": "arm",
+     "depth": 2,
+     "origin": [
+      -0.39,
+      0.94,
+      0.22
+     ]
+    },
+    {
+     "op": "push",
+     "node": "hand",
+     "depth": 3,
+     "origin": [
+      -0.78,
+      1.47,
+      0.45
+     ]
+    },
+    {
+     "op": "draw",
+     "node": "hand",
+     "depth": 3
+    },
+    {
+     "op": "pop",
+     "node": "hand",
+     "depth": 2
+    },
+    {
+     "op": "draw",
+     "node": "arm",
+     "depth": 2
+    },
+    {
+     "op": "pop",
+     "node": "arm",
+     "depth": 1
+    },
+    {
+     "op": "push",
+     "node": "arm2",
+     "depth": 2,
+     "origin": [
+      0.39,
+      0.94,
+      -0.22
+     ]
+    },
+    {
+     "op": "push",
+     "node": "hand2",
+     "depth": 3,
+     "origin": [
+      0.78,
+      1.47,
+      -0.45
+     ]
+    },
+    {
+     "op": "draw",
+     "node": "hand2",
+     "depth": 3
+    },
+    {
+     "op": "pop",
+     "node": "hand2",
+     "depth": 2
+    },
+    {
+     "op": "draw",
+     "node": "arm2",
+     "depth": 2
+    },
+    {
+     "op": "pop",
+     "node": "arm2",
+     "depth": 1
+    },
+    {
+     "op": "draw",
+     "node": "base",
+     "depth": 1
+    },
+    {
+     "op": "pop",
+     "node": "base",
+     "depth": 0
+    }
+   ],
+   "maxDepth": 3,
+   "hand": [
+    -0.78,
+    1.47,
+    0.45
+   ],
+   "hand2": [
+    0.78,
+    1.47,
+    -0.45
+   ],
+   "detArm2": -1,
+   "products": 5
+  },
+  "dirty": {
+   "bones": 59,
+   "root": 59,
+   "spine0": 46,
+   "Larm0": 19,
+   "Lhand0": 16,
+   "fingertip": 1,
+   "demo": {
+    "baseRy": 3,
+    "armBend": 2,
+    "handRy": 1
+   }
+  },
+  "shear": {
+   "parent": "S(2, 1, 1)",
+   "child": "R_z(45)",
+   "col0": [
+    1.414,
+    0.707,
+    0
+   ],
+   "col1": [
+    -1.414,
+    0.707,
+    0
+   ],
+   "lengths": [
+    1.581,
+    1.581
+   ],
+   "angleBetweenColumns": 126.9,
+   "readBackRotation": 26.6,
+   "readBackScale": [
+    1.581,
+    1.581
+   ],
+   "maxRebuildError": 0.707,
+   "det": 2,
+   "square": [
+    [
+     0,
+     0
+    ],
+    [
+     1.414,
+     0.707
+    ],
+    [
+     0,
+     1.414
+    ],
+    [
+     -1.414,
+     0.707
+    ]
+   ],
+   "rebuiltSquare": [
+    [
+     0,
+     0
+    ],
+    [
+     1.414,
+     0.707
+    ],
+    [
+     0.707,
+     2.121
+    ],
+    [
+     -0.707,
+     1.414
+    ]
+   ]
+  },
+  "bounds": {
+   "pose": "baseRy 30, armBend 40",
+   "half": {
+    "base": [
+     0.35,
+     0.2,
+     0.35
+    ],
+    "arm": [
+     0.12,
+     0.7,
+     0.12
+    ],
+    "hand": [
+     0.22,
+     0.12,
+     0.22
+    ]
+   },
+   "base": {
+    "min": [
+     -0.478,
+     0,
+     -0.478
+    ],
+    "max": [
+     0.478,
+     0.4,
+     0.478
+    ]
+   },
+   "arm": {
+    "min": [
+     -0.919,
+     0.323,
+     -0.15
+    ],
+    "max": [
+     0.14,
+     1.55,
+     0.6
+    ]
+   },
+   "hand": {
+    "min": [
+     -1.102,
+     1.239,
+     0.137
+    ],
+    "max": [
+     -0.457,
+     1.706,
+     0.763
+    ]
+   },
+   "armSubtree": {
+    "min": [
+     -1.102,
+     0.323,
+     -0.15
+    ],
+    "max": [
+     0.14,
+     1.706,
+     0.763
+    ]
+   },
+   "all": {
+    "min": [
+     -1.102,
+     0,
+     -0.478
+    ],
+    "max": [
+     0.478,
+     1.706,
+     0.763
+    ]
+   },
+   "allSphere": {
+    "c": [
+     -0.312,
+     0.853,
+     0.143
+    ],
+    "r": 1.318
+   },
+   "plane": "x = 1",
+   "testRootOnly": "entirely inside: accept all three, one test",
+   "planeX2": 1.2,
+   "test2": {
+    "rootBox": "inside",
+    "hand": "inside"
+   },
+   "descend": {
+    "plane": "x = -0.6, keep x < -0.6",
+    "all": "straddles",
+    "base": "outside (x > -0.6)",
+    "armSubtree": "straddles",
+    "arm": "straddles",
+    "hand": "straddles",
+    "tests": 5
+   }
+  },
+  "frames": {
+   "handWorld": [
+    -0.779,
+    1.472,
+    0.45
+   ],
+   "handInBase": [
+    -0.9,
+    1.272,
+    0
+   ],
+   "handInArm": [
+    0,
+    0.7,
+    0
+   ],
+   "worldPoint": [
+    0,
+    1,
+    0
+   ],
+   "worldPointInHand": [
+    0.386,
+    -0.94,
+    0
+   ],
+   "armTipInHand": [
+    0,
+    0,
+    0
+   ],
+   "armToHandTrans": [
+    0,
+    -0.7,
+    0
+   ]
+  },
+  "cameraNode": {
+   "camWorld": [
+    -0.946,
+    1.702,
+    0.546
+   ],
+   "V": [
+    [
+     0.66,
+     0.64,
+     -0.38,
+     -0.26
+    ],
+    [
+     -0.56,
+     0.77,
+     0.32,
+     -2.01
+    ],
+    [
+     0.5,
+     0,
+     0.87,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     1
+    ]
+   ],
+   "Vtrans": [
+    -0.257,
+    -2.006,
+    0
+   ],
+   "check": [
+    0,
+    0,
+    0
+   ]
+  },
+  "gltf": {
+   "baseQuat": [
+    0,
+    0.2588,
+    0,
+    0.9659
+   ],
+   "bendQuat": [
+    0,
+    0,
+    0.342,
+    0.9397
+   ],
+   "nodes": [
+    {
+     "name": "base",
+     "translation": [
+      0,
+      0.2,
+      0
+     ],
+     "rotation": [
+      0,
+      0.2588,
+      0,
+      0.9659
+     ],
+     "children": [
+      1
+     ]
+    },
+    {
+     "name": "joint",
+     "translation": [
+      0,
+      0.2,
+      0
+     ],
+     "rotation": [
+      0,
+      0,
+      0.342,
+      0.9397
+     ],
+     "children": [
+      2
+     ]
+    },
+    {
+     "name": "arm",
+     "translation": [
+      0,
+      0.7,
+      0
+     ],
+     "mesh": "armBox",
+     "children": [
+      3
+     ]
+    },
+    {
+     "name": "hand",
+     "translation": [
+      0,
+      0.7,
+      0
+     ],
+     "mesh": "handBox"
+    }
+   ]
+  }
  },
  "view": {
   "eye": [
@@ -443,6 +890,435 @@
     2
    ],
    "yp": 0.5
+  },
+  "fov": {
+   "sensor": [
+    36,
+    24
+   ],
+   "table": [
+    {
+     "mm": 14,
+     "vfov": 81.2,
+     "hfov": 104.3
+    },
+    {
+     "mm": 24,
+     "vfov": 53.1,
+     "hfov": 73.7
+    },
+    {
+     "mm": 35,
+     "vfov": 37.8,
+     "hfov": 54.4
+    },
+    {
+     "mm": 50,
+     "vfov": 27,
+     "hfov": 39.6
+    },
+    {
+     "mm": 85,
+     "vfov": 16.1,
+     "hfov": 23.9
+    },
+    {
+     "mm": 200,
+     "vfov": 6.9,
+     "hfov": 10.3
+    }
+   ],
+   "demoFocal": 29,
+   "fov45": {
+    "vertical": 45,
+    "horizontal": 72.8,
+    "diagonal": 80.4,
+    "aspect": 1.78
+   },
+   "fov90h": {
+    "horizontal": 90,
+    "verticalAt178": 58.7
+   }
+  },
+  "depthPrecision": {
+   "near": 0.1,
+   "far": 1000,
+   "note": "smallest resolvable depth difference (world units) at distance d",
+   "rows": [
+    {
+     "d": 0.2,
+     "zw": 0.50005,
+     "fixed24": 2.38e-8,
+     "float32": 2.38e-8,
+     "reversed32": 1.19e-8
+    },
+    {
+     "d": 1,
+     "zw": 0.90009,
+     "fixed24": 5.96e-7,
+     "float32": 5.96e-7,
+     "reversed32": 7.45e-8
+    },
+    {
+     "d": 10,
+     "zw": 0.990099,
+     "fixed24": 0.0000596,
+     "float32": 0.0000596,
+     "reversed32": 9.31e-7
+    },
+    {
+     "d": 100,
+     "zw": 0.9991,
+     "fixed24": 0.00596,
+     "float32": 0.00596,
+     "reversed32": 0.00000582
+    },
+    {
+     "d": 500,
+     "zw": 0.9999,
+     "fixed24": 0.149,
+     "float32": 0.149,
+     "reversed32": 0.0000182
+    },
+    {
+     "d": 900,
+     "zw": 0.999989,
+     "fixed24": 0.483,
+     "float32": 0.483,
+     "reversed32": 0.00000737
+    }
+   ],
+   "halfRangeDepth": 0.2,
+   "ratioAt100": 1024
+  },
+  "viewport": {
+   "ndc": [
+    0.098,
+    0.109,
+    0.924
+   ],
+   "pixel": [
+    702.72,
+    320.76
+   ],
+   "pixelIndex": [
+    702,
+    320
+   ],
+   "windowDepth": 0.962,
+   "depth24": 16139681
+  },
+  "frustum": {
+   "planes": {
+    "left": [
+     0.3395,
+     -0.203,
+     -0.9185,
+     4.2555
+    ],
+    "right": [
+     -0.9792,
+     -0.203,
+     0.0049,
+     4.2555
+    ],
+    "bottom": [
+     -0.3875,
+     0.7373,
+     -0.5534,
+     2.3101
+    ],
+    "top": [
+     -0.025,
+     -0.999,
+     -0.0357,
+     3.1783
+    ],
+    "near": [
+     -0.539,
+     -0.342,
+     -0.7698,
+     6.171
+    ],
+    "far": [
+     0.539,
+     0.342,
+     0.7698,
+     0.829
+    ]
+   },
+   "checks": {
+    "nearPlaneAtEye": -1,
+    "farPlaneAtEye": 8,
+    "atTarget": {
+     "left": 4.154,
+     "right": 4.154,
+     "bottom": 2.679,
+     "top": 2.679,
+     "near": 6,
+     "far": 1
+    }
+   },
+   "box1": {
+    "min": [
+     -1,
+     -0.5,
+     -1
+    ],
+    "max": [
+     1,
+     1.5,
+     1
+    ],
+    "result": "straddles",
+    "detail": {
+     "left": {
+      "p": 5.615,
+      "n": 2.693
+     },
+     "right": {
+      "p": 5.341,
+      "n": 2.967
+     },
+     "bottom": {
+      "p": 4.357,
+      "n": 1.001
+     },
+     "top": {
+      "p": 3.739,
+      "n": 1.619
+     },
+     "near": {
+      "p": 7.651,
+      "n": 4.349
+     },
+     "far": {
+      "p": 2.651,
+      "n": -0.651
+     }
+    }
+   },
+   "box2": {
+    "min": [
+     5.5,
+     0,
+     -0.5
+    ],
+    "max": [
+     6.5,
+     1,
+     0.5
+    ],
+    "result": "outside",
+    "detail": {
+     "left": {
+      "p": 6.921,
+      "n": 5.46
+     },
+     "right": {
+      "p": -1.127,
+      "n": -2.314
+     },
+     "bottom": {
+      "p": 1.193,
+      "n": -0.485
+     },
+     "top": {
+      "p": 3.059,
+      "n": 1.999
+     },
+     "near": {
+      "p": 3.591,
+      "n": 1.941
+     },
+     "far": {
+      "p": 5.059,
+      "n": 3.409
+     }
+    }
+   },
+   "box3": {
+    "min": [
+     -0.5,
+     0,
+     -8.5
+    ],
+    "max": [
+     0.5,
+     1,
+     -7.5
+    ],
+    "result": "outside",
+    "detail": {
+     "left": {
+      "p": 12.232,
+      "n": 10.771
+     },
+     "right": {
+      "p": 4.709,
+      "n": 3.522
+     },
+     "bottom": {
+      "p": 7.945,
+      "n": 6.267
+     },
+     "top": {
+      "p": 3.495,
+      "n": 2.435
+     },
+     "near": {
+      "p": 12.983,
+      "n": 11.333
+     },
+     "far": {
+      "p": -4.333,
+      "n": -5.983
+     }
+    }
+   }
+  },
+  "offAxis": {
+   "l": -0.7373,
+   "r": 0.7373,
+   "b": -0.4142,
+   "t": 0.4142,
+   "fullMatchesPerspective": 2.2e-16,
+   "leftHalf": [
+    [
+     2.713,
+     0,
+     -1,
+     0
+    ],
+    [
+     0,
+     2.414,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     -1.286,
+     -2.286
+    ],
+    [
+     0,
+     0,
+     -1,
+     0
+    ]
+   ],
+   "skew": 0,
+   "leftHalfSkew": -1,
+   "stereo": {
+    "ipd": 0.064,
+    "screenDist": 2,
+    "leftEyeRows": [
+     [
+      2,
+      0,
+      0.032,
+      0
+     ],
+     [
+      0,
+      3.333,
+      0,
+      0
+     ],
+     [
+      0,
+      0,
+      -1.667,
+      -5.333
+     ],
+     [
+      0,
+      0,
+      -1,
+      0
+     ]
+    ],
+    "skewLeft": 0.032
+   }
+  },
+  "dof": {
+   "focalMm": 50,
+   "fNumber": 2.8,
+   "apertureMm": 17.86,
+   "focusMm": 3000,
+   "pixelMm": 0.006,
+   "table": [
+    {
+     "mm": 1000,
+     "cocMm": 0.6053,
+     "pixels": 100.9
+    },
+    {
+     "mm": 2000,
+     "cocMm": 0.1513,
+     "pixels": 25.2
+    },
+    {
+     "mm": 3000,
+     "cocMm": 0,
+     "pixels": 0
+    },
+    {
+     "mm": 5000,
+     "cocMm": 0.1211,
+     "pixels": 20.2
+    },
+    {
+     "mm": 10000,
+     "cocMm": 0.2119,
+     "pixels": 35.3
+    }
+   ],
+   "hyperfocal": 29812,
+   "atF16": 3.5
+  },
+  "pole": {
+   "rows": [
+    {
+     "el": 60,
+     "crossLength": 0.5,
+     "u": [
+      0.819,
+      0,
+      -0.574
+     ]
+    },
+    {
+     "el": 85,
+     "crossLength": 0.0872,
+     "u": [
+      0.819,
+      0,
+      -0.574
+     ]
+    },
+    {
+     "el": 89,
+     "crossLength": 0.0175,
+     "u": [
+      0.819,
+      0,
+      -0.574
+     ]
+    },
+    {
+     "el": 89.9,
+     "crossLength": 0.0017,
+     "u": [
+      0.819,
+      0,
+      -0.574
+     ]
+    }
+   ],
+   "clampDeg": 89.9
   }
  },
  "ras": {
@@ -551,6 +1427,502 @@
    "pixels1080": 2073600,
    "pixelsPerSecond": 124416000,
    "nsPerPixel": 8
+  },
+  "setup": {
+   "pixelVerts": [
+    [
+     2.904,
+     1.716
+    ],
+    [
+     10.524,
+     5.748
+    ],
+    [
+     4.332,
+     10.296
+    ]
+   ],
+   "bbox": {
+    "minX": 2,
+    "maxX": 10,
+    "minY": 1,
+    "maxY": 10
+   },
+   "pixelsInBox": 90,
+   "increments": [
+    {
+     "edge": "E12",
+     "dEdx": -4.548,
+     "dEdy": -6.192
+    },
+    {
+     "edge": "E20",
+     "dEdx": 8.58,
+     "dEdy": -1.428
+    },
+    {
+     "edge": "E01",
+     "dEdx": -4.032,
+     "dEdy": 7.62
+    }
+   ],
+   "fixedPoint": {
+    "subpixelBits": 8,
+    "step": 0.00390625,
+    "snapped": [
+     [
+      2.9023,
+      1.7148
+     ],
+     [
+      10.5234,
+      5.7461
+     ],
+     [
+      4.332,
+      10.2969
+     ]
+    ],
+    "snappedInt": [
+     [
+      743,
+      439
+     ],
+     [
+      2694,
+      1471
+     ],
+     [
+      1109,
+      2636
+     ]
+    ],
+    "areaExact": 59.6219,
+    "areaSnapped": 59.641,
+    "maxEdgeValue": 274877906944,
+    "bitsNeeded": 38
+   },
+   "walk": {
+    "from": [
+     4,
+     6
+    ],
+    "to": [
+     5,
+     6
+    ],
+    "E_at_4_6": [
+     22.7408,
+     6.8621,
+     30.019
+    ],
+    "E_at_5_6": [
+     18.1928,
+     15.4421,
+     25.987
+    ]
+   }
+  },
+  "fillRule": {
+   "T1": [
+    [
+     0,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     4,
+     4
+    ]
+   ],
+   "T2": [
+    [
+     0,
+     0
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     0,
+     4
+    ]
+   ],
+   "diagonalCenters": [
+    [
+     0.5,
+     0.5
+    ],
+    [
+     1.5,
+     1.5
+    ],
+    [
+     2.5,
+     2.5
+    ],
+    [
+     3.5,
+     3.5
+    ]
+   ],
+   "withoutRule": {
+    "T1": 10,
+    "T2": 10,
+    "drawnTwice": 4,
+    "gaps": 0,
+    "total": 20
+   },
+   "withRule": {
+    "T1": 10,
+    "T2": 6,
+    "drawnTwice": 0,
+    "gaps": 0,
+    "total": 16
+   },
+   "diagonalOwner": [
+    "T1",
+    "T1",
+    "T1",
+    "T1"
+   ],
+   "edgeClasses": {
+    "T1 (0,0)->(4,0)": "not",
+    "T1 (4,4)->(0,0)": "top-left",
+    "T2 (0,0)->(4,4)": "not",
+    "T2 (0,4)->(0,0)": "top-left"
+   },
+   "halfAlphaTwice": 0.75
+  },
+  "clipping": {
+   "view": [
+    [
+     -0.8,
+     0.4,
+     -3
+    ],
+    [
+     1,
+     0.6,
+     -2.4
+    ],
+    [
+     0.3,
+     -0.5,
+     -0.4
+    ]
+   ],
+   "clip": [
+    [
+     -1.085,
+     0.966,
+     1.571,
+     3
+    ],
+    [
+     1.356,
+     1.449,
+     0.8,
+     2.4
+    ],
+    [
+     0.407,
+     -1.207,
+     -1.771,
+     0.4
+    ]
+   ],
+   "zPlusW": [
+    4.5714,
+    3.2,
+    -1.3714
+   ],
+   "insideFlags": [
+    true,
+    true,
+    false
+   ],
+   "crossings": [
+    {
+     "edge": "1→2",
+     "da": 3.2,
+     "db": -1.3714,
+     "t": 0.7,
+     "clip": [
+      0.692,
+      -0.41,
+      -1,
+      1
+     ],
+     "ndc": [
+      0.692,
+      -0.41,
+      -1
+     ],
+     "view": [
+      0.51,
+      -0.17,
+      -1
+     ]
+    },
+    {
+     "edge": "2→0",
+     "da": -1.3714,
+     "db": 4.5714,
+     "t": 0.2308,
+     "clip": [
+      0.063,
+      -0.706,
+      -1,
+      1
+     ],
+     "ndc": [
+      0.063,
+      -0.706,
+      -1
+     ],
+     "view": [
+      0.046,
+      -0.292,
+      -1
+     ]
+    }
+   ],
+   "polygon": [
+    [
+     -1.085,
+     0.966,
+     1.571,
+     3
+    ],
+    [
+     1.356,
+     1.449,
+     0.8,
+     2.4
+    ],
+    [
+     0.692,
+     -0.41,
+     -1,
+     1
+    ],
+    [
+     0.063,
+     -0.706,
+     -1,
+     1
+    ]
+   ],
+   "polygonVertices": 4,
+   "triangles": 2,
+   "fan": [
+    [
+     0,
+     1,
+     2
+    ],
+    [
+     0,
+     2,
+     3
+    ]
+   ],
+   "unclippedNdcOfBehindVertex": [
+    1.017,
+    -3.018,
+    -4.429
+   ]
+  },
+  "earlyZ": {
+   "example": {
+    "AthenB": {
+     "shadedWithoutEarlyZ": 28,
+     "shadedWithEarlyZ": 25
+    },
+    "BthenA": {
+     "shadedWithoutEarlyZ": 28,
+     "shadedWithEarlyZ": 22
+    }
+   },
+   "scene": {
+    "pixels": 2073600,
+    "overdraw": 3,
+    "backToFront": 6220800,
+    "frontToBack": 2073600,
+    "randomOrder": 3801600,
+    "randomFactor": 1.833
+   }
+  },
+  "blend": {
+   "redOverBlue": [
+    0.5,
+    0,
+    0.5
+   ],
+   "greenOverThat": [
+    0.25,
+    0.5,
+    0.25
+   ],
+   "orderSwapped": [
+    0.5,
+    0.25,
+    0.25
+   ],
+   "straight": {
+    "texelA": [
+     1,
+     0,
+     0,
+     1
+    ],
+    "texelB": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "midColor": [
+     0.5,
+     0,
+     0
+    ],
+    "midAlpha": 0.5,
+    "overWhite": [
+     0.75,
+     0.5,
+     0.5
+    ]
+   },
+   "premultiplied": {
+    "texelA": [
+     1,
+     0,
+     0,
+     1
+    ],
+    "texelB": [
+     0,
+     0,
+     0,
+     0
+    ],
+    "mid": [
+     0.5,
+     0,
+     0,
+     0.5
+    ],
+    "overWhite": [
+     1,
+     0.5,
+     0.5
+    ]
+   }
+  },
+  "deferred": {
+   "pixels": 2073600,
+   "gbufferBytesPerPixel": 16,
+   "gbufferMB": 33.2,
+   "lights": 100,
+   "forwardEvaluations": 622080000,
+   "deferredEvaluations": 207360000,
+   "tileLightsPerTile": 8,
+   "tiledEvaluations": 16588800
+  },
+  "bresenham": {
+   "from": [
+    0,
+    0
+   ],
+   "to": [
+    7,
+    3
+   ],
+   "steps": [
+    {
+     "x": 0,
+     "y": 0,
+     "err": -1
+    },
+    {
+     "x": 1,
+     "y": 0,
+     "err": 5
+    },
+    {
+     "x": 2,
+     "y": 1,
+     "err": -3
+    },
+    {
+     "x": 3,
+     "y": 1,
+     "err": 3
+    },
+    {
+     "x": 4,
+     "y": 2,
+     "err": -5
+    },
+    {
+     "x": 5,
+     "y": 2,
+     "err": 1
+    },
+    {
+     "x": 6,
+     "y": 3,
+     "err": -7
+    },
+    {
+     "x": 7,
+     "y": 3,
+     "err": -1
+    }
+   ],
+   "pixels": [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     4,
+     2
+    ],
+    [
+     5,
+     2
+    ],
+    [
+     6,
+     3
+    ],
+    [
+     7,
+     3
+    ]
+   ],
+   "incrementNoStep": 6,
+   "incrementStep": -8
   }
  }
 }

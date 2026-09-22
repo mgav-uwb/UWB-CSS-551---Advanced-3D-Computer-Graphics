@@ -888,6 +888,324 @@
     0.734
    ],
    "shine": 30
+  },
+  "halfEdge": {
+   "V": 9,
+   "F": 8,
+   "E": 16,
+   "halfEdges": 24,
+   "boundaryEdges": 8,
+   "interiorEdges": 8,
+   "euler": 1,
+   "ringOf4": [
+    1,
+    3,
+    6,
+    7,
+    5,
+    2
+   ],
+   "ringStart": {
+    "halfEdge": 5,
+    "from": 4,
+    "to": 1,
+    "face": 1,
+    "next": 3,
+    "twin": 6
+   },
+   "valence": [
+    2,
+    4,
+    3,
+    4,
+    6,
+    4,
+    3,
+    4,
+    2
+   ]
+  },
+  "euler": {
+   "cube": {
+    "V": 8,
+    "E": 12,
+    "F": 6,
+    "chi": 2
+   },
+   "grid": {
+    "V": 9,
+    "E": 16,
+    "F": 8,
+    "chi": 1,
+    "boundaryLoops": 1
+   },
+   "ico": {
+    "Vdeclared": 162,
+    "unreferenced": 0,
+    "V": 162,
+    "E": 480,
+    "F": 320,
+    "chi": 2,
+    "boundaryEdges": 0,
+    "nonManifoldEdges": 0
+   },
+   "bunny": {
+    "Vdeclared": 35947,
+    "unreferenced": 1113,
+    "V": 34834,
+    "E": 104288,
+    "F": 69451,
+    "chi": -3,
+    "boundaryEdges": 223,
+    "nonManifoldEdges": 0,
+    "boundaryLoops": 5,
+    "loopSizes": [
+     80,
+     42,
+     40,
+     39,
+     22
+    ],
+    "genus": 0
+   },
+   "bunnyL0": {
+    "Vdeclared": 454,
+    "unreferenced": 0,
+    "V": 454,
+    "E": 1325,
+    "F": 868,
+    "chi": -3,
+    "boundaryEdges": 46,
+    "nonManifoldEdges": 0,
+    "boundaryLoops": 5,
+    "genus": 0
+   }
+  },
+  "valence": {
+   "hist": {
+    "0": 1113,
+    "4": 461,
+    "5": 3948,
+    "6": 26169,
+    "7": 3889,
+    "8": 299
+   },
+   "unreferenced": 1113,
+   "mean": 5.988,
+   "sixFraction": 0.751,
+   "fiveOrSeven": 0.225
+  },
+  "laplacian": {
+   "neighborsOf4": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7
+   ],
+   "meanOfNeighbors4": [
+    0,
+    0,
+    0
+   ],
+   "lambda05": {
+    "v4": [
+     0,
+     0.2,
+     0
+    ],
+    "v1": [
+     -0.188,
+     0.05,
+     -1.125
+    ],
+    "v0": [
+     -1.125,
+     0,
+     -1.125
+    ]
+   },
+   "lambda1": {
+    "v4": [
+     0,
+     0,
+     0
+    ],
+    "v1": [
+     -0.375,
+     0.1,
+     -0.75
+    ],
+    "v0": [
+     -0.75,
+     0,
+     -0.75
+    ]
+   },
+   "note": "boundary vertices move too unless pinned"
+  },
+  "shrinkage": {
+   "icoVerts": 162,
+   "lambda": 0.5,
+   "radiusAfter": {
+    "1": 0.9776,
+    "5": 0.8932,
+    "20": 0.6367
+   },
+   "taubin": {
+    "lambda": 0.5,
+    "mu": -0.53,
+    "radiusAfter20": 1.0163
+   }
+  },
+  "marching": {
+   "center": [
+    0.2,
+    0.3,
+    0.2
+   ],
+   "radius": 1,
+   "values": [
+    0.588,
+    0.123,
+    -0.082,
+    0.245,
+    0.123,
+    -0.17,
+    -0.33,
+    -0.082
+   ],
+   "inside": [
+    1,
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0
+   ],
+   "caseIndex": 27,
+   "crossings": [
+    {
+     "edge": 1,
+     "a": 1,
+     "b": 2,
+     "crosses": true,
+     "t": 0.6,
+     "point": [
+      1,
+      0.6,
+      0
+     ]
+    },
+    {
+     "edge": 2,
+     "a": 2,
+     "b": 3,
+     "crosses": true,
+     "t": 0.25,
+     "point": [
+      0.75,
+      1,
+      0
+     ]
+    },
+    {
+     "edge": 4,
+     "a": 4,
+     "b": 5,
+     "crosses": true,
+     "t": 0.418,
+     "point": [
+      0.418,
+      0,
+      1
+     ]
+    },
+    {
+     "edge": 7,
+     "a": 7,
+     "b": 4,
+     "crosses": true,
+     "t": 0.4,
+     "point": [
+      0,
+      0.6,
+      1
+     ]
+    },
+    {
+     "edge": 9,
+     "a": 1,
+     "b": 5,
+     "crosses": true,
+     "t": 0.418,
+     "point": [
+      1,
+      0,
+      0.418
+     ]
+    },
+    {
+     "edge": 11,
+     "a": 3,
+     "b": 7,
+     "crosses": true,
+     "t": 0.75,
+     "point": [
+      0,
+      1,
+      0.75
+     ]
+    }
+   ],
+   "triangles": 4,
+   "totalCases": 256,
+   "uniqueCases": 15,
+   "loopOrder": [
+    [
+     0.418,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     0.418
+    ],
+    [
+     1,
+     0.6,
+     0
+    ],
+    [
+     0.75,
+     1,
+     0
+    ],
+    [
+     0,
+     1,
+     0.75
+    ],
+    [
+     0,
+     0.6,
+     1
+    ]
+   ]
+  },
+  "cache": {
+   "grid": 10,
+   "triangles": 200,
+   "cacheSize": 16,
+   "acmrRowMajor": 1.1,
+   "acmrShuffled": 2.695,
+   "acmrCache32": 0.605,
+   "lowerBound": 0.605,
+   "verticesPerTriangle": 3
   }
  },
  "tex": {
@@ -1268,6 +1586,426 @@
    },
    "lightAz": 55,
    "bumpDefault": 1.2
+  },
+  "projections": {
+   "point": [
+    0.5,
+    0.7,
+    0.3
+   ],
+   "radius": 0.911,
+   "planar": [
+    1,
+    0.8
+   ],
+   "cylindrical": {
+    "theta": 31,
+    "uv": [
+     0.086,
+     1.2
+    ]
+   },
+   "spherical": {
+    "theta": 31,
+    "phi": 50.2,
+    "uv": [
+     0.086,
+     0.779
+    ]
+   },
+   "seam": {
+    "a": [
+     0.999,
+     0,
+     0.01
+    ],
+    "b": [
+     0.999,
+     0,
+     -0.01
+    ],
+    "ua": 0.0016,
+    "ub": 0.9984
+   }
+  },
+  "lod": {
+   "texelsPerUnit": 12,
+   "rows": [
+    {
+     "row": 100,
+     "depth": 1.19,
+     "dudx": 0.11,
+     "dvdx": 0,
+     "dudy": 0,
+     "dvdy": -0.14,
+     "footprintX": 0.11,
+     "footprintY": 0.14,
+     "lod": -2.85,
+     "level": 0,
+     "anisotropy": 1.2,
+     "isoLevel": 0
+    },
+    {
+     "row": 60,
+     "depth": 1.96,
+     "dudx": 0.19,
+     "dvdx": 0,
+     "dudy": 0,
+     "dvdy": -0.37,
+     "footprintX": 0.19,
+     "footprintY": 0.37,
+     "lod": -1.43,
+     "level": 0,
+     "anisotropy": 2,
+     "isoLevel": 0
+    },
+    {
+     "row": 30,
+     "depth": 3.77,
+     "dudx": 0.36,
+     "dvdx": 0,
+     "dudy": 0,
+     "dvdy": -1.35,
+     "footprintX": 0.36,
+     "footprintY": 1.35,
+     "lod": 0.43,
+     "level": 0,
+     "anisotropy": 3.7,
+     "isoLevel": 0
+    },
+    {
+     "row": 10,
+     "depth": 9.82,
+     "dudx": 0.94,
+     "dvdx": 0,
+     "dudy": 0,
+     "dvdy": -8.77,
+     "footprintX": 0.94,
+     "footprintY": 8.77,
+     "lod": 3.13,
+     "level": 3,
+     "anisotropy": 9.3,
+     "isoLevel": 0
+    }
+   ],
+   "formula": "lod = log2(max(|d(u,v)/dx|, |d(u,v)/dy|)) in texels"
+  },
+  "bc1": {
+   "block": [
+    [
+     51,
+     102,
+     179
+    ],
+    [
+     64,
+     107,
+     179
+    ],
+    [
+     77,
+     112,
+     179
+    ],
+    [
+     89,
+     117,
+     179
+    ]
+   ],
+   "endpoints565": {
+    "c0": [
+     6,
+     25,
+     22
+    ],
+    "c1": [
+     20,
+     29,
+     17
+    ]
+   },
+   "endpoints": {
+    "c0": [
+     49,
+     101,
+     181
+    ],
+    "c1": [
+     165,
+     117,
+     140
+    ]
+   },
+   "palette": [
+    [
+     49,
+     101,
+     181
+    ],
+    [
+     165,
+     117,
+     140
+    ],
+    [
+     88,
+     106,
+     167
+    ],
+    [
+     126,
+     112,
+     154
+    ]
+   ],
+   "indices": [
+    0,
+    0,
+    2,
+    2,
+    2,
+    2,
+    2,
+    3,
+    2,
+    3,
+    3,
+    3,
+    3,
+    3,
+    1,
+    1
+   ],
+   "bits": 64,
+   "bitsPerTexel": 4,
+   "uncompressedBitsPerTexel": 24,
+   "ratio": 6,
+   "rmsError": 8.13,
+   "worstTexel": 20.4
+  },
+  "cubemap": {
+   "dir": [
+    0.303,
+    -0.808,
+    0.505
+   ],
+   "abs": [
+    0.303,
+    0.808,
+    0.505
+   ],
+   "majorAxis": "-Y",
+   "ma": 0.808,
+   "sc": 0.303,
+   "tc": -0.505,
+   "st": [
+    0.688,
+    0.188
+   ],
+   "texel256": [
+    176,
+    48
+   ],
+   "memory": {
+    "size": 512,
+    "faces": 6,
+    "bytesRGB8": 4718592,
+    "withMips": 6291456
+   }
+  },
+  "shadowMap": {
+   "lightDir": [
+    -0.667,
+    -0.667,
+    -0.333
+   ],
+   "orthoHalf": 3,
+   "resolution": 512,
+   "texelWorld": 0.0117,
+   "boxTopCenter": [
+    0,
+    1,
+    0
+   ],
+   "shadowQuadOnFloor": [
+    [
+     -1.5,
+     0,
+     -1
+    ],
+    [
+     -0.5,
+     0,
+     -1
+    ],
+    [
+     -0.5,
+     0,
+     0
+    ],
+    [
+     -1.5,
+     0,
+     0
+    ]
+   ],
+   "pointInShadow": [
+    -1,
+    0,
+    -0.5
+   ],
+   "pointLit": [
+    2.5,
+    0,
+    0
+   ],
+   "inShadow": {
+    "stored": 9.333,
+    "computed": 10.833,
+    "texel": [
+     256,
+     319
+    ],
+    "diff": 1.5
+   },
+   "lit": {
+    "stored": 8.333,
+    "computed": 8.333,
+    "texel": [
+     351,
+     128
+    ]
+   },
+   "floorAngleDeg": 48.2,
+   "depthPerTexelOnFloor": 0.0131,
+   "bias": 0.0197,
+   "coverageArea": {
+    "res": 512,
+    "worldArea": 36,
+    "texelsPerWorldUnit": 85.3,
+    "pixelsPerWorldUnitCamera": "depends on distance: at 720 rows and 45° fov, 1 unit at distance 5 spans 174 px"
+   }
+  },
+  "tangent": {
+   "tri": [
+    0,
+    3,
+    1
+   ],
+   "e1": [
+    0,
+    0,
+    1.5
+   ],
+   "e2": [
+    1.5,
+    0,
+    0
+   ],
+   "duv1": [
+    0,
+    0.5
+   ],
+   "duv2": [
+    0.5,
+    0
+   ],
+   "det": -0.25,
+   "T": [
+    3,
+    0,
+    0
+   ],
+   "B": [
+    0,
+    0,
+    3
+   ],
+   "Tunit": [
+    1,
+    0,
+    0
+   ],
+   "Bunit": [
+    0,
+    0,
+    1
+   ],
+   "N": [
+    0,
+    1,
+    0
+   ],
+   "handedness": -1,
+   "note": "T runs along +x (u increases with column), B along +z (v increases with row)",
+   "sample": {
+    "tangentSpace": [
+     0.457,
+     0.457,
+     0.762
+    ],
+    "world": [
+     0.457,
+     0.762,
+     0.457
+    ],
+    "encoded": [
+     186,
+     186,
+     225
+    ]
+   }
+  },
+  "parallax": {
+   "viewTangent": [
+    0.518,
+    0.207,
+    0.83
+   ],
+   "height": 0.3,
+   "scale": 0.05,
+   "offset": [
+    0.0094,
+    0.0037
+   ],
+   "grazing": {
+    "viewTangent": [
+     0.97,
+     0.108,
+     0.216
+    ],
+    "offset": [
+     0.0675,
+     0.0075
+    ]
+   }
+  },
+  "anisotropic": {
+   "row": {
+    "row": 10,
+    "depth": 9.82,
+    "dudx": 0.94,
+    "dvdx": 0,
+    "dudy": 0,
+    "dvdy": -8.77,
+    "footprintX": 0.94,
+    "footprintY": 8.77,
+    "lod": 3.13,
+    "level": 3,
+    "anisotropy": 9.3,
+    "isoLevel": 0
+   },
+   "taps": 10,
+   "note": "sample the shorter-axis level along the long axis"
+  },
+  "atlas": {
+   "textures": 16,
+   "size": 256,
+   "atlasSize": 1024,
+   "padding": 4,
+   "usable": 0.969,
+   "mipBleedLevel": 3
   }
  },
  "ill": {
@@ -1593,6 +2331,230 @@
     62.76
    ],
    "imageSize": 150
+  },
+  "irradiance": {
+   "skyRadiance": 1,
+   "E": 3.1416,
+   "lambertBrdf": "ρ/π",
+   "outgoingWhite": 1,
+   "phongNorm": {
+    "s": 30,
+    "factor": 5.093,
+    "s128": 20.69
+   }
+  },
+  "ao": {
+   "sphere": {
+    "center": [
+     0,
+     1,
+     0
+    ],
+    "radius": 1
+   },
+   "samples": 4000,
+   "table": [
+    {
+     "x": 0.05,
+     "ao": 0.003
+    },
+    {
+     "x": 0.25,
+     "ao": 0.088
+    },
+    {
+     "x": 0.5,
+     "ao": 0.282
+    },
+    {
+     "x": 1,
+     "ao": 0.647
+    },
+    {
+     "x": 1.5,
+     "ao": 0.825
+    },
+    {
+     "x": 2,
+     "ao": 0.908
+    },
+    {
+     "x": 3,
+     "ao": 0.968
+    },
+    {
+     "x": 4,
+     "ao": 0.988
+    }
+   ],
+   "crease90": 0.5,
+   "creaseNote": "a point in a 90° crease sees half its hemisphere: AO 0.5 at the corner, rising to 1 away from it"
+  },
+  "sh": {
+   "sky": "radiance 1 above the horizon, 0.2 below",
+   "coefficients": [
+    2.1269,
+    1.228,
+    0,
+    0
+   ],
+   "convolution": [
+    3.1416,
+    2.0944
+   ],
+   "rows": [
+    {
+     "elevation": 90,
+     "exact": 3.142,
+     "sh": 3.142
+    },
+    {
+     "elevation": 60,
+     "exact": 2.973,
+     "sh": 2.973
+    },
+    {
+     "elevation": 35.3,
+     "exact": 2.611,
+     "sh": 2.611
+    },
+    {
+     "elevation": 0,
+     "exact": 1.885,
+     "sh": 1.885
+    },
+    {
+     "elevation": -45,
+     "exact": 0.996,
+     "sh": 0.996
+    },
+    {
+     "elevation": -90,
+     "exact": 0.628,
+     "sh": 0.628
+    }
+   ],
+   "markedNormal": {
+    "elevation": 35.3,
+    "exact": 2.61,
+    "sh": 2.61
+   },
+   "exactBecause": "the irradiance of a sky that is constant on each side of the horizon is pi L (1 + cos theta)/2 per half, linear in the cosine, which L1 spans exactly"
+  },
+  "shSun": {
+   "sun": {
+    "radiance": 30,
+    "halfAngleDeg": 10,
+    "dir": [
+     0.612,
+     0.5,
+     0.612
+    ]
+   },
+   "coefficients9": [
+    2.93,
+    1.918,
+    0.846,
+    0.846,
+    0.931,
+    0.931,
+    0.11,
+    1.141,
+    0.191
+   ],
+   "rows": [
+    {
+     "normal": "toward the sun",
+     "exact": 5.34,
+     "L1": 4.639,
+     "L2": 5.509
+    },
+    {
+     "normal": "the marked normal",
+     "exact": 5.425,
+     "L1": 4.73,
+     "L2": 5.589
+    },
+    {
+     "normal": "straight up",
+     "exact": 4.554,
+     "L1": 4.56,
+     "L2": 4.451
+    },
+    {
+     "normal": "away from the sun",
+     "exact": 1.257,
+     "L1": 0.555,
+     "L2": 1.425
+    }
+   ]
+  },
+  "areaLight": {
+   "radius": 0.5,
+   "radiance": 1,
+   "rows": [
+    {
+     "h": 0.25,
+     "exact": 2.5133,
+     "point": 12.5664,
+     "ratio": 5
+    },
+    {
+     "h": 0.5,
+     "exact": 1.5708,
+     "point": 3.1416,
+     "ratio": 2
+    },
+    {
+     "h": 1,
+     "exact": 0.6283,
+     "point": 0.7854,
+     "ratio": 1.25
+    },
+    {
+     "h": 2,
+     "exact": 0.1848,
+     "point": 0.1963,
+     "ratio": 1.063
+    },
+    {
+     "h": 4,
+     "exact": 0.0483,
+     "point": 0.0491,
+     "ratio": 1.016
+    }
+   ],
+   "formula": "E = π L R² / (h² + R²) on axis"
+  },
+  "deferred": {
+   "pixels": 2073600,
+   "overdraw": 3,
+   "lights": 32,
+   "forward": {
+    "evaluations": 199065600,
+    "ops": 23887872000
+   },
+   "deferred": {
+    "gbufferMB": 41.5,
+    "evaluations": 66355200,
+    "ops": 7962624000,
+    "ratio": 3
+   },
+   "tiled": {
+    "tile": 16,
+    "tiles": 8160,
+    "lightsPerTileTypical": 6,
+    "evaluations": 12441600
+   }
+  },
+  "perVertexVsPixel": {
+   "bunny": {
+    "vertices": 35947,
+    "pixelsCovered": 250000
+   },
+   "gouraudEvaluations": 35947,
+   "phongEvaluations": 250000,
+   "ratio": 7
   }
  }
 }
