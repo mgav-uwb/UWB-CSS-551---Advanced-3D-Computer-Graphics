@@ -1,0 +1,534 @@
+<!doctype html>
+<!-- CSS 551 course text: Unity for This Course. Topic chapter for the tool the studios and machine problems
+     use; independent of any offering's schedule (the hub attaches it). Shared stylesheet: textbook.css.
+     Figures in figures/unity-*.svg are laid out or computed by tools/gen-textbook-figures-unity.mjs (no
+     editor screenshots: the schematics carry no version and no copyrighted pixels); the numbers quoted come
+     from figures/numbers-unity.json, computed with lib/core/xform.js. C# excerpts follow the studio projects
+     (Kelvin Sung's CSS 451 ClassExamples, distributed on Canvas). Never hand-edit the figures. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unity for This Course - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and uses MathJax for its
+        formulas. Read it through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the math.
+        <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Unity for This Course: the Editor, Objects, Scripts, and the Math Types</h1>
+      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
+      <div class="src">
+        Course text &middot; everything the Thursday studios and the machine problems assume about the tool: what the editor&rsquo;s windows are, what a scene is made of, how a script runs, how C# will surprise a Java or C++ programmer, what <code>Vector3</code>, <code>Quaternion</code> and <code>Matrix4x4</code> do and how they map onto the text&rsquo;s conventions, and how to open, run, read and debug a studio project. Read before the first studio; return to Sections 6 and 7 before the matrix and mesh studios.
+      </div>
+
+      <p class="lead">
+        The mathematics of this text is engine-independent. The practice is not: the studios and machine problems run in Unity, and they assume a working knowledge of the editor, the object model, the scripting lifecycle and the engine&rsquo;s math types that no lecture has time to teach. This chapter is that knowledge, in the order the studios need it. It is not a Unity tutorial in the usual sense. It skips terrain, physics, audio, animation clips and everything else a game needs, and it goes deeper than a tutorial on the four things a graphics course needs: the transform hierarchy and what local and world mean in numbers, the frame loop and its two clocks, the matrix type and its storage, and the difference between the engine&rsquo;s conventions and the text&rsquo;s. The course rule, implement and replace, is stated at the end with the list of helpers it forbids and the primitives it allows.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#install">Installing, and the one version</a></li>
+          <li><a href="#editor">The editor: six windows and a button</a></li>
+          <li><a href="#objects">Scenes, objects, components</a></li>
+          <li><a href="#scripts">Scripts: the lifecycle and the two clocks</a></li>
+          <li><a href="#csharp">C# for people who know Java or C++</a></li>
+          <li><a href="#transform">The Transform: local, world, parent</a></li>
+          <li><a href="#mathtypes">The math types, against the text&rsquo;s conventions</a></li>
+          <li><a href="#assets">Meshes, materials, textures, prefabs, cameras, lights</a></li>
+          <li><a href="#input">Input, UI, and drawing debug geometry</a></li>
+          <li><a href="#projects">Reading a studio project</a></li>
+          <li><a href="#rule">The course rule: implement and replace</a></li>
+          <li><a href="#exercises">Exercises</a></li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="install">1 &middot; Installing, and the one version</h2>
+      <p>
+        Unity is installed through <em>Unity Hub</em>, a launcher that manages editor versions, licenses
+        and projects. The course pins one editor version, Unity 6000.3.11f1 LTS, and every studio project
+        was saved by it. Opening a project in a different version triggers an upgrade that rewrites project
+        files, produces diffs that are not your work, and occasionally breaks a script; if Hub offers to
+        open a project in a newer version, decline and install the pinned one from Installs. A personal
+        license is free and sufficient. The editor download is several gigabytes; start it before the first
+        studio, not during it.
+      </p>
+      <p>
+        A project is a folder. Everything the editor knows about it lives under <code>Assets/</code> (your
+        scenes, scripts, materials, textures, in whatever subfolders you make) and
+        <code>ProjectSettings/</code>; the <code>Library/</code> folder is a cache the editor rebuilds and
+        should never be shared or committed. The studio projects arrive as zip files on Canvas; unzip one,
+        add its folder in Hub under Projects, and open it. The first open of any project compiles its
+        scripts and imports its assets, which takes a minute and is normal.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="editor">2 &middot; The editor: six windows and a button</h2>
+      <figure>
+        <img src="figures/unity-editor.svg" alt="A schematic of the Unity editor layout: a toolbar with the Play button; a Hierarchy panel listing Main Camera, Directional Light, Cube with a child Handle, and Controller; a Scene panel with a cube on a ground plane and the move gizmo; an Inspector panel listing the cube's Transform, Mesh Filter, Mesh Renderer and a Bounce script; a Project panel showing the Assets folders; and a Console panel with a log line and a compile error." />
+        <figcaption>The default layout, as a schematic. Every window can be moved or closed and brought back from the Window menu; the studios assume this arrangement.</figcaption>
+      </figure>
+      <ul>
+        <li><strong>Hierarchy</strong> lists the objects in the open scene as a tree. Indentation is parenting, and parenting is the scene graph of <a href="scene-graphs.html">the scene-graph chapter</a>: a child&rsquo;s transform is expressed in its parent&rsquo;s frame. Drag one object onto another to parent it.</li>
+        <li><strong>Scene</strong> is the world seen from the <em>editor</em> camera, which is not an object in the scene and is not what the player sees. Orbit it with Alt and the left mouse button, pan with the middle button, zoom with the wheel, and press F with an object selected to frame it. The three colored handles on a selected object are the move gizmo (x red, y green, z blue); W, E, R switch between move, rotate and scale.</li>
+        <li><strong>Game</strong> is the scene&rsquo;s own camera&rsquo;s view, the player&rsquo;s picture, drawn only in Play mode.</li>
+        <li><strong>Inspector</strong> shows the selected object&rsquo;s components with their editable fields, including the public fields of your scripts. Dragging a scene object onto a field of object or component type is how references are wired without code.</li>
+        <li><strong>Project</strong> is <code>Assets/</code> on disk. Double-click a script to open it in the external editor (Visual Studio, Rider or VS Code); double-click a scene to load it.</li>
+        <li><strong>Console</strong> shows <code>Debug.Log</code> output, warnings, and compile errors. A compile error anywhere in the project stops Play from starting; the Console names the file and line.</li>
+      </ul>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        Edits made in Play mode are discarded when Play stops. The tint of the editor changes to say so, and it is still the most common way to lose twenty minutes of tuning: values dragged in the Inspector while the ▶ button is lit revert to their pre-Play state. Tune in Play mode if you like the live feedback, write the numbers down, stop, and re-enter them. Script edits are different: saving a script while playing recompiles it and restarts the domain, which usually ends the session anyway.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="objects">3 &middot; Scenes, objects, components</h2>
+      <div class="def">
+        <span class="tag">Definition (the object model)</span>
+        A <strong>scene</strong> is a file holding a collection of <strong>GameObjects</strong>. A GameObject
+        is a name and a list of <strong>components</strong>; it does nothing by itself. Every GameObject has
+        exactly one <strong>Transform</strong> component (position, rotation, scale, and the parent link)
+        and any number of others: a <code>MeshFilter</code> names a mesh, a <code>MeshRenderer</code>
+        draws it with a material, a <code>Camera</code> or <code>Light</code> makes the object a viewpoint
+        or a light source, and a <strong>script</strong> is a component you write. Behavior lives in
+        components; the object is the bag they are attached to.
+      </div>
+      <figure>
+        <img src="figures/unity-object-model.svg" alt="A diagram: a Scene box points to a GameObject box, which always has a Transform component and may have MeshFilter, MeshRenderer, Camera or Light, and a script deriving from MonoBehaviour, each with a one-line description." />
+        <figcaption>The object model. A script is one more component, and Unity, not your code, calls its methods.</figcaption>
+      </figure>
+      <p>
+        Two consequences shape every studio script. First, a script needs to know which object it is on
+        and which others it should touch: <code>transform</code> and <code>gameObject</code> are the
+        script&rsquo;s own; <code>GetComponent&lt;T&gt;()</code> finds a sibling component on the same object;
+        and a public field of type <code>GameObject</code>, <code>Transform</code> or a script type is
+        filled by dragging in the Inspector. Second, the Inspector is the engine&rsquo;s view of your model:
+        a public field is visible and editable there, and its Inspector value overrides the initializer in the
+        code. The studio projects use this constantly, and it is the first place to look when a value in the
+        code seems to have no effect.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="scripts">4 &middot; Scripts: the lifecycle and the two clocks</h2>
+      <p>
+        A console program runs top to bottom and exits. An interactive program never returns: the engine
+        runs the loop of <a href="rasterization.html#loop">the rasterization chapter</a> (read input, update
+        the state, draw) forever, and a script hooks the middle of it. The hooks are methods with fixed
+        names on a class deriving from <code>MonoBehaviour</code>.
+      </p>
+      <pre>using UnityEngine;
+
+public class Bounce : MonoBehaviour {
+    public float yRange = 3f;          // visible in the Inspector; its value there wins
+    public float speed  = 2f;
+    private float dir   = 1f;          // private: not shown, not overridden
+
+    void Start() {                     // once, before the first frame this object is active
+        Debug.Log("Bounce on " + gameObject.name);
+    }
+
+    void Update() {                    // once per frame, whatever the frame rate
+        Vector3 p = transform.localPosition;         // a copy (Vector3 is a struct)
+        p.y += dir * speed * Time.deltaTime;         // rate times seconds: per-second motion
+        if (p.y > yRange || p.y < -yRange) dir = -dir;
+        transform.localPosition = p;                 // write the copy back, or nothing moves
+    }
+}</pre>
+      <figure>
+        <img src="figures/unity-lifecycle.svg" alt="A timeline of one Play session: Awake and Start once at the top; a 60 hertz row of Update boxes followed by late update and render; a 50 hertz physics row of FixedUpdate ticks at 20 millisecond spacing, six frames long." />
+        <figcaption>The calls Unity makes into a script. <code>Awake</code> and <code>Start</code> run once; <code>Update</code> runs every frame at whatever rate the machine achieves; <code>FixedUpdate</code> runs on its own fixed clock, 50 times a second by default, and the two do not line up.</figcaption>
+      </figure>
+      <div class="def">
+        <span class="tag">Definition (the lifecycle methods)</span>
+        <code>Awake()</code> runs when the object is created, before any <code>Start</code>; use it for
+        the object&rsquo;s own setup. <code>Start()</code> runs once before the object&rsquo;s first
+        <code>Update</code>; use it for setup that needs other objects. <code>Update()</code> runs once per
+        rendered frame; <code>LateUpdate()</code> runs after every object&rsquo;s <code>Update</code> (a
+        camera that follows a character reads the character&rsquo;s final position here);
+        <code>FixedUpdate()</code> runs on the physics clock, every <code>Time.fixedDeltaTime</code> seconds
+        (0.02 by default), zero or more times per frame; <code>OnDestroy()</code> runs when the object is
+        removed. Unity calls them by name, and a misspelled <code>update()</code> is simply never called,
+        with no error.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (per frame against per second)</span>
+        A script that does <code>p.x += 1f</code> in <code>Update</code> moves one unit every frame: 60
+        units per second on a 60 Hz machine, 30 on a 30 Hz one, 144 on a fast monitor. The same script with
+        <code>p.x += 3f * Time.deltaTime</code> moves 0.05 per frame at 60 Hz, 0.1 at 30 Hz and 0.0208 at
+        144 Hz, and after one second it has moved 3 units on all three. <code>Time.deltaTime</code> is the
+        length of the last frame in seconds; a rate multiplied by it is a step in units, and the motion is
+        the same on every machine. The studio&rsquo;s first poke removes the multiplication so that the
+        difference can be seen.
+      </div>
+      <figure>
+        <img src="figures/unity-deltatime.svg" alt="Position against seconds of play: three dashed lines for one unit per frame at 30, 60 and 144 frames per second reaching 30, 60 and 144; one solid blue line for three units per second reaching 3 at every frame rate." />
+        <figcaption>The two ways to move, at three frame rates. Only the per-second form gives the same motion everywhere.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (the two clocks)</span>
+        At 60 Hz a frame is 16.67 ms and the fixed step is 20 ms. Frame 1 ends at 16.67 ms with no fixed
+        step due; frame 2 ends at 33.33 ms and runs one, carrying 13.33 ms; frames 3, 4, 5 and 6 each run
+        one, carrying 10, 6.67, 3.33 and 0 ms. Six frames, five <code>FixedUpdate</code> calls, and the
+        pattern repeats every 100 ms. Anything physical (forces, rigid bodies) belongs in
+        <code>FixedUpdate</code> so that its step is constant; everything visual belongs in
+        <code>Update</code>. This is the accumulator of <a href="interaction.html#timestep">the interactive-systems
+        chapter</a>, built into the engine.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="csharp">5 &middot; C# for people who know Java or C++</h2>
+      <p>
+        Unity scripts are C#, and a programmer who knows Java or C++ can read them at once. The
+        differences that matter for the studios fit in one table; the one that causes bugs is the last row.
+      </p>
+      <table>
+        <tr><th>you write</th><th>it means</th><th>note</th></tr>
+        <tr><td><code>public float speed = 2f;</code></td><td>a public field</td><td>shown in the Inspector; the <code>f</code> suffix makes a <code>float</code> literal, since <code>2.0</code> alone is a <code>double</code> and will not assign</td></tr>
+        <tr><td><code>[SerializeField] private int n;</code></td><td>a private field still shown in the Inspector</td><td>the studio code uses public fields; either works</td></tr>
+        <tr><td><code>var v = new Vector3(1, 2, 3);</code></td><td>local type inference</td><td>as in modern Java and C++; the type is still fixed at compile time</td></tr>
+        <tr><td><code>foreach (var c in list)</code></td><td>iterate</td><td>Java&rsquo;s for-each; <code>List&lt;T&gt;</code> is <code>System.Collections.Generic</code></td></tr>
+        <tr><td><code>void M(ref Matrix4x4 m)</code></td><td>pass by reference</td><td>the caller writes <code>M(ref x)</code>; the studios&rsquo; scene-graph code passes matrices this way to avoid copies</td></tr>
+        <tr><td><code>GetComponent&lt;Renderer&gt;()</code></td><td>a generic method call</td><td>the angle brackets name the component type wanted</td></tr>
+        <tr><td><code>transform.localPosition.x = 1;</code></td><td>a compile error</td><td><code>Vector3</code> is a <em>struct</em>, a value type: the property returns a copy, and assigning into a copy is refused. Read into a local, change it, write it back.</td></tr>
+      </table>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        <code>Vector3</code>, <code>Quaternion</code>, <code>Matrix4x4</code> and <code>Color</code> are
+        structs; <code>GameObject</code>, <code>Transform</code>, <code>Mesh</code> and every component are
+        classes. Assigning a struct copies it; assigning a class copies a reference. So
+        <code>Vector3 p = transform.localPosition; p.x += 1;</code> changes nothing on screen until
+        <code>transform.localPosition = p;</code>, while <code>Transform t = other.transform; t.localPosition = ...</code>
+        moves the other object immediately. The same rule explains why <code>mesh.vertices[0] = v</code>
+        does nothing: the <code>vertices</code> property returns a fresh copy of the array each time, and
+        the studio code that builds meshes therefore fills a local array and assigns the whole array once
+        (<a href="meshes.html#grid">the meshes chapter</a> shows the pattern).
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="transform">6 &middot; The Transform: local, world, parent</h2>
+      <div class="def">
+        <span class="tag">Definition (the Transform&rsquo;s fields)</span>
+        <code>localPosition</code>, <code>localRotation</code> (a <code>Quaternion</code>) and
+        <code>localScale</code> are the node&rsquo;s transform relative to its parent, the \(L\) of
+        <a href="scene-graphs.html#rule">the scene-graph chapter</a>, composed as
+        \(T\,R\,S\) in that order; <code>localEulerAngles</code> is the same rotation as three angles.
+        <code>position</code>, <code>rotation</code> and <code>lossyScale</code> are the world values,
+        read from the composite \(W = W_{\text{parent}}\,L\); setting <code>position</code> solves for the
+        <code>localPosition</code> that produces it. <code>parent</code> is the link up the tree, and
+        <code>SetParent(p, true)</code> reparents while keeping the world pose. For an object at the root
+        the local and world values coincide.
+      </div>
+      <figure>
+        <img src="figures/unity-hierarchy.svg" alt="A top view: a parent object at (2, 0, 0) rotated 90 degrees about y, its local x axis now pointing along negative z; a child with local position (1, 0, 0) drawn at world position (2, 0, minus 1) along the parent's rotated x axis." />
+        <figcaption>A parent at \((2, 0, 0)\) turned \(90^\circ\) about \(y\); its child&rsquo;s local \((1, 0, 0)\) lands at world \((2, 0, -1)\), because the parent&rsquo;s local \(x\) axis now points along world \(-z\).</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (local to world, by hand and by the engine)</span>
+        Parent: <code>localPosition = (2, 0, 0)</code>, <code>localEulerAngles = (0, 90, 0)</code>, scale 1.
+        Child: <code>localPosition = (1, 0, 0)</code>. Grandchild under the child:
+        <code>localPosition = (0, 1, 0)</code>. The rotation chapter&rsquo;s \(R_y(90^\circ)\) sends
+        \((1, 0, 0)\) to \((0, 0, -1)\), so the child&rsquo;s world position is
+        \((2, 0, 0) + (0, 0, -1) = (2, 0, -1)\), and the grandchild&rsquo;s is \((2, 1, -1)\), one unit up,
+        since a rotation about \(y\) leaves \(y\) alone. The engine reports exactly these as
+        <code>child.transform.position</code> and <code>grandchild.transform.position</code>, and
+        <code>parent.transform.TransformPoint(new Vector3(1, 0, 0))</code> returns \((2, 0, -1)\) as well:
+        <code>TransformPoint</code> is \(W\) applied to a point, <code>TransformDirection</code> is its
+        rotation applied to a vector (no translation), and the <code>Inverse</code> forms go the other way.
+        The child&rsquo;s own <code>transform.forward</code>, its local \(+z\) in world coordinates, is
+        \((1, 0, 0)\).
+      </div>
+      <p>
+        Two facts about scale. A non-uniform scale on a parent shears a rotated child, which is why the
+        engine exposes <code>lossyScale</code> rather than a true world scale and why
+        <a href="scene-graphs.html#shear">the scene-graph chapter</a> warns against scaling anything but leaves.
+        And <code>localScale</code> scales about the object&rsquo;s own origin, which for an imported mesh is
+        wherever the modeler put it; the studios&rsquo; pivot sandwich (<a href="affine-transforms.html#pivots">the
+        affine chapter</a>) exists because the mesh origin and the desired pivot rarely coincide.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="mathtypes">7 &middot; The math types, against the text&rsquo;s conventions</h2>
+      <p>
+        Unity&rsquo;s <code>Vector3</code>, <code>Quaternion</code> and <code>Matrix4x4</code> are the
+        objects of <a href="vectors.html">the vectors</a>, <a href="rotation.html">rotation</a> and
+        <a href="affine-transforms.html">affine</a> chapters with a few differences of convention. All the
+        algebra transfers; three conventions need naming.
+      </p>
+      <figure>
+        <img src="figures/unity-handedness.svg" alt="Two coordinate frames side by side: the text's right-handed frame with x right, y up and z toward the viewer; Unity's left-handed frame with x right, y up and z forward, into the page. A line below says the cross product of right and up is (0, 0, 1) in both." />
+        <figcaption>The same three axes, drawn two ways. The algebra of the cross product is identical; only the direction \(+z\) is drawn in differs, and Unity calls \(+z\) forward.</figcaption>
+      </figure>
+      <div class="thm">
+        <span class="tag">Handedness</span>
+        Unity&rsquo;s world is left-handed with \(y\) up: \(x\) right, \(y\) up, \(z\) forward, into the screen.
+        The text and its library are right-handed with \(z\) toward the viewer. <code>Vector3.Cross(right, up)</code>
+        returns \((0, 0, 1)\), exactly the component formula of the vectors chapter; Unity names that
+        vector <code>forward</code>. A positive rotation about an axis is clockwise when looking along the
+        axis in Unity and counter-clockwise in the text, but the matrices and quaternions are the same
+        numbers: <code>Quaternion.AngleAxis(90, Vector3.up)</code> applied to <code>forward</code> gives
+        <code>right</code>, \((1, 0, 0)\), and the rotation chapter&rsquo;s \(R_y(90^\circ)\) applied to
+        \((0, 0, 1)\) gives \((1, 0, 0)\) too. A formula written in the text runs unchanged in a script; a
+        picture drawn from the text must be mirrored in \(z\) to match the Scene view.
+      </div>
+      <table>
+        <tr><th>the text</th><th>Unity</th><th>note</th></tr>
+        <tr><td>\(\mathbf{a}\cdot\mathbf{b}\), \(\mathbf{a}\times\mathbf{b}\), \(|\mathbf{a}|\), \(\hat{\mathbf{a}}\)</td><td><code>Vector3.Dot(a, b)</code>, <code>Vector3.Cross(a, b)</code>, <code>a.magnitude</code>, <code>a.normalized</code></td><td><code>a.sqrMagnitude</code> avoids the square root; <code>Vector3.Angle</code> is the arccos of the dot in degrees</td></tr>
+        <tr><td>\((x, y, z, w)\) unit quaternion</td><td><code>Quaternion</code> with fields <code>x, y, z, w</code></td><td>same component order as <code>quatFromAxisAngle</code>; <code>Quaternion.AngleAxis(deg, axis)</code> builds one, <code>q * v</code> rotates a vector, <code>q1 * q2</code> composes (\(q_2\) first), <code>Quaternion.Slerp</code> is the rotation chapter&rsquo;s slerp</td></tr>
+        <tr><td>Euler angles, engine-dependent order</td><td><code>Quaternion.Euler(x, y, z)</code>, <code>localEulerAngles</code></td><td>applied as \(R_y R_x R_z\) (the \(z\) rotation first); <a href="rotation.html#euler">the rotation chapter</a> works the same triple in three conventions</td></tr>
+        <tr><td>a \(4\times4\) affine matrix, column-major array</td><td><code>Matrix4x4</code>, <code>m[row, col]</code>, flat <code>m[i]</code></td><td>column-major like the library; <code>Matrix4x4.TRS(t, q, s)</code> is \(T R S\); <code>m.MultiplyPoint(p)</code> applies \(M\) to a point with the divide, <code>MultiplyPoint3x4</code> without, <code>MultiplyVector</code> ignores translation; <code>m.inverse</code>, <code>m.transpose</code>; <code>GetColumn(3)</code> is the translation</td></tr>
+        <tr><td>degrees in \(\sin\), \(\cos\)</td><td><code>Mathf.Sin(Mathf.Deg2Rad * deg)</code></td><td><code>Mathf</code> works in radians; <code>Mathf.Deg2Rad</code> and <code>Rad2Deg</code> convert</td></tr>
+        <tr><td>\(P\) of the viewing chapter</td><td><code>Matrix4x4.Perspective(fovY, aspect, near, far)</code></td><td>same entries as the library&rsquo;s <code>perspective</code>; <code>Camera.projectionMatrix</code> holds it, <code>worldToCameraMatrix</code> holds \(V\)</td></tr>
+      </table>
+      <figure>
+        <img src="figures/unity-matrix.svg" alt="A 4 by 4 grid of cells for Matrix4x4.TRS with translation (2, 0.5, minus 1), rotation 30 degrees about y and scale 2: each cell shows its row-column index, its value and its flat index in red; the top-right column of translation cells is highlighted in orange." />
+        <figcaption>One <code>Matrix4x4</code> two ways: indexed <code>m[row, col]</code> as the engine prints it, and by the flat index <code>m[i]</code> that runs down the columns. The translation sits at flat indices 12, 13, 14.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (a TRS matrix, read back)</span>
+        <code>Matrix4x4.TRS(new Vector3(2, 0.5f, -1), Quaternion.Euler(0, 30, 0), Vector3.one * 2)</code> has
+        rows \((1.732, 0, 1, 2)\), \((0, 2, 0, 0.5)\), \((-1, 0, 1.732, -1)\), \((0, 0, 0, 1)\). The first three
+        columns are \(R_y(30^\circ)\) scaled by 2: column 0 is \((1.732, 0, -1)\), of length 2, where the
+        rotated \(x\) axis went; column 3 is the translation. <code>m[0, 3]</code> is 2 and so is
+        <code>m[12]</code>: the flat index is column times 4 plus row, exactly the layout of the course
+        library&rsquo;s 16-element arrays, so a matrix printed by <code>node</code> from
+        <code>makeTRS(2, 0.5, -1, 0, 30, 0, 2, 2, 2)</code> lists the same sixteen numbers in the same
+        order. The read-back of <a href="affine-transforms.html#trs">the affine chapter</a> recovers the
+        scale as the column lengths and the rotation as the normalized columns.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="assets">8 &middot; Meshes, materials, textures, prefabs, cameras, lights</h2>
+      <p>
+        <strong>Mesh.</strong> A <code>Mesh</code> object holds the arrays of <a href="meshes.html#arrays">the
+        meshes chapter</a>: <code>vertices</code> (<code>Vector3[]</code>), <code>triangles</code>
+        (<code>int[]</code>, three per triangle, clockwise seen from the front in Unity&rsquo;s left-handed
+        convention), <code>normals</code>, <code>uv</code> (<code>Vector2[]</code>). A <code>MeshFilter</code>
+        holds the mesh and a <code>MeshRenderer</code> draws it. Build by filling local arrays and assigning
+        each whole array once; <code>RecalculateNormals()</code> computes the averaged normals the chapter
+        derives by hand, and the studio projects compute them by hand instead, which is the point.
+      </p>
+      <p>
+        <strong>Material and texture.</strong> A material is a shader plus the values of its properties; the
+        same shader with different values is a different material. <code>renderer.material</code> returns
+        a per-object copy (editing it affects one object), <code>sharedMaterial</code> the asset itself. A
+        texture is an image asset; drop it into the <code>Assets</code> folder and Unity imports it, and the
+        material&rsquo;s main texture slot takes it. <a href="unity-shaders.html">The shader chapter</a> covers
+        what the material feeds to the shader and how a script sets properties from code.
+      </p>
+      <p>
+        <strong>Prefab.</strong> A prefab is a saved GameObject (with its components and children) that can
+        be instantiated any number of times: <code>Instantiate(prefab, position, rotation)</code> returns a
+        new copy, and <code>Destroy(obj)</code> removes one at the end of the frame. The studios&rsquo;
+        vertex handles are instantiated sphere prefabs, one per vertex.
+      </p>
+      <p>
+        <strong>Camera and light.</strong> The scene&rsquo;s camera is a GameObject with a <code>Camera</code>
+        component; its Transform is the eye and its fields (<code>fieldOfView</code>, <code>aspect</code>,
+        <code>nearClipPlane</code>, <code>farClipPlane</code>, <code>orthographic</code>) are the parameters of
+        <a href="viewing.html#projection">the viewing chapter</a>. <code>Camera.main</code> finds the one
+        tagged MainCamera; <code>ScreenPointToRay(Input.mousePosition)</code> is the unprojection of
+        <a href="interaction.html#unproject">the interactive-systems chapter</a>. A <code>Light</code>
+        component makes its object a directional, point or spot light with a color and an intensity; the
+        studio shaders ignore the engine&rsquo;s lighting and read the light&rsquo;s transform themselves.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="input">9 &middot; Input, UI, and drawing debug geometry</h2>
+      <p>
+        The studio projects use the classic input API: <code>Input.GetKey(KeyCode.W)</code> is true while a
+        key is held, <code>GetKeyDown</code> on the frame it was pressed, <code>Input.GetMouseButton(0)</code>
+        for the left button, <code>Input.mousePosition</code> for the pointer in window pixels (origin at the
+        bottom left), and <code>Input.GetAxis("Mouse X")</code> for the pointer&rsquo;s motion this frame.
+        Unity 6 also ships the newer Input System package; the studio code does not use it, and a project
+        set to one API silently ignores the other.
+      </p>
+      <p>
+        User interface elements (sliders, buttons, toggles) live on a <code>Canvas</code> object and are
+        wired to scripts by events: a <code>Slider</code>&rsquo;s <code>onValueChanged.AddListener(handler)</code>
+        calls the handler with the new value. The first studio&rsquo;s projects are built this way, and the
+        pattern is the controller of <a href="interaction.html#mvc">model-view-controller</a>: the handler
+        writes the model, and the views read it on the next frame.
+      </p>
+      <p>
+        Drawing a line or a point for debugging needs no mesh. <code>Debug.DrawLine(a, b, Color.red)</code>
+        draws a segment in the Scene view for one frame (call it every <code>Update</code>);
+        <code>Debug.DrawRay(origin, dir)</code> likewise; <code>Gizmos.DrawSphere</code> inside an
+        <code>OnDrawGizmos()</code> method draws in the editor even when not playing. The vector studios use
+        line-renderer prefabs for the same purpose so the lines appear in the Game view too.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="projects">10 &middot; Reading a studio project</h2>
+      <p>
+        Every studio project follows one layout: a single scene under <code>Assets/Scenes</code>, scripts
+        under <code>Assets/Source</code> (sometimes split into <code>Model</code>, <code>UI Support</code>,
+        <code>Prefab Support</code>), and a <code>MainController</code> script on an object named
+        <code>Controller</code> that wires the UI and owns the world. The reading order that works:
+      </p>
+      <ol>
+        <li>Open the scene and press Play to see what it does; stop.</li>
+        <li>In the Hierarchy, select <code>Controller</code> and read its Inspector: the public fields are the model&rsquo;s parameters and the references to the objects it drives.</li>
+        <li>Open <code>MainController.cs</code>. <code>Start</code> is the wiring (the <code>AddListener</code> calls); <code>Update</code> is the per-frame work; the handlers are the controller of MVC.</li>
+        <li>Follow one value from a UI event to the screen: which handler, which model field, which object&rsquo;s transform or mesh or material changes.</li>
+        <li>Predict the effect of one change, make it, Play, compare. That loop is the studio.</li>
+      </ol>
+      <p>
+        The projects are Kelvin Sung&rsquo;s CSS 451 class examples, written for teaching rather than for
+        shipping: names are explicit, helpers are avoided on purpose, and the comments say what the code is
+        for. Where a project&rsquo;s convention differs from the lecture&rsquo;s (a quad split along the other
+        diagonal, a matrix built from rows rather than columns), the studio page says so, and both are
+        correct.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="rule">11 &middot; The course rule: implement and replace</h2>
+      <div class="def">
+        <span class="tag">Definition (implement and replace)</span>
+        Where a machine problem says so, the engine&rsquo;s convenience helpers are off limits and the
+        operation is built from primitives, then checked against the engine&rsquo;s version. The engine is
+        the answer key, not the tool.
+      </div>
+      <table>
+        <tr><th>allowed primitives</th><th>off limits, per the assignment</th><th>what to build instead</th></tr>
+        <tr><td><code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>.magnitude</code>, <code>.normalized</code>, component access</td><td><code>Transform.LookAt</code>, <code>Quaternion.LookRotation</code></td><td>the look-at basis of <a href="viewing.html#frame">the viewing chapter</a> from three cross products</td></tr>
+        <tr><td><code>Matrix4x4.TRS</code>, <code>Translate</code>, <code>Rotate</code>, <code>Scale</code>, matrix products, <code>SetRow</code>, <code>SetColumn</code></td><td><code>Matrix4x4.LookAt</code>, <code>Matrix4x4.Perspective</code> when the assignment names them</td><td>\(V\) and \(P\) entry by entry, as the viewing chapter does</td></tr>
+        <tr><td><code>Quaternion.AngleAxis</code>, quaternion products</td><td><code>Quaternion.Slerp</code>, <code>RotateTowards</code> when named</td><td>slerp from the rotation chapter&rsquo;s formula</td></tr>
+        <tr><td>filling <code>Mesh.vertices</code>, <code>triangles</code>, <code>uv</code></td><td><code>Mesh.RecalculateNormals</code>, primitive geometries when named</td><td>face and vertex normals from cross products (<a href="meshes.html#normals">the meshes chapter</a>)</td></tr>
+        <tr><td><code>Shader.SetGlobalMatrix</code>, <code>Material.SetMatrix</code></td><td>the engine&rsquo;s automatic transform when named</td><td>your own matrix uploaded to your own shader (<a href="unity-shaders.html">the shader chapter</a>)</td></tr>
+      </table>
+      <p>
+        Each assignment&rsquo;s write-up on Canvas is the authority on which helpers it forbids. The habit
+        the rule builds is the one the text is written for: to know what the helper does, and to be able
+        to say, with a number, whether it did it.
+      </p>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        Four tasks, in the first studio&rsquo;s projects (from Canvas) and in <code>node</code> from the
+        <code>css551/</code> directory.
+        <ol>
+          <li>
+            <strong>The struct copy.</strong> In the <code>MoveInX.cs</code> script of the first project,
+            replace the body of <code>Update</code> with the single line
+            <code>transform.localPosition.x += 1.0f * Time.smoothDeltaTime;</code> and save. Expected: the
+            Console shows <code>error CS1612: Cannot modify the return value of 'Transform.localPosition'
+            because it is not a variable</code>, and Play refuses to start. Restore the three-line form
+            (read, modify, write back).
+          </li>
+          <li>
+            <strong>The Inspector wins.</strong> In <code>BounceUpAndDown.cs</code>, change the initializer
+            <code>public float yRange = 10f;</code> to <code>3f</code>, save, and Play. Expected: the bounce
+            range does not change, because the Inspector still holds 10. Select the object, read the field
+            in the Inspector, set it to 3 there, and Play again.
+          </li>
+          <li>
+            <strong>Local to world, checked.</strong> Build the chain of Section 6 in any scene (three
+            empty objects, parented, with the local values given) and add to the grandchild a script
+            whose <code>Start</code> prints <code>transform.position</code>. Expected Console line:
+            <code>(2.0, 1.0, -1.0)</code>. The same numbers from the course library:
+            <pre>node -e "import('./lib/core/xform.js').then(x=>{const P=x.makeTRS(2,0,0,0,90,0,1,1,1),C=x.makeTRS(1,0,0,0,0,0,1,1,1),G=x.makeTRS(0,1,0,0,0,0,1,1,1);const W=x.matMul(x.matMul(P,C),G);console.log([W[12],W[13],W[14]].map(v=>+v.toFixed(3)))})"
+[ 2, 1, -1 ]</pre>
+          </li>
+          <li>
+            <strong>The matrix layout.</strong> Print the TRS matrix of Section 7 from the library and
+            compare with <code>Debug.Log(Matrix4x4.TRS(new Vector3(2, 0.5f, -1), Quaternion.Euler(0, 30, 0), Vector3.one * 2))</code>,
+            which Unity prints as four rows:
+            <pre>node -e "import('./lib/core/xform.js').then(x=>{const m=x.makeTRS(2,0.5,-1,0,30,0,2,2,2);for(let r=0;r<4;r++)console.log([m[r],m[4+r],m[8+r],m[12+r]].map(v=>+v.toFixed(3)))})"
+[ 1.732, 0, 1, 2 ]
+[ 0, 2, 0, 0.5 ]
+[ -1, 0, 1.732, -1 ]
+[ 0, 0, 0, 1 ]</pre>
+            The engine&rsquo;s printout has the same four rows to five decimals.
+          </li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="exercises">12 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (the loop)</span>
+        A script moves an object 2 units per second along \(x\) in <code>Update</code>. On a machine that renders 90 frames per second, how far does it move per frame, and how many frames until it has moved 5 units?
+        <details><summary>Solution</summary>
+          \(2/90 = 0.0222\) per frame; \(5/0.0222 = 225\) frames, which is 2.5 s, as it should be at any frame rate.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (the two clocks)</span>
+        At 144 frames per second and the default fixed step of 20 ms, how many <code>FixedUpdate</code> calls happen per second, and what is the largest number of frames in a row with none?
+        <details><summary>Solution</summary>
+          Fifty, always: the fixed clock does not depend on the frame rate. A frame is 6.94 ms, so at most two consecutive frames (13.9 ms) pass with no fixed step, and every third frame or so runs one.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (local and world)</span>
+        The parent of Section 6 is moved to \((2, 0, 0)\) with rotation \((0, 180, 0)\). Where is the child now, and what is its <code>transform.forward</code>?
+        <details><summary>Solution</summary>
+          \(R_y(180^\circ)(1, 0, 0) = (-1, 0, 0)\), so the child is at \((1, 0, 0)\); its forward is \(R_y(180^\circ)(0, 0, 1) = (0, 0, -1)\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (a matrix by index)</span>
+        For the matrix of Section 7, which flat indices hold the rotated \(y\) axis, and what are their values?
+        <details><summary>Solution</summary>
+          Column 1, flat indices 4, 5, 6: \((0, 2, 0)\). A rotation about \(y\) leaves the \(y\) axis where it was, and the scale doubles its length.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 5 (handedness)</span>
+        In a script, <code>Vector3.Cross(Vector3.forward, Vector3.up)</code> is computed. What is it, and which named direction is that in Unity?
+        <details><summary>Solution</summary>
+          \((0, 0, 1)\times(0, 1, 0) = (0\cdot0 - 1\cdot1,\; 1\cdot0 - 0\cdot0,\; 0\cdot1 - 0\cdot0) = (-1, 0, 0)\), which is <code>Vector3.left</code>. The formula is the vectors chapter&rsquo;s; the name is Unity&rsquo;s.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 6 (Euler order)</span>
+        <code>Quaternion.Euler(30, 0, 0)</code> and <code>Quaternion.Euler(0, 0, 30)</code> are applied to <code>Vector3.forward</code>. Which one moves it?
+        <details><summary>Solution</summary>
+          The first: a rotation about \(x\) tips forward down, to \((0, -0.5, 0.866)\). A rotation about \(z\) leaves \(z\) fixed, so the second returns \((0, 0, 1)\) unchanged.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 7 (reference or copy)</span>
+        A script holds <code>public Transform target;</code> and, in <code>Update</code>, does <code>Vector3 p = target.position; p.y = 0;</code>. Does the target move?
+        <details><summary>Solution</summary>
+          No. <code>target</code> is a reference (a class), but <code>position</code> returns a struct copy; changing <code>p</code> changes the copy. Add <code>target.position = p;</code> and it moves.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 8 (implement and replace)</span>
+        An assignment forbids <code>Transform.LookAt</code>. Using allowed primitives, write the three lines that compute a camera&rsquo;s right, up and backward axes from its position and a target, and say what to check them against.
+        <details><summary>Solution</summary>
+          <code>Vector3 w = (eye - at).normalized; Vector3 u = Vector3.Cross(Vector3.up, w).normalized; Vector3 v = Vector3.Cross(w, u);</code>, the basis of <a href="viewing.html#frame">the viewing chapter</a>. Check: call <code>transform.LookAt(at)</code> on a scratch object and compare its <code>right</code>, <code>up</code> and <code>-forward</code> with \(u\), \(v\), \(w\); they should agree to float precision.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 9 (Play mode, by code)</span>
+        Write a script whose <code>Update</code> prints <code>Time.deltaTime</code> for the first five frames only, and run it. What do the numbers look like, and why is the first one different?
+        <details><summary>Solution</summary>
+          A counter field, incremented in <code>Update</code>, gating a <code>Debug.Log</code>. Typical output: one larger value (the first frame includes scene setup and shader compilation, often 30 to 100 ms), then values near 16.7 ms on a 60 Hz display. Motion code multiplies by this value precisely so that the long first frame produces a proportionally larger step rather than a stall.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 10 (the matrix, by code)</span>
+        Print <code>Matrix4x4.TRS(new Vector3(1, 2, 3), Quaternion.Euler(0, 0, 90), Vector3.one)</code> and identify the four columns by what they are.
+        <details><summary>Solution</summary>
+          Rows \((0, -1, 0, 1)\), \((1, 0, 0, 2)\), \((0, 0, 1, 3)\), \((0, 0, 0, 1)\). Column 0 is \((0, 1, 0)\), where \(x\) went under a \(90^\circ\) turn about \(z\); column 1 is \((-1, 0, 0)\), where \(y\) went; column 2 is \(z\), unmoved; column 3 is the translation \((1, 2, 3)\).
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Unity for This Course v1.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; studio code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

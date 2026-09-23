@@ -1,0 +1,486 @@
+<!doctype html>
+<!-- CSS 551 course text: Unity Shaders. Topic chapter for the shader studios and the machine problems that
+     upload their own matrices; independent of any offering's schedule (the hub attaches it). Shared
+     stylesheet: textbook.css. Figures in figures/unity-shader-*.svg are laid out by
+     tools/gen-textbook-figures-unity.mjs; the numbers quoted come from figures/numbers-unity.json
+     (lib/core/xform.js). Shader excerpts follow the studio projects (Kelvin Sung's CSS 451 ClassExamples,
+     Built-in Render Pipeline, Cg/HLSL in ShaderLab). Never hand-edit the figures. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Unity Shaders - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and uses MathJax for its
+        formulas. Read it through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the math.
+        <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Unity Shaders: ShaderLab, the Two Programs, and the Data Between Them</h1>
+      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
+      <div class="src">
+        Course text &middot; the shader files the studios read and edit: how a <code>.shader</code> file is laid out, what the vertex and fragment programs receive and return, where the matrices, textures and lights come from, how a C# script hands values to a shader, and the render state around the programs. Read before the texture and illumination studios and before any machine problem that uploads its own matrices.
+      </div>
+
+      <p class="lead">
+        A shader is the program the GPU runs at two stages of the pipeline of <a href="rasterization.html#pipeline">the rasterization chapter</a>: once per vertex, to place it, and once per covered pixel, to color it. The mathematics of what those programs compute is in the texture and illumination chapters. This chapter is about the container: the ShaderLab file that wraps the two programs, the semantics that name their inputs and outputs, the built-in matrices and the values a script uploads, and the fixed-function state (culling, depth, blending) set around them. It reads the studio projects&rsquo; own shader, a no-cull unlit shader that grows a texture, then a second texture, then a checker computed from the coordinates, then a light, and works its arithmetic at one vertex and one pixel. It closes with the errors that produce a magenta object, a black object, or a silently wrong normal, and what each means.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#pipeline">Where the shader sits</a></li>
+          <li><a href="#anatomy">A shader file, outside in</a></li>
+          <li><a href="#programs">The two programs and their semantics</a></li>
+          <li><a href="#matrices">The matrices: built in, and your own</a></li>
+          <li><a href="#uniforms">Getting values in: properties and globals</a></li>
+          <li><a href="#textures">Textures in the shader</a></li>
+          <li><a href="#lighting">Lighting in the shader, and the normal</a></li>
+          <li><a href="#state">Render state: culling, depth, blending</a></li>
+          <li><a href="#debugging">When it goes wrong</a></li>
+          <li><a href="#exercises">Exercises</a></li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="pipeline">1 &middot; Where the shader sits</h2>
+      <p>
+        The engine sends each mesh to the GPU as its vertex arrays and a material. The GPU runs the
+        material&rsquo;s <em>vertex program</em> on every vertex, producing a clip-space position and any
+        values the pixel stage will need; the fixed rasterizer clips, divides, finds the covered pixels and
+        interpolates those values across each triangle with the barycentric weights of
+        <a href="rasterization.html#barycentric">the rasterization chapter</a>; the material&rsquo;s
+        <em>fragment program</em> runs on every covered pixel, producing a color; and the fixed depth test
+        and blend stage writes it. A shader file holds both programs and the fixed-function settings around
+        them, and a material is that file plus values for its parameters. The studio projects use the
+        Built-in Render Pipeline and write the programs in Cg/HLSL, which is what this chapter shows; Unity&rsquo;s
+        Universal Render Pipeline uses HLSL with different include files and the same two stages.
+      </p>
+      <figure>
+        <img src="figures/unity-shader-flow.svg" alt="A data-flow diagram: the Mesh feeds vertex attributes into vert; the Material feeds uniforms into both vert and frag; a C# script feeds globals through Shader.SetGlobal; Unity feeds the built-in matrices per draw; vert outputs the clip position and a v2f struct that the rasterizer interpolates into frag; frag outputs SV_Target, the framebuffer color." />
+        <figcaption>What reaches the two programs, and from where. Attributes arrive per vertex, uniforms per draw, and the rasterizer carries the vertex program&rsquo;s outputs to the fragment program.</figcaption>
+      </figure>
+
+<!-- ============================================================ -->
+      <h2 id="anatomy">2 &middot; A shader file, outside in</h2>
+      <figure>
+        <img src="figures/unity-shader-anatomy.svg" alt="A listing of a minimal ShaderLab file with its parts colored: the Properties block in orange, the SubShader and Pass braces, the render-state line Cull Off ZWrite On in gray, the CGPROGRAM block in purple with its pragmas and include, the appdata and v2f structs and vert in blue, frag in green; arrows to the right name what each part feeds." />
+        <figcaption>The structure every studio shader shares. Only the two functions and the structs are code; the rest is declaration.</figcaption>
+      </figure>
+      <pre>Shader "CSS551/UnlitTextured" {
+    Properties {
+        _MainTex ("Texture", 2D) = "white" {}     // a slot in the Inspector, and a uniform
+        _Tint    ("Tint", Color) = (1, 1, 1, 1)
+    }
+    SubShader {
+        Cull Off                                   // draw both faces (the studios' "NoCull")
+        Pass {
+            CGPROGRAM
+            #pragma vertex   vert                  // which function is the vertex program
+            #pragma fragment frag                  // which is the fragment program
+            #include "UnityCG.cginc"               // UnityObjectToClipPos, TRANSFORM_TEX, ...
+
+            sampler2D _MainTex;                    // the same names as in Properties
+            float4    _MainTex_ST;                 // tiling (xy) and offset (zw), filled by Unity
+            float4    _Tint;
+
+            struct appdata {                       // per-vertex input, from the mesh
+                float4 vertex : POSITION;
+                float3 normal : NORMAL;
+                float2 uv     : TEXCOORD0;
+            };
+            struct v2f {                           // vertex output, interpolated to the pixel
+                float4 pos : SV_POSITION;          // clip-space position (required)
+                float2 uv  : TEXCOORD0;
+            };
+
+            v2f vert (appdata v) {
+                v2f o;
+                o.pos = UnityObjectToClipPos(v.vertex);      // P · V · M · vertex
+                o.uv  = TRANSFORM_TEX(v.uv, _MainTex);       // uv * tiling + offset
+                return o;
+            }
+            fixed4 frag (v2f i) : SV_Target {
+                return tex2D(_MainTex, i.uv) * _Tint;        // one sample, tinted
+            }
+            ENDCG
+        }
+    }
+}</pre>
+      <div class="def">
+        <span class="tag">Definition (the parts)</span>
+        <strong>Shader &ldquo;name&rdquo;</strong> is the path under which the material picker lists it.
+        <strong>Properties</strong> declares the parameters an artist or a script can set, each with a type
+        (<code>2D</code>, <code>Color</code>, <code>Float</code>, <code>Vector</code>) and a default.
+        <strong>SubShader</strong> is one implementation (a file may hold several for different hardware);
+        its top-level lines are render state. <strong>Pass</strong> is one draw of the geometry; a
+        multi-pass shader draws the mesh more than once. <strong>CGPROGRAM &hellip; ENDCG</strong> encloses
+        the programs; the <code>#pragma</code> lines name which functions are which, and the
+        <code>#include</code> brings in the helper functions and matrix names of Section 4.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="programs">3 &middot; The two programs and their semantics</h2>
+      <div class="def">
+        <span class="tag">Definition (semantics)</span>
+        A <em>semantic</em> is the label after a colon on a struct field or a function that tells the
+        pipeline what the value is. Inputs to the vertex program: <code>POSITION</code> (the mesh&rsquo;s
+        vertex, in object space), <code>NORMAL</code>, <code>TEXCOORD0</code>, <code>TEXCOORD1</code>, &hellip;
+        (the mesh&rsquo;s <code>uv</code>, <code>uv2</code> arrays), <code>COLOR</code>. Outputs of the vertex
+        program and inputs of the fragment program: <code>SV_POSITION</code>, the clip-space position the
+        rasterizer needs, and <code>TEXCOORD</code><em>n</em> for anything else you want interpolated
+        (coordinates, a world position, a normal, a color). Output of the fragment program:
+        <code>SV_Target</code>, the color written to the framebuffer.
+      </div>
+      <p>
+        The types are the small vector types of shading languages: <code>float</code>, <code>float2</code>,
+        <code>float3</code>, <code>float4</code>, with <code>half</code> and <code>fixed</code> as lower
+        precision variants (the studios use <code>fixed4</code> for colors), and <code>float4x4</code> for a
+        matrix. Swizzles read and reorder components (<code>v.xyz</code>, <code>c.rgb</code>,
+        <code>p.xy</code>), and the arithmetic operators act component-wise. <code>mul(M, v)</code> is a
+        matrix-vector product, <code>dot</code>, <code>cross</code>, <code>normalize</code>, <code>length</code>,
+        <code>saturate</code> (clamp to \([0,1]\)), <code>lerp</code> and <code>smoothstep</code> are the
+        vector chapter&rsquo;s operations under their shading names.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (one vertex through the vertex program)</span>
+        The vertex \((0.5, 0.5, 0.5)\) of a unit cube whose model matrix is \(T(0, 0.5, 0)\,R_y(30^\circ)\),
+        under the demo camera of <a href="viewing.html#chain">the viewing chapter</a>, becomes the clip
+        position that chapter computes step by step and the pixel \((702.4, 320.9)\) on a \(1280\times720\)
+        view. <code>UnityObjectToClipPos(v.vertex)</code> does the whole chain in one call:
+        <code>mul(UNITY_MATRIX_MVP, float4(v.vertex.xyz, 1))</code>, which is \(P\,V\,M\) applied to the
+        homogeneous point. The divide by \(w\) and the viewport mapping happen after the program returns,
+        in the fixed stage, so <code>o.pos</code> is the four-component clip vector, not the pixel.
+      </div>
+      <p>
+        Everything in <code>v2f</code> other than <code>pos</code> is interpolated with perspective
+        correction (<a href="rasterization.html#perspective-correct">the rasterization chapter</a>) before
+        the fragment program sees it. A normal interpolated this way is no longer unit length, which is why
+        a lit fragment program normalizes it first; a world position interpolates exactly, which is why the
+        studio shaders pass one to compute the light direction per pixel.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="matrices">4 &middot; The matrices: built in, and your own</h2>
+      <table>
+        <tr><th>name in the program</th><th>what it is</th><th>the text&rsquo;s symbol</th></tr>
+        <tr><td><code>UNITY_MATRIX_M</code> (also <code>unity_ObjectToWorld</code>)</td><td>the object&rsquo;s world matrix from its Transform hierarchy</td><td>\(W\) of the scene-graph chapter, \(M\) of the viewing chain</td></tr>
+        <tr><td><code>UNITY_MATRIX_V</code></td><td>world to camera</td><td>\(V\)</td></tr>
+        <tr><td><code>UNITY_MATRIX_P</code></td><td>camera to clip</td><td>\(P\)</td></tr>
+        <tr><td><code>UNITY_MATRIX_MVP</code>, <code>_MV</code>, <code>_VP</code></td><td>the products, precomputed per draw</td><td>\(PVM\), \(VM\), \(PV\)</td></tr>
+        <tr><td><code>unity_WorldToObject</code></td><td>the inverse of the world matrix</td><td>\(M^{-1}\)</td></tr>
+        <tr><td><code>_WorldSpaceCameraPos</code></td><td>the eye</td><td>\(\mathbf{e}\)</td></tr>
+      </table>
+      <p>
+        These are filled by the engine for every draw from the object&rsquo;s Transform and the camera. The
+        studio projects that teach matrices do something different on purpose: they compute a matrix in C#
+        and upload it under their own name, so that the shader multiplies by the student&rsquo;s matrix and
+        nothing else. The scene-graph project sets each node&rsquo;s composite as
+        <code>material.SetMatrix("MyXformMat", m)</code>, and the viewing project uploads its own \(V\) and
+        \(P\) as globals:
+      </p>
+      <pre>// C#, once per frame in the camera's script (the viewing studio)
+Matrix4x4 r = ...;                                      // the basis, built from cross products
+Matrix4x4 t = Matrix4x4.TRS(-transform.position, Quaternion.identity, Vector3.one);
+Shader.SetGlobalMatrix("CameraViewMatrix", r * t);      // V = R · T(−eye)
+Matrix4x4 p = Matrix4x4.Perspective(c.fieldOfView, c.aspect, c.nearClipPlane, c.farClipPlane);
+Shader.SetGlobalMatrix("CameraProjMatrix", p);
+
+// the shader, reading them instead of UNITY_MATRIX_V and _P
+uniform float4x4 CameraViewMatrix;
+uniform float4x4 CameraProjMatrix;
+uniform float4x4 MyXformMat;
+v2f vert (appdata v) {
+    v2f o;
+    float4 world = mul(MyXformMat, v.vertex);           // your M
+    o.pos = mul(CameraProjMatrix, mul(CameraViewMatrix, world));   // your P · V
+    return o;
+}</pre>
+      <div class="ex">
+        <span class="tag">Worked example (the uploaded projection)</span>
+        With the demo camera&rsquo;s parameters, field of view \(45^\circ\), aspect \(16/9\), near 1, far 8,
+        <code>Matrix4x4.Perspective</code> returns rows \((1.358, 0, 0, 0)\), \((0, 2.414, 0, 0)\),
+        \((0, 0, -1.286, -2.286)\), \((0, 0, -1, 0)\): entry for entry the \(P\) of the viewing chapter and of
+        the library&rsquo;s <code>perspective(45, 16/9, 1, 8)</code>. The engine uses the same matrix for its own
+        <code>UNITY_MATRIX_P</code> on most platforms and a flipped or remapped one on others (Direct3D&rsquo;s
+        depth range is \([0, 1]\), and its framebuffer is upside down), which <code>GL.GetGPUProjectionMatrix</code>
+        accounts for; the studio shader that reads the uploaded matrix directly is correct wherever the
+        engine&rsquo;s choice matches, which it does in the editor on the platforms the course uses.
+      </div>
+      <p>
+        <code>mul(M, v)</code> with <code>v</code> a column is the text&rsquo;s \(M\mathbf{v}\); the
+        <code>float4(v.vertex.xyz, 1)</code> is the homogeneous lift of <a href="affine-transforms.html#homogeneous">the
+        affine chapter</a>, and a direction is lifted with 0 instead so that the translation drops out.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="uniforms">5 &middot; Getting values in: properties and globals</h2>
+      <p>
+        A value the program reads that is the same for every vertex and pixel of a draw is a
+        <em>uniform</em>. There are two routes in.
+      </p>
+      <ul>
+        <li><strong>Material properties.</strong> Declare in <code>Properties</code>, declare again as a variable of the matching type inside the program, and the Inspector shows a control for it on every material using the shader. From C#, <code>renderer.material.SetFloat("_MaxTheta", 25f)</code>, <code>SetColor</code>, <code>SetVector</code>, <code>SetMatrix</code>, <code>SetTexture</code> write it for one object&rsquo;s material copy. The illumination studio&rsquo;s spot-cone angles are set this way.</li>
+        <li><strong>Globals.</strong> <code>Shader.SetGlobalVector("LightPosition", p)</code> (and <code>SetGlobalColor</code>, <code>SetGlobalFloat</code>, <code>SetGlobalMatrix</code>) writes a value every shader can read by declaring a variable of that name, with no <code>Properties</code> entry. The studios&rsquo; light is plumbed this way: a <code>PointLight</code> script copies the light object&rsquo;s transform and color into globals every frame, and every lit shader reads them.</li>
+      </ul>
+      <pre>// PointLight.cs (the illumination studio): the light is an ordinary object, and a script
+// hands its transform and color to every shader as globals, once per frame
+public void LoadLightToShader() {
+    Shader.SetGlobalVector("LightPosition",  transform.localPosition);
+    Shader.SetGlobalColor ("LightColor",     LightColor);
+    Shader.SetGlobalFloat ("LightNear",      Near);
+    Shader.SetGlobalFloat ("LightFar",       Far);
+    Shader.SetGlobalVector("LightDirection", DirLight.up);        // the spot's aim
+    Shader.SetGlobalVector("SlightPos",      DirLight.localPosition);
+}
+// and in the shader:
+uniform float4 LightPosition;  uniform float4 LightColor;  uniform float3 LightDirection;</pre>
+      <p>
+        Names must match exactly between the C# string and the shader declaration, and a mismatch is not an
+        error: the shader reads zero. That is the first thing to check when a light has no effect.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="textures">6 &middot; Textures in the shader</h2>
+      <p>
+        A texture property arrives as a <code>sampler2D</code>, and <code>tex2D(sampler, uv)</code> is the
+        sampling of <a href="texture-mapping.html#magnification">the texture chapter</a>: wrap mode and
+        filtering are set on the texture asset in the Inspector (Repeat or Clamp; Point, Bilinear or
+        Trilinear; mipmaps on or off), and the sampler applies them. The engine also fills a companion
+        <code>float4</code> named <code>_MainTex_ST</code> with the material&rsquo;s tiling in <code>xy</code>
+        and offset in <code>zw</code>; <code>TRANSFORM_TEX(uv, _MainTex)</code> expands to
+        <code>uv * _MainTex_ST.xy + _MainTex_ST.zw</code>, the scale-then-offset placement that the texture
+        studio does by hand in C# and that <a href="texture-mapping.html#placement">the texture chapter</a>
+        writes as a \(3\times3\) matrix.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (tiling and offset, and two samplers)</span>
+        With tiling \((2, 2)\) and offset \((0.25, 0)\), the coordinate \((0.5, 0.5)\) becomes
+        \((0.5\cdot2 + 0.25,\; 0.5\cdot2 + 0) = (1.25, 1.0)\), which a Repeat texture reads at
+        \((0.25, 0)\). The multi-texturing studio shader samples two textures with two coordinate sets and
+        blends them, <code>0.2 * tex2D(_MainTex, i.uv) + 0.8 * tex2D(_SecTex, i.uv1)</code>: for texels
+        \((0.9, 0.2, 0.2)\) and \((0.2, 0.4, 0.9)\) the result is \((0.34, 0.36, 0.76)\), the weighted mix
+        per channel. The second coordinate set comes from the mesh&rsquo;s <code>uv2</code> array through a
+        <code>TEXCOORD1</code> input.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (a texture with no image)</span>
+        The synthesized-texture studio computes the checker in the fragment program from the coordinate
+        alone: <code>int su = int(i.uv.x * URepeat); int sv = int(i.uv.y * VRepeat);</code> then
+        <code>Color1</code> if <code>su % 2 == sv % 2</code>, else <code>Color2</code>. At \((0.31, 0.62)\) with
+        8 repeats, \(su = \lfloor 2.48\rfloor = 2\), \(sv = \lfloor 4.96\rfloor = 4\), both even, so
+        <code>Color1</code>: the fourth-column, fifth-row check of the board, the same parity rule the
+        course&rsquo;s uv-placement demo bakes into its 8&times;8 texture.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="lighting">7 &middot; Lighting in the shader, and the normal</h2>
+      <p>
+        The studio shaders do their own lighting rather than the engine&rsquo;s. The vertex program carries
+        the world position and the world normal to the fragment program; the fragment program builds
+        \(\mathbf{L}\) from the light&rsquo;s global position, clamps \(\mathbf{N}\cdot\mathbf{L}\), and
+        multiplies. It is <a href="illumination.html#lambert">the illumination chapter</a>&rsquo;s diffuse term,
+        in the language of Section 3:
+      </p>
+      <pre>struct v2f { float4 pos : SV_POSITION; float3 normal : TEXCOORD0; float3 vertexWC : TEXCOORD1; };
+
+v2f vert (appdata v) {
+    v2f o;
+    o.pos      = UnityObjectToClipPos(v.vertex);
+    o.vertexWC = mul(UNITY_MATRIX_M, v.vertex).xyz;          // the point, in world space
+    // "this is not pretty but we don't have access to inverse-transpose ..."
+    float3 p   = v.vertex.xyz + v.normal;                    // a point one step along the normal
+    p          = mul(UNITY_MATRIX_M, float4(p, 1)).xyz;      // that point, in world space
+    o.normal   = normalize(p - o.vertexWC);                  // the difference: a world-space direction
+    return o;
+}
+float ComputeDiffuse (v2f i) {
+    float3 l = normalize(LightPosition.xyz - i.vertexWC);   // direction to the light, per pixel
+    return clamp(dot(normalize(i.normal), l), 0, 1);        // max(0, N·L)
+}
+fixed4 frag (v2f i) : SV_Target {
+    return _Color * LightColor * ComputeDiffuse(i);
+}</pre>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        The finite-difference normal is exact for a rigid model matrix and wrong under a non-uniform scale,
+        which is the trap of <a href="illumination.html#normals">the illumination chapter</a>. Take the point
+        \((0.707, 0.707, 0)\) on a unit circle with normal \((0.707, 0.707, 0)\), and scale the object
+        \(2\times\) in \(x\). The stepped point \((1.414, 1.414, 0)\) maps to \((2.828, 1.414, 0)\), the point
+        to \((1.414, 0.707, 0)\), and their difference normalized is \((0.894, 0.447, 0)\); the correct
+        normal, \((M^{-1})^{\top}\mathbf{n}\) normalized, is \((0.447, 0.894, 0)\). The two are \(36.9^\circ\)
+        apart, and the hack&rsquo;s vector has a dot of \(-0.6\) with the surface&rsquo;s tangent where the
+        correct one has 0. For the rotation-plus-translation matrices of the studio scenes the two agree to
+        every printed digit, which is why the shortcut works there; the engine&rsquo;s own
+        <code>UnityObjectToWorldNormal(v.normal)</code> multiplies by the inverse transpose and works
+        everywhere. The studio&rsquo;s spot-light shader steps by <code>10 * v.normal</code> instead of
+        <code>v.normal</code>, which changes nothing in exact arithmetic and reduces rounding when the model
+        is small.
+      </div>
+      <p>
+        The spot cone, the attenuation and the specular term of the illumination chapter are each a few
+        more lines in <code>ComputeDiffuse</code>: <code>acos(dot(l, LightDirection))</code> for the angle to
+        the axis, <code>smoothstep</code> for the soft edge, <code>reflect(-l, n)</code> for the mirror
+        direction, <code>pow(saturate(dot(r, v)), shininess)</code> for the highlight, with
+        <code>v = normalize(_WorldSpaceCameraPos - i.vertexWC)</code>. Every one of them is a dot product of
+        two unit vectors computed per pixel, which is Phong shading in the sense of
+        <a href="meshes.html#shading">the meshes chapter</a>; moving the computation into the vertex program
+        and interpolating the result would be Gouraud shading.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="state">8 &middot; Render state: culling, depth, blending</h2>
+      <table>
+        <tr><th>line in the SubShader or Pass</th><th>default</th><th>what it does</th></tr>
+        <tr><td><code>Cull Back</code> / <code>Cull Front</code> / <code>Cull Off</code></td><td><code>Back</code></td><td>skips triangles whose winding faces away; the studios&rsquo; <code>451NoCullShader</code> sets <code>Off</code> so a hand-built triangle with the wrong winding is still visible (<a href="meshes.html#arrays">the meshes chapter</a>)</td></tr>
+        <tr><td><code>ZWrite On</code> / <code>Off</code></td><td><code>On</code></td><td>whether the pass writes the depth buffer; transparent objects usually turn it off</td></tr>
+        <tr><td><code>ZTest LEqual</code> / <code>Always</code> / &hellip;</td><td><code>LEqual</code></td><td>the depth comparison of <a href="rasterization.html#zbuffer">the rasterization chapter</a></td></tr>
+        <tr><td><code>Blend SrcAlpha OneMinusSrcAlpha</code></td><td>off</td><td>the over operator with straight alpha; <code>Blend One OneMinusSrcAlpha</code> for premultiplied; <code>Blend One One</code> is additive</td></tr>
+        <tr><td><code>Tags { "Queue" = "Transparent" }</code></td><td><code>Geometry</code></td><td>draws after the opaque queue, back to front, so blending sees the opaque scene</td></tr>
+      </table>
+      <p>
+        A blended pass with <code>ZWrite On</code> hides everything behind it that draws later; a blended pass
+        in the opaque queue draws in an order that has nothing to do with depth. Both are common first
+        transparency bugs, and both are settings, not code.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="debugging">9 &middot; When it goes wrong</h2>
+      <table>
+        <tr><th>what you see</th><th>what it means</th><th>where to look</th></tr>
+        <tr><td>the object is solid magenta</td><td>the shader failed to compile, or the material references a missing shader</td><td>select the shader asset in Project: the Inspector lists the compile errors with line numbers</td></tr>
+        <tr><td>the object is black</td><td>the fragment program returned zero: a uniform not set (name mismatch), a light behind the surface, a texture missing</td><td>return a constant color first; then return <code>fixed4(i.normal * 0.5 + 0.5, 1)</code> to see the normals as colors, the studio&rsquo;s own debugging trick</td></tr>
+        <tr><td>the object is invisible</td><td>culled (wrong winding with <code>Cull Back</code>), clipped (outside near or far), or a wrong matrix sending it off screen</td><td><code>Cull Off</code> to test; print the uploaded matrix from C#; check the camera&rsquo;s planes</td></tr>
+        <tr><td>the texture is flipped or shifted</td><td>the \(v\) origin convention, or tiling and offset on the material</td><td><a href="texture-mapping.html#uv">the texture chapter</a>; the material&rsquo;s Inspector</td></tr>
+        <tr><td>lighting is right at rest and wrong when the object is scaled</td><td>the normal transformed by \(M\) instead of the inverse transpose</td><td>Section 7</td></tr>
+        <tr><td>shading changes when the mesh is subdivided</td><td>lighting computed per vertex and interpolated</td><td>move the computation to the fragment program</td></tr>
+      </table>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        <ol>
+          <li>
+            <strong>Normals as colors.</strong> In the diffuse-illumination studio project, change the
+            fragment program&rsquo;s return to <code>return fixed4(i.normal * 0.5 + 0.5, 1);</code>. Expected:
+            the sphere shows a smooth rainbow, red where the normal points along \(+x\), green along
+            \(+y\), blue toward the camera&rsquo;s forward; rotate the object and the colors turn with it
+            because the normal is in world space. Restore the line.
+          </li>
+          <li>
+            <strong>The mismatch that reads zero.</strong> In <code>PointLight.cs</code>, misspell one global
+            name (for instance <code>"LightPosision"</code>) and Play. Expected: no error anywhere, and the
+            surface goes dark, because the shader&rsquo;s <code>LightPosition</code> is now zero and every
+            \(\mathbf{L}\) points at the origin.
+          </li>
+          <li>
+            <strong>The cull switch.</strong> In the mesh studio&rsquo;s single-triangle project, change
+            <code>Cull Off</code> to <code>Cull Back</code> in the shader and Play, then reverse the index
+            triple in the C# from <code>(0, 1, 2)</code> to <code>(0, 2, 1)</code>. Expected: the triangle
+            disappears at the first change and reappears at the second.
+          </li>
+          <li>
+            <strong>The projection, checked.</strong> Print the uploaded projection from the viewing studio
+            with <code>Debug.Log(p)</code> and compare with the library:
+            <pre>node -e "import('./lib/core/xform.js').then(x=>{const m=x.perspective(45,16/9,1,8);for(let r=0;r<4;r++)console.log([m[r],m[4+r],m[8+r],m[12+r]].map(v=>+v.toFixed(3)))})"
+[ 1.358, 0, 0, 0 ]
+[ 0, 2.414, 0, 0 ]
+[ 0, 0, -1.286, -2.286 ]
+[ 0, 0, -1, 0 ]</pre>
+          </li>
+        </ol>
+      </div>
+      <div class="aside">
+        <span class="tag">Further reading</span>
+        Unity&rsquo;s manual sections &ldquo;ShaderLab&rdquo; and &ldquo;Writing vertex and fragment shaders&rdquo;
+        document every keyword used here, and &ldquo;Built-in shader variables&rdquo; lists the matrices of
+        Section 4; the Universal Render Pipeline&rsquo;s equivalents are under &ldquo;Writing custom shaders&rdquo;
+        in its package documentation. The studio shaders are in the Topic 8 and Topic 9 projects on Canvas.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="exercises">10 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (semantics)</span>
+        A vertex program needs the mesh&rsquo;s second coordinate set and wants to pass the world-space position and a normal to the fragment program. Write the two structs.
+        <details><summary>Solution</summary>
+          <code>struct appdata { float4 vertex : POSITION; float3 normal : NORMAL; float2 uv : TEXCOORD0; float2 uv1 : TEXCOORD1; };</code> and <code>struct v2f { float4 pos : SV_POSITION; float2 uv : TEXCOORD0; float2 uv1 : TEXCOORD1; float3 worldPos : TEXCOORD2; float3 normal : TEXCOORD3; };</code>. The <code>TEXCOORD</code> indices on the output are labels for interpolation slots and need not match the input&rsquo;s.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (the chain in one line)</span>
+        Expand <code>UnityObjectToClipPos(v.vertex)</code> into explicit multiplications by the three matrices, in the right order.
+        <details><summary>Solution</summary>
+          <code>mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, mul(UNITY_MATRIX_M, float4(v.vertex.xyz, 1))))</code>: model first, then view, then projection, read right to left as in every chapter.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (a direction through M)</span>
+        Why does the world-normal hack lift the stepped point with \(w = 1\) and subtract, rather than transforming <code>float4(v.normal, 0)</code> directly?
+        <details><summary>Solution</summary>
+          Both give \(M\)&rsquo;s linear part applied to the normal, since the translation cancels in the difference and is dropped by \(w = 0\); they are the same wrong answer under non-uniform scale. The studio&rsquo;s comment explains the choice as the author&rsquo;s way of getting a direction without knowing the \(w = 0\) rule. The correct answer is the inverse transpose either way.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (tiling)</span>
+        A material has tiling \((4, 1)\) and offset \((0, 0.5)\). Where does the coordinate \((0.3, 0.3)\) sample, on a Repeat texture and on a Clamp texture?
+        <details><summary>Solution</summary>
+          \((1.2, 0.8)\). Repeat reads \((0.2, 0.8)\); Clamp reads \((1.0, 0.8)\), the right edge column.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 5 (the checker)</span>
+        With 6 repeats, which color does the checker shader return at \((0.5, 0.5)\), and at \((0.5, 0.34)\)?
+        <details><summary>Solution</summary>
+          \((3, 3)\): both odd, equal parity, <code>Color1</code>. \((3, 2)\): parities differ, <code>Color2</code>. Crossing \(v = 1/3\) flips the color, the boundary between row 1 and row 2.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 6 (blending)</span>
+        A shader draws a 50 % transparent red quad over a white background with <code>Blend SrcAlpha OneMinusSrcAlpha</code>. What pixel results? And with <code>Blend One One</code>?
+        <details><summary>Solution</summary>
+          Over: \(0.5\,(1, 0, 0) + 0.5\,(1, 1, 1) = (1, 0.5, 0.5)\), pink. Additive: \((1, 0, 0)\cdot\text{(alpha ignored)} + (1, 1, 1) = (2, 1, 1)\), clamped to white with a red tint lost; additive blending over white saturates.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 7 (globals)</span>
+        Two lights are needed. What must change in the C# and the shader to pass both?
+        <details><summary>Solution</summary>
+          Distinct global names for each (<code>LightPosition0</code>, <code>LightPosition1</code>, and so on) set by each light&rsquo;s script, matching declarations in the shader, and a fragment program that evaluates <code>ComputeDiffuse</code> for each and sums, adding the ambient once, as <a href="illumination.html#lights">the illumination chapter</a> prescribes.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 8 (magenta)</span>
+        A material turns magenta after a script edit. Name three edits to a <code>.shader</code> file that cause it and one to a <code>.cs</code> file that cannot.
+        <details><summary>Solution</summary>
+          A syntax error in the program, a semantic misspelled (<code>SV_POSITON</code>), a variable used without declaration; a C# error stops Play entirely rather than turning anything magenta, since C# compiles before the scene runs.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 9 (by code: Gouraud from Phong)</span>
+        Move the diffuse computation of Section 7 into the vertex program and pass the result as a <code>float</code> in <code>v2f</code>. Run it on a coarse sphere and on a fine one; what differs, and why?
+        <details><summary>Solution</summary>
+          The coarse sphere shows visible shading facets and a highlight-free look; the fine one approaches the per-pixel result. Lighting evaluated at vertices and interpolated is Gouraud shading; its error is the difference between a linear interpolation of the cosine and the cosine of the interpolated normal, which shrinks with the triangle size (<a href="meshes.html#shading">the meshes chapter</a>).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 10 (by code: the view, uploaded)</span>
+        Replace <code>UnityObjectToClipPos</code> in a working shader by the explicit product using the two globals of Section 4 uploaded from a script, and confirm the picture does not change. Then upload the identity as the view matrix and describe what you see.
+        <details><summary>Solution</summary>
+          With the correct \(V\) and \(P\) the frame is identical to the engine&rsquo;s. With \(V = I\) the camera is at the world origin looking down \(-z\): objects near the origin fill the screen, those behind it vanish, and the studio&rsquo;s <code>ViewMatrixWrong</code> mode is exactly this experiment.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Unity Shaders v1.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; shader code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

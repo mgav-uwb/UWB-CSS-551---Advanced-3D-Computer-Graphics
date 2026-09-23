@@ -1,0 +1,342 @@
+{
+ "fixedUpdate": {
+  "frameMs": 16.667,
+  "fixedMs": 20,
+  "rows": [
+   {
+    "frame": 1,
+    "elapsedMs": 16.67,
+    "fixedSteps": 0,
+    "carryMs": 16.67
+   },
+   {
+    "frame": 2,
+    "elapsedMs": 33.33,
+    "fixedSteps": 1,
+    "carryMs": 13.33
+   },
+   {
+    "frame": 3,
+    "elapsedMs": 50,
+    "fixedSteps": 1,
+    "carryMs": 10
+   },
+   {
+    "frame": 4,
+    "elapsedMs": 66.67,
+    "fixedSteps": 1,
+    "carryMs": 6.67
+   },
+   {
+    "frame": 5,
+    "elapsedMs": 83.33,
+    "fixedSteps": 1,
+    "carryMs": 3.33
+   },
+   {
+    "frame": 6,
+    "elapsedMs": 100,
+    "fixedSteps": 1,
+    "carryMs": 0
+   }
+  ],
+  "stepsPerSecond": 50,
+  "framesPerSecond": 60
+ },
+ "deltaTime": {
+  "speed": 3,
+  "perSecond": [
+   {
+    "fps": 60,
+    "stepPerFrame": 0.05,
+    "afterOneSecond": 3
+   },
+   {
+    "fps": 30,
+    "stepPerFrame": 0.1,
+    "afterOneSecond": 3
+   },
+   {
+    "fps": 144,
+    "stepPerFrame": 0.0208,
+    "afterOneSecond": 3
+   }
+  ],
+  "perFrame": [
+   {
+    "fps": 60,
+    "stepPerFrame": 1,
+    "afterOneSecond": 60
+   },
+   {
+    "fps": 30,
+    "stepPerFrame": 1,
+    "afterOneSecond": 30
+   },
+   {
+    "fps": 144,
+    "stepPerFrame": 1,
+    "afterOneSecond": 144
+   }
+  ]
+ },
+ "handedness": {
+  "rightCrossUp": [
+   0,
+   0,
+   1
+  ],
+  "unityCallsIt": "forward (+z, into the screen)",
+  "textCallsIt": "+z (toward the viewer)",
+  "rotateForward90AboutY": [
+   1,
+   0,
+   0
+  ],
+  "unityReads": "right",
+  "noteAngleAxisSameComponents": true
+ },
+ "hierarchy": {
+  "parent": {
+   "localPosition": [
+    2,
+    0,
+    0
+   ],
+   "localEulerY": 90,
+   "position": [
+    2,
+    0,
+    0
+   ]
+  },
+  "child": {
+   "localPosition": [
+    1,
+    0,
+    0
+   ],
+   "position": [
+    2,
+    0,
+    -1
+   ],
+   "byHand": "parent.position + R_y(90)(1,0,0) = (2,0,0) + (0,0,-1)"
+  },
+  "grandchild": {
+   "localPosition": [
+    0,
+    1,
+    0
+   ],
+   "position": [
+    2,
+    1,
+    -1
+   ]
+  },
+  "childForwardInWorld": [
+   1,
+   0,
+   0
+  ],
+  "transformPointCheck": [
+   2,
+   0,
+   -1
+  ]
+ },
+ "matrix": {
+  "trs": {
+   "t": [
+    2,
+    0.5,
+    -1
+   ],
+   "ry": 30,
+   "s": 2
+  },
+  "flat": [
+   1.732,
+   0,
+   -1,
+   0,
+   0,
+   2,
+   0,
+   0,
+   1,
+   0,
+   1.732,
+   0,
+   2,
+   0.5,
+   -1,
+   1
+  ],
+  "rows": [
+   [
+    1.732,
+    0,
+    1,
+    2
+   ],
+   [
+    0,
+    2,
+    0,
+    0.5
+   ],
+   [
+    -1,
+    0,
+    1.732,
+    -1
+   ],
+   [
+    0,
+    0,
+    0,
+    1
+   ]
+  ],
+  "translationIndices": [
+   12,
+   13,
+   14
+  ],
+  "m03": 2,
+  "note": "Unity indexes m[row, col]; the flat m[i] runs down columns, so m[12] is row 0 column 3"
+ },
+ "normalHack": {
+  "scale": [
+   2,
+   1,
+   1
+  ],
+  "point": [
+   0.707,
+   0.707,
+   0
+  ],
+  "normal": [
+   0.707,
+   0.707,
+   0
+  ],
+  "pointAfter": [
+   1.414,
+   0.707,
+   0
+  ],
+  "steppedAfter": [
+   2.828,
+   1.414,
+   0
+  ],
+  "hackNormal": [
+   0.894,
+   0.447,
+   0
+  ],
+  "correctNormal": [
+   0.447,
+   0.894,
+   0
+  ],
+  "angleErrorDeg": 36.9,
+  "hackDotTangent": -0.6,
+  "correctDotTangent": 0,
+  "rigidCase": "for rotation plus translation the two agree exactly",
+  "rigid": {
+   "hack": [
+    0.612,
+    0.707,
+    -0.354
+   ],
+   "correct": [
+    0.612,
+    0.707,
+    -0.354
+   ],
+   "angleErrorDeg": 0
+  }
+ },
+ "shader": {
+  "perspectiveRows": [
+   [
+    1.358,
+    0,
+    0,
+    0
+   ],
+   [
+    0,
+    2.414,
+    0,
+    0
+   ],
+   [
+    0,
+    0,
+    -1.286,
+    -2.286
+   ],
+   [
+    0,
+    0,
+    -1,
+    0
+   ]
+  ],
+  "checker": {
+   "uv": [
+    0.31,
+    0.62
+   ],
+   "repeat": 8,
+   "scaledU": 2,
+   "scaledV": 4,
+   "parityU": 0,
+   "parityV": 0,
+   "color": "Color1"
+  },
+  "blend": {
+   "c1": [
+    0.9,
+    0.2,
+    0.2
+   ],
+   "c2": [
+    0.2,
+    0.4,
+    0.9
+   ],
+   "w": [
+    0.2,
+    0.8
+   ],
+   "out": [
+    0.34,
+    0.36,
+    0.76
+   ]
+  },
+  "tilingOffset": {
+   "st": [
+    2,
+    2,
+    0.25,
+    0
+   ],
+   "uv": [
+    0.5,
+    0.5
+   ],
+   "out": [
+    1.25,
+    1
+   ]
+  }
+ }
+}
