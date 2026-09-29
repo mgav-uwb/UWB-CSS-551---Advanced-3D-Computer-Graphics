@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!-- CSS 551 AU26 syllabus. Plan C (planning/css551-au26-plan-c-2026-09-29.md) is the source of the
+     rhythm, grading and policies here; Canvas remains the single source of truth for every due date.
+     Styled like the hub. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 — Syllabus</title>
+<style>
+  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
+         --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15.5px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:36px clamp(14px,4vw,64px) 72px;max-width:980px;margin:0 auto}
+  header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:6px}
+  h1{font-size:30px;margin:0 0 4px}
+  .sub{color:var(--accent2);font-size:18px;font-weight:600}
+  .meta{color:var(--dim);font-size:13.5px;margin-top:6px}
+  h2{font-size:21px;margin:36px 0 6px;color:#fff;border-left:4px solid var(--accent);padding-left:12px}
+  p{margin:8px 0}
+  ul,ol{margin:8px 0 8px 4px;padding-left:22px} li{margin:5px 0}
+  a{color:var(--accent)}
+  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:13px}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#181b24;color:#fff}
+  .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 20px;margin:14px 0}
+  .warn{border-color:var(--warn)} .warn b{color:var(--warn)}
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
+  <h1>Syllabus, Autumn 2026</h1>
+  <div class="meta">5 credits · Tue 5:45–7:45 PM synchronous online · Thu 5:45–7:45 PM in person (UW Bothell) · Dr. Marcel Gavriliu · <a href="../index.html">course hub</a> · <a href="../schedule/index.html">schedule</a></div>
+</header>
+
+<h2>What the course is</h2>
+<p>
+  How a computer turns a description of a three-dimensional world into a picture, and, increasingly, how it
+  learns that world from pictures. The first half builds the foundation every renderer shares: vectors,
+  rotations, affine transformations, scene graphs, cameras and projection, rasterization, meshes, textures
+  and local illumination. A bridge week states the rendering equation and the physically based materials
+  and ray tracing that solve it. The second half is the neural era: networks and embeddings, the space of
+  images, diffusion models, learned scenes (neural radiance fields and Gaussian splatting), and generative
+  3D and video. About 40 % of the class is on the neural side.
+</p>
+<p>
+  No prior graphics or Unity experience is assumed. Programming maturity in a C-family language and
+  comfort with linear algebra at the level of vectors and matrices are.
+</p>
+
+<h2>Materials</h2>
+<ul>
+  <li><b>The course text</b> (<a href="../textbook/index.html">24 chapters</a>, free, on the course site): the primary reading. Every lecture, homework and quiz draws its numbers from it.</li>
+  <li><b>The demo library</b> (on the course site): interactive demos with live readouts; the WebGL homework skeletons are built on it.</li>
+  <li><b>Tools</b>, by track: <b>Unity 6000.3.11f1</b> (the pinned version; install through Unity Hub, personal license) or a <b>browser and a local static server</b> for the WebGL track; <b>Python 3 with NumPy</b> for the two neural homeworks, or JavaScript.</li>
+  <li><b>Canvas</b>: homework submission, grades, announcements, and the single source of truth for every due date.</li>
+</ul>
+
+<h2>How each week runs</h2>
+<table>
+  <tr><th>Meeting</th><th>Minutes</th><th>What happens</th></tr>
+  <tr><td>Tuesday, online (live, not recorded)</td><td>0–90</td><td>lecture, with the demos driven together: predict the readout, then run it</td></tr>
+  <tr><td></td><td>90–120</td><td>discussion: a few poll questions from the demos, answered, argued in pairs, answered again, then worked</td></tr>
+  <tr><td>Thursday, in person</td><td>0–80</td><td>lecture</td></tr>
+  <tr><td></td><td>80–100</td><td>discussion, and the walk-through of the homework going out</td></tr>
+  <tr><td></td><td>100–120</td><td><b>the weekly quiz</b>, on paper</td></tr>
+</table>
+<p>
+  Homework goes out on Thursday and is due the following <b>Wednesday at 11:59 PM</b> on Canvas, so that
+  Thursday's quiz can assume it was done. Week 1 has only the Thursday meeting; the week of Thanksgiving
+  has only the Tuesday meeting and no quiz or homework. The <a href="../schedule/index.html">schedule</a>
+  lists every meeting with its topic.
+</p>
+
+<h2>Grading</h2>
+<table>
+  <tr><th>Component</th><th>Weight</th><th>Detail</th></tr>
+  <tr><td>Homework, 8 assignments</td><td>20 %</td><td>2.5 % each; graded by running your submission and comparing its readouts with the numbers the assignment specifies</td></tr>
+  <tr><td>Weekly quizzes, 8</td><td>30 %</td><td><b>the best 6 count</b>; 8 to 10 multiple-choice items, 15 to 20 minutes, on paper, in the last minutes of Thursday, from week 2; no make-ups (the two dropped quizzes cover illness and travel)</td></tr>
+  <tr><td>Midterm</td><td>20 %</td><td>Thursday November 12, first 75 minutes of class, weeks 1–6, multiple choice on paper</td></tr>
+  <tr><td>Final examination</td><td>30 %</td><td>Thursday December 17, 5:45 PM, in person, two hours, cumulative with weeks 7–11 weighted, multiple choice on paper</td></tr>
+</table>
+<p>
+  Quiz and exam items are computational: which entry of the matrix, which pixel wins the depth test, what
+  the diffuse term is after the light moves, how many samples halve the error. Each quiz includes items
+  that require what the week's homework computed. Bring a pencil; no devices during quizzes or exams.
+</p>
+
+<h2>Homework: two tracks</h2>
+<p>
+  Each assignment states what to build and the numbers a correct build reproduces (taken from the text's
+  worked examples), and provides a skeleton in each of two tracks. You choose per assignment.
+</p>
+<table>
+  <tr><th>Track</th><th>What you get</th><th>What you submit</th></tr>
+  <tr><td><b>Unity</b></td><td>a Unity project with the functions to implement stubbed</td><td>the project folder, zipped, without <code>Library/</code></td></tr>
+  <tr><td><b>WebGL</b></td><td>one JavaScript file that mounts into the course's demo library, with the implementation stubbed</td><td>that file</td></tr>
+  <tr><td><b>Python</b> (HW7 and HW8 only, in place of Unity)</td><td>a notebook with the functions stubbed</td><td>the notebook, run</td></tr>
+</table>
+<div class="box">
+  <b>Implement and replace.</b> Each assignment names engine helpers that are off limits (for example
+  <code>Transform.LookAt</code> and <code>Matrix4x4.LookAt</code> in Unity, <code>Matrix4.lookAt</code> and
+  <code>Quaternion.slerp</code> in three.js). You build the operation from primitives (dot, cross, normalize,
+  matrix products) and check it against the engine's version. The engine is the answer key, not the tool.
+</div>
+<div class="box">
+  <b>Late work.</b> Every student has <b>two late tokens</b>. A token, declared in the submission comment,
+  extends one homework by 24 hours with no penalty. Beyond tokens, late homework loses 10 % per day for up
+  to three days and is not accepted after that. Quizzes and exams have no tokens and no make-ups.
+</div>
+
+<h2>Collaboration and integrity</h2>
+<ul>
+  <li>Homework: discuss freely, write your own code. Name in the submission comment anyone you worked with and any tool (including AI assistants) you used, and be ready to explain every line you submit.</li>
+  <li>Quizzes and exams: individual, closed book, on paper. They are 80 % of the grade for that reason.</li>
+  <li>UW's academic integrity policy applies; a first violation on homework is a zero on that assignment and a report, on an exam a failing grade in the course.</li>
+</ul>
+
+<h2>Getting help</h2>
+<ul>
+  <li>The Canvas discussion board, for anything a classmate might also be asking.</li>
+  <li>The discussion slot of every meeting, which is yours: bring the readout that did not match.</li>
+  <li>Office hours: see Canvas.</li>
+</ul>
+
+<div class="box warn">
+  <b>Required statements.</b> Accommodation (DRS), religious accommodation, and student conduct statements
+  follow UW policy; the current wording is on Canvas with this syllabus.
+</div>
+
+<footer>
+  Every date and weight here is also on Canvas, which governs if the two ever disagree. Syllabus v1.0, 2026-09-29.
+</footer>
+</body>
+</html>
