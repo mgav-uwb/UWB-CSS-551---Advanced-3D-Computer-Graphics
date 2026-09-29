@@ -1,0 +1,191 @@
+{
+ "inputs": {
+  "step": {
+   "xt": [
+    0.866218995142179,
+    1.05619399937019
+   ],
+   "tFrom": 0.6993,
+   "tTo": 0.67932
+  },
+  "sampler": {
+   "steps": 50,
+   "count": 60
+  },
+  "volume": {
+   "sigmas": [
+    0,
+    0.5,
+    4,
+    8,
+    1
+   ],
+   "colors": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0.5,
+     0.5,
+     0.5
+    ],
+    [
+     0.9,
+     0.2,
+     0.2
+    ],
+    [
+     0.9,
+     0.2,
+     0.2
+    ],
+    [
+     0.2,
+     0.3,
+     0.9
+    ]
+   ],
+   "delta": 0.2
+  },
+  "splat": {
+   "s": [
+    0.16,
+    0.04,
+    0.04
+   ],
+   "rotZ": 30,
+   "t": [
+    0.5,
+    0.3,
+    2
+   ],
+   "f": 500
+  },
+  "row": {
+   "u": 0.45,
+   "splats": [
+    {
+     "mu": 0.35,
+     "sd": 0.1,
+     "a": 0.8,
+     "c": [
+      0.85,
+      0.2,
+      0.2
+     ]
+    },
+    {
+     "mu": 0.55,
+     "sd": 0.14,
+     "a": 0.7,
+     "c": [
+      0.2,
+      0.45,
+      0.9
+     ]
+    },
+    {
+     "mu": 0.75,
+     "sd": 0.08,
+     "a": 0.9,
+     "c": [
+      0.95,
+      0.75,
+      0.15
+     ]
+    }
+   ]
+  }
+ },
+ "checks": [
+  {
+   "id": "x0hat",
+   "label": "denoise: x̂0 for the point x_t at step 15 of 50",
+   "points": 12,
+   "tol": 0.0001,
+   "expected": [
+    0.036710833079,
+    0.149004425572
+   ]
+  },
+  {
+   "id": "ddim",
+   "label": "ddimStep: the next point, t from step 15 to step 16",
+   "points": 14,
+   "tol": 0.0001,
+   "expected": [
+    0.853427574567,
+    1.04423482938
+   ]
+  },
+  {
+   "id": "sampler",
+   "label": "sampleDDIM, 50 steps, first 60 starts: mean distance to the nearest data point",
+   "points": 14,
+   "tol": 0.0001,
+   "expected": 0.00901763215048
+  },
+  {
+   "id": "rayC",
+   "label": "renderRay through the five samples: color C",
+   "points": 12,
+   "tol": 0.0001,
+   "expected": [
+    0.79103436563,
+    0.21659562063,
+    0.22552331216
+   ]
+  },
+  {
+   "id": "rayT",
+   "label": "renderRay: transmittance left after the ray",
+   "points": 8,
+   "tol": 0.0001,
+   "expected": 0.0672055127397
+  },
+  {
+   "id": "cov",
+   "label": "projectSplat: the pixel covariance entries (xx, xy, yy)",
+   "points": 14,
+   "tol": 0.05,
+   "expected": [
+    1231.25,
+    653.269052838,
+    477.25
+   ]
+  },
+  {
+   "id": "radii",
+   "label": "projectSplat: ellipse radii in pixels, angle, center",
+   "points": 12,
+   "tol": 0.002,
+   "expected": [
+    [
+     40.1060794495,
+     10.0001195588
+    ],
+    30.0054295071,
+    [
+     125,
+     75
+    ]
+   ]
+  },
+  {
+   "id": "splatC",
+   "label": "compositeSplats at u = 0.45: color C and transmittance T",
+   "points": 14,
+   "tol": 0.0001,
+   "expected": [
+    [
+     0.468460283368,
+     0.222828642132,
+     0.348359413872
+    ],
+    0.235380978519
+   ]
+  }
+ ]
+}

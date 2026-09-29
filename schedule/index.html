@@ -6,7 +6,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSS 551 — Schedule</title>
+<title>CSS 551 · Schedule</title>
 <style>
   :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
          --accent:#00e58a; --accent2:#5cd47a; --warn:#ffcf5c; --neural:#8f7dff; }
@@ -29,7 +29,7 @@
   .t{font-weight:600}
   .q{display:inline-block;border:1px solid var(--line);border-radius:7px;padding:1px 8px;font-size:12.5px;color:var(--ink);background:var(--panel)}
   .exam{border-color:var(--warn);color:var(--warn)}
-  .hw{display:inline-block;border:1px solid var(--line);border-radius:7px;padding:1px 8px;font-size:12.5px;background:var(--panel)}
+  .hw{display:inline-block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:1px 8px;font-size:12.5px;background:var(--panel)}
   .hw .d{color:var(--dim)}
   .none{color:#3a3f4d}
   .legend{color:var(--dim);font-size:13px;margin:14px 0 0}
@@ -54,54 +54,54 @@
 </p>
 
 <footer>
-  Canvas governs every due date. Lecture links appear as each deck is published.
+  Canvas governs every due date. Each lecture title opens its slides; each homework chip opens the assignment.
 </footer>
 
 <script>
 const T = 'textbook/';
 const WEEKS = [
   { wk:'1', kind:'', tue:null,
-    thu:{ date:'Oct 1', title:'Welcome, the two tracks; The Big Picture, part 1', sub:'history eras 1–4', href:null },
+    thu:{ date:'Oct 1', title:'Welcome, the two tracks; The Big Picture, part 1', sub:'history eras 1–4', href:'lectures/L01-big-picture-1/index.html' },
     read:[['history-of-graphics.html','A History of Computer Graphics']], quiz:null, hw:null },
   { wk:'2', kind:'',
-    tue:{ date:'Oct 6', title:'The Big Picture, part 2', sub:'eras 5–8, the neural era, the map of the field', href:null },
-    thu:{ date:'Oct 8', title:'The interactive loop, MVC, and the tool', sub:'Unity and WebGL side by side', href:null },
+    tue:{ date:'Oct 6', title:'The Big Picture, part 2', sub:'eras 5–8, the neural era, the map of the field', href:'lectures/L02-big-picture-2/index.html' },
+    thu:{ date:'Oct 8', title:'The interactive loop, MVC, and the tool', sub:'Unity and WebGL side by side', href:'lectures/L03-loop-mvc-tool/index.html' },
     read:[['interaction.html','Interactive Systems'],['unity-basics.html','Unity for This Course']], quiz:'Q1', hw:{ n:1, out:'Oct 8', due:'Wed Oct 14', what:'orientation: the loop and MVC' } },
   { wk:'3', kind:'',
-    tue:{ date:'Oct 13', title:'Vectors', sub:'dot, cross, lines, planes', href:null },
-    thu:{ date:'Oct 15', title:'Rotation', sub:'axis-angle, quaternions, Euler angles', href:null },
+    tue:{ date:'Oct 13', title:'Vectors', sub:'dot, cross, lines, planes', href:'lectures/L04-vectors/index.html' },
+    thu:{ date:'Oct 15', title:'Rotation', sub:'axis-angle, quaternions, Euler angles', href:'lectures/L05-rotation/index.html' },
     read:[['vectors.html','Vectors'],['rotation.html','Rotation']], quiz:'Q2', hw:{ n:2, out:'Oct 15', due:'Wed Oct 21', what:'vectors and rotation: EX1–EX6' } },
   { wk:'4', kind:'',
-    tue:{ date:'Oct 20', title:'Affine transformations', sub:'over homogeneous coordinates', href:null },
-    thu:{ date:'Oct 22', title:'Scene graphs', sub:'hierarchical modeling', href:null },
+    tue:{ date:'Oct 20', title:'Affine transformations', sub:'over homogeneous coordinates', href:'lectures/L06-affine/index.html' },
+    thu:{ date:'Oct 22', title:'Scene graphs', sub:'hierarchical modeling', href:'lectures/L07-scene-graphs/index.html' },
     read:[['affine-transforms.html','Affine Transformations'],['scene-graphs.html','Scene Graphs']], quiz:'Q3', hw:{ n:3, out:'Oct 22', due:'Wed Oct 28', what:'TRS by hand, pivots, a three-node chain' } },
   { wk:'5', kind:'',
-    tue:{ date:'Oct 27', title:'Viewing', sub:'the camera frame, V, P, the chain', href:null },
-    thu:{ date:'Oct 29', title:'Rasterization and antialiasing', sub:'', href:null },
+    tue:{ date:'Oct 27', title:'Viewing', sub:'the camera frame, V, P, the chain', href:'lectures/L08-viewing/index.html' },
+    thu:{ date:'Oct 29', title:'Rasterization and antialiasing', sub:'', href:'lectures/L09-rasterization-antialiasing/index.html' },
     read:[['viewing.html','Viewing'],['rasterization.html','Rasterization'],['antialiasing.html','Sampling and Antialiasing']], quiz:'Q4', hw:{ n:4, out:'Oct 29', due:'Wed Nov 4', what:'V and P by hand; one triangle rasterized' } },
   { wk:'6', kind:'',
-    tue:{ date:'Nov 3', title:'Meshes and texture mapping', sub:'', href:null },
-    thu:{ date:'Nov 5', title:'Illumination', sub:'Lambert, Phong, lights, tone mapping', href:null },
+    tue:{ date:'Nov 3', title:'Meshes and texture mapping', sub:'', href:'lectures/L10-meshes-textures/index.html' },
+    thu:{ date:'Nov 5', title:'Illumination', sub:'Lambert, Phong, lights, tone mapping', href:'lectures/L11-illumination/index.html' },
     read:[['meshes.html','Polygonal Meshes'],['texture-mapping.html','Texture Mapping'],['illumination.html','Local Illumination'],['unity-shaders.html','Unity Shaders']], quiz:'Q5', hw:{ n:5, out:'Nov 5', due:'Wed Nov 11', what:'the grid mesh, the placement matrix, a lit shader' } },
   { wk:'7', kind:'bridge',
-    tue:{ date:'Nov 10', title:'Light transport, PBR, and ray tracing', sub:'the rendering equation, which the neural models approximate; midterm review in the discussion slot', href:null },
-    thu:{ date:'Nov 12', title:'Midterm (first 75 min, weeks 1–6), then path tracing and the Cornell box', sub:'', href:null },
+    tue:{ date:'Nov 10', title:'Light transport, PBR, and ray tracing', sub:'the rendering equation, which the neural models approximate; midterm review in the discussion slot', href:'lectures/L12-light-transport-ray-tracing/index.html' },
+    thu:{ date:'Nov 12', title:'Midterm (first 75 min, weeks 1–6), then path tracing and the Cornell box', sub:'', href:'lectures/L13-path-tracing/index.html' },
     read:[['light-transport-pbr.html','Light Transport and PBR'],['ray-tracing.html','Ray Tracing'],['color.html','Color']], quiz:'MIDTERM', hw:{ n:6, out:'Nov 12', due:'Wed Nov 18', what:'a Whitted ray tracer; the Cornell box lit directly' } },
   { wk:'8', kind:'neural',
-    tue:{ date:'Nov 17', title:'Neural networks and embeddings', sub:'', href:null },
-    thu:{ date:'Nov 19', title:'The space of images', sub:'', href:null },
+    tue:{ date:'Nov 17', title:'Neural networks and embeddings', sub:'', href:'lectures/L14-neural-nets-embeddings/index.html' },
+    thu:{ date:'Nov 19', title:'The space of images', sub:'', href:'lectures/L15-image-space/index.html' },
     read:[['neural-nets-embeddings.html','Neural Networks and Embeddings'],['image-space.html','The Space of Images']], quiz:'Q6', hw:{ n:7, out:'Nov 19', due:'Wed Nov 25', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
   { wk:'9', kind:'neural',
-    tue:{ date:'Nov 24', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:null },
+    tue:{ date:'Nov 24', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:'lectures/L16-diffusion-1/index.html' },
     thu:{ date:'Nov 26', title:'Thanksgiving, no class', sub:'', href:null, off:true },
     read:[['diffusion-models.html','Diffusion Models']], quiz:null, hw:null },
   { wk:'10', kind:'neural',
-    tue:{ date:'Dec 1', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:null },
-    thu:{ date:'Dec 3', title:'Learned scenes', sub:'neural radiance fields, 3D Gaussian splatting', href:null },
+    tue:{ date:'Dec 1', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:'lectures/L17-diffusion-2/index.html' },
+    thu:{ date:'Dec 3', title:'Learned scenes', sub:'neural radiance fields, 3D Gaussian splatting', href:'lectures/L18-learned-scenes/index.html' },
     read:[['learned-scenes.html','Learned Scenes']], quiz:'Q7', hw:{ n:8, out:'Dec 3', due:'Wed Dec 9', what:'a DDIM stepper; one ray through a volume; one splat projected (JS or Python)' } },
   { wk:'11', kind:'neural',
-    tue:{ date:'Dec 8', title:'Generative 3D and video, and where the field is going', sub:'', href:null },
-    thu:{ date:'Dec 10', title:'Synthesis and review', sub:'the map of the field, the final’s scope, open discussion', href:null },
+    tue:{ date:'Dec 8', title:'Generative 3D and video, and where the field is going', sub:'', href:'lectures/L19-generative-3d-video/index.html' },
+    thu:{ date:'Dec 10', title:'Synthesis and review', sub:'the map of the field, the final’s scope, open discussion', href:'lectures/L20-synthesis-review/index.html' },
     read:[['history-of-graphics.html#era-map','The map of the field today']], quiz:'Q8', hw:null },
   { wk:'F', kind:'bridge', tue:null,
     thu:{ date:'Dec 17', title:'Final examination', sub:'5:45 PM, in person, two hours, cumulative with weeks 7–11 weighted', href:null },
@@ -119,9 +119,9 @@ document.getElementById('weeks').innerHTML = `
       <td class="wk">${w.wk}</td>
       <td>${lec(w.tue)}</td>
       <td>${lec(w.thu)}</td>
-      <td>${w.read.map(([h, t]) => `<a href="../${T}${h}">${t}</a>`).join('<br>') || '<span class="none">—</span>'}</td>
-      <td>${w.quiz ? `<span class="q${/MIDTERM|FINAL/.test(w.quiz) ? ' exam' : ''}">${w.quiz}</span>` : '<span class="none">—</span>'}</td>
-      <td>${w.hw ? `<span class="hw">HW${w.hw.n} <span class="d">out ${w.hw.out}, due ${w.hw.due}</span></span><div style="color:var(--dim);font-size:12.5px;margin-top:3px">${w.hw.what}</div>` : '<span class="none">—</span>'}</td>
+      <td>${w.read.map(([h, t]) => `<a href="../${T}${h}">${t}</a>`).join('<br>') || '<span class="none">·</span>'}</td>
+      <td>${w.quiz ? `<span class="q${/MIDTERM|FINAL/.test(w.quiz) ? ' exam' : ''}">${w.quiz}</span>` : '<span class="none">·</span>'}</td>
+      <td>${w.hw ? `<a class="hw" href="../homework/hw0${w.hw.n}/index.html">HW${w.hw.n} <span class="d">out ${w.hw.out}, due ${w.hw.due}</span></a><div style="color:var(--dim);font-size:12.5px;margin-top:3px">${w.hw.what}</div>` : '<span class="none">·</span>'}</td>
     </tr>`).join('')}
   </tbody>`;
 </script>

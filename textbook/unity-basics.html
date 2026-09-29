@@ -1,9 +1,9 @@
 <!doctype html>
-<!-- CSS 551 course text: Unity for This Course. Topic chapter for the tool the studios and machine problems
+<!-- CSS 551 course text: Unity for This Course. Topic chapter for the tool the Unity track of the homework
      use; independent of any offering's schedule (the hub attaches it). Shared stylesheet: textbook.css.
      Figures in figures/unity-*.svg are laid out or computed by tools/gen-textbook-figures-unity.mjs (no
      editor screenshots: the schematics carry no version and no copyrighted pixels); the numbers quoted come
-     from figures/numbers-unity.json, computed with lib/core/xform.js. C# excerpts follow the studio projects
+     from figures/numbers-unity.json, computed with lib/core/xform.js. C# excerpts follow the class-example projects
      (Kelvin Sung's CSS 451 ClassExamples, distributed on Canvas). Never hand-edit the figures. -->
 <html lang="en">
   <head>
@@ -28,11 +28,11 @@
       <h1>Unity for This Course: the Editor, Objects, Scripts, and the Math Types</h1>
       <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
       <div class="src">
-        Course text &middot; everything the Thursday studios and the machine problems assume about the tool: what the editor&rsquo;s windows are, what a scene is made of, how a script runs, how C# will surprise a Java or C++ programmer, what <code>Vector3</code>, <code>Quaternion</code> and <code>Matrix4x4</code> do and how they map onto the text&rsquo;s conventions, and how to open, run, read and debug a studio project. Read before the first studio; return to Sections 6 and 7 before the matrix and mesh studios.
+        Course text &middot; everything the Unity track of the homework assumes about the tool: what the editor&rsquo;s windows are, what a scene is made of, how a script runs, how C# will surprise a Java or C++ programmer, what <code>Vector3</code>, <code>Quaternion</code> and <code>Matrix4x4</code> do and how they map onto the text&rsquo;s conventions, and how to open, run, read and debug a class-example project. Read before the first homework (HW1); return to Sections 6 and 7 before HW3 (affine and scene graphs) and HW5 (meshes, textures, illumination).
       </div>
 
       <p class="lead">
-        The mathematics of this text is engine-independent. The practice is not: the studios and machine problems run in Unity, and they assume a working knowledge of the editor, the object model, the scripting lifecycle and the engine&rsquo;s math types that no lecture has time to teach. This chapter is that knowledge, in the order the studios need it. It is not a Unity tutorial in the usual sense. It skips terrain, physics, audio, animation clips and everything else a game needs, and it goes deeper than a tutorial on the four things a graphics course needs: the transform hierarchy and what local and world mean in numbers, the frame loop and its two clocks, the matrix type and its storage, and the difference between the engine&rsquo;s conventions and the text&rsquo;s. The course rule, implement and replace, is stated at the end with the list of helpers it forbids and the primitives it allows.
+        The mathematics of this text is engine-independent. The practice is not. Each homework (HW1 to HW6) can be done in either of two tracks, Unity or WebGL (the course&rsquo;s JavaScript demo library over three.js), and HW7 and HW8 in JavaScript or Python. This chapter serves the Unity track, which assumes a working knowledge of the editor, the object model, the scripting lifecycle and the engine&rsquo;s math types that no lecture has time to teach; the chapter supplies that knowledge in the order the homework needs it. It is not a Unity tutorial in the usual sense. It skips terrain, physics, audio, animation clips and everything else a game needs, and it goes deeper than a tutorial on the four things a graphics course needs: the transform hierarchy and what local and world mean in numbers, the frame loop and its two clocks, the matrix type and its storage, and the difference between the engine&rsquo;s conventions and the text&rsquo;s. The course rule, implement and replace, is stated at the end with the list of helpers it forbids and the primitives it allows.
       </p>
 
       <div class="toc">
@@ -47,7 +47,7 @@
           <li><a href="#mathtypes">The math types, against the text&rsquo;s conventions</a></li>
           <li><a href="#assets">Meshes, materials, textures, prefabs, cameras, lights</a></li>
           <li><a href="#input">Input, UI, and drawing debug geometry</a></li>
-          <li><a href="#projects">Reading a studio project</a></li>
+          <li><a href="#projects">Reading a class-example project</a></li>
           <li><a href="#rule">The course rule: implement and replace</a></li>
           <li><a href="#exercises">Exercises</a></li>
         </ol>
@@ -57,18 +57,18 @@
       <h2 id="install">1 &middot; Installing, and the one version</h2>
       <p>
         Unity is installed through <em>Unity Hub</em>, a launcher that manages editor versions, licenses
-        and projects. The course pins one editor version, Unity 6000.3.11f1 LTS, and every studio project
+        and projects. The course pins one editor version, Unity 6000.3.11f1 LTS, and every class-example project
         was saved by it. Opening a project in a different version triggers an upgrade that rewrites project
         files, produces diffs that are not your work, and occasionally breaks a script; if Hub offers to
         open a project in a newer version, decline and install the pinned one from Installs. A personal
         license is free and sufficient. The editor download is several gigabytes; start it before the first
-        studio, not during it.
+        homework, not during it.
       </p>
       <p>
         A project is a folder. Everything the editor knows about it lives under <code>Assets/</code> (your
         scenes, scripts, materials, textures, in whatever subfolders you make) and
         <code>ProjectSettings/</code>; the <code>Library/</code> folder is a cache the editor rebuilds and
-        should never be shared or committed. The studio projects arrive as zip files on Canvas; unzip one,
+        should never be shared or committed. The class-example projects arrive as zip files on Canvas; unzip one,
         add its folder in Hub under Projects, and open it. The first open of any project compiles its
         scripts and imports its assets, which takes a minute and is normal.
       </p>
@@ -77,7 +77,7 @@
       <h2 id="editor">2 &middot; The editor: six windows and a button</h2>
       <figure>
         <img src="figures/unity-editor.svg" alt="A schematic of the Unity editor layout: a toolbar with the Play button; a Hierarchy panel listing Main Camera, Directional Light, Cube with a child Handle, and Controller; a Scene panel with a cube on a ground plane and the move gizmo; an Inspector panel listing the cube's Transform, Mesh Filter, Mesh Renderer and a Bounce script; a Project panel showing the Assets folders; and a Console panel with a log line and a compile error." />
-        <figcaption>The default layout, as a schematic. Every window can be moved or closed and brought back from the Window menu; the studios assume this arrangement.</figcaption>
+        <figcaption>The default layout, as a schematic. Every window can be moved or closed and brought back from the Window menu; the homework instructions assume this arrangement.</figcaption>
       </figure>
       <ul>
         <li><strong>Hierarchy</strong> lists the objects in the open scene as a tree. Indentation is parenting, and parenting is the scene graph of <a href="scene-graphs.html">the scene-graph chapter</a>: a child&rsquo;s transform is expressed in its parent&rsquo;s frame. Drag one object onto another to parent it.</li>
@@ -109,13 +109,13 @@
         <figcaption>The object model. A script is one more component, and Unity, not your code, calls its methods.</figcaption>
       </figure>
       <p>
-        Two consequences shape every studio script. First, a script needs to know which object it is on
+        Two consequences shape every class-example script. First, a script needs to know which object it is on
         and which others it should touch: <code>transform</code> and <code>gameObject</code> are the
         script&rsquo;s own; <code>GetComponent&lt;T&gt;()</code> finds a sibling component on the same object;
         and a public field of type <code>GameObject</code>, <code>Transform</code> or a script type is
         filled by dragging in the Inspector. Second, the Inspector is the engine&rsquo;s view of your model:
         a public field is visible and editable there, and its Inspector value overrides the initializer in the
-        code. The studio projects use this constantly, and it is the first place to look when a value in the
+        code. The class-example projects use this constantly, and it is the first place to look when a value in the
         code seems to have no effect.
       </p>
 
@@ -168,8 +168,8 @@ public class Bounce : MonoBehaviour {
         <code>p.x += 3f * Time.deltaTime</code> moves 0.05 per frame at 60 Hz, 0.1 at 30 Hz and 0.0208 at
         144 Hz, and after one second it has moved 3 units on all three. <code>Time.deltaTime</code> is the
         length of the last frame in seconds; a rate multiplied by it is a step in units, and the motion is
-        the same on every machine. The studio&rsquo;s first poke removes the multiplication so that the
-        difference can be seen.
+        the same on every machine. Removing the multiplication for one run makes the
+        difference visible.
       </div>
       <figure>
         <img src="figures/unity-deltatime.svg" alt="Position against seconds of play: three dashed lines for one unit per frame at 30, 60 and 144 frames per second reaching 30, 60 and 144; one solid blue line for three units per second reaching 3 at every frame rate." />
@@ -190,15 +190,15 @@ public class Bounce : MonoBehaviour {
       <h2 id="csharp">5 &middot; C# for people who know Java or C++</h2>
       <p>
         Unity scripts are C#, and a programmer who knows Java or C++ can read them at once. The
-        differences that matter for the studios fit in one table; the one that causes bugs is the last row.
+        differences that matter for the homework fit in one table; the one that causes bugs is the last row.
       </p>
       <table>
         <tr><th>you write</th><th>it means</th><th>note</th></tr>
         <tr><td><code>public float speed = 2f;</code></td><td>a public field</td><td>shown in the Inspector; the <code>f</code> suffix makes a <code>float</code> literal, since <code>2.0</code> alone is a <code>double</code> and will not assign</td></tr>
-        <tr><td><code>[SerializeField] private int n;</code></td><td>a private field still shown in the Inspector</td><td>the studio code uses public fields; either works</td></tr>
+        <tr><td><code>[SerializeField] private int n;</code></td><td>a private field still shown in the Inspector</td><td>the class-example code uses public fields; either works</td></tr>
         <tr><td><code>var v = new Vector3(1, 2, 3);</code></td><td>local type inference</td><td>as in modern Java and C++; the type is still fixed at compile time</td></tr>
         <tr><td><code>foreach (var c in list)</code></td><td>iterate</td><td>Java&rsquo;s for-each; <code>List&lt;T&gt;</code> is <code>System.Collections.Generic</code></td></tr>
-        <tr><td><code>void M(ref Matrix4x4 m)</code></td><td>pass by reference</td><td>the caller writes <code>M(ref x)</code>; the studios&rsquo; scene-graph code passes matrices this way to avoid copies</td></tr>
+        <tr><td><code>void M(ref Matrix4x4 m)</code></td><td>pass by reference</td><td>the caller writes <code>M(ref x)</code>; the class examples&rsquo; scene-graph code passes matrices this way to avoid copies</td></tr>
         <tr><td><code>GetComponent&lt;Renderer&gt;()</code></td><td>a generic method call</td><td>the angle brackets name the component type wanted</td></tr>
         <tr><td><code>transform.localPosition.x = 1;</code></td><td>a compile error</td><td><code>Vector3</code> is a <em>struct</em>, a value type: the property returns a copy, and assigning into a copy is refused. Read into a local, change it, write it back.</td></tr>
       </table>
@@ -211,7 +211,7 @@ public class Bounce : MonoBehaviour {
         <code>transform.localPosition = p;</code>, while <code>Transform t = other.transform; t.localPosition = ...</code>
         moves the other object immediately. The same rule explains why <code>mesh.vertices[0] = v</code>
         does nothing: the <code>vertices</code> property returns a fresh copy of the array each time, and
-        the studio code that builds meshes therefore fills a local array and assigns the whole array once
+        the class-example code that builds meshes therefore fills a local array and assigns the whole array once
         (<a href="meshes.html#grid">the meshes chapter</a> shows the pattern).
       </div>
 
@@ -253,7 +253,7 @@ public class Bounce : MonoBehaviour {
         engine exposes <code>lossyScale</code> rather than a true world scale and why
         <a href="scene-graphs.html#shear">the scene-graph chapter</a> warns against scaling anything but leaves.
         And <code>localScale</code> scales about the object&rsquo;s own origin, which for an imported mesh is
-        wherever the modeler put it; the studios&rsquo; pivot sandwich (<a href="affine-transforms.html#pivots">the
+        wherever the modeler put it; the class examples&rsquo; pivot sandwich (<a href="affine-transforms.html#pivots">the
         affine chapter</a>) exists because the mesh origin and the desired pivot rarely coincide.
       </p>
 
@@ -316,7 +316,7 @@ public class Bounce : MonoBehaviour {
         convention), <code>normals</code>, <code>uv</code> (<code>Vector2[]</code>). A <code>MeshFilter</code>
         holds the mesh and a <code>MeshRenderer</code> draws it. Build by filling local arrays and assigning
         each whole array once; <code>RecalculateNormals()</code> computes the averaged normals the chapter
-        derives by hand, and the studio projects compute them by hand instead, which is the point.
+        derives by hand, and the class-example projects compute them by hand instead, which is the point.
       </p>
       <p>
         <strong>Material and texture.</strong> A material is a shader plus the values of its properties; the
@@ -329,7 +329,7 @@ public class Bounce : MonoBehaviour {
       <p>
         <strong>Prefab.</strong> A prefab is a saved GameObject (with its components and children) that can
         be instantiated any number of times: <code>Instantiate(prefab, position, rotation)</code> returns a
-        new copy, and <code>Destroy(obj)</code> removes one at the end of the frame. The studios&rsquo;
+        new copy, and <code>Destroy(obj)</code> removes one at the end of the frame. The class examples&rsquo;
         vertex handles are instantiated sphere prefabs, one per vertex.
       </p>
       <p>
@@ -340,23 +340,23 @@ public class Bounce : MonoBehaviour {
         tagged MainCamera; <code>ScreenPointToRay(Input.mousePosition)</code> is the unprojection of
         <a href="interaction.html#unproject">the interactive-systems chapter</a>. A <code>Light</code>
         component makes its object a directional, point or spot light with a color and an intensity; the
-        studio shaders ignore the engine&rsquo;s lighting and read the light&rsquo;s transform themselves.
+        class-example shaders ignore the engine&rsquo;s lighting and read the light&rsquo;s transform themselves.
       </p>
 
 <!-- ============================================================ -->
       <h2 id="input">9 &middot; Input, UI, and drawing debug geometry</h2>
       <p>
-        The studio projects use the classic input API: <code>Input.GetKey(KeyCode.W)</code> is true while a
+        The class-example projects use the classic input API: <code>Input.GetKey(KeyCode.W)</code> is true while a
         key is held, <code>GetKeyDown</code> on the frame it was pressed, <code>Input.GetMouseButton(0)</code>
         for the left button, <code>Input.mousePosition</code> for the pointer in window pixels (origin at the
         bottom left), and <code>Input.GetAxis("Mouse X")</code> for the pointer&rsquo;s motion this frame.
-        Unity 6 also ships the newer Input System package; the studio code does not use it, and a project
+        Unity 6 also ships the newer Input System package; the class-example code does not use it, and a project
         set to one API silently ignores the other.
       </p>
       <p>
         User interface elements (sliders, buttons, toggles) live on a <code>Canvas</code> object and are
         wired to scripts by events: a <code>Slider</code>&rsquo;s <code>onValueChanged.AddListener(handler)</code>
-        calls the handler with the new value. The first studio&rsquo;s projects are built this way, and the
+        calls the handler with the new value. The first class-example projects are built this way, and the
         pattern is the controller of <a href="interaction.html#mvc">model-view-controller</a>: the handler
         writes the model, and the views read it on the next frame.
       </p>
@@ -364,14 +364,14 @@ public class Bounce : MonoBehaviour {
         Drawing a line or a point for debugging needs no mesh. <code>Debug.DrawLine(a, b, Color.red)</code>
         draws a segment in the Scene view for one frame (call it every <code>Update</code>);
         <code>Debug.DrawRay(origin, dir)</code> likewise; <code>Gizmos.DrawSphere</code> inside an
-        <code>OnDrawGizmos()</code> method draws in the editor even when not playing. The vector studios use
+        <code>OnDrawGizmos()</code> method draws in the editor even when not playing. The vector class examples use
         line-renderer prefabs for the same purpose so the lines appear in the Game view too.
       </p>
 
 <!-- ============================================================ -->
-      <h2 id="projects">10 &middot; Reading a studio project</h2>
+      <h2 id="projects">10 &middot; Reading a class-example project</h2>
       <p>
-        Every studio project follows one layout: a single scene under <code>Assets/Scenes</code>, scripts
+        Every class-example project follows one layout: a single scene under <code>Assets/Scenes</code>, scripts
         under <code>Assets/Source</code> (sometimes split into <code>Model</code>, <code>UI Support</code>,
         <code>Prefab Support</code>), and a <code>MainController</code> script on an object named
         <code>Controller</code> that wires the UI and owns the world. The reading order that works:
@@ -381,13 +381,13 @@ public class Bounce : MonoBehaviour {
         <li>In the Hierarchy, select <code>Controller</code> and read its Inspector: the public fields are the model&rsquo;s parameters and the references to the objects it drives.</li>
         <li>Open <code>MainController.cs</code>. <code>Start</code> is the wiring (the <code>AddListener</code> calls); <code>Update</code> is the per-frame work; the handlers are the controller of MVC.</li>
         <li>Follow one value from a UI event to the screen: which handler, which model field, which object&rsquo;s transform or mesh or material changes.</li>
-        <li>Predict the effect of one change, make it, Play, compare. That loop is the studio.</li>
+        <li>Predict the effect of one change, make it, Play, compare. That loop is the homework&rsquo;s method.</li>
       </ol>
       <p>
         The projects are Kelvin Sung&rsquo;s CSS 451 class examples, written for teaching rather than for
         shipping: names are explicit, helpers are avoided on purpose, and the comments say what the code is
         for. Where a project&rsquo;s convention differs from the lecture&rsquo;s (a quad split along the other
-        diagonal, a matrix built from rows rather than columns), the studio page says so, and both are
+        diagonal, a matrix built from rows rather than columns), the homework page says so, and both are
         correct.
       </p>
 
@@ -395,26 +395,27 @@ public class Bounce : MonoBehaviour {
       <h2 id="rule">11 &middot; The course rule: implement and replace</h2>
       <div class="def">
         <span class="tag">Definition (implement and replace)</span>
-        Where a machine problem says so, the engine&rsquo;s convenience helpers are off limits and the
+        Where a homework says so, the engine&rsquo;s convenience helpers are off limits and the
         operation is built from primitives, then checked against the engine&rsquo;s version. The engine is
         the answer key, not the tool.
       </div>
       <table>
-        <tr><th>allowed primitives</th><th>off limits, per the assignment</th><th>what to build instead</th></tr>
-        <tr><td><code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>.magnitude</code>, <code>.normalized</code>, component access</td><td><code>Transform.LookAt</code>, <code>Quaternion.LookRotation</code></td><td>the look-at basis of <a href="viewing.html#frame">the viewing chapter</a> from three cross products</td></tr>
-        <tr><td><code>Matrix4x4.TRS</code>, <code>Translate</code>, <code>Rotate</code>, <code>Scale</code>, matrix products, <code>SetRow</code>, <code>SetColumn</code></td><td><code>Matrix4x4.LookAt</code>, <code>Matrix4x4.Perspective</code> when the assignment names them</td><td>\(V\) and \(P\) entry by entry, as the viewing chapter does</td></tr>
-        <tr><td><code>Quaternion.AngleAxis</code>, quaternion products</td><td><code>Quaternion.Slerp</code>, <code>RotateTowards</code> when named</td><td>slerp from the rotation chapter&rsquo;s formula</td></tr>
-        <tr><td>filling <code>Mesh.vertices</code>, <code>triangles</code>, <code>uv</code></td><td><code>Mesh.RecalculateNormals</code>, primitive geometries when named</td><td>face and vertex normals from cross products (<a href="meshes.html#normals">the meshes chapter</a>)</td></tr>
-        <tr><td><code>Shader.SetGlobalMatrix</code>, <code>Material.SetMatrix</code></td><td>the engine&rsquo;s automatic transform when named</td><td>your own matrix uploaded to your own shader (<a href="unity-shaders.html">the shader chapter</a>)</td></tr>
+        <tr><th>allowed primitives (Unity)</th><th>off limits in Unity</th><th>off limits in three.js (WebGL track)</th><th>what to build instead</th></tr>
+        <tr><td><code>Vector3.Dot</code>, <code>Vector3.Cross</code>, <code>.magnitude</code>, <code>.normalized</code>, component access</td><td><code>Transform.LookAt</code>, <code>Quaternion.LookRotation</code></td><td><code>Object3D.lookAt</code>, <code>Matrix4.lookAt</code>; the course library&rsquo;s <code>lookAtBasis</code> when the homework asks for it</td><td>the look-at basis of <a href="viewing.html#frame">the viewing chapter</a> from three cross products</td></tr>
+        <tr><td><code>Matrix4x4.TRS</code>, <code>Translate</code>, <code>Rotate</code>, <code>Scale</code>, matrix products, <code>SetRow</code>, <code>SetColumn</code></td><td><code>Matrix4x4.LookAt</code>, <code>Matrix4x4.Perspective</code> when the homework names them</td><td><code>Matrix4.makePerspective</code>, the projection a <code>PerspectiveCamera</code> builds in <code>updateProjectionMatrix</code>, the library&rsquo;s <code>perspective</code>, when named</td><td>\(V\) and \(P\) entry by entry, as the viewing chapter does</td></tr>
+        <tr><td><code>Quaternion.AngleAxis</code>, quaternion products</td><td><code>Quaternion.Slerp</code>, <code>RotateTowards</code> when named</td><td><code>Quaternion.slerp</code>, <code>Quaternion.slerpQuaternions</code> when named</td><td>slerp from the rotation chapter&rsquo;s formula</td></tr>
+        <tr><td>filling <code>Mesh.vertices</code>, <code>triangles</code>, <code>uv</code></td><td><code>Mesh.RecalculateNormals</code>, primitive geometries when named</td><td><code>BufferGeometry.computeVertexNormals</code>, the built-in geometries when named</td><td>face and vertex normals from cross products (<a href="meshes.html#normals">the meshes chapter</a>)</td></tr>
+        <tr><td>a 3&times;3 matrix filled entry by entry</td><td><code>Material.mainTextureOffset</code>, <code>mainTextureScale</code> when the placement matrix is the task</td><td><code>Texture.offset</code>, <code>repeat</code>, <code>rotation</code> with <code>matrixAutoUpdate</code> left on, <code>Texture.matrix.setUvTransform</code>, the library&rsquo;s <code>uvMat3</code>, when the placement matrix is the task</td><td>the placement matrix of <a href="texture-mapping.html#placement">the texture-mapping chapter</a></td></tr>
+        <tr><td><code>Shader.SetGlobalMatrix</code>, <code>Material.SetMatrix</code></td><td>the engine&rsquo;s automatic transform when named</td><td>the <code>modelViewMatrix</code> and <code>projectionMatrix</code> uniforms a <code>ShaderMaterial</code> receives automatically, when named (a <code>RawShaderMaterial</code> receives only what you upload)</td><td>your own matrix uploaded to your own shader (<a href="unity-shaders.html">the shader chapter</a>)</td></tr>
       </table>
       <p>
-        Each assignment&rsquo;s write-up on Canvas is the authority on which helpers it forbids. The habit
+        Each homework page (one per assignment, <code>homework/hwNN/index.html</code> on the course site) names its own list for both tracks and is the authority on which helpers it forbids. The habit
         the rule builds is the one the text is written for: to know what the helper does, and to be able
         to say, with a number, whether it did it.
       </p>
       <div class="hands">
         <span class="tag">Hands-on</span>
-        Four tasks, in the first studio&rsquo;s projects (from Canvas) and in <code>node</code> from the
+        Four tasks, in the first class-example projects (from Canvas) and in <code>node</code> from the
         <code>css551/</code> directory.
         <ol>
           <li>
@@ -527,7 +528,7 @@ public class Bounce : MonoBehaviour {
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Unity for This Course v1.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; studio code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Unity for This Course v1.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; class-example code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

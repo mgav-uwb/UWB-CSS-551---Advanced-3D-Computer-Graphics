@@ -1,0 +1,266 @@
+{
+ "ring": {
+  "radius": 2,
+  "elevationDeg": 20,
+  "fovDeg": 40,
+  "point": [
+   0.3,
+   0.2,
+   0
+  ],
+  "cams": [
+   {
+    "az": 0,
+    "eye": [
+     0,
+     0.684,
+     1.879
+    ],
+    "w": [
+     0,
+     0.342,
+     0.94
+    ],
+    "u": [
+     1,
+     0,
+     0
+    ],
+    "t": [
+     0,
+     0,
+     -2
+    ],
+    "ndcOfX": [
+     0.427,
+     0.267
+    ]
+   },
+   {
+    "az": 90,
+    "eye": [
+     1.879,
+     0.684,
+     0
+    ],
+    "w": [
+     0.94,
+     0.342,
+     0
+    ],
+    "u": [
+     0,
+     0,
+     -1
+    ],
+    "t": [
+     0,
+     0,
+     -2
+    ],
+    "ndcOfX": [
+     0,
+     0.142
+    ]
+   },
+   {
+    "az": 180,
+    "eye": [
+     0,
+     0.684,
+     -1.879
+    ],
+    "w": [
+     0,
+     0.342,
+     -0.94
+    ],
+    "u": [
+     -1,
+     0,
+     0
+    ],
+    "t": [
+     0,
+     0,
+     -2
+    ],
+    "ndcOfX": [
+     -0.427,
+     0.267
+    ]
+   },
+   {
+    "az": 270,
+    "eye": [
+     -1.879,
+     0.684,
+     0
+    ],
+    "w": [
+     -0.94,
+     0.342,
+     0
+    ],
+    "u": [
+     0,
+     0,
+     1
+    ],
+    "t": [
+     0,
+     0,
+     -2
+    ],
+    "ndcOfX": [
+     0,
+     0.361
+    ]
+   }
+  ]
+ },
+ "unproject": {
+  "image": [
+   256,
+   256
+  ],
+  "fovDeg": 50,
+  "pixel": [
+   180,
+   100
+  ],
+  "ndc": [
+   0.4102,
+   0.2148
+  ],
+  "tanHalf": 0.4663,
+  "dirCam": [
+   0.1913,
+   0.1002,
+   -1
+  ],
+  "depthAlongMinusZ": 2.4,
+  "pointCam": [
+   0.459,
+   0.24,
+   -2.4
+  ],
+  "splatsPerView": 65536,
+  "splatsFourViews": 262144
+ },
+ "attention": {
+  "frames": 16,
+  "latentSide": 64,
+  "patch": 2,
+  "tokensPerFrame": 1024,
+  "tokens": 16384,
+  "full": 268435456,
+  "spatial": 16777216,
+  "temporal": 262144,
+  "factorized": 17039360,
+  "ratioFullOverFactorized": 15.75,
+  "oneImage": 1048576,
+  "fullOverOneImage": 256,
+  "latentNumbersPerClip": 262144,
+  "frames120": 120,
+  "full120OverFull16": 56.25
+ },
+ "drift": {
+  "dt": 0.01667,
+  "v0": 5,
+  "g": -9.8,
+  "velocityBias": 0.01,
+  "frames": 60,
+  "exact60": 0.1,
+  "pred60": 0.796,
+  "err10": 0.0346,
+  "err30": 0.2738,
+  "err60": 0.696
+ },
+ "relight": {
+  "normal": [
+   0,
+   1,
+   0
+  ],
+  "L1": [
+   0.707,
+   0.707,
+   0
+  ],
+  "L2": [
+   0,
+   1,
+   0
+  ],
+  "albedo": 0.8,
+  "meshBefore": 0.566,
+  "meshAfter": 0.8,
+  "splatBefore": 0.566,
+  "splatAfter": 0.566
+ },
+ "upscale": {
+  "out": [
+   1920,
+   1080
+  ],
+  "render": [
+   960,
+   540
+  ],
+  "outPixels": 2073600,
+  "renderPixels": 518400,
+  "shadedFraction": 0.25,
+  "withFrameGen": 0.125,
+  "mcQuarterNoiseSamples": 16
+ },
+ "q": {
+  "attn": {
+   "frames": 8,
+   "tokensPerFrame": 1024,
+   "full": 67108864,
+   "oneFrame": 1048576,
+   "ratio": 64
+  },
+  "unproject": {
+   "ndc": [
+    0.5,
+    0
+   ],
+   "depth": 2,
+   "tanHalf": 0.4663,
+   "point": [
+    0.466,
+    0,
+    -2
+   ],
+   "wrongNoTan": [
+    1,
+    0,
+    -2
+   ],
+   "wrongNoDepth": [
+    0.233,
+    0,
+    -1
+   ]
+  },
+  "relight": {
+   "albedo": 0.6,
+   "captured": 0.424,
+   "overhead": 0.6
+  },
+  "upscale": {
+   "out": [
+    3840,
+    2160
+   ],
+   "render": [
+    1920,
+    1080
+   ],
+   "fraction": 0.25,
+   "withFrameGen": 0.125
+  }
+ }
+}

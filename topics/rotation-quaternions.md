@@ -1,34 +1,46 @@
 <!--
-  CSS 551 · TOPIC DECK — Rotation: axis-angle, quaternions, gimbal lock (~50 min).
-  A topic is a reusable stretch of slides that a session page mounts as one
+  CSS 551 · TOPIC DECK: Rotation: matrices, axis-angle, quaternions, Euler angles (~78 min).
+  A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/rotation-quaternions.md"> among others; it carries no
-  session logistics (no title, Thursday, MP, wrap) and no "Part N" numbering.
-  Sessions compose topics in their index.html; see sessions/README.md.
+  logistics (no title, homework, wrap) and no "Part N" numbering.
+  Lectures compose topics in their index.html; see lectures/README.md and topics/README.md.
 
-  TEACHES: a rotation is where the axes land (columns); the 2D rotation lifted to R_y; Rodrigues from the projection split and a cross, worked to the demo's numbers; quaternions (half angle, the sandwich verified on one point, the product as composition, slerp, what Unity stores); Euler angles and gimbal lock, and why quaternions dodge it.
+  TEACHES: a rotation is where the axes land (columns); orthonormal columns, determinant +1, the
+  transpose as inverse, a mirror is not a rotation; the 2D rotation lifted to R_y; Rodrigues from the
+  projection split and a cross, worked on one vector and column by column; the diagonal axis at 120
+  degrees; reading axis and angle back out of a matrix and its failure near 180; quaternions (half
+  angle, the sandwich verified on one point, quaternion to matrix, the product as composition worked
+  against matrices, slerp worked, the double cover and the long way round, drift measured, what Unity
+  stores); Euler angles (three conventions give three poses, gimbal lock by the inner axis, extraction
+  at the lock), and why quaternions dodge it.
   NEEDS:   the vectors topic (projection split, the cross, "two vectors, a whole frame"); mount it after that topic.
-  DEMOS:   data-demo="axis-angle" data-controls="angle" (under the session page's 200px crop). Fallback hand-verified: axis (0,1,0), 30 deg: R columns (0.866,0,-0.5) / (0,1,0) / (0.5,0,0.866); q = (0, 0.259, 0, 0.966).
-  SOURCE:  derived 2026-09-18 from the former sessions/S03-rotation-quaternions/L03-rotation-quaternions.md (38 slides) (Plan B merge of the vectors and rotation Tuesdays); the CDP walkthrough slides were dropped (the labs open those projects) and a few code slides trimmed. Real C# excerpts are from Kelvin Sung's CSS 451 ClassExamples.
+  DEMOS:   data-demo="axis-angle" data-controls="angle" (under the lecture page's 200px crop).
+           Fallback: axis (0,1,0), 30 deg: R columns (0.866,0,-0.5) / (0,1,0) / (0.5,0,0.866); q = (0, 0.259, 0, 0.966).
+  NUMBERS: every number is from textbook/figures/numbers-foundations.json (key rot) or recomputed by
+           node against lib/core/xform.js.
+  FIGURES: ../../textbook/figures/rot-*.svg (computed by tools/gen-textbook-figures-foundations.mjs).
+  SOURCE:  derived 2026-09-18 from the former S03 rotation deck; expanded 2026-09-29 (Plan C, an
+           80-minute Thursday lecture) with the textbook chapter's properties, log map, conversions,
+           composition, slerp, double cover, drift and Euler-convention sections. Real C# excerpts are
+           from Kelvin Sung's CSS 451 ClassExamples.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
-  backtick names with underscores. No <small> on math. Demo embeds live on
-  demo-full or cropped slides (a short ## title + the embed div + its
-  viz-fallback pre). Paths are relative to the SESSION page that mounts this
-  topic (sessions/SNN/index.html).
+  backtick names with underscores. No <small> on math. Paths are relative to the
+  lecture page that mounts this topic (lectures/LNN-slug/index.html).
 -->
 
-### Rotation: axis-angle, quaternions, gimbal lock
+### Rotation: matrices, axis-angle, quaternions, Euler angles
 
-<small>(~50 min)</small>
+<small>(~78 min)</small>
 
-Note: A rotation is the one transform that keeps lengths and angles but is genuinely hard to store well: three representations, matrix, axis-angle, quaternion, each answer a different question, and every engine uses all three. Build them in that order, then Euler angles and the lock as the reason storage uses quaternions. Rodrigues is the projection split plus a cross from the vectors stretch; nothing new is needed.
 
 ---
+
 ### Rotation about an axis
 
-<small>(~20 min)</small>
+<small>(~16 min)</small>
 
 ---
 
@@ -36,171 +48,186 @@ Note: A rotation is the one transform that keeps lengths and angles but is genui
 
 A rotation is a transform that keeps a rigid body rigid:
 
-- **lengths** stay the same — no stretch, no squash
-- **angles** stay the same — perpendicular stays perpendicular
+- **lengths** stay the same: no stretch, no squash
+- **angles** stay the same: perpendicular stays perpendicular
 - the **origin** stays put (it is a rotation, not a move)
+- **handedness** stays the same: a right hand stays a right hand
 
 So a rotation just says **where the three axes go**. Find that, and you have the whole matrix.
 
-Note: Frame rotation by its invariants before any formula (playbook §4). A rotation is a linear map that preserves the dot product — that is the compact definition, and it forces lengths and angles to be preserved. Because it is linear and fixes the origin, it is fully determined by where it sends the three basis vectors. That single fact — "a rotation is where the axes land" — is what makes the matrix columns readable, which is the next slide's payoff.
 
 ---
 
 ## Rotating a point in 2D
 
-Spin the point `(x, y)` counter-clockwise by `theta`. Trace where it lands:
+<img src="../../textbook/figures/rot-2d.svg" alt="a point rotated by theta about the origin in 2D" style="height:220px">
 
 ```text
-x' = x*cos(theta) - y*sin(theta)
-y' = x*sin(theta) + y*cos(theta)
+x' = x cos θ - y sin θ          [ x' ]   [ cos θ   -sin θ ] [ x ]
+y' = x sin θ + y cos θ          [ y' ] = [ sin θ    cos θ ] [ y ]
 ```
 
-Read it as one matrix times the column vector `(x, y)`:
+Worked: `(2, 1)` by 30° lands at `(1.232, 1.866)`.
 
-```text
-[ x' ]   [ cos(theta)  -sin(theta) ] [ x ]
-[ y' ] = [ sin(theta)   cos(theta) ] [ y ]
-```
-
-Note: The one derivation everything else lifts from. Fastest path: a point at radius r and start angle phi is (r cos phi, r sin phi); rotating adds theta, so the new point is (r cos(phi+theta), r sin(phi+theta)); expand with the angle-addition formulas and regroup in terms of x = r cos phi and y = r sin phi. The two expressions above fall straight out. Keep the column-vector convention (matrix on the LEFT, vector on the right) — that is the lib's convention and the whole course's.
 
 ---
 
 ## The columns are where the axes go
 
-Look at the two columns of that 2D matrix:
+<img src="../../textbook/figures/rot-columns.svg" alt="the columns of a rotation matrix are the images of the basis vectors" style="height:250px">
 
 ```text
-first column  = ( cos(theta),  sin(theta) )   <- where (1,0) lands
-second column = ( -sin(theta), cos(theta) )   <- where (0,1) lands
+first column  = ( cos θ,  sin θ )   <- where (1,0) lands
+second column = ( -sin θ, cos θ )   <- where (0,1) lands
 ```
 
-Feed in `(1, 0)`: you get the first column. Feed in `(0, 1)`: the second.
+**A rotation matrix is its rotated basis vectors, stacked as columns.**
 
-**A rotation matrix is literally its rotated basis vectors, stacked as columns.**
-
-Note: This is the reading that makes rotation matrices legible for the rest of the quarter. Multiplying the matrix by (1,0) selects column 0; by (0,1) selects column 1. So the columns are not abstract numbers — they are the images of the basis vectors, the new x-axis and new y-axis. When we open the demo panel in the axis-angle stretch, that is exactly what you are looking at: each column is a landed axis. This is the glass-cockpit tie-in — the matrix panel shows the axes' destinations.
 
 ---
 
 ## Lift 2D into 3D: rotate about y
 
-Rotating about the **y axis** leaves `y` alone and spins the `x`–`z` plane. Drop the 2D block into the x–z slots:
+Rotating about the **y axis** leaves `y` alone and spins the `x`-`z` plane:
 
 ```text
-          [ cos(theta)   0   sin(theta) ]
-R_y(theta) = [   0          1     0        ]
-          [ -sin(theta)  0   cos(theta) ]
+            [  cos θ   0   sin θ ]
+   R_y(θ) = [   0      1    0    ]
+            [ -sin θ   0   cos θ ]
 ```
 
-- the **middle row and column** are `(0, 1, 0)` — `y` is untouched
-- the top-left / corners carry the 2D spin, now in x and z
+- the **middle row and column** are `(0, 1, 0)`: `y` is untouched
+- the corners carry the 2D spin, now in z and x
+- at θ = 90°: column 0 is `(0, 0, -1)`: the old x axis now points along `-z`
 
-Note: Axis rotations are the 2D matrix embedded in the plane perpendicular to the axis. For y, that plane is x-z, so the cos/sin land in the four corners and the y row/column stay the identity. Watch the sign pattern: for R_y the +sin sits top-right and -sin bottom-left — the opposite of the textbook R_z — because in a right-handed frame with y up, the x axis tips toward -z. This exact matrix is what our lib's axisAngleMatrix(0,1,0,theta) produces; we will read it off the demo panel next.
 
 ---
 
-## Read R_y off its columns
+## Orthonormal columns, determinant +1
 
-The columns of `R_y(theta)` are where the three axes land:
+`R_y(30°)` has columns `(0.866, 0, -0.5)`, `(0, 1, 0)`, `(0.5, 0, 0.866)`:
 
 ```text
-x-axis (1,0,0) -> ( cos(theta), 0, -sin(theta) )    (column 0)
-y-axis (0,1,0) -> ( 0, 1, 0 )                        (column 1, fixed)
-z-axis (0,0,1) -> ( sin(theta), 0,  cos(theta) )     (column 2)
+col0 . col0 = 0.866² + 0.5² = 0.75 + 0.25 = 1         every column has length 1
+col0 . col2 = 0.866(0.5) + 0 + (-0.5)(0.866) = 0      every pair is perpendicular
+det R       = 1                                        RᵀR = I, so R⁻¹ = Rᵀ
+Rᵀ (1.016, 0.6, -0.24) = (1, 0.6, 0.3)                 the transpose undoes it
 ```
 
-Sanity check at `theta = 90`: `x`-axis `(1,0,0) -> (0, 0, -1)`. The old x now points along `-z`. **The columns told you before you multiplied anything.**
+Nine numbers, **six constraints**, three degrees of freedom.
 
-Note: The payoff of the column reading and a hand-checked special case. At 90 degrees cos=0, sin=1, so column 0 = (0,0,-1): the x axis has swung a quarter turn in the x-z plane to point down -z, exactly what a right-handed spin about y does. Verify against the lib: axisAngleMatrix(0,1,0,90) times (1,0,0) is column 0 = (0,0,-1). Students should be able to predict any axis's destination by reading a column — no multiply needed. This is the whole habit the axis-rotation stretch is trying to build.
+
+---
+
+## A mirror is not a rotation
+
+<img src="../../textbook/figures/rot-reflection.svg" alt="a mirror flips handedness; two mirrors make a rotation" style="height:220px">
+
+```text
+M_x = diag(-1, 1, 1):   orthonormal columns, det = -1
+(M_x x) × (M_x y) = (-x) × y = -z,   but M_x z = +z          handedness flipped
+M_y M_x = diag(-1, -1, 1) = R_z(180°),   det = +1              two mirrors: a rotation
+```
+
 
 ---
 
 ### Axis-angle: any axis
 
-<small>(~25 min)</small>
+<small>(~20 min)</small>
 
 ---
 
 ## The general question
 
-We can spin about x, y, or z. But a rotation can be about **any** axis — a unit vector `n` — by any angle `theta`.
+We can spin about x, y, or z. But a rotation can be about **any** axis, a unit vector `n`, by any angle `θ`.
 
-- store a rotation as **just that**: an axis `n` and an angle `theta` (four numbers)
-- but how do you *apply* it — rotate an arbitrary `v` about an arbitrary `n`?
+- store a rotation as **just that**: an axis `n` and an angle `θ` (four numbers)
+- but how do you *apply* it: rotate an arbitrary `v` about an arbitrary `n`?
 
-The answer reuses **exactly** last week's projection split.
+The answer reuses **exactly** the vectors lecture's projection split.
 
-Note: Axis-angle is the most human representation: "turn 40 degrees about this stick." Four numbers (three for the axis, one for the angle; the axis is unit so really three degrees of freedom). The open question is how to turn (n, theta) into the moved vector v'. We are about to derive Rodrigues' formula geometrically, and the only tools are the parallel/perpendicular split (dot) and a perpendicular partner (cross) from the vectors stretch — no new machinery.
 
 ---
 
 ## Split v into along-axis and across-axis
 
-The part of `v` **along** `n` does not move when you spin about `n`. Only the part **across** `n` turns.
+<img src="../../textbook/figures/rot-rodrigues.svg" alt="v split into a frozen part along n and a turning part across n" style="height:250px">
 
 ```text
-v-par  = (v . n) n          the piece parallel to the axis  (frozen)
+v-par  = (v . n) n          the piece along the axis     (frozen)
 v-perp = v - v-par          the piece in the rotation plane (turns)
+w      = n × v              the plane's second axis, |w| = |v-perp|
 ```
 
-`v-par` sits on the axis; `v-perp` lies in the plane perpendicular to `n`. Spinning about `n` only swings `v-perp`.
-
-Note: This is the projection split from earlier tonight, reused verbatim — (v.n)n is the shadow of v on the unit axis n, and v-perp is the leftover, which is perpendicular to n by construction. The geometric insight of the whole formula: a rotation about n does nothing to the along-axis component and rotates the across-axis component within its plane. So we only have to solve a 2D rotation, in the plane perpendicular to n. n must be unit for (v.n)n to be the true projection.
-
----
-
-## Build the second axis of the plane with a cross
-
-In that plane, `v-perp` is one direction. For a clean 2D spin we need a second, perpendicular to it and the **same length**:
-
-```text
-w = n x v            perpendicular to both n and v, |w| = |v-perp|
-```
-
-Now `{v-perp, w}` is a right-angle pair spanning the rotation plane — a little 2D coordinate frame to turn inside.
-
-Note: The cross product manufactures the plane's other axis ("two vectors, a whole frame", earlier tonight). n x v is perpendicular to n (so it lies in the rotation plane) and perpendicular to v. Its length: |n x v| = |n||v|sin(angle between) = |v-perp|, because |n|=1 and |v|sin(angle) is exactly the perpendicular component's length. So w has the same length as v-perp and is 90 degrees around from it — a perfect (v-perp, w) basis to run the 2D rotation in. Note n x v = n x v-perp since n x v-par = 0.
 
 ---
 
 ## Turn inside the plane: Rodrigues
 
-A 2D rotation of `v-perp` by `theta`, using `v-perp` and `w` as the two axes:
+A 2D rotation of `v-perp` by `θ`, using `v-perp` and `w` as the two axes:
 
 ```text
-v-perp' = cos(theta) * v-perp + sin(theta) * w
+v-perp' = cos θ · v-perp + sin θ · w
 ```
 
-Add back the frozen part and substitute — the axis-angle rotation of `v`:
+Add back the frozen part and substitute; this is the axis-angle rotation of `v`:
 
 ```text
-v' = cos(theta) v + (1 - cos(theta)) (v . n) n + sin(theta) (n x v)
+v' = cos θ · v  +  (1 - cos θ)(v . n) n  +  sin θ · (n × v)
 ```
 
-Note: This IS the axis-rotation stretch's 2D rotation (cos on the current axis, sin on the perpendicular one), applied inside the rotation plane, then the untouched v-par added back. Substitute v-perp = v - (v.n)n and w = n x v into v' = v-par + v-perp': v' = (v.n)n + cos(theta)(v - (v.n)n) + sin(theta)(n x v), and regrouping the (v.n)n terms gives the boxed line. That is Rodrigues' rotation formula. Every term is a dot, a cross, or a scale — nothing past the dot and the cross. Build a rotation matrix by applying it to each of e_x, e_y, e_z; its columns are the results.
 
 ---
 
-## Worked: build R_y(30) from Rodrigues
+## Worked: Rodrigues on one vector
 
-Axis `n = (0, 1, 0)`, angle `theta = 30` (`cos30 = 0.866`, `sin30 = 0.5`). Apply Rodrigues to each basis vector — the results are the columns:
+`n = (0, 1, 0)`, `θ = 30°`, `v = (1, 0.6, 0.3)`:
 
 ```text
-e_x=(1,0,0): v.n=0, n x e_x=(0,0,-1) -> 0.866(1,0,0)+0.5(0,0,-1) = (0.866, 0, -0.5)
-e_y=(0,1,0): v.n=1, n x e_y=(0,0,0)  -> (0,1,0) unchanged           = (0, 1, 0)
-e_z=(0,0,1): v.n=0, n x e_z=(1,0,0)  -> 0.866(0,0,1)+0.5(1,0,0)     = (0.5, 0, 0.866)
+v . n = 0.6          n × v = (1·0.3 - 0·0.6,  0·1 - 0·0.3,  0·0.6 - 1·1) = (0.3, 0, -1)
+v' = 0.866 (1, 0.6, 0.3) + 0.134 · 0.6 (0, 1, 0) + 0.5 (0.3, 0, -1)
+   = (0.866 + 0.15,  0.520 + 0.080,  0.260 - 0.5) = (1.016, 0.6, -0.240)
 ```
 
-These three columns **are** the `R_y(30)` matrix — and the demo's `R` panel, digit-for-digit.
+The library's `R_y(30°)` applied to the same `v` gives `(1.016, 0.6, -0.240)`.
 
-Note: Hand-verified, and deliberately the demo's default state (axis (0,1,0), angle 30) so the panel reads these exact numbers (playbook §3 cross-consistency). Recompute e_z: n x e_z = (0,1,0) x (0,0,1) = (1*1-0*0, 0*0-0*1, 0*0-1*0) = (1,0,0); 0.866(0,0,1) + 0.5(1,0,0) = (0.5, 0, 0.866). Column 0 = (0.866,0,-0.5) matches the axis-rotation stretch's R_y column reading (cos,0,-sin at 30 deg). Rodrigues and the axis-matrix are the same object, reached two ways.
+
+---
+
+## Worked: build R_y(30) column by column
+
+Apply Rodrigues to each basis vector; the results are the columns:
+
+```text
+x=(1,0,0): v.n=0, n × x=(0,0,-1) -> 0.866(1,0,0)+0.5(0,0,-1) = (0.866, 0, -0.5)
+y=(0,1,0): v.n=1, n × y=(0,0,0)  -> (0,1,0), unchanged        = (0, 1, 0)
+z=(0,0,1): v.n=0, n × z=(1,0,0)  -> 0.866(0,0,1)+0.5(1,0,0)   = (0.5, 0, 0.866)
+```
+
+These three columns **are** `R_y(30°)`, and the demo's `R` panel, digit for digit.
+
+
+---
+
+## Worked: the diagonal axis at 120°
+
+<img src="../../textbook/figures/rot-diagonal-axis.svg" alt="rotation by 120 degrees about the cube diagonal permutes the axes" style="height:230px">
+
+`n = (1, 1, 1)/√3`, `θ = 120°`: `sin θ = 0.866`, `1 - cos θ = 1.5`. Rodrigues on the three axes gives:
+
+```text
+R = [ 0 0 1 ]      x -> y,   y -> z,   z -> x         R (1,1,1) = (1,1,1): the axis is fixed
+    [ 1 0 0 ]      three of these turns are the identity
+    [ 0 1 0 ]
+```
+
 
 ---
 
 ## Axis-angle, live
 
-One **model** `{axX, axY, axZ, angle}` drives the spun cube and the `R`/`q` panel; with the embed's **angle** slider the axis is fixed at `(0, 1, 0)`, pure `R_y`.
+One **model** `{axX, axY, axZ, angle}` drives the spun cube and the `R`/`q` panel; with the **angle** slider the axis stays at `(0, 1, 0)`, pure `R_y`.
 
 <div class="cockpit" data-demo="axis-angle" data-controls="angle"><pre class="viz-fallback">  model {axX,axY,axZ, angle} -> spun cube + R/q panel, one model
   -- default: axis (0,1,0), angle 30 deg ------------------
@@ -210,95 +237,126 @@ One **model** `{axX, axY, axZ, angle}` drives the spun cube and the `R`/`q` pane
         [ 0       1     0    ]
         [-0.500   0     0.866]</pre></div>
 
-Note: The live demo (axis-angle, embed control "angle"; axis stays at its default (0,1,0), so it opens on a pure R_y(30)). The fallback is hand-verified and matches the Part-2 worked slide and the Part-3 quaternion slide digit-for-digit: R columns (0.866,0,-0.5) / (0,1,0) / (0.5,0,0.866), and q = (0, 0.259, 0, 0.966). Drag angle from 30 and watch both R and q update together — R's column 0 sweeps (cos,0,-sin) while q's y-component is sin(angle/2). The full four-slider sandbox with the trace-path toggle is on the hub.
+
+---
+
+## Reading axis and angle out of a matrix
+
+`R = R_x(30°) R_y(30°)`, rows `(0.866, 0, 0.5)`, `(0.25, 0.866, -0.433)`, `(-0.433, 0.5, 0.75)`:
+
+```text
+trace R = 1 + 2 cos θ = 2.482          ->  cos θ = 0.741,  θ = 42.18°
+R - Rᵀ gives (R21-R12, R02-R20, R10-R01) = (0.933, 0.933, 0.25)
+divide by 2 sin θ = 1.343              ->  n = (0.695, 0.695, 0.186)
+```
+
+Two rotations about two axes are **one** rotation about a third.
+
+
+---
+
+## Pitfall: the axis near a half turn
+
+For `R_y(θ)`, the vector read from `R - Rᵀ` has length `2 sin θ`:
+
+| θ | length of the antisymmetric vector |
+| --- | --- |
+| 170° | 0.347 |
+| 179° | 0.035 |
+| 179.9° | 0.0035 |
+| 180° | 2e-16 (round-off) |
+
+At 180° you divide noise by noise: the "axis" points anywhere. The diagonal still works: `sqrt((Rii + 1)/2)` gives `(0, 1, 0)`.
+
 
 ---
 
 ### Quaternions
 
-<small>(~30 min)</small>
+<small>(~26 min)</small>
 
 ---
 
 ## Why not just store the matrix?
 
-Nine numbers, six hidden constraints — where **four** would do. Three problems:
+Nine numbers, six hidden constraints, where **four** would do. Three problems:
 
-- **drift** — composing matrices breaks orthonormality; shapes shear
-- **interpolation** — averaging two rotation matrices is not a rotation
-- **redundant** — nine numbers for three degrees of freedom
+- **drift**: composing matrices in floating point breaks orthonormality; shapes shear
+- **interpolation**: averaging two rotation matrices is not a rotation
+- **redundancy**: nine numbers for three degrees of freedom
 
-Note: Motivate quaternions by the matrix's failure modes, not by fiat. Nine floats, but a rotation has only three degrees of freedom, so six constraints must hold; floating-point composition erodes them and the object visibly shears after enough frames (re-orthonormalizing is a chore). And you cannot blend matrices: the componentwise average of two rotation matrices is not orthonormal, so smooth camera/animation blends are impossible. Axis-angle interpolates better but composes awkwardly. Quaternions are four numbers, one constraint (unit length), compose by multiplication, and interpolate cleanly — the reason every engine stores them.
+Axis-angle interpolates well but composes awkwardly. The quaternion does both.
+
 
 ---
 
 ## A quaternion for a rotation
 
-Take the axis-angle `(n, theta)` and fold it into four numbers using the **half angle**:
+Fold the axis-angle `(n, θ)` into four numbers using the **half angle**:
 
 ```text
-q = ( sin(theta/2) * n ,  cos(theta/2) )
-  = ( x, y, z, w )        <- three "vector" parts + one "scalar" part w
+q = ( sin(θ/2) n ,  cos(θ/2) ) = ( x, y, z, w )
 ```
 
-- the vector part `(x, y, z)` points along the axis, scaled by `sin(theta/2)`
-- the scalar part `w = cos(theta/2)`
-- a rotation quaternion is always **unit length**: `x*x + y*y + z*z + w*w = 1`
+- the vector part `(x, y, z)` points along the axis, scaled by `sin(θ/2)`
+- the scalar part `w = cos(θ/2)`
+- always **unit length**: `x² + y² + z² + w² = sin²(θ/2) + cos²(θ/2) = 1`
 
-Note: The half-angle is the one surprise; it falls out of the q p q-inv sandwich applying the rotation twice over (theta/2 on each side composes to theta). Component order here is (x,y,z,w) — three.js and Unity's storage order, and our quatFromAxisAngle's. Unit length is the single constraint (versus the matrix's six), and it is cheap to restore: divide by the norm. Note x*x+y*y+z*z = sin^2(theta/2) and w*w = cos^2(theta/2), summing to 1 for free.
+Worked, `R_y(30°)`: half angle 15°, `q = (0, 0.259, 0, 0.966)`; `0.259² + 0.966² = 0.067 + 0.933 = 1`.
 
----
-
-## Worked: the quaternion for R_y(30)
-
-Axis `n = (0, 1, 0)`, angle `theta = 30`, so the half angle is `15`:
-
-```text
-sin(15) = 0.259     cos(15) = 0.966
-q = ( 0.259*(0,1,0), 0.966 ) = ( 0, 0.259, 0, 0.966 )
-```
-
-Only the `y` component is non-zero (the axis is `y`), and `w = cos15 = 0.966`. This is the demo panel's `q` row, exactly.
-
-Note: Hand-verified against the demo, same default as the first two stretches. sin(15 deg) = 0.2588, cos(15 deg) = 0.9659; the vector part is sin15 times (0,1,0) = (0, 0.259, 0) and w = 0.966. Check unit length: 0.259^2 + 0.966^2 = 0.067 + 0.933 = 1.000. This is quatFromAxisAngle(0,1,0,30) and it is what the cockpit's q [x,y,z,w] row displays. Small angle -> w near 1 and vector part near 0 (identity is (0,0,0,1)).
 
 ---
 
 ## Applying a quaternion to a point
 
-To rotate a point `p`, quaternions use a **sandwich**: `p' = q p q-inv`. Expanded into pure vector operations (with `q_v = (x,y,z)` the vector part, `w` the scalar):
+The **sandwich** `p' = q p q⁻¹`, expanded into vector operations (`qv = (x, y, z)`, scalar `w`):
 
 ```text
-p' = p + 2w (q_v x p) + 2 q_v x (q_v x p)
+p' = p + 2w (qv × p) + 2 qv × (qv × p)
 ```
 
-Two cross products and some scaling — no trig at apply time. `q-inv` just negates the vector part: `(-x, -y, -z, w)`.
+Two cross products and some scaling; no trig at apply time. `q⁻¹` negates the vector part: `(-x, -y, -z, w)`.
 
-Note: The sandwich q p q-inv is the actual rotation operator; p is treated as a quaternion (p, 0). The expanded vector identity above avoids constructing quaternions at apply time — just two crosses and a couple of scales, which is why it is fast. q-inv for a UNIT quaternion is the conjugate (negate the vector part), because inverting a rotation means the same axis by -theta, i.e. sin flips sign on the vector part while cos(=w) stays. We verify the identity numerically next.
 
 ---
 
 ## Verify the identity on one point
 
-Rotate `p = (1, 0, 0)` by `90` about `y`: `q = (0, 0.707, 0, 0.707)` (`sin45 = cos45 = 0.707`), so `q_v = (0, 0.707, 0)`, `w = 0.707`.
+Rotate `p = (1, 0, 0)` by 90° about `y`: `q = (0, 0.707, 0, 0.707)`.
 
 ```text
-q_v x p         = (0,0.707,0) x (1,0,0) = (0, 0, -0.707)
-2w (q_v x p)    = 2(0.707)(0,0,-0.707)  = (0, 0, -1.0)
-q_v x (q_v x p) = (0,0.707,0) x (0,0,-0.707) = (-0.5, 0, 0)
-2 q_v x (q_v x p)                            = (-1.0, 0, 0)
-p' = (1,0,0) + (0,0,-1.0) + (-1.0,0,0)  =  (0, 0, -1)
+qv × p            = (0,0.707,0) × (1,0,0)       = (0, 0, -0.707)
+2w (qv × p)       = 1.414 (0, 0, -0.707)        = (0, 0, -1)
+qv × (qv × p)     = (0,0.707,0) × (0,0,-0.707)  = (-0.5, 0, 0)
+2 qv × (qv × p)                                 = (-1, 0, 0)
+p' = (1,0,0) + (0,0,-1) + (-1,0,0)              = (0, 0, -1)
 ```
 
-`(1,0,0) -> (0,0,-1)` — the same answer `R_y(90)` gave in the axis-rotation stretch. **The quaternion and the matrix agree.**
+`R_y(90°)` sent `(1,0,0)` to `(0,0,-1)` (its column 0). **The quaternion and the matrix agree.**
 
-Note: Digit-checked by hand. First cross: (0,0.707,0) x (1,0,0) = (0.707*0 - 0*0, 0*1 - 0*0, 0*0 - 0.707*1) = (0,0,-0.707); times 2w = 1.414 gives (0,0,-1.0). Second cross: (0,0.707,0) x (0,0,-0.707) = (0.707*(-0.707) - 0, 0 - 0, 0 - 0) = (-0.5,0,0); times 2 = (-1,0,0). Sum with p: (1-1, 0, -1) = (0,0,-1). This is exactly R_y(90) applied to (1,0,0) from the axis-rotation stretch — the two representations rotate the point to the same place, which is the point of showing both.
+
+---
+
+## Quaternion to matrix, no trig
+
+```text
+R = [ 1-2(y²+z²)   2(xy-zw)     2(xz+yw)   ]
+    [ 2(xy+zw)     1-2(x²+z²)   2(yz-xw)   ]
+    [ 2(xz-yw)     2(yz+xw)     1-2(x²+y²) ]
+```
+
+For `q = (0, 0.259, 0, 0.966)`:
+
+```text
+R00 = 1 - 2(0.259² + 0) = 1 - 0.134 = 0.866        R02 = 2(0 + 0.259·0.966) = 0.5
+```
+
+All nine give `R_y(30°)`, with no cosine evaluated.
+
 
 ---
 
 ## Composing rotations = multiplying quaternions
-
-Do rotation `q1`, then `q2`? **Multiply** the quaternions:
 
 ```csharp [1-6]
 Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
@@ -310,76 +368,130 @@ Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
 }
 ```
 
-<small>EX_8_1_MyScript.cs. Like matrix multiply, the product is **not commutative** — order is the rotation order.</small>
+<small>EX_8_1_MyScript.cs. Like matrix multiply, the product is **not commutative**: order is the rotation order.</small>
 
-Note: Real excerpt. Quaternion multiply is the composition operator: q2 * q1 means "apply q1, then q2" (same right-to-left reading as matrices on column vectors). It is 16 multiplies and 12 adds — cheaper than a 3x3 matrix product (27 mult) and it stays a rotation with only a length renormalize, no orthonormalization. Non-commutative, exactly like rotations themselves: pitch-then-yaw is not yaw-then-pitch. This is why chaining thousands of rotations per frame is safe in quaternion form.
 
 ---
 
-## Why interpolation just works
+## Worked: compose, and check against the matrices
 
-To blend from orientation `q1` to `q2` — say a camera easing between two angles — **slerp** walks the short arc on the unit sphere:
+`R_y(30°)` first, then `R_x(30°)`: `qy = (0, 0.259, 0, 0.966)`, `qx = (0.259, 0, 0, 0.966)`:
 
 ```text
-slerp(q1, q2, t)  =  the unit quaternion t of the way from q1 to q2
-                     (constant angular speed, always a valid rotation)
+q = qx qy = (0.25, 0.25, 0.067, 0.933)            |q|² = 1.000
+sandwich on (1, 2, 3)                   -> (2.366, 0.683, 2.817)
+R_x(30°) R_y(30°) on (1, 2, 3)          -> (2.366, 0.683, 2.817)
+angle 2 acos(0.933) = 42.2°, axis (0.695, 0.695, 0.186)
 ```
 
-- every step is still **unit length** -> still a real rotation (no shearing)
-- it takes the **shortest** turn between the two orientations
 
-Note: Slerp = spherical linear interpolation. Unit quaternions live on the surface of the 4D unit sphere; a rotation blend is a walk along that surface, and slerp traces the great-circle arc at constant angular speed. Contrast the matrix: a componentwise average leaves the sphere (not unit, not orthonormal) and the object shears mid-blend. Sung's OurOwnExample composes many small AngleAxis quaternions to walk from one orientation to another — the same idea, discretized. One slide; the takeaway is "blending orientations is a sphere walk, and only quaternions stay on the sphere."
+---
+
+## Slerp: blending orientations
+
+<img src="../../textbook/figures/rot-slerp.svg" alt="slerp walks the great arc; the plain average leaves the unit sphere" style="height:210px">
+
+Identity `(0,0,0,1)` to `R_y(120°)`, `q2 = (0, 0.866, 0, 0.5)`: `cos Ω = 0.5`, `Ω = 60°`.
+
+```text
+slerp at t = 1/2:  0.577 (0, 0.866, 0, 1.5) = (0, 0.5, 0, 0.866)    = the quaternion of R_y(60°)
+plain average:     (0, 0.433, 0, 0.75),  length 0.866               not a rotation
+```
+
+
+---
+
+## Pitfall: q and -q, and the long way round
+
+`q` and `-q` are the **same rotation**: `(0, 0.259, 0, 0.966)` and `(0, -0.259, 0, -0.966)` both give `R_y(30°)`.
+
+```text
+q1 = identity,  q2 = -(quaternion of R_y(120°)) = (0, -0.866, 0, -0.5)
+q1 . q2 = -0.5  ->  slerp walks 120° in 4D  ->  a 240° turn: the long way round
+fix: if q1 . q2 < 0, negate q2 first
+```
+
+
+---
+
+## Drift, measured
+
+<img src="../../textbook/figures/rot-drift.svg" alt="error growth over 200,000 float32 compositions: matrix, quaternion, renormalized quaternion" style="height:220px">
+
+200,000 compositions of `R_y(1°)` in float32:
+
+| representation | error after 200,000 steps |
+| --- | --- |
+| 3×3 matrix product | columns off orthonormal by 5.7e-3 |
+| quaternion product | length off 1 by 2.1e-3 |
+| quaternion, renormalized each step | 1.8e-8 |
+
 
 ---
 
 ## What Unity's Quaternion stores
 
-`UnityEngine.Quaternion` is four floats `(x, y, z, w)` — the same `q` we built:
+`UnityEngine.Quaternion` is four floats `(x, y, z, w)`, the same `q`:
 
-- `transform.rotation` is a **quaternion** under the hood, always
+- `transform.rotation` is a **quaternion**, always
 - build with `Quaternion.AngleAxis(angle, axis)`; compose with `*`; blend with `Slerp`
+- three.js: `Quaternion.setFromAxisAngle`, `multiply`, `slerp`, same layout
 
 You *read* Euler angles in the Inspector, but the engine *stores* a quaternion.
 
-Note: Tie the math to the tool students actually touch. Every transform's rotation is a quaternion internally — the Inspector's three Euler fields are a human-readable view computed on demand, not the storage. AngleAxis is exactly our (sin(theta/2) axis, cos(theta/2)); the * operator is QMultiplication; Slerp is the arc walk. The one honest caveat: the Inspector shows Euler, which is why beginners think rotations are three angles — the Euler stretch shows why that view is the leaky one.
 
 ---
 
 ### Euler angles and gimbal lock
 
-<small>(~20 min)</small>
+<small>(~14 min)</small>
 
 ---
 
 ## Euler angles: three turns in a row
 
-The human way to say an orientation: three rotations about three axes, in a fixed order.
+Three rotations about three axes, in a **fixed order**: readable ("pitch 20, yaw 45, roll 10"), but the order is a convention.
 
-```text
-orientation = rotate about one axis, then a second, then a third
-```
+| convention | product | where x lands for (20°, 45°, 10°) |
+| --- | --- | --- |
+| Unity, `Quaternion.Euler` | `R_y R_x R_z` (Z first) | (0.738, 0.163, -0.654) |
+| three.js default, XYZ | `R_x R_y R_z` | (0.696, 0.401, -0.595) |
+| aerospace, extrinsic XYZ | `R_z R_y R_x` | (0.696, 0.123, -0.707) |
 
-- Unity's `Quaternion.Euler(x, y, z)` applies them in the order **Z, then X, then Y** (Sung's `3.1.GimbalLock` project sets one Euler component at a time and rebuilds with it; you will run it in a studio)
-- three readable numbers — "pitch 20, yaw 45, roll 0"
-- the order is a **convention**; different engines pick different ones
+Same three numbers, **three poses**: Unity and three.js differ by 15.2°.
 
-Note: Euler angles are three sequential axis rotations (the axis-rotation stretch matrices) composed in a chosen order. Unity's Quaternion.Euler(x,y,z) documents its order as Z first, then X, then Y (verified in this session's project code, RotationDemoControl.cs, which sets one Euler component at a time and rebuilds with Quaternion.Euler). The order matters because rotations do not commute, and every engine/DCC tool picks its own (Z-X-Y, X-Y-Z, ...) — a frequent source of "why is my imported model rotated wrong" bugs. Readable, but as we will see, structurally fragile.
 
 ---
 
-## The lock: two axes collapse
+## The lock: the inner axis lands on the outer one
 
-In a Z-X-Y order, the **middle** axis is X. Pitch it to `90` degrees and the first and third axes line up:
+<img src="../../textbook/figures/rot-gimbal.svg" alt="at a 90-degree middle angle the inner and outer rotation axes coincide" style="height:220px">
+
+Unity's order: `Z` inner, `X` middle, `Y` outer. After the middle turn, the inner axis in the world is:
 
 ```text
-X = 90  ->  the Z axis has been tipped onto the Y axis
-        ->  the Z slider and the Y slider now do the SAME thing
-        ->  one degree of freedom is gone (three knobs, two effects)
+R_x(x) z = (0, -sin x, cos x)
+x = 30°:  (0, -0.5, 0.866)        a distinct direction
+x = 90°:  (0, -1, 0)              the outer Y axis itself: Z and Y do the same thing
 ```
 
-You can no longer turn in one direction at all until you back `X` off `90`. That dead direction is **gimbal lock**.
 
-Note: The concrete lock, tied to the demo's exact order. With Z applied first (inner) and Y last (outer), the middle X rotation carries the inner Z axis; at X=90 the tipped Z axis coincides with the outer Y axis, so rotating Z and rotating Y produce the identical motion — the two gimbals are parallel and one rotational freedom vanishes. In the project: set the X slider to 90, then drag Y and Z and watch them do the same spin. Generically (any order) the lock is at the middle angle = +/-90, where the outer and inner axes align; the locked value and axis depend on the convention, so "middle axis at 90" is the honest general statement.
+---
+
+## Extraction, and the lock
+
+Reading the triple back from `R` (Unity order):
+
+```text
+(20°, 45°, 10°):  x = asin(-R12) = asin(0.342) = 20°
+                  y = atan2(R02, R22) = atan2(0.6645, 0.6645) = 45°
+                  z = atan2(R10, R11) = atan2(0.163, 0.925) = 10°
+(90°, 45°, 10°):  R12 = -1, so x = 90°, but R02 = R22 = R10 = R11 = 0:  atan2(0, 0)
+                  only y - z survives: atan2(R01, R00) = 35°
+```
+
+At the lock, `(90°, 45°, 10°)` and `(90°, 60°, 25°)` are the **same orientation**.
+
 
 ---
 
@@ -387,21 +499,19 @@ Note: The concrete lock, tied to the demo's exact order. With Z applied first (i
 
 Gimbal lock is a disease of the **representation**, not of rotation itself:
 
-- three sequential angles have singular configs — the `90`-degree collapse
-- a **quaternion** names axis and angle **directly** — no gimbals to align
-- engines **store** quaternions, only **show** Euler for editing
+- three sequential angles have singular configurations: the 90° collapse
+- a **quaternion** names axis and angle **directly**: no gimbals to align
+- engines **store** quaternions and only **show** Euler angles for editing
 
-Note: Close the loop from the quaternion stretch. There is nothing wrong with the orientation at pitch 90 — the object is fine; it is the (yaw, pitch, roll) coordinate chart that goes singular there, the way longitude is undefined at the poles. A quaternion stores one axis and one angle with no sequence of nested frames, so there is no configuration where two of them align. That is the concrete engineering reason engines keep rotation as a quaternion internally and expose Euler only as an editing convenience. This is the "why quaternions win" payoff the whole night has been building to.
 
 ---
 
-## Rotation, three ways
+## Rotation, four ways
 
-- **Matrix** — columns are the rotated axes; nine numbers, six constraints, drifts
-- **Axis-angle (Rodrigues)** — spin the across-axis part; a dot, a cross, a scale
-- **Quaternion** — `(sin(theta/2) n, cos(theta/2))`; compose by `*`, blend by slerp, no lock
-- **Euler** — three readable angles, but a middle-axis `90` **gimbal-locks**
+- **Matrix**: columns are the rotated axes; orthonormal, det +1, inverse = transpose; nine numbers, drifts
+- **Axis-angle (Rodrigues)**: spin the across-axis part; a dot, a cross, a scale; read back by trace and `R - Rᵀ`, but branch near 180°
+- **Quaternion**: `(sin(θ/2) n, cos(θ/2))`; compose by `*`, blend by slerp with the sign check, renormalize
+- **Euler**: three readable angles, a convention per tool, and a middle-axis 90° **lock**
 
-Engines store the quaternion; they show you Euler.
+Engines store the quaternion, build the matrix for the GPU, and show you Euler angles.
 
-Note: The synthesis slide (a real recap, playbook §3 exception). Four representations of one operation, each with its niche: the matrix for applying to many points, axis-angle for a human "turn about this stick", the quaternion for storage/compose/blend, Euler for the Inspector. The through-line from the vectors stretch: Rodrigues is the projection split plus a cross, and the quaternion is that axis-angle folded through the half angle. Next week these rotations become the linear part of an affine map.

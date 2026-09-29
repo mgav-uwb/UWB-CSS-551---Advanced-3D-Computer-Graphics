@@ -1,0 +1,109 @@
+{
+ "inputs": {
+  "tiny": {
+   "w1": [
+    1,
+    -1
+   ],
+   "b1": [
+    0.5,
+    0.5
+   ],
+   "w2": [
+    0.8,
+    -0.6
+   ],
+   "b2": 0.1,
+   "x": 0.4,
+   "y": 0.3,
+   "lr": 0.1
+  },
+  "fit": {
+   "steps": 400,
+   "lr": 0.05
+  },
+  "dct": {
+   "n": 20,
+   "keep": [
+    5,
+    8
+   ]
+  }
+ },
+ "checks": [
+  {
+   "id": "fwd",
+   "label": "forward on the tiny net at x = 0.4: hidden a and output f",
+   "points": 10,
+   "tol": 0.0001,
+   "expected": [
+    [
+     0.716297870199,
+     0.099667994625
+    ],
+    0.613237499384
+   ]
+  },
+  {
+   "id": "grad",
+   "label": "gradients on the one sample: loss, dw1, db1, dw2, db2",
+   "points": 20,
+   "tol": 0.0001,
+   "expected": [
+    0.0981177310205,
+    [
+     0.0976132970322,
+     -0.148860426801
+    ],
+    [
+     0.244033242581,
+     -0.372151067004
+    ],
+    [
+     0.448742707351,
+     0.0624395068099
+    ],
+    0.626474998768
+   ]
+  },
+  {
+   "id": "after",
+   "label": "after one sgdStep (lr 0.1): the new output f",
+   "points": 10,
+   "tol": 0.0001,
+   "expected": 0.481419141667
+  },
+  {
+   "id": "fit",
+   "label": "12-unit net on the 12 wave samples: loss after 400 steps (lr 0.05)",
+   "points": 20,
+   "tol": 0.00001,
+   "expected": 0.0083552986821
+  },
+  {
+   "id": "dc",
+   "label": "dct2 of the digit: the first three coefficients C[0][0], C[0][1], C[1][0]",
+   "points": 10,
+   "tol": 0.0001,
+   "expected": [
+    6.8570588226,
+    -1.34555089862,
+    -0.042906424459
+   ]
+  },
+  {
+   "id": "psnr5",
+   "label": "psnr of the 5 × 5 low-frequency rebuild against the digit",
+   "points": 15,
+   "tol": 0.001,
+   "expected": 10.3045322785
+  },
+  {
+   "id": "psnr8",
+   "label": "psnr of the 8 × 8 low-frequency rebuild against the digit",
+   "points": 15,
+   "tol": 0.001,
+   "expected": 16.5246062454
+  }
+ ]
+}

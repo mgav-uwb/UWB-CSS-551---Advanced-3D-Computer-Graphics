@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <!--
-  CSS 551 — course hub. Serve the WHOLE course from one server:
+  CSS 551 course hub. Serve the WHOLE course from one server:
       cd css551 && python3 -m http.server 8551      # then open http://localhost:8551/
   Every session deck/lab uses relative asset paths, so one root serves them all.
 
-  LAYOUT: one row per session — the session card on the left, its relevant
+  LAYOUT: one row per week: the week card on the left, its relevant
   handouts in the middle, its interactive demos on the right.
-  TO ADD A SESSION: fill in its dir/deck/lab under the SESSIONS array below
-  (deck/lab stay null until that session's files exist — null renders unlinked,
+  TO LINK A LECTURE: set its href in LECTURES; weeks live in the WEEKS array below
+  (deck/lab stay null until that session's files exist; null renders unlinked,
   exactly like 343's exam rows). handouts/demos = keys into the HANDOUTS/DEMOS maps; HANDOUTS
   are the topic chapters of textbook/ (offering-independent), attached per session HERE.
 -->
@@ -15,7 +15,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSS 551 — Course Hub</title>
+<title>CSS 551 · Course Hub</title>
 <style>
   :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
          --accent:#00e58a; --accent2:#5cd47a; }
@@ -92,6 +92,19 @@
     a.card{margin-top:6px}
   }
 
+
+  /* Plan C week cards: two lecture chips, a homework chip, a quiz marker */
+  .card.static{display:block;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:11px;padding:13px 15px}
+  .week.neural .card.static{border-left-color:#8f7dff} .week.neural .badge{color:#8f7dff;border-color:#8f7dff;background:#8f7dff14}
+  .week.bridge .card.static{border-left-color:#ffcf5c} .week.bridge .badge{color:#ffcf5c;border-color:#ffcf5c;background:#ffcf5c14}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  span.chip.lec{display:block;border:1px dashed var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;color:var(--dim)}
+  .chip.lec .t{font-weight:600} .chip.lec .d{display:block;font-size:11.5px;color:var(--dim)}
+  .marks{display:flex;gap:8px;margin-top:8px;align-items:center}
+  .marks:empty{display:none}
+  a.chip.hwc{padding:4px 11px} .chip.hwc .t::before{content:"🛠 "}
+  .qm{font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:7px;padding:3px 9px;color:var(--ink)}
+  .qm.exam{border-color:#ffcf5c;color:#ffcf5c}
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 </style>
@@ -109,7 +122,7 @@
 
   <footer>
     One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
-    → open <code>http://localhost:8551/</code>.
+    then open <code>http://localhost:8551/</code>.
   </footer>
 
 <script>
@@ -119,7 +132,7 @@ const QUICKLINKS = [
   { href:"textbook/index.html", title:"Course text", desc:"topic chapters, independent of the week schedule" },
   { href:"schedule/index.html", title:"Schedule", desc:"every meeting, quiz and homework on the calendar" },
   { href:"syllabus/index.html", title:"Syllabus", desc:"format, grading, tracks, policies" },
-  { href:null, title:"Assignments", desc:"studio labs & projects" },
+  { href:"homework/index.html", title:"Homework", desc:"eight assignments, Unity or WebGL (Python for the neural two)" },
 ];
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
@@ -171,13 +184,13 @@ const HANDOUTS = {
               desc:"the event loop; MVC on the transform demo; unprojection and picking worked; dragging; the arcball; latency" },
   unity:    { href:"textbook/unity-basics.html",
               title:"Text · Unity for This Course",
-              desc:"the editor; scenes, objects, components; the script lifecycle and deltaTime; C# gotchas; the Transform hierarchy worked; Vector3, Quaternion, Matrix4x4 vs the text's conventions; reading a studio project; implement and replace" },
+              desc:"the editor; scenes, objects, components; the script lifecycle and deltaTime; C# gotchas; the Transform hierarchy worked; Vector3, Quaternion, Matrix4x4 vs the text's conventions; reading a class-example project; implement and replace in Unity and three.js" },
   unityshaders:{ href:"textbook/unity-shaders.html",
               title:"Text · Unity Shaders",
               desc:"a .shader file outside in; the two programs and their semantics; built-in and uploaded matrices; properties and globals; textures; lighting and the normal hack; render state; what magenta means" },
   history:  { href:"textbook/history-of-graphics.html",
               title:"Text · A History of Computer Graphics",
-              desc:"the field's story — seminal papers, people &amp; places, hardware pipelines" },
+              desc:"the field's story: seminal papers, people &amp; places, hardware pipelines" },
   pbr:      { href:"textbook/light-transport-pbr.html",
               title:"Text · Light Transport and PBR",
               desc:"the rendering equation term by term; the BRDF; microfacets and the metallic/roughness model" },
@@ -189,7 +202,7 @@ const HANDOUTS = {
               desc:"images as vectors and as functions; sampling, bases, aliasing revisited; the thin sheet; the non-invertible concept map" },
   diffusion:{ href:"textbook/diffusion-models.html",
               title:"Text · Diffusion Models",
-              desc:"destroy, learn to undo, sample — the exact denoiser and Tweedie, DDPM/DDIM, guidance, the scalings, what still breaks, the papers" },
+              desc:"destroy, learn to undo, sample: the exact denoiser and Tweedie, DDPM/DDIM, guidance, the scalings, what still breaks, the papers" },
   scenes:   { href:"textbook/learned-scenes.html",
               title:"Text · Learned Scenes",
               desc:"NeRF and its volume-rendering integral; 3D Gaussian splatting; learned scenes against learned images" },
@@ -198,144 +211,131 @@ const HANDOUTS = {
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
 const DEMOS = {
   "raster": { title:"Rasterization: One Triangle Becomes Pixels",
-    desc:"drag res/angle — a triangle sampled onto a coarse framebuffer; covered-pixel readout; grid/centers/outline toggles" },
+    desc:"drag res/angle: a triangle sampled onto a coarse framebuffer; covered-pixel readout; grid/centers/outline toggles" },
   "mesh-view": { title:"Meshes: Real Models, Wireframe to Solid",
-    desc:"pick cube/teapot/bunny/dragon — drag wire to cross-fade solid ↔ wireframe; exact vertex/triangle readout + source credit" },
+    desc:"pick cube/teapot/bunny/dragon: drag wire to cross-fade solid ↔ wireframe; exact vertex/triangle readout + source credit" },
   "our-scene": { title:"Our Scene: A Cornell Box, Five Ways",
-    desc:"drag stage/lightX — a modified Cornell box (bunny on the short box, sphere front) walked through wireframe → flat → smooth → textured → anti-aliased" },
+    desc:"drag stage/lightX: a modified Cornell box (bunny on the short box, sphere front) walked through wireframe → flat → smooth → textured → anti-aliased" },
   "lod": { title:"Level of Detail: One Mesh at Five Resolutions",
-    desc:"drag level/dist — the same icosphere at five triangle counts (20 → 5,120); exact vertex/triangle readout" },
+    desc:"drag level/dist: the same icosphere at five triangle counts (20 → 5,120); exact vertex/triangle readout" },
   "keyframe": { title:"Keyframe Animation: In-Betweening, Linear vs Smooth",
-    desc:"drag t/ease — three keyframes; linear (visible corner at the middle key) vs Catmull-Rom smooth path; interpolated-position readout" },
+    desc:"drag t/ease: three keyframes; linear (visible corner at the middle key) vs Catmull-Rom smooth path; interpolated-position readout" },
   "bump-map": { title:"Bump Mapping: Lighting Lies About Geometry",
-    desc:"drag bump/lightAz — a flat two-triangle wall shaded to look grooved; the readout's triangle count proves the geometry never changed" },
+    desc:"drag bump/lightAz: a flat two-triangle wall shaded to look grooved; the readout's triangle count proves the geometry never changed" },
   "mvc-transform": { title:"MVC: One Model, Two Views (Transform)",
-    desc:"drag tx/ry/s — cube view and matrix-panel view stay in sync" },
+    desc:"drag tx/ry/s: cube view and matrix-panel view stay in sync" },
   "view-matrix": { title:"The View Matrix: Hand-Built, Glass Cockpit",
     desc:"az/el/dist sliders drive a hand-built lookAt; u/v/w rows exposed" },
   "dot-cross": { title:"Dot &amp; Cross Products: Angle and Projection",
-    desc:"drag a/b — arrows, projection, and a·b / |a| / |b| / θ / a×b panel" },
+    desc:"drag a/b: arrows, projection, and a·b / |a| / |b| / θ / a×b panel" },
   "axis-angle": { title:"Axis-Angle Rotation: Rodrigues, Live",
-    desc:"drag axis + angle — a cube spins about the axis; q and R panel update" },
+    desc:"drag axis + angle: a cube spins about the axis; q and R panel update" },
   "trs-order": { title:"Matrix Composition: Order Matters (T·R vs R·T)",
-    desc:"drag tx/ry — two cubes, same factors, opposite order; T·R and R·T panels" },
+    desc:"drag tx/ry: two cubes, same factors, opposite order; T·R and R·T panels" },
   "scene-graph": { title:"Scene Graphs: A Hand-Built Base-Arm-Hand Chain",
-    desc:"drag baseRy/armBend/handRy/armT — three flat boxes composed by matMul; W_base/W_arm/W_hand panel" },
+    desc:"drag baseRy/armBend/handRy/armT: three flat boxes composed by matMul; W_base/W_arm/W_hand panel" },
   "projection": { title:"Perspective Projection: Squeeze the Frustum",
-    desc:"drag fov/aspect/near/far — a third-person camera frustum; boxes inside stay bright; P + marked-box NDC panel" },
+    desc:"drag fov/aspect/near/far: a third-person camera frustum; boxes inside stay bright; P + marked-box NDC panel" },
   "mesh-grid": { title:"Mesh Grids: Hand-Built Vertices, Indices, Normals",
-    desc:"drag n/lift — an n×n quad grid built by hand; counts (n+1)²/2n²/6n² + first-two-triangle triples; wireframe + normals" },
+    desc:"drag n/lift: an n×n quad grid built by hand; counts (n+1)²/2n²/6n² + first-two-triangle triples; wireframe + normals" },
   "uv-placement": { title:"Texture Placement: The UV Matrix, Live",
-    desc:"drag offU/offV/rot/tile — a checker on a quad placed by our uvMat3; the live 3×3 texture.matrix panel" },
+    desc:"drag offU/offV/rot/tile: a checker on a quad placed by our uvMat3; the live 3×3 texture.matrix panel" },
   "illumination": { title:"Phong Lighting: Light a Sphere, Live",
-    desc:"drag lightAz/lightEl/shine — one point light on a sphere; live N·L / R·V / diffuse / specular at a marked point" },
+    desc:"drag lightAz/lightEl/shine: one point light on a sphere; live N·L / R·V / diffuse / specular at a marked point" },
   "brdf-lobe": { title:"BRDF Lobes: Phong vs GGX-Flavored Reflectance Shape",
-    desc:"our Cornell scene wearing ONE BRDF — metal teapot+box, plastic bunny, glossy box — with the polar lobe inset; Phong s / GGX α, HWHM, and formula panel (shape, not calibrated units)" },
+    desc:"our Cornell scene wearing ONE BRDF (metal teapot and box, plastic bunny, glossy box) with the polar lobe inset; Phong s / GGX α, HWHM, and formula panel (shape, not calibrated units)" },
   "gsplat": { title:"3D Gaussian Splatting: A Real Scene, Live in the Browser",
-    desc:"orbit a real ~240K-splat Mip-NeRF 360 bonsai scene; drag orbitAz/dist — a rasterizer, not a mesh (attribution in media/gsplat/)" },
+    desc:"orbit a real ~240K-splat Mip-NeRF 360 bonsai scene; drag orbitAz/dist; a rasterizer, not a mesh (attribution in media/gsplat/)" },
   "simplify-compare": { title:"Mesh Simplification: QEM vs Progressive Meshes vs Gavriliu 2001",
-    desc:"drag tris — the same bunny scan simplified three ways at once (QEM snapped levels, PM's exact continuous stream, MG2001's mesh-graph adaptive extraction); per-algorithm tris/maxErr/minAspect readout" },
+    desc:"drag tris: the same bunny scan simplified three ways at once (QEM snapped levels, PM's exact continuous stream, MG2001's mesh-graph adaptive extraction); per-algorithm tris/maxErr/minAspect readout" },
 };
 
-// ───────── one row per session: card + its handouts + its demos ─────────
-const SESSIONS = [
-  // One row per Tuesday lecture, paired with the Thursday studio that follows it under
-  // the AU26 calendar (planning/css551-au26-schedule-2026-09-18.md): from week 3 on the
-  // studio runs one week behind its lecture, so the lab chip names the lab explicitly.
-  { id:"W1–2", title:"3D Computer Graphics: The Big Picture",
-    deck:"sessions/S01-cg-overview/index.html",
-    lab:"sessions/S01-cg-overview/lab01/index.html", labTitle:"Lab 01 · Unity, the loop &amp; MVC",
-    handouts:["history","unity","raster","interaction"],
-    demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map","mvc-transform"] },
-  { id:"W3", title:"Vectors and Rotations: Dot &amp; Cross, Lines, Planes; Axis-Angle, Quaternions",
-    deck:"sessions/S02-vectors-dot-cross/index.html",
-    lab:"sessions/S02-vectors-dot-cross/lab02/index.html", labTitle:"Lab 02 · Vectors EX1–EX3",
-    handouts:["vectors","rotation"],
-    demos:["dot-cross","axis-angle"] },
-  { id:"W4", title:"Affine Transformations over Homogeneous Coordinates",
-    deck:"sessions/S04-matrices-spaces/index.html",
-    lab:"sessions/S03-rotation-quaternions/lab03/index.html", labTitle:"Lab 03 · Projection EX4–EX6",
-    handouts:["affine"],
-    demos:["trs-order"] },
-  { id:"W5", title:"Scene Graphs &amp; Hierarchical Modeling",
-    deck:"sessions/S05-scene-graphs/index.html",
-    lab:"sessions/S04-matrices-spaces/lab04/index.html", labTitle:"Lab 04 · Matrix studio + MP3 lab",
-    handouts:["scenegraphs","animation"],
-    demos:["scene-graph"] },
-  { id:"W6", title:"3D Viewing: View &amp; Projection Matrices",
-    deck:"sessions/S06-3d-viewing/index.html",
-    lab:"sessions/S05-scene-graphs/lab05/index.html", labTitle:"Lab 05 · SceneNode studio + MP4",
-    handouts:["viewing"],
-    demos:["view-matrix","projection"] },
-  { id:"W7", title:"Polygonal Modeling",
-    deck:"sessions/S07-polygonal-modeling/index.html",
-    lab:"sessions/S06-3d-viewing/lab06/index.html", labTitle:"Lab 06 · CameraMatrices + MP5",
-    handouts:["meshes","curves"],
-    demos:["mesh-grid","simplify-compare"] },
-  { id:"W8", title:"Texture Mapping",
-    deck:"sessions/S08-texture-mapping/index.html",
-    lab:"sessions/S07-polygonal-modeling/lab07/index.html", labTitle:"Lab 07 · MyMesh + FP proposal workshop",
-    handouts:["textures","unityshaders","antialiasing"],
-    demos:["uv-placement"] },
-  { id:"W9", title:"Illumination",
-    deck:"sessions/S09-illumination/index.html",
-    lab:null, labTitle:null,   // Thanksgiving Thursday; the texture items fold into Lab 09
-    handouts:["illumination"],
-    demos:["illumination"] },
-  { id:"W10", title:"Light &amp; Learned Images: PBR, Networks, Diffusion",
-    deck:"sessions/S10-rendering-frontier/index.html",
-    lab:"sessions/S09-illumination/lab09/index.html", labTitle:"Lab 09 · Shader studio + FP progress demos",
-    handouts:["illumination","pbr","raytracing","color","nets","images","diffusion"],
-    demos:["brdf-lobe","mlp-fit","embed-map","diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
-  { id:"W11", title:"Learned Scenes, and Where the Field Is Going",
-    deck:"sessions/S11-learned-scenes/index.html",
-    lab:"sessions/S11-learned-scenes/lab10/index.html", labTitle:"Lab 10 · Final Project studio",
-    handouts:["scenes"],
-    demos:["gsplat"] },
+// ───────── the lectures (Plan C: planning/css551-au26-plan-c-2026-09-29.md) ─────────
+// href:null renders unlinked until the deck exists.
+const LECTURES = {
+  L01:{ title:"The Big Picture, part 1", href:"lectures/L01-big-picture-1/index.html" },
+  L02:{ title:"The Big Picture, part 2", href:"lectures/L02-big-picture-2/index.html" },
+  L03:{ title:"The interactive loop, MVC, and the tool", href:"lectures/L03-loop-mvc-tool/index.html" },
+  L04:{ title:"Vectors", href:"lectures/L04-vectors/index.html" },
+  L05:{ title:"Rotation", href:"lectures/L05-rotation/index.html" },
+  L06:{ title:"Affine transformations", href:"lectures/L06-affine/index.html" },
+  L07:{ title:"Scene graphs", href:"lectures/L07-scene-graphs/index.html" },
+  L08:{ title:"Viewing", href:"lectures/L08-viewing/index.html" },
+  L09:{ title:"Rasterization and antialiasing", href:"lectures/L09-rasterization-antialiasing/index.html" },
+  L10:{ title:"Meshes and texture mapping", href:"lectures/L10-meshes-textures/index.html" },
+  L11:{ title:"Illumination", href:"lectures/L11-illumination/index.html" },
+  L12:{ title:"Light transport, PBR, and ray tracing", href:"lectures/L12-light-transport-ray-tracing/index.html" },
+  L13:{ title:"Midterm, then path tracing", href:"lectures/L13-path-tracing/index.html" },
+  L14:{ title:"Neural networks and embeddings", href:"lectures/L14-neural-nets-embeddings/index.html" },
+  L15:{ title:"The space of images", href:"lectures/L15-image-space/index.html" },
+  L16:{ title:"Diffusion models I", href:"lectures/L16-diffusion-1/index.html" },
+  L17:{ title:"Diffusion models II", href:"lectures/L17-diffusion-2/index.html" },
+  L18:{ title:"Learned scenes", href:"lectures/L18-learned-scenes/index.html" },
+  L19:{ title:"Generative 3D and video", href:"lectures/L19-generative-3d-video/index.html" },
+  L20:{ title:"Synthesis and review", href:"lectures/L20-synthesis-review/index.html" },
+};
+const HW = n => ({ n, href:`homework/hw0${n}/index.html` });
+
+// ───────── one row per week: two lectures, the homework going out, the quiz ─────────
+const WEEKS = [
+  { id:"W1",  title:"The Big Picture", tue:null, thu:"L01", hw:null, quiz:null,
+    handouts:["history"], demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map"] },
+  { id:"W2",  title:"The Big Picture; the loop and the tool", tue:"L02", thu:"L03", hw:HW(1), quiz:"Q1",
+    handouts:["history","interaction","unity"], demos:["mvc-transform"] },
+  { id:"W3",  title:"Vectors and rotation", tue:"L04", thu:"L05", hw:HW(2), quiz:"Q2",
+    handouts:["vectors","rotation"], demos:["dot-cross","axis-angle"] },
+  { id:"W4",  title:"Affine transformations and scene graphs", tue:"L06", thu:"L07", hw:HW(3), quiz:"Q3",
+    handouts:["affine","scenegraphs","animation"], demos:["trs-order","scene-graph"] },
+  { id:"W5",  title:"Viewing, rasterization, antialiasing", tue:"L08", thu:"L09", hw:HW(4), quiz:"Q4",
+    handouts:["viewing","raster","antialiasing"], demos:["view-matrix","projection","raster"] },
+  { id:"W6",  title:"Meshes, textures, illumination", tue:"L10", thu:"L11", hw:HW(5), quiz:"Q5",
+    handouts:["meshes","textures","illumination","unityshaders","curves"], demos:["mesh-grid","uv-placement","bump-map","illumination","simplify-compare"] },
+  { id:"W7",  title:"The bridge: light transport and ray tracing", tue:"L12", thu:"L13", hw:HW(6), quiz:"Midterm", bridge:true,
+    handouts:["pbr","raytracing","color"], demos:["brdf-lobe"] },
+  { id:"W8",  title:"Networks, embeddings, the space of images", tue:"L14", thu:"L15", hw:HW(7), quiz:"Q6", neural:true,
+    handouts:["nets","images"], demos:["mlp-fit","embed-map","digit-view"] },
+  { id:"W9",  title:"Diffusion models I (Thanksgiving Thursday)", tue:"L16", thu:null, hw:null, quiz:null, neural:true,
+    handouts:["diffusion"], demos:["diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
+  { id:"W10", title:"Diffusion models II and learned scenes", tue:"L17", thu:"L18", hw:HW(8), quiz:"Q7", neural:true,
+    handouts:["diffusion","scenes"], demos:["gsplat"] },
+  { id:"W11", title:"Generative 3D and video; synthesis", tue:"L19", thu:"L20", hw:null, quiz:"Q8", neural:true,
+    handouts:["scenes","history"], demos:[] },
+  { id:"F",   title:"Final examination, Thursday December 17, 5:45 PM", tue:null, thu:null, hw:null, quiz:"Final", handouts:[], demos:[] },
 ];
 
 const quickCell = q => q.href ? `
   <a class="q" href="${q.href}">${q.title} <span class="qd">· ${q.desc}</span></a>` : `
   <span class="q">${q.title} <span class="qd">· ${q.desc}</span></span>`;
 
-const sessionCell = s => {
-  if (!s.deck && !s.lab) return `
-  <div class="card unlinked">
-    <div class="lec">
-      <span class="badge">${s.id}</span>
-      <div>
-        <div class="ctitle">${s.title}</div>
+const lecChip = (day, key) => {
+  if (!key) return `<span class="chip lec off"><span class="t">${day}</span><span class="d">no meeting</span></span>`;
+  const L = LECTURES[key];
+  return L.href
+    ? `<a class="chip lec" href="${L.href}"><span class="t">${day} · ${key}</span><span class="d">${L.title}</span></a>`
+    : `<span class="chip lec off"><span class="t">${day} · ${key}</span><span class="d">${L.title}</span></span>`;
+};
+const sessionCell = w => `
+  <div class="card-wrap week${w.neural ? " neural" : ""}${w.bridge ? " bridge" : ""}">
+    <div class="card static">
+      <div class="lec">
+        <span class="badge">${w.id}</span>
+        <div><div class="ctitle">${w.title}</div></div>
       </div>
+      ${w.id === "F" ? "" : `<div class="pair">${lecChip("Tue", w.tue) + lecChip("Thu", w.thu)}</div>`}
+      <div class="marks">${w.hw ? `<a class="chip hwc" href="${w.hw.href}"><span class="t">HW${w.hw.n}</span></a>` : ""}${w.quiz ? `<span class="qm${/Midterm|Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</div>
     </div>
   </div>`;
-  const primary = s.deck || s.lab;
-  const primaryLabel = s.deck ? "Open deck →" : "Open lab →";
-  const labChip = (s.deck && s.lab) ? `
-    <a class="chip lab" href="${s.lab}"><span class="t">${s.labTitle || "Lab"}</span></a>` : "";
-  return `
-  <div class="card-wrap">
-    <a class="card" href="${primary}">
-      <div class="lec">
-        <span class="badge">${s.id}</span>
-        <div>
-          <div class="ctitle">${s.title}</div>
-          <div class="go">${primaryLabel}</div>
-        </div>
-      </div>
-    </a>${labChip}
-  </div>`;
-};
 
 const handoutCell = s => {
   const hs = (s.handouts || []).map(k => HANDOUTS[k]).filter(Boolean);
-  if (!hs.length) return `<div class="cell"><span class="none">—</span></div>`;
+  if (!hs.length) return `<div class="cell"><span class="none">·</span></div>`;
   return `<div class="cell">` + hs.map(h => `
     <a class="chip h" href="${h.href}"><span class="t">${h.title}</span><span class="d">${h.desc}</span></a>`).join("") + `</div>`;
 };
 
 const demoCell = s => {
   const ds = (s.demos || []).map(k => [k, DEMOS[k]]).filter(([,d]) => d);
-  if (!ds.length) return `<div class="cell"><span class="none">—</span></div>`;
+  if (!ds.length) return `<div class="cell"><span class="none">·</span></div>`;
   return `<div class="cell">` + ds.map(([k, d]) => `
     <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("") + `</div>`;
 };
@@ -343,10 +343,10 @@ const demoCell = s => {
 document.getElementById("quick").innerHTML = QUICKLINKS.map(quickCell).join("");
 
 document.getElementById("sessions").innerHTML =
-  `<div class="colhead">Weeks: Tuesday deck · Thursday studio</div>
+  `<div class="colhead">Weeks: lectures · homework · quiz</div>
    <div class="colhead">Handouts</div>
    <div class="colhead">Demos</div>` +
-  SESSIONS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
+  WEEKS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
 </script>
 </body>
 </html>
