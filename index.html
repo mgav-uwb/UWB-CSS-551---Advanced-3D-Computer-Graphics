@@ -184,6 +184,17 @@
   .wisdom2 .sx-dot{font-size:14px;width:16px}
   @media (max-width: 760px){ .wisdom2{grid-template-columns:1fr} .wisdom2 > div{height:auto} .wisdom2 > div > *{position:static} .stripbox .sx-tile{flex-basis:64px;width:64px;height:64px} .stripbox .sx-refresh{height:64px} }
   @media (max-width: 920px){ .wkbody{grid-template-columns:1fr} .wm .hwtag{display:none} }
+
+  /* layout v6: five tiles on the left, quote over fact on the right, one 76 px row */
+  .toprow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start;margin:12px 0 0}
+  .toprow .stripbox{margin:0}
+  .toprow .wisdom2{grid-template-columns:1fr;gap:6px;margin:0}
+  .toprow .wisdom2 > div{height:35px}
+  .toprow .wisdom2 .sx-quote,.toprow .wisdom2 .sx-fact{min-height:35px;padding:3px 12px}
+  .toprow .wisdom2 .sx-quote p{font-size:13px}
+  .toprow .wisdom2 .sx-quote .sx-by{display:none}
+  .toprow .wisdom2 > div:hover .sx-quote .sx-by,.toprow .wisdom2 > div:focus-within .sx-quote .sx-by{display:block}
+  @media (max-width: 760px){ .toprow{grid-template-columns:1fr} .toprow .wisdom2 > div{height:auto} .stripbox .sx-tile:nth-child(n+5){display:none} }
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 
@@ -204,10 +215,12 @@
     <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online / Thu 5:45–7:45 PM in person (lecture, discussion, and the weekly quiz) · Dr. Marcel Gavriliu</div>
   </header>
 
-  <div data-strip class="stripbox"></div>
-  <div class="wisdom2">
-    <div data-quote></div>
-    <div data-fact></div>
+  <div class="toprow">
+    <div data-strip="5" class="stripbox"></div>
+    <div class="wisdom2">
+      <div data-quote></div>
+      <div data-fact></div>
+    </div>
   </div>
 
   <div class="quick" id="quick"></div>
@@ -474,6 +487,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=6"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=7"; mountExtras({ base: "./" });</script>
 </body>
 </html>
