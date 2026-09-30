@@ -251,7 +251,7 @@ Instead of a force proportional to the stretch, **move the two particles back** 
 ```js
 for (const p of particles) { p.prev = p.x; p.v += h * g; p.x += h * p.v; }   // predict
 collide(particles);                                                          // contacts
-for (const L of links) {                                                     // project
+for (let it = 0; it < 2; it++) for (const L of links) {                     // project, 2 passes
   const d = sub(L.b.x, L.a.x), len = length(d), C = len - L.rest;
   const alpha = 1 / (k * h * h);
   const dl = -C / (L.a.w + L.b.w + alpha);
@@ -269,13 +269,13 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 
 | substeps | h (ms) | max stretch | cost per frame |
 | --- | --- | --- | --- |
-| 1 | 16.67 | 369.9 % | 0.45 ms |
-| 4 | 4.167 | 31.6 % | 1.64 ms |
-| 16 | 1.042 | 3.6 % | 6.96 ms |
-| 64 | 0.260 | 1.3 % | 27.8 ms |
+| 1 | 16.67 | 125.3 % | 0.66 ms |
+| 4 | 4.167 | 5.3 % | 1.79 ms |
+| 16 | 1.042 | 2.0 % | 7.47 ms |
+| 64 | 0.260 | 1.2 % | 29.3 ms |
 
 - **never explodes**, at any setting; too few substeps make it **rubbery**, not dangerous
-- 16 substeps: a cloth that holds its size at under 7 ms
+- 16 substeps: a cloth that holds its size at about 7.5 ms
 
 
 ---
