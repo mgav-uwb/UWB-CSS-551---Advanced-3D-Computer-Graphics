@@ -489,6 +489,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=10"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=11"; mountExtras({ base: "./" });</script>
 </body>
 </html>
