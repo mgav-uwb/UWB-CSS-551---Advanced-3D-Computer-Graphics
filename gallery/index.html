@@ -68,7 +68,7 @@
 </footer>
 
 <script type="module">
-import { loadPool, comicItem } from '../lib/site-extras.js?v=9';
+import { loadPool, comicItem } from '../lib/site-extras.js?v=10';
 import { COMICS } from '../lib/site-data.js';
 
 const base = '../';
@@ -115,7 +115,7 @@ function open(i) {
       ? `<p class="alt">${esc(it.alt)}</p><div class="credit"><a href="${link}" target="_blank" rel="noopener">xkcd</a> by Randall Munroe, <a href="https://creativecommons.org/licenses/by-nc/2.5/" target="_blank" rel="noopener">CC BY-NC 2.5</a></div>`
       : `${(it.facts || []).length ? `<ul>${it.facts.map((f) => `<li>${esc(f.t)} <span class="src">${srcHTML(f.src)}</span></li>`).join('')}</ul>` : ''}
          ${it.credit ? `<div class="credit">${esc(it.credit)}</div>` : ''}
-         ${it.link ? `<div class="credit"><a href="${esc(it.link.url)}" target="_blank" rel="noopener">${esc(it.link.label)}</a></div>` : ''}`}`;
+         ${it.link ? `<div class="credit"><a href="${/^https?:/.test(it.link.url) ? esc(it.link.url) : base + esc(it.link.url)}" target="_blank" rel="noopener">${esc(it.link.label)}</a></div>` : ''}`}`;
   box.querySelector('[data-a=prev]').onclick = () => open(cur - 1);
   box.querySelector('[data-a=next]').onclick = () => open(cur + 1);
   box.querySelector('[data-a=rand]').onclick = () => { let j = cur; while (shown.length > 1 && j === cur) j = Math.floor(Math.random() * shown.length); open(j); };

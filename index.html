@@ -368,7 +368,9 @@ const DEMOS = {
   "cloth": { title:"Cloth: Springs vs Constraints, and Why Stiff Springs Explode",
     desc:"drag stiffness/substeps/wind: a cloth over a sphere; switch springs vs constraints; live h·√(k/m), stretch, energy, step time" },
   "fluid": { title:"Fluids as Particles: A 2D SPH Dam Break, Live",
-    desc:"drag viscosity/stiffness/particles/steps: a particle fluid, dam break or drop into a pool; live density error and step time" }
+    desc:"drag viscosity/stiffness/particles/steps: a particle fluid, dam break or drop into a pool; live density error and step time" },
+  "fur": { title:"Fur: 100,000 Hairs, Kajiya-Kay Lit, Live",
+    desc:"drag lightAz/lightEl/shine/rootShade (instant) or hairs/length/gravity/curl (regrows): strands on the Stanford bunny; live hair, vertex and timing readout" }
 };
 
 // ───────── the lectures (Plan C: planning/css551-au26-plan-c-2026-09-29.md) ─────────
@@ -410,7 +412,7 @@ const WEEKS = [
   { id:"W5",  title:"Viewing, rasterization, antialiasing", tue:"L08", thu:"L09", hw:HW(4), quiz:"Q4",
     handouts:["viewing","raster","antialiasing"], demos:["view-matrix","projection","raster"] },
   { id:"W6",  title:"Meshes, textures, illumination", tue:"L10", thu:"L11", hw:HW(5), quiz:"Q5",
-    handouts:["meshes","textures","illumination","unityshaders","curves"], demos:["mesh-grid","uv-placement","bump-map","illumination","simplify-compare"] },
+    handouts:["meshes","textures","illumination","unityshaders","curves"], demos:["mesh-grid","uv-placement","bump-map","illumination","fur","simplify-compare"] },
   { id:"W7",  title:"The bridge: light transport and ray tracing", tue:"L12", thu:"L13", hw:HW(6), quiz:"Midterm", bridge:true,
     handouts:["pbr","raytracing","color"], demos:["brdf-lobe"] },
   { id:"W8",  title:"Networks, embeddings, the space of images", tue:"L14", thu:"L15", hw:HW(7), quiz:"Q6", neural:true,
@@ -487,6 +489,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=9"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=10"; mountExtras({ base: "./" });</script>
 </body>
 </html>
