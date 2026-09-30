@@ -118,6 +118,9 @@
   .icons img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px}
   .icons figcaption{font-size:12px;font-weight:700;color:#3a2f55;line-height:1.25;margin-top:4px}
   .icons figcaption span{display:block;font-weight:400;color:#8d86a3;font-size:11px}
+  .comicrow{max-width:760px;margin:16px auto 0}
+  .icons figure{position:relative}
+  .icons figure:has(.sx-pop:not([hidden])){transform:none}
   .extras{display:flex;flex-direction:column;gap:12px;justify-content:center}
   @media (max-width: 920px){ .hero{grid-template-columns:1fr} .icons{grid-template-columns:repeat(5,1fr)} }
   @media (max-width: 520px){ .icons{grid-template-columns:repeat(3,1fr)} }
@@ -153,11 +156,11 @@
 
   <div class="hero">
     <div class="icons">
-      <figure><img src="media/icons/teapot.png" alt="the Utah teapot, pastel pink"><figcaption>Utah teapot<span>Newell, 1975</span></figcaption></figure>
-      <figure><img src="media/icons/bunny.png" alt="the Stanford bunny, mint"><figcaption>Stanford bunny<span>Turk &amp; Levoy, 1994</span></figcaption></figure>
-      <figure><img src="media/icons/cornell.png" alt="a Cornell box with rose and mint walls"><figcaption>Cornell box<span>Goral et al., 1984</span></figcaption></figure>
-      <figure><img src="media/icons/whitted.png" alt="glass and glossy spheres over a pastel checkerboard"><figcaption>Spheres on a checkerboard<span>after Whitted, 1980</span></figcaption></figure>
-      <figure><img src="media/icons/dragon.png" alt="the Stanford dragon, lavender"><figcaption>Stanford dragon<span>Stanford, 1996</span></figcaption></figure>
+      <figure data-icon="teapot"><img src="media/icons/teapot.png" alt="the Utah teapot, pastel pink"><figcaption>Utah teapot<span>Newell, 1975</span></figcaption></figure>
+      <figure data-icon="bunny"><img src="media/icons/bunny.png" alt="the Stanford bunny, mint"><figcaption>Stanford bunny<span>Turk &amp; Levoy, 1994</span></figcaption></figure>
+      <figure data-icon="cornell"><img src="media/icons/cornell.png" alt="a Cornell box with rose and mint walls"><figcaption>Cornell box<span>Goral et al., 1984</span></figcaption></figure>
+      <figure data-icon="whitted"><img src="media/icons/whitted.png" alt="glass and glossy spheres over a pastel checkerboard"><figcaption>Spheres on a checkerboard<span>after Whitted, 1980</span></figcaption></figure>
+      <figure data-icon="dragon"><img src="media/icons/dragon.png" alt="the Stanford dragon, lavender"><figcaption>Stanford dragon<span>Stanford, 1996</span></figcaption></figure>
     </div>
     <div class="extras">
       <div data-quote></div>
@@ -166,6 +169,8 @@
   </div>
 
   <div class="quick" id="quick"></div>
+
+  <div class="comicrow"><div data-comic></div></div>
 
   <div id="sessions"></div>
 
