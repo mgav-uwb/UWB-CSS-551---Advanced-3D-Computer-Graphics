@@ -1,13 +1,13 @@
 <!--
   CSS 551 · L18 discussion (10 min), HW8 walk-through (8 min), wrap (2 min).
-  Two peer-instruction questions; answers only in the notes. Numbers from
+  Three peer-instruction questions (the third a quick one); answers only in the notes. Numbers from
   lectures/L18-learned-scenes/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
   HW8 numbers from homework/hw08/expected.json, which match textbook/figures/numbers.json.
 -->
 
 ### Discussion
 
-<small>(~10 min · two questions · vote, argue in pairs, vote again)</small>
+<small>(~10 min · three questions · vote, argue in pairs, vote again)</small>
 
 
 ---
@@ -32,6 +32,18 @@ A splat projects to the screen with covariance `Σ′ = [ 5  2 ; 2  2 ]` (pixels
 - **B.** 6 and 1 px
 - **C.** 2.449 and 1.000 px
 - **D.** 1.871 and 1.871 px
+
+
+---
+
+## Question 3: the smallest splat
+
+A splat projects to `Σ′ = diag(0.05, 0.05)` px². The rasterizer adds 0.3 px² to the diagonal and uses a radius of `⌈3·√λ_max⌉` pixels. The radius is:
+
+- **A.** 1 px
+- **B.** 2 px
+- **C.** 0.67 px
+- **D.** 1.77 px
 
 
 ---

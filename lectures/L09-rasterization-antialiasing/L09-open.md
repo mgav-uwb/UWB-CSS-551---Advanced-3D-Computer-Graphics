@@ -1,14 +1,14 @@
 <!--
   CSS 551 · Lecture 9 (Thursday October 29, in person): Rasterization and Antialiasing.
-  Mounts, in order: L09-open.md, ../../topics/rasterization.md (~45 min),
-  ../../topics/antialiasing.md (~33 min), L09-discuss.md (discussion, HW4
+  Mounts, in order: L09-open.md, ../../topics/rasterization.md (~46 min, 32 slides),
+  ../../topics/antialiasing.md (~34 min, 21 slides), L09-discuss.md (discussion, HW4
   walk-through, wrap). Then Quiz 4 on paper.
 
   Minute plan (120 min, Thu 5:45–7:45 PM in person):
     0:00  opening                                     2 min
-    0:02  rasterization (topic)                      45 min
-    0:47  antialiasing (topic)                       33 min
-    1:20  discussion: two questions                  12 min
+    0:02  rasterization (topic)                      46 min
+    0:48  antialiasing (topic)                       34 min
+    1:22  discussion: two questions                  10 min
     1:32  HW4 walk-through                            6 min
     1:38  wrap                                        2 min
     1:40  Quiz 4 (paper, 20 min): viewing, rasterization and antialiasing, HW3
@@ -31,9 +31,10 @@
 
 ## Tonight
 
-- **Rasterization**: the edge function, one pixel by hand, triangle setup, the top-left rule, barycentric weights, the demo
-- **Around the test**: clipping at the near plane; the depth buffer and early z; perspective-correct interpolation; blending
-- **Sampling and antialiasing**: the sampling theorem, the alias frequency, coverage, SSAA and MSAA, sample patterns, aliasing in time
+- **Rasterization**: the edge function, culling by winding, one pixel by hand, setup in code, the top-left rule, barycentric weights for every attribute, the demo
+- **Around the test**: 2×2 quads; clipping at the near plane; the depth buffer, its precision and its history; early z; perspective-correct interpolation; blending and transparency; lines
+- **The machine**: the GPU pipeline, deferred and tile-based rendering, the frame loop and vsync, varyings in GLSL
+- **Sampling and antialiasing**: the sampling theorem, the Fourier view, filters, coverage and sample patterns, SSAA and MSAA and their cost, post-process AA, mip levels from derivatives, shading aliasing, aliasing in time, upscaling
 - **Discussion**, the **HW4** walk-through, then **Quiz 4**
 
 Reading: [Rasterization](../../textbook/rasterization.html) and [Sampling and Antialiasing](../../textbook/antialiasing.html).

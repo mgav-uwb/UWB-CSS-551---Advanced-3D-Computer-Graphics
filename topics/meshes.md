@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~40 min).
+  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~45 min, 31 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/meshes.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -27,7 +27,7 @@
 
 ### Polygonal meshes: everything is triangles
 
-<small>(~40 min)</small>
+<small>(~45 min)</small>
 
 
 ---
@@ -163,6 +163,52 @@ Read the three counts straight off the construction:
 ```
 
 Check at n=2: `(2+1)² = 9` vertices, `2·2² = 8` triangles, `6·2² = 24` indices. At n=10: `121` / `200` / `600`. The demo prints these live as you drag `n`.
+
+
+---
+
+## Beyond two arrays: the half-edge structure
+
+<img src="../../textbook/figures/mesh-halfedge.svg" class="media-shot" style="max-height: 240px;" alt="the 2 by 2 grid with each edge split into two opposite half-edges; the ring around the center vertex highlighted">
+
+Index arrays answer "draw it". Editing needs **neighbors**: which faces touch this vertex, which face is across this edge. A **half-edge** mesh stores each edge twice, once per side, with four links:
+
+```text
+   half-edge:  to (vertex),  face,  next (around the face),  twin (the opposite half)
+   the 2×2 grid:  V 9,  F 8,  E 16  →  24 half-edges inside faces (8 boundary edges have one side)
+   the ring around vertex 4:  twin, then next, repeated  →  1, 3, 6, 7, 5, 2    (valence 6)
+```
+
+
+---
+
+
+## Euler's formula checks a mesh
+
+For a closed surface, **V − E + F = 2 − 2g** (g = holes through it); each boundary loop subtracts 1 more.
+
+```text
+   cube             8 − 12 + 6          =  2      closed, genus 0
+   the 2×2 grid     9 − 16 + 8          =  1      one boundary loop
+   icosphere      162 − 480 + 320       =  2
+   Stanford bunny  34,834 − 104,288 + 69,451 = −3     genus 0, so 5 boundary loops
+```
+
+The bunny has **five holes in its base** (loops of 80, 42, 40, 39 and 22 edges): where the scanner could not see. A mesh tool that gets −3 and expected 2 has found them.
+
+
+---
+
+
+## Valence: meshes are mostly sixes
+
+<img src="../../textbook/figures/mesh-valence.svg" class="media-shot" style="max-height: 230px;" alt="histogram of vertex valence on the Stanford bunny, peaked sharply at six">
+
+```text
+   Stanford bunny:  valence 6 for 75.1 % of vertices,  5 or 7 for 22.5 %,  mean 5.988
+```
+
+For a large closed triangle mesh, **E ≈ 3V** and **F ≈ 2V** (from Euler), so the average valence is **6**. Irregular vertices (4, 5, 7, 8) are where subdivision and remeshing leave artifacts.
 
 
 ---
@@ -333,4 +379,106 @@ If a profile point lies **on** the axis (radius 0), all `S` rotated copies land 
 - fix: collapse the pole to **one** vertex and cap with a **triangle fan**, not quads, or keep the profile off the axis
 
 Guard it: our `computeNormals` returns `(0, 1, 0)` when a vertex's summed normal is near-zero length, so a pole never yields a `NaN`.
+
+
+---
+
+## Simplification: collapse an edge
+
+<img src="../../textbook/figures/mesh-edge-collapse.svg" class="media-shot" style="max-height: 220px;" alt="an edge collapsed: its two endpoints merged into one vertex, the two triangles on the edge removed">
+
+Merge an edge's two endpoints into one vertex; the two triangles that shared the edge vanish:
+
+```text
+   before:  V 8,  T 8,  E 15
+   after:   V 7,  T 6,  E 12        one collapse: −1 vertex, −2 triangles, −3 edges
+```
+
+Repeat, cheapest edge first, until the triangle budget is met. The question is **which** edge is cheapest and **where** the merged vertex goes.
+
+
+---
+
+
+## The quadric error, worked
+
+Garland and Heckbert (1997): the cost of moving a vertex is the **sum of squared distances** to the planes of its original triangles.
+
+```text
+   the lifted 2×2 grid, edge 4–1 (the center to an edge vertex), 7 planes involved:
+      merge at vertex 4        cost 0.160
+      merge at vertex 1        cost 1.457
+      merge at the midpoint    cost 0.404
+      merge at the optimum (0, 0.338, 0)   cost 0.135     (solve a 3×3 system)
+   edge 0–1, on the flat border:  merge at vertex 1, cost 0: free
+```
+
+Each vertex keeps one 4×4 matrix, the sum of its planes' quadrics; a collapse adds two matrices. Cheap enough for millions of edges.
+
+
+---
+
+
+## A level-of-detail ladder, and when to switch
+
+<img src="../../textbook/figures/mesh-lod-ladder.svg" class="media-shot" style="max-height: 200px;" alt="the Stanford bunny at 868, 3,472, 13,889 and 69,451 triangles side by side">
+
+A 720-row screen with a 45° field of view: one pixel spans **0.00115** units at distance 1. A level is safe beyond the distance where its worst error is under a pixel:
+
+| level | triangles | max error | safe beyond | error at distance 2 |
+| ----- | --------- | --------- | ----------- | ------------------- |
+| 0 | 868 | 0.0154 | 13.4 | 6.7 px |
+| 1 | 3,472 | 0.00635 | 5.5 | 2.8 px |
+| 2 | 13,889 | 0.00192 | 1.7 | 0.8 px |
+
+
+---
+
+
+## Order matters: the vertex cache
+
+A GPU keeps the last few transformed vertices; a triangle whose vertices are still there costs no vertex-shader work. The measure is **ACMR**, vertices transformed per triangle:
+
+```text
+   a 10×10 grid, 200 triangles, cache of 16 vertices:
+      triangles shuffled              ACMR 2.695    (almost every vertex transformed again)
+      row-major, as built             ACMR 1.100
+      optimized order                 ACMR 0.605    (the lower bound: each vertex once)
+```
+
+Same triangles, **4.5 times** less vertex work, by reordering the index array.
+
+
+---
+
+
+## Smoothing, and why it shrinks
+
+<img src="../../textbook/figures/mesh-smoothing.svg" class="media-shot" style="max-height: 200px;" alt="a noisy sphere smoothed by Laplacian steps, shrinking; and by Taubin's alternating steps, keeping its size">
+
+**Laplacian smoothing**: move each vertex a fraction λ toward the average of its neighbors. It removes noise, and it **shrinks**:
+
+```text
+   icosphere of radius 1 (162 vertices), λ = 0.5:
+      after 1 step:  0.978      after 5:  0.893      after 20:  0.637
+   Taubin (1995): alternate λ = 0.5 and μ = −0.53 (a step back out)
+      after 20 steps: 1.016      smooth, and the same size
+```
+
+
+---
+
+
+## Meshes from volumes: marching cubes
+
+<img src="../../textbook/figures/mesh-marching-cubes.svg" class="media-shot" style="max-height: 220px;" alt="one cube of a grid with four corners inside a sphere, the surface crossing six of its edges, triangulated into four triangles">
+
+A CT scan, a fluid or a signed distance field gives **values on a grid**. Marching cubes (Lorensen and Cline, 1987) visits each cube:
+
+```text
+   8 corners, each inside or outside:   2^8 = 256 cases,  15 up to symmetry, in a lookup table
+   the chapter's cube: 4 corners inside, case 27;  the surface crosses 6 edges
+   crossing on an edge, by linear interpolation of the values:  e.g. t = 0.6 on edge 1–2
+   → 4 triangles
+```
 

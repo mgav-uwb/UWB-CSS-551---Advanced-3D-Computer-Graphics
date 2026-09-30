@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L04 discussion and wrap (~30 min). Four peer-instruction questions:
+  CSS 551 · L04 discussion and wrap (~30 min). Five peer-instruction questions:
   project, vote, argue in pairs for two minutes, vote again, then work it.
   Answers ONLY in the notes. Every number computed by node against lib/core/xform.js
   (and Math.fround for question 4); distractors are the pitfalls the topic names.
@@ -56,6 +56,18 @@ Two unit normals are `0.0002` radians apart. In float32, what does `acos(dot(n1,
 - **B.** `0`
 - **C.** `NaN`
 - **D.** `0.00024`
+
+
+---
+
+## Question 5: a reflection
+
+A ray travels along **d = (0, 0, −1)** and hits a surface whose **unit** normal is **n = (0, 0.6, 0.8)**. Which way does it bounce?
+
+- **A.** (0, 0.48, −0.36)
+- **B.** (0, 0.96, 0.28)
+- **C.** (0, −0.96, −2.28)
+- **D.** (0, 0.6, 0.8)
 
 
 ---

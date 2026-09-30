@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: The big picture, part 2: eras 5 to 7 (~40 min).
+  CSS 551 · TOPIC DECK: The big picture, part 2: eras 5 to 7 (~30 min).
   Mounted as <section data-markdown="../../topics/big-picture-eras-5-7.md">.
   No logistics.
 
@@ -7,13 +7,14 @@
   textures, environment maps, mipmaps, PBR, NPR); capturing and simulating
   reality (scanning, the Stanford bunny, curves and subdivision, LOD and
   simplification, procedural worlds, volumes; animation, keyframes, skeletons,
-  motion capture, simulation, rigid bodies, procedural animation); real time
+  procedural animation; motion capture and FX simulation moved to
+  topics/film-pipeline.md, physics to topics/physics-simulation.md, 2026-09-29); real time
   catches film (the interactive loop and its 16 ms, games, ray-tracing cores
   and denoising, VR and AR).
   NEEDS:   topics/big-picture-eras-1-4.md (the pipeline demo, the eras before);
     this topic says "the same pipeline demo from the Utah era" and means the
     our-scene embed there.
-  COMPANION: topics/big-picture-neural-era.md follows it.
+  COMPANION: topics/film-pipeline.md follows it in L02, then topics/big-picture-neural-era.md.
   DEMOS: our-scene (stage,lightX) at the textured stop, lod (level,dist),
     keyframe (t,ease). The mounting page carries the .demo-full CSS.
   FIGURES: ../../media/figures/bezier-spline.svg; media per
@@ -27,7 +28,7 @@
 
 ### The big picture, continued: eras 5 to 7
 
-<small>(~40 min) · reading: <a href="../../textbook/history-of-graphics.html#era-programmable">History, Sections 5 to 7</a></small>
+<small>(~30 min) · reading: <a href="../../textbook/history-of-graphics.html#era-programmable">History, Sections 5 to 7</a></small>
 
 
 ---
@@ -275,45 +276,6 @@ Watch for: the corner at the middle key; there with linear, gone with smooth.
 - **skeletal animation**: build a **rig** of bones inside the mesh
 - **skinning** glues the mesh's vertices to nearby bones: bend a bone, the surface follows
 - animate *dozens of bones*, not millions of vertices
-
-
----
-
-## Motion capture
-
-<img src="../../media/overview/mocap.jpg" class="media-shot" style="max-height: 240px;" alt="a motion-capture suit dotted with reflective markers, shown on a mannequin in a museum display case">
-<small class="credit">Mbrickn · CC0 · via Wikimedia Commons</small>
-
-**Motion capture**: record a *real performer's* motion onto the rig; *scanning, aimed at a performance.*
-
-
----
-
-## Simulation: let physics act
-
-- **physical simulation**: when hand-animation is hopeless: water, cloth, smoke, hair
-- encode the *rules* (gravity pulls, springs resist, fluids flow) and step them each frame
-- the animator becomes a *director of conditions*, not of outcomes
-
-
----
-
-## Two families of simulation
-
-<img src="../../media/overview/fluid-sim.jpg" class="media-shot" style="max-height: 190px;" alt="a fluid simulation frame from Blender: liquid mid-splash, caught as a sheet of droplets">
-<small class="credit">Charybdis · CC BY-SA 3.0 · via Wikimedia Commons</small>
-
-- **particles & mass-spring** (**Lagrangian**): track *moving stuff*; cloth as a spring net; **particle systems** for fire and spray
-- **grid-based** (**Eulerian**): divide *space* into fixed cells; stuff flows between them; how water and smoke are done
-
-
----
-
-## Rigid bodies & collisions
-
-- **rigid-body** simulation: solid things tumble, stack, and rest, no bending
-- **collision detection**: the other half: *notice the overlap*, push things apart
-- crates, ragdolls, debris: every game's physics engine, running right now
 
 
 ---

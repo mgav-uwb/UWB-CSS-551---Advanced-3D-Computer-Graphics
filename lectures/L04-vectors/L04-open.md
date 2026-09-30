@@ -26,11 +26,11 @@
 
 ## Tonight
 
-- **Vectors are displacements**: aim and march
-- **The dot product**: angle, projection, which side, and where acos fails
-- **The cross product**: normals, area, handedness, a frame from two vectors
-- **Lines, planes, and triangles**: nearest points, signed distance, ray hits, barycentric weights
-- **Discussion**: four questions, vote, argue, vote again
+- **Vectors are displacements**: aim and march; where the two products came from
+- **The dot product**: the law of cosines, angle, projection, reflection, which side, and three precision traps
+- **The cross product**: normals (Newell's too), polygon area, the 2D perp-dot and line intersection, handedness, frames
+- **Lines, planes, and triangles**: nearest points, skew lines, signed distance, rays against planes and spheres, barycentric weights
+- **Discussion**: five questions, vote, argue, vote again
 
 Reading: [Vectors](../../textbook/vectors.html) in the course text.
 

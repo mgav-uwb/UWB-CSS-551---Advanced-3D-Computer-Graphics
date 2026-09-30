@@ -8,9 +8,9 @@
     0:00  MIDTERM, on paper, weeks 1–6                              75 min
     1:15  break and collection                                      3 min
     1:18  opening                                                    1 min
-    1:19  path tracing (topic)                                      34 min
-    1:53  HW6 walk-through                                           5 min
-    1:58  wrap                                                       2 min
+    1:19  path tracing (topic, 24 content slides, brisk)            37 min
+    1:56  HW6 walk-through                                           3 min
+    1:59  wrap                                                       1 min
     2:00  end
   No quiz this week. Numbers: numbers-motion.json rt.monteCarlo and rt.cornell;
   tools/gen-lecture-figures-c.mjs (l13_*).
@@ -31,7 +31,7 @@
 
 - **5:45–7:00**: the **midterm**, weeks 1–6, 75 minutes, on paper
 - **7:00–7:03**: collection and a short break
-- **7:03–7:45**: **path tracing**: the Monte Carlo estimator, four samples by hand, the 1/√N law; the random walk and Russian roulette; one path through the Cornell box; light and BRDF sampling; denoisers
+- **7:03–7:45**: **path tracing**: the Monte Carlo estimator and why its error is 1/√N; drawing directions; stratification; soft shadows and depth of field as more dimensions; the path tracer in code; next-event estimation; Russian roulette and the furnace test; the Cornell box; fireflies, MIS, caustics and fog; the budget per frame
 - then the **HW6** walk-through
 
 Reading: [Ray Tracing](../../textbook/ray-tracing.html), sections 7 and 8, and [Light Transport and PBR](../../textbook/light-transport-pbr.html), section 11.

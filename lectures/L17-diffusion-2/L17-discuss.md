@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L17 discussion (28 min) and wrap (3 min). Four peer-instruction
+  CSS 551 · L17 discussion (28 min) and wrap (3 min). Six peer-instruction
   questions: project, vote, argue in pairs two minutes, vote again, then work it.
   Answers and worked solutions are in the notes only. Every number is from
   lectures/L17-diffusion-2/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~28 min · four questions · vote, argue in pairs, vote again)</small>
+<small>(~28 min · six questions · vote, argue in pairs, vote again)</small>
 
 
 ---
@@ -60,9 +60,34 @@ Data `{−1, +1}`, `t = 0.5`, and a particle at `x = −0.3`. The exact velocity
 
 ---
 
+## Question 5: rescale, not clip
+
+A guided estimate has three pixels `(1.2, 0.3, −0.6)`. With dynamic thresholding, `s` is the largest magnitude (at least 1); the estimate is clipped to `[−s, s]` and divided by `s`. The result is:
+
+- **A.** `(1.0, 0.3, −0.6)`
+- **B.** `(1.0, 0.25, −0.5)`
+- **C.** `(0.667, 0.167, −0.333)`
+- **D.** `(1.2, 0.3, −0.6)`
+
+
+---
+
+## Question 6: the latent's penalty
+
+An encoder outputs `μ = 0`, `σ = 0.5` for one latent number. Its KL penalty `½(μ² + σ² − 1 − ln σ²)` is:
+
+- **A.** `0.318`
+- **B.** `0`
+- **C.** `−0.375`
+- **D.** `0.693`
+
+
+---
+
 ## Wrap
 
 - Guidance, latents, text and control all change **what the denoiser estimates or where the point lives**; the sampler is the one from before
+- Guidance extrapolates past the conditional estimate: sharper, less varied, clamped at the rail; rescaling, intervals and distillation are its repairs
 - Score distillation turns an image model into a **judge of renders**; with a differentiable renderer it trains a 3D scene, and it averages rather than samples
 
 **Reading**: the course text, <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 3.2 and 5 to 9. **Thursday**: Quiz 7 at the end of class; HW8 goes out.

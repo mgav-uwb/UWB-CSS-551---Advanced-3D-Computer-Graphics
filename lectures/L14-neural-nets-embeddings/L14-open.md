@@ -10,8 +10,8 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Neural networks and embeddings (topic)             88 min
-    1:30  Discussion: four questions, vote, pairs, vote       27 min
+    0:02  Neural networks and embeddings (topic, 52 slides)  88 min
+    1:30  Discussion: five questions, vote, pairs, vote       27 min
     1:57  Wrap                                                 3 min
 -->
 
@@ -28,12 +28,13 @@
 
 ## Tonight
 
-- a network is a **function**: a forward pass by hand, and why it needs a nonlinearity
-- training is **gradient descent**: one step by hand, then live
-- deep networks: the **backward sweep** through layers, **Adam**, **overfitting**
-- the two layer types: **convolution** and **attention**, one output each
+- where networks came from, and why they run on graphics hardware
+- a network is a **function**: a forward pass by hand, XOR, and why it needs a nonlinearity
+- training is **gradient descent**: losses, one step by hand, a gradient check, the code, then live
+- deep networks: mini-batches, the **backward sweep**, vanishing gradients, initialization, normalization, **Adam**, schedules, **overfitting**
+- the two layer types: **convolution** and **attention**, one output each, their costs, and how a network is told the time
 - **embeddings**: vectors for concepts, read from the course's own network
-- **CLIP**: two encoders, one space, and the contrastive loss
+- autoencoders and **VAEs**; **CLIP**: two encoders, one space, the contrastive loss, zero-shot classification
 
 Reading: [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html)
 

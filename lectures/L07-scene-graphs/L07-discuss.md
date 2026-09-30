@@ -1,6 +1,6 @@
 <!--
   CSS 551 · L07 discussion, HW3 walk-through and wrap (~20 min), then the quiz.
-  Two peer-instruction questions; answers ONLY in the notes; numbers computed by node against
+  Three peer-instruction questions; answers ONLY in the notes; numbers computed by node against
   lib/core/xform.js (makeTRS, axisAngleMatrix, matMul, applyMat4) and from
   textbook/figures/numbers-foundations.json (aff) and numbers-pipeline.json (sg).
 -->
@@ -32,6 +32,18 @@ Parent `S(1, 2, 1)`, child `R_z(45°)`. What angle do the child's world x and y 
 - **B.** 53.1°
 - **C.** 45°
 - **D.** 126.9°
+
+
+---
+
+## Question 3: into the hand's frame
+
+At the default pose the hand's world matrix is `W_hand` (origin `(-0.78, 1.47, 0.45)`). A world point lies exactly at the hand's origin. What are its coordinates in the **arm's** frame, whose origin is `(-0.39, 0.94, 0.22)` and whose local places the hand at `T(0, 0.7, 0)`?
+
+- **A.** `(0, 0.7, 0)`
+- **B.** `(-0.39, 0.53, 0.23)`
+- **C.** `(0, 0, 0)`
+- **D.** `(0, -0.7, 0)`
 
 
 ---

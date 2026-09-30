@@ -29,6 +29,7 @@
            one-vertex chain, frustum culling and the dolly added from the textbook chapter. Real C# excerpts
            are from Kelvin Sung's CSS 451 ClassExamples, Topic6-3DViewing (6.8.OurOwnProjMatrix CameraMatrices.cs,
            6.3.Tumble CameraManipulation.cs, 6.4.DrawCameraFrustum).
+  DENSIFIED 2026-09-29 (Plan C; 60+ slides per two hours): Brunelleschi and Alberti, checks on V and V as the camera's inverse, the pinhole worked, rows of P derived, a predict slide, the NDC-cube and depth-precision figures, behind-the-camera, homogeneous clipping and Sutherland-Hodgman, a near-plane clip worked, the viewport transform and the y-flip pitfall, both tracks' camera matrices and Unity's -z view space, unprojection worked and picking in both tracks, zoom versus dolly and the dolly zoom, off-axis and stereo projection, depth of field, a check-yourself slide. Numbers from numbers-pipeline.json (view) or node.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -47,6 +48,15 @@
 ### The camera is a frame
 
 <small>(~14 min)</small>
+
+---
+
+## Perspective is six hundred years old
+
+- **about 1415**: Filippo Brunelleschi demonstrates linear perspective in Florence: a painted panel of the Baptistery, viewed through a hole in its back and a mirror, lines up with the real building
+- **1435**: Leon Battista Alberti's *De pictura* writes down the construction: the picture is a **window**, and every scene point is drawn where its line to the eye crosses the window
+- **today**: a GPU does Alberti's construction for every vertex: the view matrix places the eye, the projection matrix finds the crossing, the divide by `w` is the similar triangle
+
 
 ---
 
@@ -167,6 +177,39 @@ Every entry matches the panel, because the demo runs this arithmetic.
 
 ---
 
+## Check: V's rows are a rotation
+
+```text
+   u = ( 0.8192,  0,      −0.5736)      |u| = 1
+   v = (−0.1962,  0.9397, −0.2802)      |v| = 1        u·v = v·w = w·u = 0
+   w = ( 0.539,   0.342,   0.7698)      |w| = 1        u × v = w  (right-handed)
+
+   V · (eye, 1) = (0, 0, 0, 1)          the eye lands on the view-space origin
+   V · (at, 1)  = (0, 0, −7, 1)         the target lands 7 units down −z: the demo's distance
+```
+
+Three checks that catch every wrong view matrix: unit rows, orthogonal rows, eye to origin.
+
+
+---
+
+## V is the camera's world matrix, inverted
+
+The camera is an object with a world matrix whose columns are its axes and position:
+
+```text
+   C = [ u  v  w  eye ]          (the camera as a node: axes in columns, origin in column 3)
+       [ 0  0  0   1  ]
+   V = C⁻¹ = [ u^T   −u·eye ]    rigid inverse: transpose the rotation, rotate and negate the origin
+             [ v^T   −v·eye ]
+             [ w^T   −w·eye ]
+```
+
+This is why the scene-graph topic's camera node gives `V` for free: invert its world matrix.
+
+
+---
+
 ## The wrong view matrix
 
 Sung's `CameraMatrices` ships a mode `ViewMatrixWrong`, "to show we are doing something":
@@ -234,6 +277,20 @@ Worked: `d = 1`, a point at height 2, depth 4: `y' = 1 · 2 / 4 = 0.5`. Double t
 
 ---
 
+## Worked: one point through a pinhole
+
+Image plane at distance `d = 1`, point at `(y, z) = (2, −4)`:
+
+```text
+   y' = d · y / (−z) = 1 · 2 / 4 = 0.5
+   move it twice as far, (2, −8):   y' = 0.25          twice as far, half as tall
+```
+
+Division by depth is the **only** non-linear step in the whole pipeline, and the homogeneous `w` is how a matrix asks for it.
+
+
+---
+
 ## Field of view and focal length
 
 <img src="../../textbook/figures/view-fov-focal.svg" alt="focal length and field of view on a 36 by 24 mm sensor" style="height:200px">
@@ -280,6 +337,46 @@ Whatever the fov, aspect, near or far, the visible region becomes this **2×2×2
 
 ---
 
+## Row 3 puts the depth into w
+
+```text
+   row 3 of P = (0, 0, −1, 0)     →   w' = −z_view
+   after the divide:  x_ndc = x' / w' = (f / aspect) · x / (−z)       y_ndc = f · y / (−z)
+```
+
+`f = 1 / tan(fov / 2)`: at 45°, `f = 2.414`; at the demo's aspect 1.78, `f / aspect = 1.356`. The x and y rows are just the pinhole with the window scaled to `[−1, 1]`.
+
+
+---
+
+## Solving the depth row
+
+The depth row is `(0, 0, A, B)`, so `z_ndc = (A z + B) / (−z)`. Require near → −1 and far → +1 (near 1, far 8):
+
+```text
+   z = −1:   (−A + B) / 1  = −1
+   z = −8:   (−8A + B) / 8 = +1
+   ⇒  A = −(f + n)/(f − n) = −9/7 = −1.2857        B = −2 f n/(f − n) = −16/7 = −2.2857
+```
+
+Two conditions, two unknowns: the depth row is the only part of `P` that is **fitted** rather than read off a triangle.
+
+
+---
+
+## Predict before you drag
+
+In the frustum demo, widen the vertical field of view from **45° to 90°** (aspect 1.78, near 1, far 8). Predict:
+
+```text
+   P[0][0] = f / aspect :   1.358  →  ?
+   P[1][1] = f          :   2.414  →  ?
+   the depth row        :   (−1.2857, −2.2857)  →  ?
+```
+
+
+---
+
 ## The frustum, live
 
 <div class="cockpit" data-demo="projection" data-controls="fov,near"><pre class="viz-fallback">  subject camera eye=(4,3,6), at=(0,0.5,0); sliders drive its P
@@ -322,6 +419,15 @@ Half the NDC range, −1 to 0, is spent between depth 1 and about 1.8. Depth res
 
 ---
 
+## The frustum becomes a cube
+
+<img src="../../textbook/figures/view-frustum-ndc.svg" alt="the view frustum on the left and the NDC cube it maps to on the right, with near slices mapped to thick slabs and far slices to thin ones" style="height:300px">
+
+Equal steps in view depth become **unequal** slabs of the NDC cube: the near slices are fat, the far ones thin.
+
+
+---
+
 ## Pitfall: what a depth buffer can resolve
 
 near 0.1, far 1000: the smallest depth difference two surfaces need to be told apart:
@@ -338,6 +444,15 @@ At 100 m, surfaces closer than **6 mm** share a depth value: z-fighting. The ste
 
 ---
 
+## Depth precision, pictured
+
+<img src="../../textbook/figures/view-depth-precision.svg" alt="the smallest resolvable depth step against distance for fixed-point, float and reversed-z float depth buffers" style="height:300px">
+
+Reversed z (store `1 − depth` in a float) puts the float format's dense values near 0 exactly where the `1/z` curve is flat, and flattens the error curve.
+
+
+---
+
 ## Orthographic projection
 
 <img src="../../textbook/figures/view-ortho-persp.svg" alt="the same scene in perspective and orthographic projection" style="height:220px">
@@ -346,6 +461,51 @@ At 100 m, surfaces closer than **6 mm** share a depth value: z-fighting. The ste
    perspective:  w' = −z   ->  divide by depth   ->  far things shrink, parallels converge
    orthographic: w' = 1    ->  no divide         ->  size constant, parallels stay parallel
 ```
+
+
+---
+
+## Pitfall: a point behind the camera
+
+Send the view-space point `(0.5, 0, +1)`, one unit **behind** the eye, through `P`:
+
+```text
+   clip = (0.679, 0, −3.571, −1)            w' = −z = −1: negative
+   divide:  (−0.679, 0, 3.571)              x flipped sign; z outside [−1, 1]
+```
+
+Divide first and the point appears on the **opposite side** of the screen. Triangles that cross the eye plane must be **clipped before the divide**.
+
+
+---
+
+## Clipping in homogeneous coordinates
+
+Inside the frustum means, before any divide:
+
+```text
+   −w ≤ x ≤ w,     −w ≤ y ≤ w,     −w ≤ z ≤ w          (and so w > 0)
+```
+
+- six linear inequalities in `(x, y, z, w)`: each edge is cut where one of them becomes an equality
+- clipping here, instead of in NDC, never divides by zero and never sees a flipped point
+- **Sutherland and Hodgman, 1974** ("Reentrant polygon clipping"): clip the polygon against one plane at a time, feeding each stage's output to the next
+
+
+---
+
+## Worked: clip a triangle at the near plane
+
+View-space triangle `A(−1, 0, −3)`, `B(1, 0, −3)`, `C(0, 0, 1)`; near plane `z = −1`. `A` and `B` are in front, `C` is behind:
+
+```text
+   edge B→C:  t = (−1 − (−3)) / (1 − (−3)) = 0.5    →  (0.5, 0, −1)
+   edge A→C:  t = 0.5                               →  (−0.5, 0, −1)
+   result:    the quad A, B, (0.5, 0, −1), (−0.5, 0, −1)   =  two triangles
+   in clip space: A has w = 3 (inside), C has w = −1 (outside)
+```
+
+One triangle in, two out: clipping can **grow** the triangle count.
 
 
 ---
@@ -368,6 +528,36 @@ At 100 m, surfaces closer than **6 mm** share a depth value: z-fighting. The ste
 | clip | (0.616, 0.687, 5.840, 6.320) | `P`; note `w' = 6.32 = −z` |
 | NDC | (0.098, 0.109, 0.924) | divide by `w'` |
 | pixel | (702.7, 320.8), window depth 0.962 | viewport 1280×720 |
+
+
+---
+
+## The viewport transform
+
+NDC `[−1, 1]` to pixels on a `W × H` target with the origin at the **top left**:
+
+```text
+   px = (x_ndc + 1) / 2 · W               py = (1 − y_ndc) / 2 · H               depth = (z_ndc + 1) / 2
+
+   W × H = 1280 × 720:   NDC (0, 0)       → (640, 360)       the center
+                         NDC (0.5, −0.5)  → (960, 540)
+                         NDC (−1, 1)      → (0, 0)           the top-left corner
+```
+
+The `1 − y` is the flip from NDC's up to the image's down.
+
+
+---
+
+## Pitfall: whose y points down?
+
+| convention | origin of the pixel grid | y |
+| --- | --- | --- |
+| OpenGL / WebGL framebuffer | bottom left | up |
+| Direct3D render targets, image files, HTML canvas, DOM mouse events | top left | down |
+| Unity screen space (`Input.mousePosition`, `WorldToScreenPoint`) | bottom left | up |
+
+An upside-down render, a mouse pick that hits the mirror image of the target: the y flip was applied **zero or two** times.
 
 
 ---
@@ -407,6 +597,31 @@ Shader.SetGlobalMatrix("CameraProjMatrix", p);
 
 ---
 
+## The camera's matrices in both tracks
+
+| quantity | three.js | Unity |
+| --- | --- | --- |
+| `V` | `camera.matrixWorldInverse` | `cam.worldToCameraMatrix` |
+| `P` | `camera.projectionMatrix` | `cam.projectionMatrix` (GPU form: `GL.GetGPUProjectionMatrix`) |
+| world → NDC | `p.clone().project(camera)` | `cam.WorldToViewportPoint(p)` (0 to 1, not −1 to 1) |
+| NDC → world | `v.unproject(camera)` | `cam.ViewportToWorldPoint(v)` |
+
+
+---
+
+## Pitfall: Unity's view space looks down −z
+
+Unity's world is **left-handed** with `+z` forward. Its `worldToCameraMatrix` uses the **OpenGL convention**, camera looking down `−z`: the matrix includes a **z flip**, determinant `−1`.
+
+```text
+   a point 5 m in front of a Unity camera:   world forward +z   →   view z = −5
+```
+
+Hand-building `V` from `transform.right`, `up`, `forward` gives the left-handed version; compare against `worldToCameraMatrix` only after negating its third row.
+
+
+---
+
 ## Frustum planes and culling
 
 <img src="../../textbook/figures/view-frustum-planes.svg" alt="the six frustum planes and three test boxes" style="height:210px">
@@ -418,6 +633,53 @@ Six planes, from the rows of `P V`, each `n · p + d ≥ 0` inside. Near: `(−0
 | [−1,1] × [−0.5,1.5] × [−1,1] | straddles | far: one corner inside, one outside |
 | [5.5,6.5] × [0,1] × [−0.5,0.5] | outside | right: even the most inside corner is at −1.127 |
 | [−0.5,0.5] × [0,1] × [−8.5,−7.5] | outside | far |
+
+
+---
+
+## Unprojection: a pixel back to a ray
+
+Invert the chain for a pixel at NDC `(x, y)`: the view-space direction through it is
+
+```text
+   d_view = ( x / P[0][0],   y / P[1][1],   −1 ) = ( x · aspect · tan(fov/2),  y · tan(fov/2),  −1 )
+   d_world = x' u + y' v − w          (rotate by the camera's axes), then normalize
+   ray:  eye + t · d_world
+```
+
+This is the first line of every ray tracer and every mouse pick.
+
+
+---
+
+## Worked: two rays from the demo's camera
+
+```text
+   center pixel, NDC (0, 0):   d_view = (0, 0, −1)          d_world = −w = (−0.539, −0.342, −0.770)
+   top-right corner, NDC (1, 1):
+       d_view = (1 / 1.3563, 1 / 2.4142, −1) = (0.737, 0.414, −1)
+       d_world = 0.737 u + 0.414 v − w = (−0.016, 0.047, −1.309)   →   normalized (−0.012, 0.036, −0.999)
+```
+
+The center ray points straight down the sightline at the target; the corner ray leans by half the field of view in each direction.
+
+
+---
+
+## Picking in both tracks
+
+```js
+// three.js: NDC from the mouse, then a ray from the camera
+const ndc = new THREE.Vector2((e.clientX / w) * 2 - 1, -(e.clientY / h) * 2 + 1);
+raycaster.setFromCamera(ndc, camera);
+const hits = raycaster.intersectObjects(scene.children);
+```
+
+```csharp
+// Unity: screen pixels (origin bottom left) straight to a ray
+Ray r = cam.ScreenPointToRay(Input.mousePosition);
+if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
+```
 
 
 ---
@@ -435,6 +697,32 @@ Six planes, from the rows of `P V`, each `n · p + d ≥ 0` inside. Near: `(−0
 - **dolly**: move `eye` along the sightline: the demo's `dist`
 
 Worked dolly, distance 7 to 4: `eye' = at + 4w = (2.156, 1.868, 3.079)`. The basis is unchanged; only `−w·eye'` changes, from −7.17 to **−4.17**.
+
+
+---
+
+## Zoom is not dolly
+
+| move | changes | perspective |
+| --- | --- | --- |
+| **dolly** | the eye (`V`) | near things grow faster than far things: the depth relations change |
+| **zoom** | the field of view (`P`) | the whole image scales about its center: depth relations stay |
+
+A 2× zoom on the demo: `fov 45° → 23.4°`. A 2× dolly: distance `7 → 3.5`. Same subject size, different pictures.
+
+
+---
+
+## The dolly zoom
+
+Dolly **out** and zoom **in** together, keeping the subject's height constant: `d · tan(fov/2) = constant`.
+
+```text
+   d = 5,  fov = 45°:     half-height of the view at the subject = 5 · tan 22.5° = 2.071
+   d = 10: fov = 2 · atan(2.071 / 10) = 23.4°     the subject stays the same size; the background swells
+```
+
+First used on film in Alfred Hitchcock's *Vertigo* (1958), which is why it is often called the Vertigo effect.
 
 
 ---
@@ -466,6 +754,62 @@ Vector3 nearPlaneCenter = eye + c.nearClipPlane * transform.forward;
 <small>CameraManipulation_DrawFrustum.cs, 6.4. The projection demo builds its wireframe from the same formula.</small>
 
 At the demo's defaults the near window is `±0.737 × ±0.414`: `tan 22.5° = 0.414`, times 1.78.
+
+
+---
+
+## Off-axis projection: the window need not be centered
+
+General frustum with near-plane window `[l, r] × [b, t]`:
+
+```text
+   P = [ 2n/(r−l)    0         (r+l)/(r−l)     0    ]
+       [ 0           2n/(t−b)  (t+b)/(t−b)     0    ]
+       [ 0           0         A               B    ]
+       [ 0           0         −1              0    ]
+
+   symmetric (l = −r):  the third column's top entries are 0: the ordinary P
+   left half of the demo's window (l = −0.7373, r = 0):  P[0][0] = 2.713,  P[0][2] = −1
+```
+
+
+---
+
+## Stereo for VR: two off-axis eyes
+
+Two eyes `6.4 cm` apart looking at a screen `2 m` away: each eye's window is the **same** physical screen, so each frustum is off-axis:
+
+```text
+   eye offset ±0.032 m   →   left eye's skew entry  P[0][2] = +0.032  (right eye: −0.032)
+   both frusta meet at the screen plane: objects there have zero disparity
+```
+
+Toed-in cameras (rotating each eye inward) are the common mistake: they add vertical disparity at the corners.
+
+
+---
+
+## Depth of field: a real lens has an aperture
+
+<img src="../../textbook/figures/view-dof.svg" alt="a thin lens focusing one depth sharply while nearer and farther points spread into circles of confusion" style="height:180px">
+
+50 mm lens at f/2.8, focused at 3 m, 6 µm pixels:
+
+| object distance | 1 m | 2 m | 3 m | 5 m | 10 m |
+| --- | --- | --- | --- | --- | --- |
+| blur circle, pixels | 100.9 | 25.2 | 0 | 20.2 | 35.3 |
+
+The pinhole of tonight has **no** blur at all; film renderers add it. Focused at the hyperfocal distance, 29.8 m at f/2.8, everything from half that distance to infinity is acceptably sharp.
+
+
+---
+
+## Check yourself
+
+1. The eye is at `(0, 0, 10)` looking at the origin, up `+y`. Write `V`'s translation column.
+2. Near 0.5, far 100. A student sets near to 0.01. What happens to depth resolution at 50 m?
+3. A vertex has clip coordinates `(2, 1, 3, 4)`. Is it inside the frustum? Its NDC?
+4. A game's field-of-view slider says 90° **horizontal** at 16:9. What vertical fov goes into `P`?
 
 
 ---

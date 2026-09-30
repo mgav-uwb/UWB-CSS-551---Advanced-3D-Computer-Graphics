@@ -1,6 +1,6 @@
 <!--
   CSS 551 · L15 discussion, HW7 walk-through and wrap (~20 min). Mounted AFTER the topic.
-  Two peer-instruction questions (vote, argue in pairs, vote again, then work it); answers
+  Three peer-instruction questions (vote, argue in pairs, vote again, then work it); answers
   ONLY in the Note: blocks. Numbers from tools/gen-lecture-figures-d1.mjs
   (lectures/L16-diffusion-1/analysis/numbers-d1.json keys alias, psnrQ, tiny, fit, dctPsnr) and
   textbook/image-space.html Section 3. The HW7 slide quotes the plan's HW7 content
@@ -39,6 +39,18 @@ Render A differs from the reference by a **uniform offset of 0.05** in every pix
 
 ---
 
+## Question 3: average in the right space
+
+A white pixel (code 1) and a black pixel (code 0) are averaged to shrink an image by two. Pixel values are sRGB codes. Which **code** should the result have so that it emits half of white's light?
+
+- **A.** 0.500
+- **B.** 0.735
+- **C.** 0.214
+- **D.** 0.250
+
+
+---
+
 ## HW7: networks and images
 
 Out tonight, due **Wednesday November 25, 11:59 PM**. JavaScript (the WebGL track) or a Python notebook.
@@ -52,8 +64,19 @@ Out tonight, due **Wednesday November 25, 11:59 PM**. JavaScript (the WebGL trac
         C[0][0] = 6.85706;  k = 5: PSNR 10.3045 dB;  k = 8: PSNR 16.5246 dB
 ```
 
-- **off limits**: in JavaScript, any machine-learning or signal-processing library (plain arrays and loops); in Python, `scipy`, `torch`, `jax` and any autodiff, `np.fft` and any DCT routine (NumPy arrays and products are allowed)
-- specification, skeletons and the run-and-compare rubric: [HW7](../../homework/hw07/index.html)
+The specification, skeletons and the run-and-compare rubric: [HW7](../../homework/hw07/index.html)
+
+
+---
+
+## HW7: tracks and what is off limits
+
+- **JavaScript** (the WebGL track's language): plain arrays and loops; any machine-learning or signal-processing library is off limits
+- **Python notebook**: NumPy arrays and products are allowed; `scipy`, `torch`, `jax` and any autodiff, `np.fft` and any DCT routine are off limits
+- a library routine may be used to **check** your own result, never in the submission
+- graded on the page's inputs and on a hidden input set: a check scores only when both match
+
+Specification and skeletons: [HW7](../../homework/hw07/index.html)
 
 
 ---

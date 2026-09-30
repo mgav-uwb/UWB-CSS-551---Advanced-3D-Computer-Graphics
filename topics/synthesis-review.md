@@ -1,13 +1,15 @@
 <!--
-  CSS 551 · TOPIC DECK: Synthesis and review: the map, the thread, twelve worked problems (~74 min).
+  CSS 551 · TOPIC DECK: Synthesis and review: the map, the thread, twenty-three worked problems (~78 min, densified 2026-09-29).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/synthesis-review.md"> among others; it carries no
   logistics beyond one slide on the final's format, and no "Part N" numbering.
 
   TEACHES: the map of the field (the history chapter's era-to-chapter map); the one chain the course
   follows, from model coordinates to learned scenes; where each foundation tool reappears in the neural
-  weeks; the final's format and the pitfalls its distractors are built from; twelve review problems
-  across the term, each posed on one slide and worked on the next.
+  weeks; the final's format and the pitfalls its distractors are built from; twenty-three review problems
+  across the term, each posed on one slide and worked on the next (13 to 23 added 2026-09-29: the rigid
+  inverse, look-at, P entries, the viewport, barycentric weights, bilinear filtering, the mip level, a ray and a
+  sphere, uniform against cosine sampling, attention weights, guidance).
   NEEDS:   the whole course; mount last.
   DEMOS:   none.
   FIGURES: ../../textbook/figures/hist-map.svg (tools/gen-textbook-figures-history.mjs). Every answer is
@@ -22,7 +24,7 @@
 
 ### Synthesis and review
 
-<small>(~74 min)</small>
+<small>(~78 min)</small>
 
 
 ---
@@ -335,4 +337,227 @@ Front to back at one pixel: a red splat with `α = 0.6`, then a blue splat with 
 
 - the pitfall: compositing in the wrong order gives `(0.2, 0, 0.5)`; splats are **sorted by depth** before blending
 - the weights sum to `1 − T(end) = 0.8`: the rest is background
+
+
+---
+
+## Review 13: back into a node's frame
+
+A node's world transform is `M = T(2, 0, 0) · R_y(90°)`. A world point `p = (2, 0, −1)` is touching it. Where is `p` in the node's own frame?
+
+---
+
+## Review 13, worked
+
+```text
+   rigid inverse:  M⁻¹ = R_y(90°)ᵀ · T(−2, 0, 0)          local = Rᵀ (p − t)
+   p − t = (0, 0, −1)
+   R_y(90°) sends +x to (0, 0, −1), so Rᵀ sends (0, 0, −1) to (1, 0, 0)
+   local = (1, 0, 0)                check: M·(1, 0, 0) = R·(1, 0, 0) + t = (0, 0, −1) + (2, 0, 0) = (2, 0, −1) ✓
+```
+
+- pitfall 1: `p − t = (0, 0, −1)` with no rotation, the translation undone but not the turn
+- pitfall 2: `R·(p − t) = (−1, 0, 0)`, rotating the wrong way: the inverse of a rotation is its **transpose**
+
+
+---
+
+## Review 14: a look-at camera
+
+A camera at `eye = (3, 2, 4)` looks at the origin with up `(0, 1, 0)`. Give `w`, `u`, `v`, and the translation column of `V`.
+
+---
+
+## Review 14, worked
+
+```text
+   w = normalize(eye − at) = (3, 2, 4)/√29 = (0.557, 0.371, 0.743)
+   u = normalize(up × w) = normalize(4, 0, −3) = (0.8, 0, −0.6)
+   v = w × u = (−0.223, 0.928, −0.297)
+   translation column = (−u·eye, −v·eye, −w·eye) = (0, 0, −5.385)
+```
+
+- the target lands at `(0, 0, −5.385)` in eye space: straight ahead, at distance `√29`, on the camera's `−z` axis
+- pitfall: `w = normalize(at − eye)`, which makes the camera look **backward**, away from the target
+
+
+---
+
+## Review 15: the projection matrix
+
+A camera with vertical field of view 60°, aspect 16:9, near 0.1, far 100. Give `P₀₀`, `P₁₁`, and the two depth entries `A` and `B`.
+
+---
+
+## Review 15, worked
+
+```text
+   f = 1 / tan(30°) = 1.7321
+   P₀₀ = f / aspect = 1.7321 / 1.7778 = 0.9743        P₁₁ = f = 1.7321
+   A = −(far + near)/(far − near) = −100.1 / 99.9 = −1.0020
+   B = −2·far·near/(far − near) = −20 / 99.9 = −0.2002
+```
+
+- pitfall: `P₀₀ = f · aspect`, which stretches the image horizontally instead of compensating for the wide screen
+- the ratio far/near = 1,000 puts almost all depth precision near the camera (Review 6)
+
+
+---
+
+## Review 16: NDC to pixels
+
+A 1920×1080 viewport; pixel rows count **down** from the top. Where does NDC `(0.25, −0.5)` land?
+
+---
+
+## Review 16, worked
+
+```text
+   x_px = (x_ndc + 1)/2 · 1920 = 0.625 · 1920 = 1200
+   y_px = (1 − y_ndc)/2 · 1080 = 0.75 · 1080 = 810
+```
+
+- NDC `y = −0.5` is below the center, and rows count down, so the pixel row is **greater** than 540
+- pitfall: `(y_ndc + 1)/2 · 1080 = 270`, the image upside down
+
+
+---
+
+## Review 17: inside the triangle?
+
+Triangle `A = (0, 0)`, `B = (4, 0)`, `C = (0, 4)`. Give the barycentric weights of `p = (1, 1)` and of `q = (5, 1)`, and say which point is inside.
+
+---
+
+## Review 17, worked
+
+```text
+   edge function e(a, b, p) = (b − a) × (p − a), the z of the 2D cross product;   area term e(A, B, C) = 16
+   p = (1, 1):   w_A = e(B, C, p)/16 = 0.5    w_B = e(C, A, p)/16 = 0.25    w_C = e(A, B, p)/16 = 0.25
+   q = (5, 1):   w_A = −0.5                   w_B = 1.25                    w_C = 0.25
+```
+
+- `p` is inside: all three weights are positive and sum to 1; `q` is outside, across edge `BC`, the edge opposite the negative weight
+- the rasterizer's coverage test is exactly "all three edge functions ≥ 0"
+
+
+---
+
+## Review 18: bilinear filtering
+
+Four texels: top row `10, 20`, bottom row `30, 40`. Sample at fractional position `u = 0.25` (across), `v = 0.5` (down) between their centers.
+
+---
+
+## Review 18, worked
+
+```text
+   top:     10·(1 − 0.25) + 20·0.25 = 12.5
+   bottom:  30·0.75 + 40·0.25 = 32.5
+   result:  12.5·(1 − 0.5) + 32.5·0.5 = 22.5
+```
+
+- pitfall: the plain average of the four texels, 25, which ignores where the sample is
+- three linear interpolations; the order (rows first or columns first) does not matter
+
+
+---
+
+## Review 19: which mip level?
+
+On screen, one pixel covers about 8 texels of a 1024² texture in each direction. Which mip level should be sampled, and how much extra memory does the full pyramid cost?
+
+---
+
+## Review 19, worked
+
+```text
+   level = log₂(8) = 3             level 3 is 128², one texel per pixel again
+   pyramid memory: 1 + 1/4 + 1/16 + … = 4/3           one third more than the base texture
+```
+
+- pitfall: level 8, reading the footprint as the level; the level is its **logarithm**
+- sampling level 0 instead aliases: 64 texels per pixel, one of them picked
+
+
+---
+
+## Review 20: a ray meets a sphere
+
+A ray from the origin along `(0, 0, −1)` meets a sphere of radius 1 centered at `(0.5, 0, −5)`. Give the entry distance `t`, the hit point, and the surface normal there.
+
+---
+
+## Review 20, worked
+
+```text
+   o − c = (−0.5, 0, 5)       b = (o − c)·d = −5       c′ = |o − c|² − r² = 25.25 − 1 = 24.25
+   discriminant  b² − c′ = 25 − 24.25 = 0.75
+   t = −b − √0.75 = 5 − 0.866 = 4.134        (exit: 5.866)
+   hit = (0, 0, −4.134)        normal = (hit − center)/r = (−0.5, 0, 0.866)
+```
+
+- the normal leans toward `−x` because the sphere's center is to the ray's right
+- pitfall: taking `t = −b + √Δ`, the exit point on the far side of the sphere
+
+
+---
+
+## Review 21: Monte Carlo, uniform against cosine
+
+A Lambert surface of albedo 0.5 under a uniform sky of radiance 1. Estimate the reflected radiance with directions sampled (a) uniformly over the hemisphere, (b) proportionally to `cos θ`. Give each estimator's mean and variance.
+
+---
+
+## Review 21, worked
+
+```text
+   exact:  L_out = albedo · 1 = 0.5
+   (a) pdf 1/(2π):   one sample = (0.5/π)·1·cos θ / (1/(2π)) = cos θ
+       mean E[cos θ] = 0.5 ✓      variance E[cos²θ] − 0.25 = 1/3 − 1/4 = 0.0833      std 0.289
+       for a standard error of 0.01:   (0.289/0.01)² = 834 samples
+   (b) pdf cos θ/π:  one sample = (0.5/π)·cos θ / (cos θ/π) = 0.5       variance 0
+```
+
+- importance sampling by the cosine makes every sample **exact** here: the pdf matches the integrand
+- this is why path tracers sample cosine-weighted directions off diffuse surfaces
+
+
+---
+
+## Review 22: attention weights
+
+A query `q = (1, 0)` and two keys `(2, 0)` and `(0, 2)`, dimension `d = 2`. Give the attention weights, and what they would be without the `1/√d` scale.
+
+---
+
+## Review 22, worked
+
+```text
+   scores q·k/√2:   2/1.414 = 1.414,   0
+   softmax:         e^1.414 / (e^1.414 + 1) = 0.804,    0.196
+   without 1/√d:    scores 2, 0   →   0.881, 0.119
+```
+
+- the scale keeps scores from growing with the dimension; without it, softmax saturates and attention becomes nearly **one-hot**, with vanishing gradients
+- the same dot product as the vectors lecture's first slide, followed by a normalized exponential
+
+
+---
+
+## Review 23: guidance once more
+
+At one step, the unconditional estimate of two pixels is `(0.1, 0.4)` and the conditional one `(0.3, 0.2)`. Give the guided estimate at `w = 2`.
+
+---
+
+## Review 23, worked
+
+```text
+   class direction:   (0.3, 0.2) − (0.1, 0.4) = (0.2, −0.2)
+   guided:            (0.1, 0.4) + 2·(0.2, −0.2) = (0.5, 0.0)
+```
+
+- pitfall: `(0.3, 0.2) + 2·(0.2, −0.2) = (0.7, −0.2)`, starting from the conditional estimate: that is `w = 3`
+- pitfall: `2·(0.3, 0.2) = (0.6, 0.4)`, scaling the conditional estimate instead of the difference
 

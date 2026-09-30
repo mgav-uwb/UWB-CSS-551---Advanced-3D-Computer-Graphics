@@ -12,6 +12,8 @@
         (the rotation's sign flipped), (1,0,2) (parent and child swapped:
         Ry(90)(2,0,0) + (1,0,0) = (1,0,-2) is the other swap; (1,0,2) is the
         swap with the sign flipped too).
+    Q4  v *= 0.95 per frame: 0.95^30 = 0.215, 0.95^60 = 0.046, ratio 4.66.
+        Distractors: 0.21 (inverted), 1 (the per-second fix), 2 (frame-count ratio).
     HW1 (lib/skeletons/hw01.js, lib/skeletons/expected.js): advance() reaches
         (3,0,0) after one second at 60 Hz and at 20 Hz; trsMatrix for
         t = (2,0.5,-1), 30 deg, s = 2 has rows [1.732 0 1 2] [0 2 0 0.5]
@@ -60,6 +62,18 @@ A parent sits at **(2, 0, 0)**, rotated **90° about y**. Its child has `localPo
 - **B.** (2, 0, 1)
 - **C.** (2, 0, −1)
 - **D.** (1, 0, 2)
+
+
+---
+
+## Question 4: damping at two frame rates
+
+A game slows a sliding puck with `v *= 0.95;` once **per frame**. After **one second**, how many times more speed does the puck keep on a **30 Hz** machine than on a **60 Hz** machine?
+
+- **A.** 0.21
+- **B.** 1
+- **C.** 2
+- **D.** 4.66
 
 
 ---

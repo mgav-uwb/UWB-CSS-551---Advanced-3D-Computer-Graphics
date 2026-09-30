@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~76 min).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~78 min, 56 slides, incl. a short color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -28,7 +28,7 @@
 
 ### Local illumination: light, normal, eye
 
-<small>(~76 min)</small>
+<small>(~78 min)</small>
 
 
 ---
@@ -96,9 +96,30 @@ Three terms, each a dot product; add and clamp to the display range. That is Pho
 
 ---
 
+## The three terms, pictured
+
+<img src="../../textbook/figures/ill-sphere-terms.png" class="media-shot" style="max-height: 290px;" alt="the demo's sphere rendered four times: ambient only, diffuse only, specular only, and their sum">
+
+Ambient is flat, diffuse follows the cosine, specular is a small bright spot; the sum is the image. The marked point, whose numbers the next slides compute, sits near the diffuse peak and at the edge of the highlight.
+
+
+---
+
+
+## The vectors at the marked point, drawn
+
+<img src="../../textbook/figures/ill-vectors.svg" class="media-shot" style="max-height: 280px;" alt="a surface point with its normal N, the light direction L, the view direction V, the mirror direction R and the half vector H">
+
+- **N** the surface normal, **L** toward the light, **V** toward the eye: all unit length, all from the point
+- **R** is L mirrored about N; **H** is halfway between L and V
+- the model uses only **dot products** of these five vectors
+
+
+---
+
 ### Diffuse reflection
 
-<small>(~28 min)</small>
+<small>(~22 min)</small>
 
 ---
 
@@ -115,6 +136,15 @@ A **matte** surface (chalk, paper, unfinished wood) scatters incoming light **eq
 ```
 
 A fixed beam of light striking a surface **head-on** is concentrated on a small patch; striking at a **grazing** angle, the **same** beam smears over a larger patch, so each bit of surface catches **less**. Brightness tracks the **angle** the surface makes to the light.
+
+
+---
+
+## Lambert's cosine, drawn
+
+<img src="../../textbook/figures/ill-lambert.svg" class="media-shot" style="max-height: 260px;" alt="a beam of parallel rays striking a surface head-on and at an angle; the tilted surface receives the same rays over a larger area">
+
+The same beam over a tilted patch covers an area larger by **1/cos θ**, so each unit of area receives **cos θ** as much light. At 60° the patch gets half.
 
 
 ---
@@ -204,6 +234,24 @@ The marked point faces **almost straight into** the light (`N·L` near 1), so it
 
 ---
 
+## The same sum, in color
+
+The terms are **per channel**: a red plastic sphere at the marked point.
+
+```text
+   ka = 0.12   kd = (0.86, 0.36, 0.30)   ks = 0.5 (white highlight)   N·L = 0.988   (R·V)^30 = 0.021
+
+   ambient    0.12 × kd            = (0.103, 0.043, 0.036)
+   diffuse    kd × 0.988           = (0.850, 0.356, 0.297)
+   specular   0.5 × 0.021          = (0.010, 0.010, 0.010)
+   sum                             = (0.964, 0.409, 0.343)
+```
+
+The highlight is **white** because ks is white: plastic reflects the light's color at the surface. A metal's highlight takes the metal's color.
+
+
+---
+
 ## Meet the demo: light a sphere
 
 The `illumination` demo lights **one** sphere with **one** orbiting point light and marks the spot we just computed. As you drag the light, the panel shows the live **classic-Phong** numbers at that point:
@@ -278,9 +326,23 @@ In Unity, `UnityObjectToWorldNormal` applies it; the Unity-shaders chapter shows
 
 ---
 
+## Normals under a non-uniform scale, drawn
+
+<img src="../../textbook/figures/ill-normal-transform.svg" class="media-shot" style="max-height: 250px;" alt="a circle scaled by 2 in x into an ellipse; at one point the normal transformed by M is wrong, the normal transformed by the inverse transpose is perpendicular to the surface">
+
+```text
+   the point (0.707, 0.707) of a circle, scaled by diag(2, 1):   it moves to (1.414, 0.707)
+   tangent after the scale: (−0.894, 0.447)
+   normal through M:        (0.894, 0.447)    · tangent = −0.6    36.9° off
+   normal through (M⁻¹)ᵀ:   (0.447, 0.894)    · tangent =  0      perpendicular
+```
+
+
+---
+
 ### Specular and ambient
 
-<small>(~20 min)</small>
+<small>(~22 min)</small>
 
 ---
 
@@ -352,6 +414,22 @@ A raw cosine `R·V` gives a highlight **too broad** for a shiny surface. Raise i
 
 ---
 
+## Shininess: how fast the highlight falls off
+
+<img src="../../textbook/figures/ill-shininess.svg" class="media-shot" style="max-height: 200px;" alt="curves of cos to the power s for several s, narrowing as s grows">
+
+At the marked point, R·V = 0.879 and H·N = 0.969:
+
+| s | (R·V)^s, Phong | (H·N)^s, Blinn |
+| - | ------------- | -------------- |
+| 1 | 0.879 | 0.969 |
+| 4 | 0.597 | 0.881 |
+| 30 | **0.021** | 0.387 |
+| 128 | 0.00000007 | 0.018 |
+
+
+---
+
 ## Honest note: the demo renders Blinn, not Phong
 
 The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial` shades with **Blinn's** variant: the **half-vector** `H = normalize(L + V)`, dotted with the **normal**:
@@ -364,6 +442,64 @@ The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial
 
 - `H·N = 1` exactly when `R·V = 1`, so the highlight sits in the **same place**
 - not numerically equal (Blinn needs a **larger** exponent), but they **peak together**: qualitative agreement is the point, stated honestly on the demo
+
+
+---
+
+## Matching Blinn to Phong
+
+The angle between H and N is about **half** the angle between R and V, so Blinn needs about **four times** the exponent for the same highlight:
+
+```text
+   Phong at s = 30:        0.879^30  = 0.021
+   Blinn with the same:    0.969^s = 0.021   →   s = ln 0.021 / ln 0.969 = 122.6     (≈ 4 × 30)
+```
+
+A material authored for one model and rendered with the other is **four times too glossy** or **four times too dull**.
+
+
+---
+
+
+## Energy: a shininess slider should not change brightness
+
+Raising s narrows the lobe, and a narrow lobe also **reflects less total light**. The normalized Phong lobe fixes it:
+
+```text
+   normalized specular = (s + 2) / (2π) · (R·V)^s
+      s = 30:   factor 5.093
+      s = 128:  factor 20.69
+```
+
+With the factor, a sharper highlight is **brighter and smaller** with the same total, the way a polished surface looks.
+
+
+---
+
+
+## Four models in eleven years
+
+| year | who | what it added |
+| ---- | --- | ------------- |
+| 1971 | Gouraud | smooth shading: light the **vertices**, interpolate the **colors** |
+| 1975 | Phong | interpolate the **normals**, light every pixel; the specular term |
+| 1977 | Blinn | the **half vector**; reflection models grounded in optics (Torrance–Sparrow) |
+| 1982 | Cook and Torrance | a **microfacet** BRDF with Fresnel: the ancestor of PBR |
+
+Gouraud, Phong and Blinn worked at Utah; Cook and Torrance at Cornell.
+
+
+---
+
+
+## Per vertex or per pixel?
+
+```text
+   Gouraud: light each vertex, interpolate colors      the full bunny: 35,947 lighting evaluations
+   Phong:   interpolate normals, light each pixel       the bunny on screen: about 250,000
+```
+
+Per pixel costs **7 times** more here and is universal now. Per-vertex lighting **misses highlights** that fall between vertices: a highlight smaller than a triangle is either smeared or lost entirely.
 
 
 ---
@@ -387,9 +523,56 @@ That is the whole **Phong sum**: three terms, added up.
 
 ---
 
+## Sky light, better than a constant: ambient occlusion
+
+<img src="../../textbook/figures/ill-ao.svg" class="media-shot" style="max-height: 200px;" alt="a unit sphere resting on a floor; the fraction of sky visible from floor points, low near the contact and rising with distance">
+
+Ambient occlusion: the fraction of the sky a point can see. A unit sphere on a floor, 4,000 rays per point:
+
+| distance from contact | 0.05 | 0.25 | 0.5 | 1 | 2 | 4 |
+| --------------------- | ---- | ---- | --- | - | - | - |
+| AO | 0.003 | 0.088 | 0.282 | 0.647 | 0.908 | 0.988 |
+
+Multiply the ambient term by it: contact shadows appear. A 90° crease sees half the sky: 0.5.
+
+
+---
+
+
+## A sky, in nine numbers
+
+<img src="../../textbook/figures/ill-sh.svg" class="media-shot" style="max-height: 200px;" alt="irradiance from a two-toned sky as a function of the normal's elevation, the exact curve and the spherical-harmonic fit lying on top of each other">
+
+A sky of radiance 1 above the horizon and 0.2 below. The irradiance a normal receives depends only on its **elevation**:
+
+```text
+   up (90°)        3.142        horizontal (0°)   1.885
+   the marked normal (35.3°)  2.611        straight down   0.628
+```
+
+Ramamoorthi and Hanrahan (2001): irradiance from **any** distant sky is captured to within a few percent by **9** spherical-harmonic coefficients. Diffuse lighting from an environment costs nine multiplies.
+
+
+---
+
+
+## A uniform sky gives π
+
+Irradiance is the cosine-weighted sum of incoming radiance over the hemisphere. For a sky of radiance 1 in every direction:
+
+```text
+   E = ∫ L cos θ dω  =  π                           (not 2π: the cosine weights it)
+   a white Lambertian surface, BRDF ρ/π = 1/π:   outgoing radiance = (1/π) · π = 1
+```
+
+The **1/π** in the Lambert BRDF is what makes a white surface under a white sky exactly white: energy in equals energy out.
+
+
+---
+
 ### Light sources
 
-<small>(~12 min)</small>
+<small>(~16 min)</small>
 
 ---
 
@@ -415,6 +598,15 @@ The demo used a **point** light. Real scenes mix all three.
 
 ---
 
+## The light types, drawn
+
+<img src="../../textbook/figures/ill-lights.svg" class="media-shot" style="max-height: 280px;" alt="a directional light with parallel rays, a point light radiating in all directions with falloff, and a spot light's cone with inner and outer angles">
+
+What changes between them is only **L** and a **strength** multiplier: constant for a directional light, a distance falloff for a point, a falloff times a cone factor for a spot. The lighting sum does not change.
+
+
+---
+
 ## Distance attenuation
 
 A point or spot light gets **dimmer** with distance. Light spreads over a sphere whose area grows as `d²`, so ideal falloff is **inverse-square**; in practice a tunable polynomial is common:
@@ -428,6 +620,20 @@ A point or spot light gets **dimmer** with distance. Light spreads over a sphere
 - the **polynomial** form tunes the falloff; `kc` avoids a divide-by-zero at `d = 0`; a hard **cutoff** radius (Sung's `Near`/`Far`) makes distant lights free
 
 Multiply the light's intensity by the attenuation before the Phong sum.
+
+
+---
+
+## Falloff, by the numbers
+
+| distance d | inverse square 1/d² | a polynomial falloff |
+| ---------- | ------------------- | -------------------- |
+| 1 | 1 | 0.891 |
+| 2 | 0.25 | 0.765 |
+| 4 | 0.0625 | 0.534 |
+| 10 | 0.01 | 0.196 |
+
+The physical law drops **100 times** from 1 to 10; the tuned polynomial drops 4.5 times. Artists liked the second because rooms stayed lit; physically based engines use the first, with **real** light intensities and exposure.
 
 
 ---
@@ -456,6 +662,23 @@ The cone is a **second** angular test layered on `N·L`: `acos` for the angle, `
 
 ---
 
+## The spot cone, worked at 20°
+
+Inner angle 15° (full strength), outer 25° (zero), Sung's soft edge between:
+
+```text
+   α = 20°:   n = 15 − 20 = −5,   range = 25 − 15 = 10
+             x = n² / range² = 25 / 100 = 0.25
+             smoothstep(1, 0, x):  t = (x − 1) / (0 − 1) = 0.75,   S = 3t² − 2t³ = 1.688 − 0.844 = 0.844
+```
+
+| angle | 10° | 15° | 18° | 20° | 22° | 25° |
+| ----- | --- | --- | --- | --- | --- | --- |
+| strength | 1 | 1 | 0.977 | **0.844** | 0.515 | 0 |
+
+
+---
+
 ## Many lights: just add them
 
 One surface, several lights? The reflection model is **linear** in the lights, so the answer is the simplest possible: **sum** each light's contribution:
@@ -469,6 +692,52 @@ One surface, several lights? The reflection model is **linear** in the lights, s
 - more lights ⇒ more terms ⇒ more cost: the honest reason real-time budgets **cap** the light count per object
 
 Three dot products per light, summed. That is the entire local lighting model, end to end.
+
+
+---
+
+## Two lights, and one that adds nothing
+
+Add a second light at azimuth 200°, elevation 20°, half strength:
+
+```text
+   its L at the marked point:   N·L = −0.719      → diffuse max(0, −0.719) = 0
+                                R·V = −0.432      → specular 0
+   total diffuse: 0.988 + 0 = 0.988                 the second light is behind the surface here
+```
+
+Every light costs its evaluation **even when it contributes zero**. Culling lights by distance and cone before shading is where real-time lighting's speed comes from.
+
+
+---
+
+
+## Many lights, the cost
+
+A 1080p frame, overdraw 3, 32 lights:
+
+```text
+   forward, every light at every fragment:        199,065,600 evaluations
+   deferred, every light at every pixel once:      66,355,200     (G-buffer 41.5 MB)
+   tiled deferred, 16×16 tiles, about 6 lights reach each tile:
+                                                   12,441,600     (16 times fewer than forward)
+```
+
+
+---
+
+
+## Area lights: a point is a lie up close
+
+<img src="../../textbook/figures/ill-area-light.svg" class="media-shot" style="max-height: 200px;" alt="irradiance under a disc light of radius 0.5 as a function of height, compared with a point light of the same power">
+
+A disc light of radius 0.5 and radiance 1, straight above a point at height h, against a point light of the same power:
+
+| h | 0.25 | 0.5 | 1 | 2 | 4 |
+| - | ---- | --- | - | - | - |
+| disc (exact) | 2.513 | 1.571 | 0.628 | 0.185 | 0.048 |
+| point | 12.566 | 3.142 | 0.785 | 0.196 | 0.049 |
+| point / disc | **5.0** | 2.0 | 1.25 | 1.06 | 1.02 |
 
 
 ---
@@ -510,4 +779,77 @@ The simplest respectable tone-map is the **Reinhard** curve: divide each value b
 - small values pass **almost unchanged** (`0.5 → 0.33`), so shadows and midtones keep their look
 - large values are **squeezed** toward, never past, 1, so bright regions **stay distinct** (`4 → 0.80`, `8 → 0.89`, not both 1)
 - one line, no parameters (film curves are fancier, and **exposure** scales `x` first); apply it **last**, after all lighting
+
+
+---
+
+## Tone mapping a real scene
+
+<img src="../../textbook/figures/ill-tonemap.svg" class="media-shot" style="max-height: 200px;" alt="the Reinhard curve against a hard clip, with sky, cloud and sun values marked">
+
+```text
+   sky 6,  cloud 4,  sun 40                    (linear values; a white page would be about 1)
+   clipped:   1, 1, 1                          sky, cloud and sun indistinguishable
+   Reinhard:  0.857, 0.800, 0.976              three different brightnesses
+
+   exposure 0.5 first (halve everything):     sky 0.750,  sun 0.952
+```
+
+Exposure places the scene on the curve; the curve keeps everything distinct.
+
+
+---
+
+
+### Color in rendering
+
+<small>(~6 min)</small>
+
+
+---
+
+
+## Shade in linear light
+
+The lighting sums are **light**: twice the number, twice the photons. The **codes** stored in an 8-bit image are not; they are encoded by the sRGB curve.
+
+```text
+   blend yellow and black 50/50:
+      in codes:   (128, 128, 0)   → linear 0.214 per channel → luminance 0.199
+      in light:   0.5 per channel → code (188, 188, 0)      → luminance 0.464
+   a fine checker of the two, viewed from afar:                luminance 0.464
+```
+
+Only the linear blend matches what the eye averages.
+
+
+---
+
+
+## The sRGB curve: why codes are not light
+
+<img src="../../textbook/figures/col-transfer.svg" class="media-shot" style="max-height: 210px;" alt="the sRGB transfer function mapping code values to linear light, with code 128 marked at 0.216">
+
+```text
+   code 128  →  0.216 of full light          linear 0.5  →  code 188
+   one code step near black:  sRGB 0.0003,   linear 8-bit 0.0039    (12.9 times finer)
+   codes below 1 % of full light:  sRGB 25,   linear 8-bit 3
+```
+
+The curve spends codes where the eye is sensitive, in the darks. That is why 8-bit images store encoded values, and why shaders must **decode on read** and **encode on write**.
+
+
+---
+
+
+## Pitfall: lighting the codes
+
+An albedo texel of code 200, lit at N·L = 0.5:
+
+```text
+   correct: decode 200 → 0.578,  × 0.5 = 0.289 light,  encode → code 146
+   wrong:   200 × 0.5 = code 100 → 0.127 light              44 % of the correct light
+```
+
+Shading on codes makes every partly lit surface **too dark** and every falloff **too steep**; artists then brighten the lights to compensate, and the highlights blow out.
 

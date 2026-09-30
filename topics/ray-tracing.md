@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~48 min).
+  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~44 min, 22 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/ray-tracing.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -27,7 +27,7 @@
 
 ### Ray tracing
 
-<small>(~48 min)</small>
+<small>(~44 min)</small>
 
 
 ---
@@ -44,6 +44,19 @@
 - it pays per pixel a **search**, which a tree over the scene turns from linear to logarithmic
 
 Appel cast rays for visibility and shadows in 1968; Whitted made the hit point a source of rays in 1980; since 2018 GPUs trace rays in dedicated hardware.
+
+
+---
+
+## Ray tracing, in five dates
+
+| year | who | what |
+| ---- | --- | ---- |
+| 1968 | Appel (IBM) | rays from the eye to find visible surfaces and shadows |
+| 1980 | Whitted | recursive rays: reflection, refraction, shadows (74 minutes per image on a VAX-11/780) |
+| 1984 | Cook, Porter, Carpenter | distributed rays: soft shadows, glossy reflection, depth of field, motion blur |
+| 1986 | Kajiya | the rendering equation; path tracing solves it by Monte Carlo |
+| 2018 | NVIDIA Turing | ray tracing hardware in consumer GPUs |
 
 
 ---
@@ -104,6 +117,19 @@ Solve `o + t d = A + u e1 + v e2` for t, u, v at once (Cramer's rule):
 ```
 
 From (1.5, 1.5, 1): u = v = 0.75, u + v = 1.5 > 1, **outside**. The weights are the rasterizer's barycentric weights, in 3D.
+
+
+---
+
+## Three outcomes of one triangle test
+
+```text
+   hit:       o = (0.5, 0.5, 1), d = (0, 0, −1):     u = 0.25, v = 0.25, u + v = 0.5,  t = 1    inside
+   miss:      o = (1.5, 1.5, 1):                      u = 0.75, v = 0.75, u + v = 1.5 > 1       outside
+   parallel:  d = (1, 0, 0), in the triangle's plane:  det = e1 · (d × e2) = 0                   no hit
+```
+
+A robust tracer tests `|det| < ε`, not `det = 0`: a ray **almost** parallel gives a huge t from a tiny determinant.
 
 
 ---
@@ -191,6 +217,22 @@ A window is nearly invisible face-on and a **mirror** at a grazing angle. Whitte
 
 ---
 
+## How many rays does Whitted need?
+
+Each hit on a glass surface spawns a **reflected** and a **refracted** ray, and each hit sends a **shadow** ray toward each light:
+
+```text
+   the 2D figure:   13 segments: 2 primary, 3 reflected, 2 refracted, 6 shadow (5 blocked)
+   the 320 × 200 render:   64,000 primary rays, depth limit 4
+      worst case per pixel:  1 + 2 + 4 + 8 + 16 = 31 rays (without shadow rays)
+      worst case per frame:  1,984,000 rays, plus a shadow ray at every hit
+```
+
+The depth limit and Fresnel-weighted **cutoffs** (stop when a ray's weight is tiny) keep the tree small in practice.
+
+
+---
+
 ## Pitfall: shadow acne
 
 A shadow ray that starts **exactly** at the hit point re-hits the same surface at `t ≈ 10⁻⁸` from rounding, and the surface shadows itself in speckles.
@@ -222,6 +264,21 @@ A binary tree of boxes: each node holds the box of everything below it. A ray de
 
 ---
 
+## Building a good BVH: the surface area heuristic
+
+Where to split a node? The probability that a random ray hitting the parent also hits a child is the ratio of their **surface areas**. The expected cost of a split (MacDonald and Booth, 1990):
+
+```text
+   cost = C_trav + (A_left / A) · N_left · C_tri + (A_right / A) · N_right · C_tri       (C = 1 each)
+
+   14 triangles, no split:                       14
+   split into 7 + 7, children with area 0.6, 0.5:   1 + 0.6·7 + 0.5·7 = 8.7     good
+   split into 7 + 7, overlapping children 0.9, 0.9: 1 + 0.9·7 + 0.9·7 = 13.6    barely worth it
+```
+
+
+---
+
 ## Distributed rays: soft shadows
 
 <img src="../../textbook/figures/rt-soft-shadow.png" class="media-shot" style="max-height: 230px;" alt="a sphere over a floor lit by a square area light: one shadow ray per pixel gives a hard shadow, sixteen give a soft penumbra with noise at its edge">
@@ -236,4 +293,80 @@ Cook, Porter and Carpenter, 1984: every hard edge in a Whitted image is an **int
 ```
 
 The same idea on the lens gives **depth of field**, on the shutter **motion blur**, on the lobe **glossy** reflection: N rays, noise falling as 1/√N.
+
+
+---
+
+## Depth of field: sample the lens
+
+<img src="../../textbook/figures/rt-thin-lens.png" class="media-shot" style="max-height: 220px;" alt="three spheres at different depths rendered through a thin lens: the middle one sharp, the near and far ones blurred">
+
+A pinhole camera is always in focus. A **thin lens** of radius 0.12 focused at 3.482 blurs everything else:
+
+```text
+   sphere at depth 2.31:    blur circle 6.71 px
+   sphere at depth 3.482:   0 px               (in focus)
+   sphere at depth 5.044:   4.1 px
+   32 rays per pixel, each from a random point on the lens, aimed at the pixel's point on the focal plane
+```
+
+
+---
+
+
+## Fog and smoke: rays through a medium
+
+<img src="../../textbook/figures/rt-media.svg" class="media-shot" style="max-height: 180px;" alt="transmittance falling exponentially with distance through a medium, and light scattered into a ray along its length">
+
+In a medium, a ray loses light by **extinction** and gains it by **in-scattering**:
+
+```text
+   σt = 0.5:   T(d) = e^(−σt d):   d = 1 → 0.607,   d = 2 → 0.368,   d = 4 → 0.135;   half at 1.386
+   light fog, σt = 0.05:   contrast falls to 2 % at 78.2 units: the visibility distance
+```
+
+The volume rendering of NeRF, later in the course, is this equation, with σ and color learned by a network.
+
+
+---
+
+
+## What Whitted cannot see
+
+Whitted rays go only in **mirror** and **refraction** directions, and to the lights. Missing:
+
+- **color bleeding**: the red wall's light on the white box (diffuse to diffuse)
+- **caustics**: light focused by glass onto a floor (specular to diffuse, seen from the light's side)
+- **soft indirect shadows** and light around corners
+- **glossy** reflection (a lobe, not a mirror)
+
+All are the rendering equation's integral over the **whole hemisphere**, which Whitted replaced by at most two directions. Path tracing, on Thursday, restores it.
+
+
+---
+
+
+## Rasterize or trace?
+
+| | rasterization | ray tracing |
+| --- | --- | --- |
+| loop | for each triangle, find its pixels | for each pixel, find its triangle |
+| visibility | depth buffer | nearest hit along the ray |
+| cost grows with | triangles × covered pixels | pixels × log(triangles) |
+| shadows, reflections | extra passes and tricks (shadow maps, probes) | more rays |
+| data structure | none needed (streams triangles) | a BVH, rebuilt when things move |
+
+Games in 2026 do **both**: rasterize what the camera sees, trace rays for shadows, reflections and indirect light.
+
+
+---
+
+
+## Ray tracing in hardware, and denoising
+
+- **RT cores** (NVIDIA Turing, 2018; AMD and Intel since): fixed-function BVH traversal and ray–triangle tests, exposed through DirectX Raytracing and Vulkan
+- real-time budgets allow about **1 or 2 rays per pixel per effect**, far too few for a clean image
+- a **denoiser** reconstructs the image from those samples: spatial and temporal filters guided by normals and depth (SVGF, Schied et al., 2017), or a trained network (NVIDIA's OptiX denoiser, film renderers)
+
+The ray tracer produces noise; the denoiser, like TAA, borrows from neighbors in space and time.
 

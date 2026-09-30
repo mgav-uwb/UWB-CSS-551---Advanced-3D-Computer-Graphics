@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L08 discussion and wrap (~30 min). Four peer-instruction questions; answers ONLY
+  CSS 551 · L08 discussion and wrap (~30 min). Five peer-instruction questions; answers ONLY
   in the notes. Numbers computed by node against lib/core/xform.js (lookAtBasis, perspective,
   applyMat4, perspectiveDivide) and from textbook/figures/numbers-pipeline.json (view).
 -->
@@ -55,6 +55,18 @@ A game's setting is a **horizontal** field of view of 90° on a 16:9 screen. Wha
 - **B.** 58.7°
 - **C.** 50.6°
 - **D.** 45°
+
+
+---
+
+## Question 5: behind the eye
+
+A vertex's clip coordinates are `(0.8, -0.2, 1.5, -2)`. What should the pipeline do with it?
+
+- **A.** Treat it as outside: `w < 0` puts it behind the eye; clip the triangle's edges against the frustum before dividing
+- **B.** Draw it at NDC `(-0.4, 0.1, -0.75)`
+- **C.** Draw it at NDC `(0.4, -0.1, 0.75)`
+- **D.** Keep it: `|x|, |y|, |z|` are all at most `|w| = 2`, so it is inside
 
 
 ---

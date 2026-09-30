@@ -1,6 +1,6 @@
 <!--
   CSS 551 · L14 discussion and wrap (~30 min). Mounted by index.html AFTER the topic.
-  Four peer-instruction questions (vote, argue in pairs two minutes, vote again, then work it).
+  Five peer-instruction questions (vote, argue in pairs two minutes, vote again, then work it).
   Answers and worked solutions live ONLY in the Note: blocks. Every number is from
   tools/gen-lecture-figures-d1.mjs (lectures/L16-diffusion-1/analysis/numbers-d1.json, keys
   tiny.relu, adam, contrastive) or from textbook/neural-nets-embeddings.html Section 5.1.
@@ -63,6 +63,18 @@ The noisy wave (12 points, noise variance 0.0225), trained 5000 epochs, error ag
 - **B.** H = 40 stopped at epoch 950
 - **C.** H = 40 with weight decay
 - **D.** H = 4: too small to overfit
+
+
+---
+
+## Question 5: the NaN
+
+Your classifier's final layer outputs logits **(1000, 999)** and the loss is NaN. Which change returns the correct class probabilities?
+
+- **A.** switch from single to double precision
+- **B.** divide both logits by 1000 before the softmax
+- **C.** subtract the larger logit from both before exponentiating
+- **D.** clamp each exponential at 10³⁰⁰
 
 
 ---

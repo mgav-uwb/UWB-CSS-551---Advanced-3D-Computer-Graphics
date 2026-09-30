@@ -6,7 +6,7 @@
     0:00  Opening                                          2 min
     0:02  Viewing: frame, view matrix, projection,
           the chain, camera moves (topic)                88 min
-    1:30  Discussion: four peer-instruction questions    25 min
+    1:30  Discussion: five peer-instruction questions    26 min
     1:55  Wrap                                             5 min
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -31,7 +31,7 @@
 - **Projection**: the pinhole, field of view, P entry by entry, NDC, depth precision
 - **The full chain**: one vertex from object space to a pixel; frustum culling
 - **Moving the camera**: tumble, track, dolly
-- **Discussion**: four questions, vote, argue, vote again
+- **Discussion**: five questions, vote, argue, vote again
 
 Reading: [Viewing](../../textbook/viewing.html) in the course text.
 

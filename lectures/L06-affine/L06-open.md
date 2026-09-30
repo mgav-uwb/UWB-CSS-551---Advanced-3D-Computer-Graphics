@@ -6,7 +6,7 @@
     0:00  Opening                                          2 min
     0:02  Affine transformations over homogeneous
           coordinates (topic)                            88 min
-    1:30  Discussion: four peer-instruction questions    25 min
+    1:30  Discussion: six peer-instruction questions     28 min
     1:55  Wrap                                             5 min
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -30,7 +30,7 @@
 - **Homogeneous coordinates**: w = 1 points, w = 0 vectors; composition and inverse by blocks
 - **Frames and spaces**: a matrix is a frame; TRS; normals by the inverse transpose
 - **Pivots, and where affine ends**: the conjugation sandwich; the last row
-- **Discussion**: four questions, vote, argue, vote again
+- **Discussion**: six questions, vote, argue, vote again
 
 Reading: [Affine Transformations](../../textbook/affine-transforms.html) in the course text.
 

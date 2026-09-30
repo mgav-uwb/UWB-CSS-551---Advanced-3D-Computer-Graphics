@@ -1,13 +1,20 @@
 <!--
-  CSS 551 · TOPIC DECK: Diffusion models II: conditioning, guidance, latents, control, text to 3D (~85 min).
+  CSS 551 · TOPIC DECK: Diffusion models II: conditioning, guidance, latents, control, text to 3D (~88 min, densified 2026-09-29).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-2.md"> among others; it carries no
   logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
 
-  TEACHES: how a condition reaches the denoiser (the five mechanisms); classifier-free guidance, worked on two numbers, live, and its cost in saturated pixels; flow matching and one Euler step by hand; the three scalings; latent diffusion and the variational autoencoder; cross-attention worked on a three-word caption; ControlNet, and the depth buffer against the linear depth a condition wants; score distillation, one step by hand with the identity renderer, and what it converges to on the spiral; FID and its blind spots; the papers.
+  TEACHES: how a condition reaches the denoiser (the five mechanisms; the course network's class and time embeddings; condition dropout);
+           guidance in noise coordinates, as a tilted distribution, before classifier-free (classifier guidance), negative prompts,
+           dynamic thresholding and the guidance interval; the sampler table, reflow, guidance on a velocity, distillation to few steps;
+           the VAE penalty and reparameterization, the latent scale factor, what eight-fold downsampling costs; cross-attention at
+           scale, Prompt-to-Prompt, text encoders; zero convolutions, rendering the conditions, inpainting channels, SDEdit;
+           DreamFusion's numbers and its successors; FID's sample-size bias, precision and recall, CLIP score, memorization;
+           the guided sampler as code; what breaks and what the pipeline supplies. Also (the original list): classifier-free guidance, worked on two numbers, live, and its cost in saturated pixels; flow matching and one Euler step by hand; the three scalings; latent diffusion and the variational autoencoder; cross-attention worked on a three-word caption; ControlNet, and the depth buffer against the linear depth a condition wants; score distillation, one step by hand with the identity renderer, and what it converges to on the spiral; FID and its blind spots; the papers.
   NEEDS:   the first diffusion topic (the forward process, the exact denoiser, DDPM and DDIM); the networks and embeddings topic (embeddings, attention); viewing (the projection matrix and the depth buffer); the learned-scenes idea of a differentiable renderer is introduced here in one slide.
   DEMOS:   data-demo="diffusion-net" data-controls="guide,steps" (demo-full).
-  FIGURES: ../../textbook/figures/diff-*.svg|png (tools/gen-textbook-figures.mjs, numbers.json);
+  FIGURES: ../../textbook/figures/diff-*.svg|png (tools/gen-textbook-figures.mjs, numbers.json; diff-sampler-steps.svg added);
+           the densified slides' numbers: lectures/L17-diffusion-2/figures/numbers.json, key "dense";
            ../../lectures/L17-diffusion-2/figures/{sds-toy,depth-buffer}.svg and numbers.json
            (tools/gen-lecture-figures-d2.mjs). Media: ../../media/generative/{cfg-row,controlnet-depth}.jpg,
            credit lines verbatim from media/generative/CREDITS.md.
@@ -20,7 +27,7 @@
 
 ### Diffusion models II: conditioning, guidance, latents, control, text to 3D
 
-<small>(~85 min)</small>
+<small>(~88 min)</small>
 
 
 ---
@@ -54,6 +61,59 @@
 | guidance | conditional minus unconditional prediction, amplified at sampling time | all of the above |
 
 - the first four decide **what the network sees**; guidance decides **how hard the sampler listens**
+
+
+---
+
+## The class slot, concretely
+
+The course's digit network (`lib/core/mlp-denoiser.js`, 1,002,064 weights) builds its first layer's input by **concatenation**:
+
+```text
+   input = [ x_t (400 numbers) | time embedding (64) | e_c (64) ]  →  528 numbers
+   label c ∈ {0, …, 9}  →  e_c, a learned 64-vector;   "no class"  →  e_10, the eleventh
+   first layer:   h = SiLU( W·input + b ) = SiLU( W_x·x_t + W_t·τ(t) + W_c·e_c + b )     512 units
+
+   concatenate, then multiply by W  =  a sum of three products: the class adds W_c·e_c to every unit
+```
+
+- the same weights for every class: only the 64 numbers of `e_c` change with the label
+- every richer condition later tonight (a caption, a depth map) is this slot with more numbers in it
+
+
+---
+
+## How the time gets in
+
+The noise level enters the same way as a coordinate enters NeRF: through **sines and cosines at many frequencies**.
+
+```text
+   τ(t): 32 frequencies fᵢ = 10000^(−i/32),  angle = 1000·t·fᵢ,  then (sin, cos) of each  →  64 numbers
+
+                   i = 0 (f = 1)      i = 8 (f = 0.1)    i = 16 (f = 0.01)   i = 24 (f = 0.001)
+   t = 0.50        (−0.468, −0.884)   (−0.262, 0.965)    (−0.959, 0.284)     (0.479, 0.878)
+   t = 0.52        (−0.998,  0.066)   ( 0.987, −0.163)   (−0.883, 0.469)     (0.497, 0.868)
+```
+
+- high frequencies tell nearby times apart; low frequencies say roughly **where** in the run the step is
+- the same idea as the transformer's position encoding and NeRF's positional encoding: give a small network frequencies
+
+
+---
+
+## Training with the condition dropped
+
+```text
+   for each training example (x₀, c):
+       with probability 0.15:  c ← "no class"
+       t ~ U(0, 1),  ε ~ N(0, I),  x_t = √ᾱ·x₀ + √(1−ᾱ)·ε
+       loss = ‖ x̂₀(x_t, t, c) − x₀ ‖²
+
+   a batch of 128:  about 128 × 0.15 = 19.2 unconditional examples, 108.8 conditional
+```
+
+- one network, one loss, two tasks: the conditional and the unconditional estimate share every weight
+- drop too rarely and the unconditional estimate is poor; too often and the conditional one is
 
 
 ---
@@ -93,6 +153,84 @@ Two pixels at one step. Unconditional estimate `(0.2, 0.2)`, conditional `(0.5, 
 
 ---
 
+## Guidance in noise coordinates is the same guidance
+
+The denoiser's two outputs are tied by `ε̂ = (x_t − √ᾱ·x̂₀) / √(1−ᾱ)`, an **affine** map that does not depend on the condition. Guide either one and you get the same step:
+
+```text
+   one pixel at the recap's step:  x_t = 0.866,  √ᾱ = 0.452,  √(1−ᾱ) = 0.892
+   x̂₀(∅) = 0.2   →  ε̂(∅) = (0.866 − 0.452·0.2)/0.892 = 0.8695
+   x̂₀(c) = 0.5   →  ε̂(c) = 0.7175
+
+   guide ε̂ at w = 3:   0.8695 + 3·(0.7175 − 0.8695) = 0.4135
+   guide x̂₀ at w = 3:  0.2 + 3·(0.5 − 0.2) = 1.1   →   ε̂ = (0.866 − 0.452·1.1)/0.892 = 0.4135   ✓
+```
+
+- papers write guidance on `ε̂` or on a velocity; the course writes it on `x̂₀`; for any affine reparameterization they agree **before clamping**
+
+
+---
+
+## What guidance does to a distribution
+
+Guidance samples, approximately, from `p(x)^(1−w) · p(x | c)^w`. Two Gaussians make that exact:
+
+```text
+   p(x) = N(0, 1)           p(x | c) = N(1, 0.5²)            (precision 1 and 4)
+
+   tilted:  precision λ = (1 − w)·1 + w·4        mean = (w·4·1) / λ
+
+   w     precision    mean     standard deviation
+   1     4            1.000    0.500        (plain conditioning)
+   3     10           1.200    0.316        (past the conditional mean, and narrower)
+   7     22           1.273    0.213
+```
+
+- guidance **sharpens** and **shifts away** from the unconditional mean: more "a 3" than any 3, and less variety
+- that is the variety loss the saturation table counted, derived instead of measured
+
+
+---
+
+## Before classifier-free: classifier guidance
+
+Dhariwal & Nichol (2021, arXiv:2105.05233) guided with a **separate classifier** trained on noisy images:
+
+```text
+   score of the guided density:   ∇ log p(x_t) + s · ∇ log p(c | x_t)
+                                  ─────────────   ────────────────────
+                                  the denoiser    the gradient of a classifier's log-probability
+```
+
+| | classifier guidance (2021) | classifier-free guidance (2022) |
+| - | ------------------------- | -------------------------------- |
+| extra network | a classifier trained on noisy images at every t | none: the same denoiser with and without c |
+| per step | one denoiser pass + a classifier backward pass | two denoiser passes |
+| conditions | only what the classifier knows (1,000 ImageNet classes) | anything the denoiser reads: captions, depth |
+
+- Ho & Salimans (2022, arXiv:2207.12598) replaced the classifier by the difference of the denoiser's two estimates
+
+
+---
+
+## Negative prompts
+
+Replace the unconditional estimate by an estimate for what you **do not** want:
+
+```text
+   x̂₀ ← x̂₀(neg) + w · ( x̂₀(c) − x̂₀(neg) )
+
+   x̂₀(c) = (0.5, 0.1)     x̂₀(∅) = (0.2, 0.2)     x̂₀(neg) = (0.4, 0.3)         w = 3
+   from "no class":    (0.2, 0.2) + 3·(0.3, −0.1) = (1.1, −0.1)
+   from the negative:  (0.4, 0.3) + 3·(0.1, −0.2) = (0.7, −0.3)
+```
+
+- the step now points **away from the negative** as well as toward the prompt; the second pixel is pushed down harder
+- same cost: still two network passes per step, the second with the negative caption in the "no class" slot
+
+
+---
+
 <!-- .slide: class="demo-full" -->
 
 ## The guide knob, live
@@ -121,6 +259,37 @@ Two pixels at one step. Unconditional estimate `(0.2, 0.2)`, conditional `(0.5, 
 
 - at scale, text-to-image sits near `w ≈ 7`; past that, saturation and repetition
 - remedies: apply `w` only in the **middle** of the run; **rescale** instead of clipping
+
+
+---
+
+## Rescale, do not clip: dynamic thresholding
+
+Imagen (Saharia et al. 2022, arXiv:2205.11487) handles an overshooting estimate by **rescaling** it: take `s`, a high percentile of `|x̂₀|` (at least 1), clip to `[−s, s]`, divide by `s`.
+
+```text
+   guided estimate, five pixels:   ( 1.1,  −0.1,  0.4,  −0.9,  1.3 )
+   clip to [−1, 1]:                ( 1.0,  −0.1,  0.4,  −0.9,  1.0 )     two pixels flattened at the rail
+   rescale by s = 1.3:             ( 0.846, −0.077, 0.308, −0.692, 1.0 )  every ratio between pixels kept
+```
+
+- clipping destroys the **difference** between the two brightest pixels (1.1 and 1.3 both become 1.0); rescaling keeps it
+- the price: the whole estimate gets dimmer; the sampler restores contrast over the remaining steps
+
+
+---
+
+## Guide only where it helps
+
+Kynkäänniemi et al. (2024, arXiv:2404.07724): guidance is **harmful at high noise**, largely **unnecessary at low noise**, and beneficial only in the middle; restricting it to an interval improved ImageNet-512 FID from 1.81 to 1.40.
+
+```text
+   30 steps, guidance at every step:        30 × 2 = 60 network evaluations
+   guidance on 10 middle steps only:        20 × 1 + 10 × 2 = 40 evaluations      (a third fewer)
+```
+
+- at high noise the estimate is the data mean; extrapolating it pushes every sample toward the **same** layout, the variety loss again
+- at low noise the image is decided; guidance there only adds contrast
 
 
 ---
@@ -162,6 +331,77 @@ Data `{−1, +1}`, `t = 0.5`, `x_t = 0.3`:
 <img src="../../textbook/figures/diff-flow-paths.svg" class="media-shot" style="max-height: 175px;" alt="six particles from the same starts under DDIM and under the exact flow-matching velocity; the flow paths are straighter">
 
 - a single jump lands on the current estimate, exactly like a one-step DDIM jump; rectified flow re-pairs noise and data to straighten paths further, the route by which Stable Diffusion 3 samples in a few dozen steps
+
+
+---
+
+## Straight lines help the sampler, measured
+
+The chapter's sampler table: the same exact denoiser on the spiral, mean distance of 300 samples to the data (lower is better).
+
+| steps | DDIM | flow matching |
+| ----- | ---- | ------------- |
+| 10 | 0.0641 | 0.0342 |
+| 20 | 0.0197 | 0.0099 |
+| 50 | 0.0086 | 0.0077 |
+| 100 | 0.0081 | 0.0055 |
+
+<img src="../../textbook/figures/diff-sampler-steps.svg" class="media-shot" style="max-height: 118px;" alt="mean nearest distance to the data against the number of sampling steps for DDPM, DDIM and flow matching on a log axis">
+
+- at 10 and 20 steps the straight-path sampler halves the error; at 100 both are at the data's own resolution
+
+
+---
+
+## Crossing paths, and why reflow straightens them
+
+Pair each noise with a data point at random and the straight segments can **cross**; the learned velocity at a crossing is an average, and the average path bends.
+
+```text
+   data {−1, +1}, noises {+0.8, −1.2}
+   random pairing:   −1 ↔ +0.8,  +1 ↔ −1.2        paths meet at t = 0.5, x = −0.1
+                     total squared length 1.8² + 2.2² = 8.08
+   re-paired:        −1 ↔ −1.2,  +1 ↔ +0.8         no crossing
+                     total squared length 0.2² + 0.2² = 0.08
+```
+
+- **rectified flow** (Liu et al. 2022) samples the trained model once, pairs each noise with the image it produced, and trains again on those pairs: the new paths do not cross
+- straighter paths, fewer steps: the route to one-to-four-step samplers
+
+
+---
+
+## Guidance on a velocity
+
+Flow matching guides the same way, on its velocity:
+
+```text
+   v ← v(∅) + w · ( v(c) − v(∅) )
+
+   the worked step (x = 0.3, t = 0.5): v(∅) = −0.474
+   suppose the class moves the estimate to x̂₀(c) = 0.9:   v(c) = (0.3 − 0.9)/0.5 = −1.2
+   w = 2:   v = −0.474 + 2·(−1.2 + 0.474) = −1.926
+   Euler to t = 0.4:   x = 0.3 − 0.1·(−1.926) = 0.493
+```
+
+- `v = (x_t − x̂₀)/t` is affine in `x̂₀` at fixed `x_t, t`, so this is guidance on `x̂₀` again, in the third coordinate system of the evening
+
+
+---
+
+## From a thousand steps to four
+
+| method | idea | steps |
+| ------ | ---- | ----- |
+| DDPM (2020) | the stochastic reverse chain | 1,000 |
+| DDIM (2021) | the deterministic ODE, larger steps | 20 to 50 |
+| progressive distillation (Salimans & Ho 2022, arXiv:2202.00512) | a student learns to do two teacher steps in one; repeat | 1,024 → 4 in 8 halvings |
+| consistency models (Song et al. 2023, arXiv:2303.01469) | map any point on a trajectory straight to its end | 1 to 2 |
+
+```text
+   a guided 50-step sampler:    50 steps × 2 passes = 100 network evaluations
+   a distilled 4-step sampler with guidance folded in:  4 evaluations       25× fewer
+```
 
 
 ---
@@ -215,6 +455,74 @@ A **variational** autoencoder (Kingma & Welling 2014):
 
 ---
 
+## The penalty, on one latent number
+
+The penalty is the Kullback-Leibler divergence from the encoder's Gaussian to the standard normal, in closed form per number:
+
+```text
+   KL( N(μ, σ²) ‖ N(0, 1) ) = ½ ( μ² + σ² − 1 − ln σ² )
+
+   μ = 0.5, σ = 0.8:   ½ (0.25 + 0.64 − 1 − ln 0.64) = ½ (−0.11 + 0.4463) = 0.1681
+   μ = 0,   σ = 1:     0              (the prior itself: no penalty)
+```
+
+- the penalty pulls μ toward 0 and σ toward 1; the reconstruction loss pulls the other way, toward sharp, informative codes
+- latent diffusion keeps the weight of this term **small**: enough to smooth the space, not so much that the codes blur
+
+
+---
+
+## Sampling through a gradient: the reparameterization
+
+`z` is random, yet the encoder has to be trained through it. Write the randomness as an input:
+
+```text
+   z = μ + σ·ε,   ε ~ N(0, 1)          ∂z/∂μ = 1,   ∂z/∂σ = ε
+
+   μ = 0.5, σ = 0.8, ε = 0.3:   z = 0.74
+   a downstream loss (z − 1)²:  ∂L/∂z = 2(0.74 − 1) = −0.52
+                                ∂L/∂μ = −0.52        ∂L/∂σ = −0.52 · 0.3 = −0.156
+```
+
+- the noise `ε` is drawn, then held fixed for the backward pass; the gradient flows to μ and σ as through any product and sum
+- the same trick is inside every diffusion training step: `x_t = √ᾱ·x₀ + √(1−ᾱ)·ε`
+
+
+---
+
+## Scaling the latent to unit variance
+
+Stable Diffusion v1's autoencoder does not produce unit-variance latents. The diffusion model works on rescaled ones, with the factor chosen to bring their spread to about 1:
+
+```text
+   configs/stable-diffusion/v1-inference.yaml:   scale_factor: 0.18215
+
+   encode:   z = 0.18215 · E(image)            (1 / 0.18215 = 5.49)
+   decode:   image = D( z / 0.18215 )
+```
+
+- the forward process assumes data of **unit variance**: with `x₀` five times too large, the noise at every `t` would be five times too small relative to the signal
+- forgetting the factor on decode is a classic bug: the decoder sees latents 5.49 times too small and returns a gray smear
+
+
+---
+
+## What eight-fold downsampling costs
+
+Each latent cell stands for an **8×8 block** of pixels. The decoder, not the diffusion model, decides everything inside a block.
+
+```text
+   a 12-pixel-tall letter:   12 / 8 = 1.5 latent cells tall
+   a 32-pixel face:          32 / 8 = 4 cells across: eyes, nose and mouth share 16 cells
+   a 512×512 image:          64 × 64 = 4,096 cells in all
+```
+
+- small text, distant faces and fingers are drawn **mostly by the decoder**, from a handful of numbers: that is where latent models fail first
+- the fixes at scale: more latent channels (16 instead of 4 in later models) and higher resolutions
+
+
+---
+
 ## Scaling the condition: text in the class slot
 
 The digit network's class vector becomes the caption's token vectors, read by **cross-attention**: queries from an image token, keys and values from the caption's tokens.
@@ -231,6 +539,54 @@ The digit network's class vector becomes the caption's token vectors, read by **
 
 - the weights depend on the **data**: a different image token asks a different question of the same caption
 - the caption's vectors come from **CLIP**'s text encoder (Radford et al. 2021), trained so an image and its caption embed near each other
+
+
+---
+
+## Cross-attention at Stable Diffusion scale
+
+```text
+   the caption:   77 tokens (CLIP's context length), 768 numbers each        (FrozenCLIPEmbedder, max_length 77)
+   the image:     at the 64×64 latent level, 4,096 image tokens
+   heads:         8 per attention layer                                      (v1-inference.yaml: num_heads 8)
+
+   one head, one cross-attention layer:   4,096 × 77     =    315,392 scores
+   one head, one self-attention layer:    4,096 × 4,096  = 16,777,216 scores      (53× more)
+```
+
+- a caption longer than 77 tokens is **truncated**: words past the limit never reach the image
+- cross-attention is cheap next to the image's own self-attention; the caption is short, the image is long
+
+
+---
+
+## Attention maps are editable
+
+A token's cross-attention weights say **where** in the image each word acts. Keep the weights, change a word's value vector, and the edit lands in the same place:
+
+```text
+   the image token from before, caption "a red cube":   weights (0.189, 0.490, 0.321)
+   update:  0.490·(1, 0) + 0.321·(0, 1)            = (0.490, 0.321)
+
+   swap "cube" → "sphere", keep the weights:   v_sphere = (0.2, 0.9)
+   update:  0.490·(1, 0) + 0.321·(0.2, 0.9)        = (0.554, 0.289)
+```
+
+- Prompt-to-Prompt (Hertz et al. 2022, arXiv:2208.01626) injects the original run's attention maps into the edited run: the layout stays, the object changes
+- without the injection, a one-word change re-rolls the whole picture
+
+
+---
+
+## Which text encoder?
+
+| model | text encoder | trained on |
+| ----- | ------------ | ---------- |
+| Stable Diffusion v1 | CLIP ViT-L/14 text tower, frozen | image-caption pairs (contrastive) |
+| Imagen (Saharia et al. 2022) | T5, a frozen language model | text only |
+
+- Imagen's finding (its abstract): making the **language model** bigger improved fidelity and image-text alignment **much more** than making the image model bigger
+- CLIP's text vectors know what things **look like**; a language model's know how words **relate**: counting, negation, "the red cube left of the blue sphere"
 
 
 ---
@@ -286,6 +642,77 @@ A **trainable copy** of the frozen model's encoder reads a structural image (dep
 
 ---
 
+## Zero convolutions: why ControlNet starts as the original
+
+The copy's features enter the frozen model through a layer whose weight starts at **zero**:
+
+```text
+   y = F(x) + w · g(x, c)          F frozen, g the trainable copy, w initialized to 0
+
+   step 0:   w = 0  →  y = F(x): exactly the original model's output
+   but ∂L/∂w = g · ∂L/∂y ≠ 0:      g = 0.7,  ∂L/∂y = 0.4   →   ∂L/∂w = 0.28
+   one SGD step, lr = 0.1:         w = −0.028             the control signal is born
+```
+
+- training cannot damage the frozen model at the start, so a few thousand condition-image pairs suffice
+- the zero weight has a nonzero gradient because the copy's features `g` are not zero
+
+
+---
+
+## Rendering the conditions yourself
+
+Your renderer can write every condition a ControlNet reads, if the encodings match:
+
+```text
+   normals:  view-space unit normal → RGB by (n + 1)/2 · 255
+             n = (0, 0.6, 0.8)   →   (128, 204, 230)
+   depth:    linear distance, near bright:  (far − d)/(far − near)
+             n = 1, f = 8, d = 2  →  0.857  →  219 of 255
+   edges:    a line drawing of silhouettes and creases, white on black
+```
+
+- conventions differ between models: which way is `+y` in the normal map, whether near is bright; check the model's examples before feeding your buffers
+- the depth line is the linearized buffer of the pitfall slide, remapped to near-bright
+
+
+---
+
+## Inpainting: the condition as extra channels
+
+Stable Diffusion's inpainting model reads **9 channels** instead of 4:
+
+```text
+   4   the noisy latent x_t
+   4   the encoded image with the hole blanked
+   1   the mask, downsampled to 64×64
+   ──
+   9   channels  →  64 × 64 × 9 = 36,864 numbers into the first layer
+```
+
+- the 5 extra input channels' weights start at **zero**, the same trick as ControlNet: the model begins as the text-to-image model and learns to use them
+- concatenation is the cheapest way in: no new layers, only a wider first one
+
+
+---
+
+## SDEdit: start from your sketch
+
+Meng et al. (2021, arXiv:2108.01073): noise a rough input to a time `t₀`, then run the ordinary sampler from there. On the spiral, a "sketch" at `(0.9, 0.9)`, 0.648 from the data:
+
+```text
+   t₀      after DDIM to t = 0      distance to the data     moved from the sketch
+   0.2     (0.467, 0.377)           0.016                    0.678
+   0.5     (0.517, 0.248)           0.006                    0.756
+   0.8     (0.156, 0.084)           0.010                    1.104
+```
+
+- small `t₀` stays **close to the sketch**; large `t₀` forgets it; every run lands **on** the data
+- this is how a rough render, a paint-over or a blocky layout becomes a realistic image with the same composition
+
+
+---
+
 ## Text to 3D: score distillation
 
 Optimize a 3D scene θ (a NeRF, or Gaussians) so that **its renders score well** under a text-conditioned image model (DreamFusion, Poole et al. 2022):
@@ -333,6 +760,39 @@ Make the "scene" a 2D point θ and the renderer the identity (`x = θ`). The ima
 
 ---
 
+## DreamFusion, by the numbers
+
+From the paper (Poole et al. 2022, arXiv:2209.14988):
+
+```text
+   image model:       Imagen's 64×64 base model, frozen            renders:  64×64
+   timesteps:         t ~ U(0.02, 0.98)                           (the extremes are numerically unstable)
+   guidance:          w = 100                                     (image sampling uses 5 to 30)
+   optimization:      15,000 iterations, about 1.5 hours on a TPUv4 machine with 4 chips
+   view prompts:      elevation above 60°: append "overhead view";
+                      otherwise a weighted mix of "front view", "side view", "back view" by azimuth
+```
+
+- the view prompts are a **patch for the extra-face problem**: they tell the judge which side it is looking at
+- 64×64 renders explain the soft look of the results; the successors add resolution
+
+
+---
+
+## After DreamFusion
+
+| paper | what it changed |
+| ----- | --------------- |
+| Magic3D (Lin et al. 2022, arXiv:2211.10440) | coarse NeRF first, then a **mesh** refined with a latent diffusion model at high resolution |
+| ProlificDreamer (Wang et al. 2023, arXiv:2305.16213) | **variational** score distillation: treats the 3D scene as a random variable, works at ordinary guidance, less saturation |
+| Zero-1-to-3 (Liu et al. 2023, arXiv:2303.11328) | an image model conditioned on a **relative camera change**: the step to the multi-view route |
+
+- all three keep the core loop: render, noise, ask a frozen image model, backpropagate through the renderer
+- the next lecture takes the multi-view route further
+
+
+---
+
 ## Judging a generator: FID
 
 A generator's samples are supposed to be new, so there is no reference image. Compare **distributions** instead (Heusel et al. 2017):
@@ -349,6 +809,107 @@ A generator's samples are supposed to be new, so there is no reference image. Co
 
 - blind spot 1: **copies score best**; FID cannot see memorization
 - blind spot 2: it sees only what its embedding sees; a model can have an excellent FID and draw six fingers
+
+
+---
+
+## FID depends on how many samples you draw
+
+The same distribution against itself should score 0. A sampled estimate is **biased upward**, and the bias shrinks with the sample count:
+
+```text
+   2D standard normal samples against the exact N(0, I), 200 trials each
+
+   N          25        100       400       1,600
+   mean FID   0.154     0.036     0.008     0.002
+```
+
+- the bias falls roughly as `1/N`; with 2,048 features it is far larger at a given `N`, so papers fix `N` (commonly 50,000) and only compare at the same `N`
+- a FID difference smaller than the estimate's own noise is not a result
+
+
+---
+
+## Precision and recall: quality and coverage apart
+
+Kynkäänniemi et al. (2019, arXiv:1904.06991) ask two questions with nearest-neighbor balls: are the samples **on** the data (precision), and does the data get **covered** (recall)?
+
+```text
+   real points   0, 1, 2, 3, 4          each real ball: radius to its nearest real neighbor = 1
+   generated     0.4, 1.2, 3.1, 6       each generated ball: radius to its nearest generated neighbor
+
+   precision:  samples inside some real ball:        0.4 ✓   1.2 ✓   3.1 ✓   6 ✗        3/4 = 0.75
+   recall:     real points inside some sample ball:  0 ✓ 1 ✓ 2 ✓ 3 ✓ 4 ✓                   5/5 = 1.00
+```
+
+- heavy guidance raises precision (typical samples) and lowers recall (less variety); one FID number mixes the two
+- in practice the points are image embeddings and the balls use the `k`-th nearest neighbor, `k = 3`
+
+
+---
+
+## CLIP score: does the image match the caption?
+
+Embed the image and the caption with CLIP; the score is their **cosine**:
+
+```text
+   image embedding   (0.6, 0.8, 0)
+   caption A         (0.8, 0.6, 0)      cosine 0.96
+   caption B         (0, 0.6, 0.8)      cosine 0.48
+```
+
+- measures prompt following, not quality: a caption-matching blur can score well
+- the same dot product as attention scores and embedding similarity in the networks lecture
+
+
+---
+
+## Memorization, measured
+
+Carlini et al. (2023, arXiv:2301.13188) extracted **over a thousand training images** from state-of-the-art diffusion models with a generate-and-filter pipeline: generate many samples per caption, keep the ones that are near-identical to each other, check against the training set.
+
+- duplicated training images are the ones most likely to be memorized
+- FID rewards memorization; only a novelty test catches it
+- the course's demo carries one: the **nearest training digit** readout, whose distance stays well above the copy threshold at every guidance scale
+
+
+---
+
+## The guided sampler, whole
+
+```js
+// DDIM with classifier-free guidance; net(x, t, c) returns x̂₀. c = null means "no class".
+function sample(net, c, w, steps, shape) {
+  let x = randn(shape);                                  // start at t = 1: pure noise
+  for (let k = 0; k < steps; k++) {
+    const t1 = 1 - k / steps, t2 = 1 - (k + 1) / steps;
+    const a1 = alphaBar(t1), a2 = t2 > 0 ? alphaBar(t2) : 1;
+    const u = net(x, t1, null), g = net(x, t1, c);       // two passes per step
+    let x0 = add(u, scale(w, sub(g, u)));                // guidance on x̂₀
+    x0 = clamp(x0, -1, 1);                               // or rescale (dynamic thresholding)
+    const eps = scale(1 / Math.sqrt(1 - a1), sub(x, scale(Math.sqrt(a1), x0)));
+    x = add(scale(Math.sqrt(a2), x0), scale(Math.sqrt(1 - a2), eps));
+  }
+  return x;
+}
+```
+
+- every idea of tonight's first hour is a line here: the two passes, the extrapolation, the clamp, the DDIM re-mix
+
+
+---
+
+## What still breaks, and what the pipeline supplies
+
+| failure of a diffusion model | why | what graphics has instead |
+| ---------------------------- | --- | ------------------------- |
+| the cup changes between frames | no object persists between samples | a scene graph: the cup is one node |
+| hands with six fingers, text that does not spell | fine structure drawn by the decoder from a few latent cells | geometry and glyphs, drawn exactly |
+| cannot move the camera an inch | no camera exists | `V`, recomputed per frame |
+| an edit changes everything | every sample re-rolls the whole picture | edit a node, re-render |
+| physics is only plausible | nothing integrates motion | a simulation step |
+
+- the merged field uses each for what it is good at: the pipeline for **structure and control**, the model for **appearance**
 
 
 ---

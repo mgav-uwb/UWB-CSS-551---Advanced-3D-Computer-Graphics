@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Sampling and antialiasing (~33 min).
+  CSS 551 · TOPIC DECK: Sampling and antialiasing (~34 min, 21 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/antialiasing.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -23,7 +23,7 @@
 
 ### Sampling and antialiasing
 
-<small>(~33 min)</small>
+<small>(~34 min)</small>
 
 
 ---
@@ -62,6 +62,21 @@ The high frequency is not lost; it is **replaced** by a low one, and reconstruct
 
 ---
 
+## The Fourier view: sampling makes copies
+
+<img src="../../textbook/figures/aa-spectra.svg" class="media-shot" style="max-height: 220px;" alt="a signal's spectrum and its copies at multiples of the sampling rate, overlapping when the signal extends past Nyquist; below, the frequency responses of box, tent and Gaussian filters">
+
+Sampling at rate fs **copies the spectrum** to every multiple of fs. Where copies overlap, their frequencies are indistinguishable: that overlap **is** aliasing. A filter's job is to pass what is below Nyquist and stop the rest. How well three pixel filters do (sampling rate 1 per pixel):
+
+| cycles per pixel | box | tent | Gaussian, σ ½ pixel |
+| ---------------- | --- | ---- | ------------------- |
+| 0.5 (Nyquist) | 0.637 | 0.405 | 0.291 |
+| 1.0 | 0 | 0 | 0.007 |
+| 1.5 (must be 0) | **0.212** | 0.045 | about 0 |
+
+
+---
+
 ## The zone plate
 
 <img src="../../textbook/figures/aa-zoneplate.png" class="media-shot" style="max-height: 300px;" alt="three renderings of a zone plate: one sample per pixel with false rings in the outer region, 16 and 256 samples per pixel with the outer region blending to gray">
@@ -79,6 +94,40 @@ Content above Nyquist must be removed **before** sampling; after sampling it is 
 - **supersample** when it does not: evaluate several positions per pixel and average; works on anything (shading, shadows), costs in proportion to the samples, and reduces aliasing without eliminating it, because averaging is a box filter
 
 Real pipelines use both: mipmaps for textures, multisampled coverage for edges, temporal supersampling for what remains.
+
+
+---
+
+## Choosing a filter
+
+<img src="../../textbook/figures/aa-filters.svg" class="media-shot" style="max-height: 200px;" alt="four reconstruction filters over six pixels: box, tent, Gaussian with sigma one half, and Lanczos-3, the last dipping below zero">
+
+- **box**: averages the samples inside the pixel; cheap, leaks aliases
+- **tent**, **Gaussian**: weigh by distance, reach into neighbors; less leakage, softer
+- **Lanczos**: **negative lobes** restore sharpness, and ring near high-contrast edges (Lanczos-3 dips to −0.147)
+
+Film renderers use wide Gaussian or Mitchell filters; real-time renderers mostly box-filter one pixel's samples.
+
+
+---
+
+
+## Mitchell and Netravali (1988): two knobs
+
+<img src="../../textbook/figures/aa-mitchell.svg" class="media-shot" style="max-height: 190px;" alt="the Mitchell-Netravali family of cubic filters for several (B, C) pairs, from the blurry B-spline to the sharp Catmull-Rom">
+
+A family of cubics with two parameters, B (blur) and C (ringing):
+
+| filter (B, C) | at 0 | at 0.5 | at 1 | at 1.5 |
+| ------------- | ---- | ------ | ---- | ------ |
+| cubic B-spline (1, 0) | 0.667 | 0.479 | 0.167 | 0.021 |
+| **Mitchell (⅓, ⅓)** | 0.889 | 0.535 | 0.056 | −0.035 |
+| Catmull–Rom (0, ½) | 1 | 0.563 | 0 | −0.063 |
+
+```text
+   Mitchell at x = 0.5:  ((12 − 9B − 6C)·0.125 + (−18 + 12B + 6C)·0.25 + (6 − 2B)) / 6
+                       = (0.875 − 3 + 5.333) / 6 = 0.535
+```
 
 
 ---
@@ -116,12 +165,109 @@ MSAA gives edges 4-sample quality at the shading cost of none. What it does **no
 
 ---
 
+## Where the four samples sit
+
+The 4× pattern of the coverage table, in pixel coordinates:
+
+```text
+   (0.375, 0.125)   (0.875, 0.375)   (0.125, 0.625)   (0.625, 0.875)
+```
+
+- no two share a **row** or a **column**: a near-horizontal or near-vertical edge sees **four** distinct thresholds, five coverage levels
+- a 2×2 square grid puts two samples on each row: the same edge gets only **three** levels
+- n samples give at most **n + 1** levels: 2, 5, 9, 17 for 1, 4, 8, 16
+
+
+---
+
+
+## What antialiasing costs
+
+A 1920 × 1080 frame, 4 million fragments at 300 instructions each:
+
+| | fragment runs | instructions | color memory |
+| --- | --- | --- | --- |
+| no AA | 4,000,000 | 1.2 billion | 7.9 MB |
+| SSAA 4× | 16,000,000 | 4.8 billion | 31.6 MB |
+| MSAA 4× | 4,000,000 | 1.2 billion | 31.6 MB |
+
+MSAA pays in **memory and bandwidth**, not in shading; SSAA pays in both.
+
+
+---
+
+
+## Post-process antialiasing: find the edges in the image
+
+When the pipeline cannot afford samples, **search the finished image** for edges and blend across them:
+
+- **MLAA** (Reshetov, 2009): classify edge shapes (L, Z, U) from color discontinuities; estimate coverage from the shape
+- **FXAA** (Lottes, 2009): one cheap full-screen pass along luminance edges
+- **SMAA** (Jimenez et al., 2012): MLAA's shapes, sharper, optionally combined with a few real samples
+
+One pass, fixed cost, works with deferred shading. It cannot recover what was never sampled: a wire thinner than a pixel stays broken.
+
+
+---
+
 ## Supersampling, live
 
 <div class="cockpit" data-demo="raster" data-controls="aa,angle"><pre class="viz-fallback">  the same triangle at res = 12; aa = samples per pixel axis
   -- aa off (1 sample per pixel):   coverage 19.4 %   (28 of 144 pixels, all or nothing)
   -- aa = 4 (4 × 4 = 16 samples):   coverage 20.7 %   (fractional pixels along the edges)
      true area 20.7 %; drag aa → the staircase becomes a ramp; drag angle → it no longer crawls</pre></div>
+
+
+---
+
+## Lines, Wu's way
+
+<img src="../../textbook/figures/aa-wu.png" class="media-shot" style="max-height: 200px;" alt="the line from (1,1) to (6,3) drawn with Wu's method: each column lights two pixels with complementary intensities">
+
+Bresenham picks **one** pixel per column; Wu (1991) lights **two**, weighted by distance:
+
+```text
+   (1, 1) to (6, 3), slope 0.4:
+   x = 2:  y = 1.4  →  pixel row 1 at 0.6,  row 2 at 0.4
+   x = 3:  y = 1.8  →  row 1 at 0.2,  row 2 at 0.8
+   x = 4:  y = 2.2  →  row 2 at 0.8,  row 3 at 0.2
+   10 pixels touched instead of Bresenham's 6; the total intensity per column stays 1
+```
+
+
+---
+
+
+## Textures: the derivatives pick the mip level
+
+A 256×256 texture. At one pixel the UV changes by:
+
+```text
+   per pixel right:  du = 0.0125,  dv = 0.002      × 256  →  (3.2, 0.512) texels   length 3.241
+   per pixel up:     du = 0.001,   dv = 0.009      × 256  →  (0.256, 2.304) texels  length 2.318
+
+   ρ = max(3.241, 2.318) = 3.241 texels per pixel
+   λ = log2 ρ = 1.696   →  blend mip levels 1 and 2, weight 0.696 on level 2   (trilinear)
+   the footprint is 1.4 times longer than wide: anisotropic filtering takes 2 taps at λ = 1.213
+```
+
+The 2×2 quad exists to provide exactly these four numbers.
+
+
+---
+
+
+## Shading aliasing: a highlight thinner than a pixel
+
+A sharp specular highlight on a bumpy surface can be **smaller than a pixel**: the lighting itself aliases, even with a perfect texture filter.
+
+```text
+   average two unit normals 30° apart:            length 0.966   (the mip level blurred them)
+   Toksvig (2005): a normal of length 0.9, shininess 64:
+      effective shininess = 0.9·64 / (0.9 + 64·(1 − 0.9)) = 57.6 / 7.3 = 7.9
+```
+
+A shorter averaged normal means the normals **disagreed**: widen the lobe, and the sparkle becomes a correct, broader glint.
 
 
 ---
@@ -156,6 +302,22 @@ The frame rate samples **time**, and the theorem applies unchanged:
 - a film camera **prefilters in time**: the open shutter integrates motion into blur
 - **TAA** (temporal antialiasing): jitter the sample position a sub-pixel amount every frame and blend with the previous frames, reprojected; one sample per frame, many over a few frames
 - its failure is stale history: at a blend weight of 0.1, a pixel reaches 90 % of a new value after **22 frames**, about a third of a second at 60 Hz: the length of the ghost
+
+
+---
+
+## Rendering fewer pixels: temporal upscaling
+
+Temporal antialiasing's accumulation, turned into resolution:
+
+```text
+   output 3840 × 2160 = 8,294,400 pixels
+   render 2560 × 1440 = 3,686,400 pixels     44 % of the output, a different sub-pixel jitter each frame
+   accumulate over frames, reprojected by motion vectors → the output resolution
+```
+
+- NVIDIA's DLSS (2018, a trained network does the accumulation), AMD's FSR (2021; temporal from version 2, hand-designed rather than trained), Intel's XeSS (2022)
+- same failure as TAA: **ghosts** where the history is wrong, and new detail that takes several frames to resolve
 
 
 ---

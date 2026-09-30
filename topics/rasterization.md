@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Rasterization, how a projected triangle becomes pixels (~45 min).
+  CSS 551 · TOPIC DECK: Rasterization, how a projected triangle becomes pixels (~46 min, 32 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/rasterization.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -26,7 +26,7 @@
 
 ### Rasterization: from a triangle to pixels
 
-<small>(~45 min)</small>
+<small>(~46 min)</small>
 
 
 ---
@@ -57,6 +57,22 @@ For a directed edge from **a** to **b** and a point **p** on the image plane:
 - for a counter-clockwise triangle v0 v1 v2, **p is inside exactly when E12, E20, E01 are all ≥ 0**
 
 And it is **linear** in p: one pixel to the right adds a constant. Three additions per pixel, which is why it could be frozen into silicon (Pineda, 1988).
+
+
+---
+
+## Winding decides the front: culling for free
+
+The twice-area that setup computes anyway carries a **sign**:
+
+```text
+   corners in the order v0, v1, v2:   twice-area = +0.414    counter-clockwise on screen: front, kept
+   the same corners as v0, v2, v1:    twice-area = −0.414    clockwise on screen: back, culled
+```
+
+- a closed mesh shows the camera **about half** of its triangles' backs; culling drops them **before any pixel work**
+- the test costs nothing: the sign is already in the setup
+- a mesh with its index order reversed renders **inside out**: the front faces are culled and the back faces drawn
 
 
 ---
@@ -99,6 +115,31 @@ In hardware the vertices snap to **1/256 pixel** (8 sub-pixel bits): every E is 
 
 ---
 
+## Setup, then three additions per pixel
+
+```js
+// once per triangle, in pixel units: each edge's steps and its value at the box's first center
+for (const [a, b] of [[v1, v2], [v2, v0], [v0, v1]]) {
+  stepX.push(a.y - b.y);                     // E12: 5.748 − 10.296 = −4.548
+  stepY.push(b.x - a.x);                     // E12: 4.332 − 10.524 = −6.192
+  rowStart.push(edge(a, b, firstCenter));    // (xmin + ½, ymin + ½)
+}
+// per pixel: a sign test and three additions
+for (let y = ymin; y <= ymax; y++) {
+  const e = rowStart.slice();
+  for (let x = xmin; x <= xmax; x++) {
+    if (e[0] >= 0 && e[1] >= 0 && e[2] >= 0) emit(x, y, e);   // e / twiceArea = the weights
+    e[0] += stepX[0]; e[1] += stepX[1]; e[2] += stepX[2];
+  }
+  rowStart[0] += stepY[0]; rowStart[1] += stepY[1]; rowStart[2] += stepY[2];
+}
+```
+
+No multiplication in the inner loop. Hardware runs the same arithmetic on **tiles** of pixels at once.
+
+
+---
+
 ## Shared edges: the top-left rule
 
 <img src="../../textbook/figures/ras-fill-rule.svg" class="media-shot" style="max-height: 230px;" alt="two triangles sharing the diagonal of a 4 by 4 grid, the four pixel centers on the diagonal marked, drawn twice without a rule and once with it">
@@ -135,6 +176,38 @@ Divide the three edge functions by the twice-area and they are the pixel's **bar
 
 ---
 
+## Every attribute, the same three weights
+
+Pixel (5, 6) again, weights w = (0.305, 0.259, 0.436). Give the corners a depth and a UV:
+
+```text
+   depth  z = (0.2, 0.5, 0.8):     0.305·0.2 + 0.259·0.5 + 0.436·0.8        = 0.539
+   UV  (0,0), (1,0), (0,1):        u = 0.259,  v = 0.436
+   a normal:                       blend the three, then renormalize (a blend of unit vectors is shorter)
+```
+
+- **depth** interpolated this way is exact: z/w is linear on the screen
+- **UV** interpolated this way is **not**: it needs the ÷w correction (a few slides on)
+- a vertex shader writes values at **three** corners; the rasterizer makes every value in between
+
+
+---
+
+
+## Weights are area ratios
+
+<img src="../../textbook/figures/ras-barycentric.svg" class="media-shot" style="max-height: 250px;" alt="a triangle with a point p inside, split into three sub-triangles, each opposite one vertex and shaded by its area">
+
+Join p to the three corners: three small triangles. Each weight is the area of the triangle **opposite** its vertex over the whole:
+
+```text
+   w0 = area(p, v1, v2) / area(v0, v1, v2)       p at v0: the opposite triangle is the whole, w0 = 1
+                                                   p on edge v1 v2: it is flat, w0 = 0
+```
+
+
+---
+
 ## The triangle, live
 
 <div class="cockpit" data-demo="raster" data-controls="res,angle"><pre class="viz-fallback">  one triangle (red, green, blue corners) over a res × res framebuffer;
@@ -143,6 +216,35 @@ Divide the three edge functions by the twice-area and they are the pixel's **bar
   -- defaults: res = 12, angle = 15°, aa off ------------------------------
      pixels 144    covered 28    coverage 19.4 %    (true area 20.7 %)
      drag res → the same triangle, finer; drag angle → the stair-steps crawl</pre></div>
+
+
+---
+
+## Two ways to fill a triangle
+
+| | scanline | half-space (edge functions) |
+| --- | --- | --- |
+| idea | walk the left and right edges down the rows; fill each **span** between them | test each pixel center against the three edges |
+| order | one row after another, strictly | any order: tiles, blocks, in parallel |
+| per pixel | one step along the span | three additions and a sign test |
+| used by | software renderers of the 1970s to 1990s | every GPU since the 1990s |
+
+Pineda (1988) described the half-space form for parallel hardware: each pixel's decision needs nothing from its neighbors, so thousands can be made at once.
+
+
+---
+
+
+## Pixels are shaded in 2×2 quads
+
+A GPU runs the fragment shader on **2×2 blocks** of pixels, so that each pixel has neighbors for **finite differences** (the derivatives that pick a texture's mip level). A quad the triangle only partly covers still runs four times.
+
+```text
+   the demo's triangle at res 12:   28 covered pixels   in 11 quads   = 44 shader runs   (64 % useful)
+   a triangle covering 1 pixel:      1 covered pixel    in  1 quad    =  4 shader runs   (25 % useful)
+```
+
+**Small triangles cost more per pixel.** Level of detail (the meshes topic) keeps triangles at several pixels each for this reason.
 
 
 ---
@@ -165,6 +267,30 @@ Unclipped, v2 divides by w = 0.4 to NDC (1.02, −3.02, −4.43): off the cube a
 
 ---
 
+## Clipping against one plane, in code
+
+```js
+// Sutherland–Hodgman against the near plane: inside when z + w ≥ 0 (clip space)
+function clipNear(poly) {                      // poly: vertices [x, y, z, w], in order
+  const out = [];
+  for (let i = 0; i < poly.length; i++) {
+    const a = poly[i], b = poly[(i + 1) % poly.length];
+    const da = a[2] + a[3], db = b[2] + b[3];
+    if (da >= 0) out.push(a);                  // keep an inside vertex
+    if ((da >= 0) !== (db >= 0)) {             // the edge crosses: emit the crossing
+      const t = da / (da - db);                // edge 1→2: 3.2 / (3.2 + 1.371) = 0.700
+      out.push(a.map((ak, k) => ak + t * (b[k] - ak)));
+    }
+  }
+  return out;                                  // a triangle comes back with 0, 3 or 4 vertices
+}
+```
+
+Every attribute (color, UV, normal) is interpolated with the **same t**.
+
+
+---
+
 ## After the test: the depth buffer
 
 <img src="../../textbook/figures/ras-zbuffer.svg" class="media-shot" style="max-height: 230px;" alt="two overlapping rectangles of pixels, A at constant depth 0.3 and B with depth rising left to right, with the resulting color and depth buffers">
@@ -176,6 +302,39 @@ Beside the color, keep per pixel the **depth of the nearest thing drawn so far**
    x = 2:  B 0.2 < 0.3  → B wins (3 pixels)       x = 3:  B 0.3, not < 0.3 → discarded (3 pixels)
    B: 16 fragments, 13 drawn, 3 rejected.  Draw B first: the same picture.
 ```
+
+
+---
+
+## Pitfall: where depth precision goes
+
+A 24-bit depth buffer stores z/w, which crowds its precision toward the **near** plane. The smallest depth step it can tell apart at distance d, near 0.1, far 1000:
+
+```text
+   d = 1        0.0000006
+   d = 10       0.00006
+   d = 100      0.006      (6 mm)
+   d = 500      0.149      (15 cm: two walls 10 cm apart flicker)
+
+   push the near plane to 1:    at d = 500 the step becomes 0.015  (ten times finer)
+```
+
+**Z-fighting** is two surfaces within one step of each other, trading pixels frame to frame. The fix is the near plane, not the far.
+
+
+---
+
+
+## The z-buffer was once too expensive
+
+Catmull described the depth buffer in his 1974 Utah thesis (Straßer, independently, the same year). The idea was simple; the memory was not.
+
+```text
+   512 × 512 pixels × 2 bytes of depth        =    524,288 bytes   (1974: an expensive machine's worth)
+   1920 × 1080 × 4 bytes (24 depth + 8 stencil) = 8,294,400 bytes   (today: a rounding error)
+```
+
+For a decade renderers sorted polygons (the painter's algorithm) or walked scanlines instead. When memory became cheap, the per-pixel test won because it needs **no sorting and no cases**.
 
 
 ---
@@ -240,6 +399,56 @@ A fragment that passes the depth test can be **combined** with what is there ins
 
 ---
 
+## Premultiplied alpha, pictured
+
+<img src="../../textbook/figures/ras-premultiplied.png" class="media-shot" style="max-height: 300px;" alt="a red disc with a soft edge, magnified and composited over white twice: straight alpha shows a dark fringe, premultiplied alpha a clean edge">
+
+The same soft-edged texture, filtered and composited over white. Straight alpha averages the transparent texels' **black** color into the edge; premultiplied alpha cannot, because a transparent texel's color is already zero.
+
+
+---
+
+
+## Transparency without a sort
+
+Sorting per object fails when transparent objects **interpenetrate** or overlap in a cycle. Three standard answers:
+
+- **depth peeling** (Everitt, 2001): render the scene several times, each pass peeling off the next-nearest layer with a second depth test; exact, one pass per layer
+- **per-pixel lists**: store every transparent fragment of a pixel in a linked list, sort each list, composite; exact, memory unbounded
+- **weighted blended** (McGuire and Bavoil, 2013): replace over with a weighted average that does not depend on order; one pass, approximate
+
+
+---
+
+
+## Lines: Bresenham
+
+<img src="../../textbook/figures/ras-bresenham.svg" class="media-shot" style="max-height: 200px;" alt="the line from (0,0) to (7,3) over a pixel grid, the eight chosen pixels filled">
+
+A line from (0, 0) to (7, 3): one pixel per column, and the row steps up when the line has risen past the midpoint. Bresenham (1965) did it with **integers only**:
+
+```text
+   dx = 7, dy = 3        err starts at 2·dy − dx = −1
+   each column:          err ≤ 0 → same row,   err += 2·dy = +6
+                         err > 0 → next row,   err += 2·(dy − dx) = −8
+```
+
+
+---
+
+
+## Bresenham, column by column
+
+| x | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+| - | - | - | - | - | - | - | - | - |
+| y | 0 | 0 | 1 | 1 | 2 | 2 | 3 | 3 |
+| err at x | −1 | 5 | −3 | 3 | −5 | 1 | −7 | −1 |
+
+Eight pixels, no multiplication, no division, no floating point. The line is **aliased** by construction: each column is all or nothing, which the antialiasing topic fixes with Wu's method.
+
+
+---
+
 ## The GPU pipeline
 
 | stage | does | where it was taught |
@@ -249,6 +458,34 @@ A fragment that passes the depth test can be **combined** with what is there ins
 | rasterize | setup, edge functions, tie rule, barycentric, ÷w interpolation | here |
 | fragment shader | per covered sample: texture lookups, lighting | texture mapping, illumination |
 | depth test, blend | z compare (early when possible), over | here |
+
+
+---
+
+## Deferred shading: light the G-buffer
+
+Forward shading lights every fragment, including the ones later overwritten. **Deferred** shading draws the geometry first into a **G-buffer** (normal, albedo, depth, roughness per pixel), then lights each pixel once.
+
+```text
+   1920 × 1080, 16 bytes per pixel               G-buffer 33.2 MB
+   100 lights, overdraw 3:
+      forward:          622,080,000 light evaluations
+      deferred:         207,360,000        (one surface per pixel)
+      tiled deferred:    16,588,800        (only the 8 lights that reach each 16×16 tile)
+```
+
+
+---
+
+
+## Tile-based GPUs: keep the tile on chip
+
+Most phone GPUs render in two passes:
+
+1. **bin**: transform every triangle and record which screen **tiles** (16×16 or 32×32 pixels) it touches
+2. **render each tile** in fast on-chip memory: all its triangles, depth test, blending; then write the finished tile to main memory **once**
+
+Main-memory traffic, not arithmetic, is what costs power on a phone. A tile renderer never reads or writes depth to main memory at all.
 
 
 ---
@@ -263,4 +500,42 @@ A fragment that passes the depth test can be **combined** with what is there ins
 ```
 
 Eight nanoseconds is a few dozen instructions on one core. The GPU meets the budget by running **thousands** of pixels at once, and every technique in this topic (setup once, three additions per pixel, early z, no overdraw) exists to keep the per-pixel work small.
+
+
+---
+
+## The frame loop: two buffers and vsync
+
+<img src="../../textbook/figures/ras-frame-loop.svg" class="media-shot" style="max-height: 200px;" alt="a timeline of display refreshes every 16.67 ms, with frames rendered into a back buffer and swapped at refresh boundaries">
+
+The GPU draws into a **back buffer** while the display scans out the **front** one; at a refresh they **swap**. With vsync, a swap waits for the next refresh:
+
+```text
+   frame takes 16 ms   → shown at the next refresh: 60 fps
+   frame takes 17 ms   → misses it, waits:  shown after 33.3 ms, 30 fps for that frame
+   without vsync       → swap mid-scan: tearing, the top and bottom from different frames
+```
+
+
+---
+
+
+## Varyings in GLSL: how each attribute interpolates
+
+```glsl
+// vertex shader
+out vec2 vUV;                        // smooth (the default): perspective-correct
+flat out int vMaterial;              // flat: one vertex's value for the whole triangle
+noperspective out float vFade;       // linear on the screen, no ÷w
+
+void main() {
+  vUV = uv;  vMaterial = materialId;  vFade = fade;
+  gl_Position = P * V * M * vec4(position, 1.0);   // clip coordinates
+}
+
+// fragment shader: the same names, already interpolated at this pixel
+in vec2 vUV;  flat in int vMaterial;  noperspective in float vFade;
+```
+
+The rasterizer's three weights, the ÷w correction and the tie rule all happen between these two programs, in hardware.
 

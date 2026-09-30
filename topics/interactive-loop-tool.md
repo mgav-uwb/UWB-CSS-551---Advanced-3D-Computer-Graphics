@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~70 min).
+  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
   TEACHES: the frame loop and its budget; continuous versus on-demand loops;
@@ -11,12 +11,22 @@
   worked, the matrix layout; the WebGL track's demo anatomy (makeShell,
   makeScene, SliderRow, Mat4Panel, one update function) and how to run it;
   implement and replace in both tracks; checking a build against the engine.
+  ADDED 2026-09-29 (densification): frame budgets at 30 to 144 Hz; the accumulator
+  in code; interpolation between steps; three time pitfalls (per-frame damping, the
+  hitch and the tunnel, float drift far from the origin); Unity's Time properties;
+  MVC's origin (Reenskaug 1979); undo as commands in code; the event table; the
+  device-pixel pitfall; 2D hit testing, target sizes and the drag state machine;
+  picking by ray and ID buffer; dragging on a plane; the arcball; the orbit
+  controller's constants; latency, input to photon, and in a headset. Numbers from
+  textbook/interaction.html (Sections 2, 4, 5, 7 to 10), lib/core/orbit-camera.js and
+  tools/gen-lecture-figures-a.mjs. A physics-simulation topic follows this one in L03.
   NEEDS:   nothing beyond the big-picture topics (the loop of era 7); vectors and
     matrices are used as pictures and printed numbers only.
   DEMOS: mvc-transform (tx,ry,s) on a demo-full slide; its matrix card must stay
     VISIBLE (the mounting page must not carry the big-picture overview rule
     that hides .mat-panel cards).
-  FIGURES: ../../textbook/figures/unity-{deltatime,editor,object-model,hierarchy,matrix}.svg
+  FIGURES: ../../textbook/figures/unity-{deltatime,editor,object-model,hierarchy,matrix}.svg,
+    ui-{hittest,picking,arcball,latency}.svg
     (tools/gen-textbook-figures-unity.mjs; numbers in numbers-unity.json).
   NUMBERS, all node-checked against lib/core/xform.js or taken from
     textbook/figures/numbers-unity.json and textbook/interaction.html:
@@ -36,7 +46,7 @@
 
 ### The interactive loop, MVC, and the tool
 
-<small>(~70 min) · reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3</small>
+<small>(~50 min) · reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3</small>
 
 
 ---
@@ -64,6 +74,21 @@
 - **on demand**: render only when an event changed the state; the course's demos, which draw nothing while idle
 - the same structure either way: an event arrives, a handler **edits the state**, a frame is **requested**, the frame **reads the state**
 - no correct program draws inside an event handler
+
+
+---
+
+## The budget at other rates
+
+| display rate | one frame | where you meet it |
+| --- | --- | --- |
+| 30 Hz | 33.3 ms | cinematic console games, a laptop on battery |
+| 60 Hz | 16.7 ms | most monitors, the course's reference |
+| 90 Hz | 11.1 ms | a VR headset's minimum |
+| 120 Hz | 8.33 ms | phones, high-refresh laptops |
+| 144 Hz | 6.94 ms | gaming monitors |
+
+Everything, input, simulation, drawing and the operating system, shares one row.
 
 
 ---
@@ -108,6 +133,85 @@ Fixed step **10 ms**; frames of 16, 20, 33, 8 and 17 ms. Add the frame to the ac
 | 17 | 24 | 2 | 4 | 0.4 |
 
 Nine steps of exactly 10 ms in 94 ms of wall time. Clamp a stalled frame (at 250 ms, say) or it demands hundreds of steps.
+
+
+---
+
+## Real code: the accumulator
+
+```javascript
+const DT = 0.010;                          // fixed step, seconds
+let acc = 0, last = performance.now() / 1000;
+let prev = initialState(), curr = prev;
+function frame(nowMs) {
+  const now = nowMs / 1000;
+  acc += Math.min(now - last, 0.25);       // clamp a stall (the spiral of death)
+  last = now;
+  while (acc >= DT) {                      // run every whole step that fits
+    prev = curr;
+    curr = step(curr, DT);
+    acc -= DT;
+  }
+  draw(lerp(prev, curr, acc / DT));        // alpha = carry / step
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+```
+
+
+---
+
+## Drawing between two steps
+
+The simulation holds states at step times; the frame falls between them.
+
+```text
+   previous step:  x = 1.0         current step:  x = 1.2
+   carry 4 ms of a 10 ms step:     α = 0.4
+   draw at         x = 1.0 + 0.4 · (1.2 − 1.0) = 1.08
+```
+
+Without it, motion **judders**: some frames show two steps of progress, some one, some none.
+
+
+---
+
+## Pitfall: damping per frame
+
+`v *= 0.9` every frame, meant as "slow down". After one second:
+
+| rate | 0.9 raised to the frames | speed left |
+| --- | --- | --- |
+| 30 Hz | 0.9^30 | 0.0424 |
+| 60 Hz | 0.9^60 | 0.0018 |
+| 144 Hz | 0.9^144 | 0.00000026 |
+
+The 30 Hz machine keeps **23.6×** the speed of the 60 Hz one. Fix: `v *= Math.exp(-k * dt)` with k = −ln(0.9) · 60 = **6.32** per second, which leaves **0.0018** after one second at every rate.
+
+
+---
+
+## Pitfall: the hitch and the tunnel
+
+Speed **3 units/s**, per-second motion, then one frame stalls for **250 ms**:
+
+- the object jumps **0.75** units in a single step
+- a wall **0.2** thick is skipped whenever one step is longer than 0.2 / 3 = **0.067 s** (a 15 fps frame)
+- on a fixed **10 ms** step, the largest move is **0.03**: the wall is never skipped
+
+
+---
+
+## Pitfall: floats drift far from the origin
+
+Add **0.05** per frame for **3,600** frames (a minute at 60 Hz) in 32-bit floats:
+
+| start | exact end | float32 end | error |
+| --- | --- | --- | --- |
+| 0 | 180 | 180.006 | 0.006 |
+| 1000 | 1180 | 1180.146 | 0.146 |
+
+Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times wider than near 180.
 
 
 ---
@@ -184,6 +288,142 @@ Each of the first three columns is **where an axis lands**, scaled; the last col
 
 ---
 
+## Where MVC came from
+
+- **Trygve Reenskaug**, a visiting scientist at **Xerox PARC**, 1978 to 1979, working in Smalltalk
+- his note of May 12, 1979, "Thing-Model-View-Editor"; renamed in his note of December 10, 1979, "Models-Views-Controllers"
+- implemented for the Smalltalk-80 library by others at PARC; written up by Krasner and Pope (1988)
+
+
+---
+
+## Real code: undo as commands
+
+```javascript
+class MoveVertex {                               // one edit, and its inverse
+  constructor(mesh, i, d) { Object.assign(this, { mesh, i, d }); }
+  do()   { this.mesh.move(this.i, this.d); }
+  undo() { this.mesh.move(this.i, this.d.map((x) => -x)); }
+}
+const history = [];
+function run(cmd) { cmd.do(); history.push(cmd); requestRender(); }
+function undo()   { const c = history.pop(); if (c) { c.undo(); requestRender(); } }
+```
+
+About **16 bytes** of state per edit instead of **431 kB** per bunny snapshot.
+
+
+---
+
+## What the controller hears
+
+| event | carries | used for |
+| --- | --- | --- |
+| pointerdown, pointermove, pointerup | position, button, pressure, pointer type | picking, dragging, orbiting (mouse, pen and touch in one form) |
+| wheel | delta, modifier keys | zoom, scroll |
+| keydown, keyup | key code, repeat flag | fly controls (the demos' WASD), shortcuts |
+| gamepad (polled once per frame) | axes in [−1, 1], buttons | continuous control |
+| resize, visibilitychange | the new size; hidden or shown | reallocating the framebuffer; pausing the loop |
+
+
+---
+
+## Pitfall: the wrong pixel grid
+
+An **800 × 500** CSS-pixel canvas on a display with device-pixel ratio **2** has a **1,600 × 1,000** drawing buffer. A click arrives at CSS **(300, 200)**.
+
+| normalized against | x | y | |
+| --- | --- | --- | --- |
+| the CSS size, 800 × 500 | −0.249 | 0.198 | correct |
+| the buffer size, 1,600 × 1,000 | −0.624 | 0.599 | wrong by 2× from the center |
+
+Normalize against the size the event was **measured in**: the element's bounding rectangle.
+
+
+---
+
+## Hit testing in two dimensions
+
+<img src="../../textbook/figures/ui-hittest.svg" alt="Left: a pentagon with vertices numbered 0 to 4; point A inside it with a dashed ray to the right crossing one edge; point B outside with a ray crossing none. Right: a state diagram with idle, pressed, dragging and clicked states joined by arrows labeled down, move over four pixels, up, and done." style="max-height: 250px; width: auto;">
+
+Cast a ray to the right; **odd** crossings means inside. Pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5):
+
+- **A = (3, 2.5)**: edges cross y = 2.5 at x = 0.7 (left, not counted) and **5.8** (right): **1** crossing, inside
+- **B = (5.5, 4.5)**: crossings at 4.125 and 2.5, both left: **0**, outside
+
+
+---
+
+## Near misses, target sizes, and a drag's states
+
+- circle of radius **1.2** at (2, 2) against (2.8, 2.9): 0.64 + 0.81 = **1.45** > 1.44, outside by a hair
+- make hit shapes larger than drawn ones: at least **8 px** for a mouse, about **44 px** for a finger
+- a drag is a **state machine**: idle, then **pressed** on pointerdown, **dragging** once it moves over **4 px**, **clicked** if released before that
+
+
+---
+
+## Picking in 3D: a ray from the mouse
+
+<img src="../../textbook/figures/ui-picking.svg" alt="A perspective sketch: the eye at (3, 3, 6) with a small orange near-plane rectangle in front of it, a red ray to a hit point on a blue sphere at the origin labeled with t = 6.23, and a dashed green ray landing on a grid ground plane at (0.5, 0, 1.63)." style="max-height: 270px; width: auto;">
+
+The clicked pixel becomes a **ray** from the eye; the nearest hit is the picked object (here the sphere at **t = 6.23**). The alternative: render object **IDs** as colors and read back one pixel.
+
+
+---
+
+## Dragging on the ground, worked
+
+A mouse position has two numbers; a world position has three. Add a **constraint**: the ground plane y = 0.
+
+```text
+   eye o = (3, 3, 6), ray through pixel (60, 110): d = (−0.426, −0.512, −0.746)
+   reach y = 0:  t = −o_y / d_y = 3 / 0.512 = 5.861
+   point:        o + t·d = (0.501, 0, 1.629)
+```
+
+As the mouse moves, the intersection slides along the plane, and the object follows.
+
+
+---
+
+## Turning an object: the arcball
+
+<img src="../../textbook/figures/ui-arcball.svg" alt="Left: a unit circle in the window with two red mouse points at (0.2, 0.1) and (0.5, 0.3) joined by a blue arc, and a gray point outside the circle projected to its rim. Right: the sphere in profile with the two points at heights z = 0.975 and 0.812." style="max-height: 230px; width: auto;">
+
+Lift the mouse onto a sphere: (x, y) becomes (x, y, √(1 − x² − y²)). Drag (0.2, 0.1) to (0.5, 0.3): p1 = (0.2, 0.1, 0.975), p2 = (0.5, 0.3, 0.812); axis = normalize(p1 × p2) = **(−0.545, 0.838, 0.026)**, angle = arccos(p1 · p2) = **22.8°** (Shoemake, 1992).
+
+
+---
+
+## Orbiting: the demos' camera controller
+
+- horizontal drag: yaw **0.4° per pixel**, so a **90-pixel** drag turns **36°**
+- vertical drag: pitch, clamped short of the poles, so the horizon never flips
+- wheel: distance × **1.12** per notch out, × **0.88** per notch in; five notches out is **1.76**, five in **0.53**
+- an orbit **cannot roll**: right for inspecting an object, where the arcball is right for turning one in the hand
+
+
+---
+
+## Latency: input to photon
+
+<img src="../../textbook/figures/ui-latency.svg" alt="A timeline with vertical syncs at 0, 16.7, 33.3 and 50 milliseconds: an input at 3 milliseconds, a blue bar for rendering frame 1 between 16.7 and 33.3, a green bar for scanning it out between 33.3 and 50, and a dashed red line at 41.7 where the mid-screen pixel changes." style="max-height: 230px; width: auto;">
+
+Input at 3 ms, 60 Hz, double buffered: wait for the next frame **13.7** + render **16.7** + scan out to mid-screen **8.3** = **38.7 ms**, two and a half frames. At 120 Hz every term halves: **17.8 ms**.
+
+
+---
+
+## Latency in a headset
+
+- 90 Hz: **11.1 ms** a frame; the same pipeline is **27.8 ms** from head pose to mid-screen photon
+- a head turning at **100°/s** moves **2.78°** in that time: an object 1 m away is drawn **4.9 cm** off, **56 pixels** at 20 pixels per degree
+- **reprojection**: read the pose again just before scan-out and rotate the finished frame; only **5.6 ms** is left, **0.56°**, about 1 cm
+
+
+---
+
 ## Two tracks, one specification
 
 | | Unity track | WebGL track |
@@ -236,6 +476,16 @@ public class Bounce : MonoBehaviour {
 ```
 
 **Awake**, **Start** once · **Update** every frame · **LateUpdate** after every Update · **FixedUpdate** on the fixed clock. Unity calls them **by name**: a misspelled `update()` is never called, and nothing warns you.
+
+
+---
+
+## Unity's clocks, by name
+
+- `Time.deltaTime`: seconds since the last frame, **scaled** by `Time.timeScale`
+- `Time.fixedDeltaTime`: the fixed step, **0.02 s** by default (the 50 steps a second of the table)
+- `Time.timeScale = 0.5`: slow motion; **0** stops the scaled clock, and `FixedUpdate` stops with it
+- `Time.unscaledDeltaTime`: the real frame time, for a pause menu that must keep animating
 
 
 ---

@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L19 discussion (28 min) and wrap (3 min). Four peer-instruction
+  CSS 551 · L19 discussion (28 min) and wrap (2 min). Six peer-instruction
   questions; answers and worked solutions only in the notes. Numbers from
   lectures/L19-generative-3d-video/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
 -->
 
 ### Discussion
 
-<small>(~28 min · four questions · vote, argue in pairs, vote again)</small>
+<small>(~28 min · six questions · vote, argue in pairs, vote again)</small>
 
 
 ---
@@ -59,8 +59,33 @@ A game displays 3840×2160 at 120 frames per second. It renders at 1920×1080 an
 
 ---
 
+## Question 5: foveation
+
+A headset's field is 90° square. The central 30° square is shaded at full rate and the rest at a quarter of the rate. What fraction of the full-rate shading work remains?
+
+- **A.** 33 %
+- **B.** 11 %
+- **C.** 25 %
+- **D.** 56 %
+
+
+---
+
+## Question 6: accumulating frames
+
+A renderer blends each new frame into its history with weight `α = 0.2`. For independent per-frame noise, the history's noise variance equals that of an average of how many frames?
+
+- **A.** 9
+- **B.** 5
+- **C.** 10
+- **D.** 20
+
+
+---
+
 ## Wrap
 
+- Networks inside the renderer and inside the headset reuse the pipeline's buffers: jitter, motion vectors, depth, the head pose
 - Generative 3D and video are **consistency problems**: between views of one object, between frames of one clip; the pipeline supplies consistency for free, the generator has to learn it
 - The field is merging from both sides: generators that use your cameras and renderers, and renderers with networks in the loop; **every row stands on the pipeline**
 

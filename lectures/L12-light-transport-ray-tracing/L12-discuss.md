@@ -1,7 +1,7 @@
 <!--
   CSS 551 · Lecture 12, the discussion slot as midterm review (28 min: the exam's
-  logistics and scope, four questions spanning weeks 1–6) and the wrap. Answers
-  only in the notes. Numbers from tools/gen-lecture-figures-c.mjs (l12_q1 to l12_q4).
+  logistics and scope, eight questions spanning weeks 1–6) and the wrap. Answers
+  only in the notes. Numbers from tools/gen-lecture-figures-c.mjs (l12_q1 to l12_q4; questions 5 to 8 computed by node).
 -->
 
 ### Midterm review
@@ -66,6 +66,56 @@ At one point: `kd = 0.8`, `N·L = 0.6`, `ks = 0.5`, `R·V = 0.9`, shininess **s 
 - **B.** 0.573
 - **C.** 0.893
 - **D.** 0.930
+
+
+---
+
+## Review 5: which mip level?
+
+A texture is **512 texels** wide. At one pixel the texture coordinate u changes by **0.0156** per pixel (v barely changes). Which mip level does trilinear filtering center on?
+
+- **A.** 0
+- **B.** 3
+- **C.** 8
+- **D.** 9
+
+
+---
+
+
+## Review 6: a normal under a scale
+
+A model is scaled by **M = diag(2, 1, 1)**. At a surface point the unit normal before the scale is **(0.6, 0.8, 0)**. The correct unit normal after it is:
+
+- **A.** (0.6, 0.8, 0)
+- **B.** (0.832, 0.555, 0)
+- **C.** (0.351, 0.936, 0)
+- **D.** (0.3, 0.8, 0)
+
+
+---
+
+## Review 7: a quaternion
+
+The unit quaternion for a rotation of **90° about the y axis**, written (x, y, z, w):
+
+- **A.** (0, 1, 0, 0)
+- **B.** (0, 0.707, 0, 0.707)
+- **C.** (0.707, 0, 0, 0.707)
+- **D.** (0, 0.851, 0, 0.525)
+
+
+---
+
+
+## Review 8: a color from three corners
+
+A triangle with corners **v0 = (0, 0)** red (1, 0, 0), **v1 = (4, 0)** green (0, 1, 0), **v2 = (0, 4)** blue (0, 0, 1). The interpolated color at the point **(1, 1)** is:
+
+- **A.** (0.333, 0.333, 0.333)
+- **B.** (0.5, 0.25, 0.25)
+- **C.** (0.25, 0.25, 0.5)
+- **D.** (1, 0.5, 0.5)
 
 
 ---

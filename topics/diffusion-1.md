@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Diffusion models I: the forward process, the denoiser, DDPM and DDIM (~88 min).
+  CSS 551 · TOPIC DECK · Diffusion models I: the forward process, the denoiser, DDPM and DDIM (~88 min, 54 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-1.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -14,6 +14,15 @@
   dots exhibit; how many steps (table); the probability-flow ODE; flow matching (worked); the exact
   denoiser on digits memorizes (exhibit), the bandwidth knob (exhibit) and its ceiling; the trained
   network draws (exhibit), watched step by step; the papers 2015 to 2022.
+  DENSIFIED (2026-09-29): the generative families; why not independent pixels; Box-Muller
+  (−0.480, −1.476); the forward process in code; one pixel forward (0.562 ± 0.711); two steps
+  compose (0.72, 0.28); the cosine formula (0.4938); the noise shell (√d); the terminal-SNR
+  pitfall (linear √ᾱ(1) = 0.0064); the Gaussian-data denoiser (0.211); softmax underflow (−1720);
+  the noised data as a blur; Tweedie checked (−0.268); the score field on its own slide; ε̂
+  amplification (6.365 at t = 0.9); the training counted (15 % null label); the sampler in code;
+  a DDPM step worked (0.957, 0.875); the cost of a sample; Euler and solver order; DDIM
+  inversion; slerp between noises (14.1 vs 20); memorization at scale; three error sources; the
+  bimodal reverse step; 2015 to 2022 milestones; the whole method on one slide.
   NOT HERE (topics/diffusion-2.md, lecture 17): guidance beyond one sentence, latent diffusion, text
   conditioning at scale, ControlNet, text-to-3D, video, evaluation.
   NEEDS:   topics/neural-nets-embeddings.md ("smooth between the examples", "a network is a function",
@@ -61,6 +70,32 @@ A concept fixes a few hundred numbers of a picture; the rest (which cat, which p
 
 ---
 
+## The generative model families
+
+| family | a sample is made by | strength | weakness |
+| ------ | ------------------- | -------- | -------- |
+| VAE (2013, arXiv:1312.6114) | decoding a random code | one pass | blurry |
+| GAN (2014, arXiv:1406.2661) | a generator trained against a critic | sharp, one pass | unstable, drops modes |
+| autoregressive (2016, arXiv:1601.06759) | one pixel at a time | exact likelihood | one step per pixel |
+| flow (2016, arXiv:1605.08803) | an invertible network on noise | exact likelihood | restricted networks |
+| **diffusion** | many small denoising steps | stable, sharp, diverse | many network calls |
+
+- diffusion trades **sampling cost** for the easiest training of the five: a squared error against a target it generates itself
+
+
+---
+
+## Why not sample each pixel on its own?
+
+The simplest generator: learn each pixel's own distribution from the data, then draw every pixel independently.
+
+- every pixel's **histogram** would be right, and the image would be **static**: which pixels are dark depends on which other pixels are dark
+- the information is in the **joint** distribution; for 400 binary pixels a full table of it has 2⁴⁰⁰ entries
+- every family on the previous slide is a way to represent that joint distribution **without** the table; diffusion does it as a chain of small, learnable conditional steps
+
+
+---
+
 ## The forward process
 
 Fix a schedule ᾱ(t) falling from 1 at t = 0 to 0 at t = 1 (the course uses the cosine schedule, Nichol & Dhariwal 2021, arXiv:2102.09672):
@@ -74,6 +109,73 @@ Fix a schedule ᾱ(t) falling from 1 at t = 0 to 0 at t = 1 (the course uses the
 
 - at t = 1 **every** image has become the same standard Gaussian: the one distribution we can sample trivially
 - nothing is learned in this direction; it is arithmetic
+
+
+---
+
+## The forward process, in code
+
+```js
+// x0: clean image as numbers in [-1, 1]; t in [0, 1]
+function noisify(x0, t, rng) {
+  const a = alphaBar(t);                            // the cosine schedule
+  const eps = x0.map(() => randn(rng));             // one standard normal per pixel
+  const xt = x0.map((v, i) => Math.sqrt(a) * v + Math.sqrt(1 - a) * eps[i]);
+  return { xt, eps };                               // the training pair: input xt, target eps (or x0)
+}
+```
+
+- no loop over time steps: the closed form jumps to any t in **one** line per pixel
+- training calls this with a **fresh** t and fresh noise for every example in every batch
+
+
+---
+
+## Sampling a Gaussian: Box–Muller
+
+The forward process needs ε ~ N(0, 1) per pixel. From two uniform numbers u₁, u₂:
+
+```text
+   r = √(−2 ln u₁),   z₁ = r cos(2π u₂),   z₂ = r sin(2π u₂)      two independent normals
+
+   u₁ = 0.3, u₂ = 0.7:   r = 1.552,   z₁ = −0.480,   z₂ = −1.476
+```
+
+- one pair of uniforms, two Gaussian numbers; a 49,152-pixel image needs 24,576 pairs
+- the course's generator is a seeded PRNG (mulberry32), so a slide shows the same noise every time
+
+
+---
+
+## One pixel through the forward process
+
+A pixel of value **0.8**, at t = 0.5 (ᾱ = 0.494):
+
+```text
+   x(0.5) = √0.494 · 0.8 + √0.506 · ε = 0.562 + 0.711 ε
+   its distribution:  mean 0.562,  standard deviation 0.711
+   95 % of draws in   [0.562 − 1.96·0.711,  0.562 + 1.96·0.711]  =  [−0.83, 1.96]
+```
+
+- the signal has shrunk by 0.703 and the noise is already larger than it: SNR ≈ 0 dB
+- every pixel of the image does this **independently**; the image is still there only as a faint bias of each pixel's mean
+
+
+---
+
+## Small steps compose into one jump
+
+The original definition is a chain of small steps, `x_k = √(1 − β_k) x_(k−1) + √β_k ε_k`. Two steps, β₁ = 0.1, β₂ = 0.2:
+
+```text
+   x₂ = √0.8 ( √0.9 x₀ + √0.1 ε₁ ) + √0.2 ε₂
+      = √(0.8 · 0.9) x₀  +  [ √0.08 ε₁ + √0.2 ε₂ ]
+   signal coefficient²   0.8 · 0.9 = 0.72 = ᾱ
+   noise variance        0.08 + 0.2 = 0.28 = 1 − ᾱ          independent Gaussians add variances
+```
+
+- so `x_k = √ᾱ_k x₀ + √(1 − ᾱ_k) ε` with **ᾱ = Π(1 − β)**: any noise level in one draw
+- this closed form is what makes training cheap: no need to simulate the chain step by step
 
 
 ---
@@ -92,6 +194,38 @@ Fix a schedule ᾱ(t) falling from 1 at t = 0 to 0 at t = 1 (the course uses the
 
 - the SNR crosses **0 dB at t = 0.5** and falls about 3 dB per tenth of t through the middle
 - the 7 survives to about t = 0.6: coarse structure is the **last** to drown
+
+
+---
+
+## The cosine schedule's formula
+
+Nichol & Dhariwal (2021) define ᾱ through a squared cosine with a small offset s = 0.008:
+
+```text
+   f(t) = cos²( (t + s)/(1 + s) · π/2 ),      ᾱ(t) = f(t) / f(0)
+
+   t = 0.5:   f(0.5) = 0.4938,   f(0) = 0.9998,   ᾱ = 0.4938      (the library agrees)
+```
+
+- the offset keeps the first steps from being **too small** to learn from; dividing by f(0) makes ᾱ(0) exactly 1
+- near t = 0 and t = 1 the curve is flat, so little time is spent at noise levels where the image barely changes
+
+
+---
+
+## The noise lives on a shell
+
+A standard Gaussian vector in d dimensions has length close to **√d**:
+
+```text
+   d = 400 (a 20 × 20 digit)           ‖ε‖ ≈ 20
+   d = 49,152 (128 × 128 RGB)          ‖ε‖ ≈ 221.7
+   d = 786,432 (512 × 512 RGB)         ‖ε‖ ≈ 886.8        with a spread of only about ±0.7
+```
+
+- the "cloud" at t = 1 is a thin **shell**, not a ball: almost no noise vector is short
+- the image-space lecture's "the cube is all corners" in Gaussian form; it matters when noises are **interpolated** (later tonight)
 
 
 ---
@@ -123,6 +257,22 @@ DDPM's original schedule: 1,000 steps with noise variances β rising linearly fr
 
 - the linear schedule destroys the signal early: at t = 0.7 the image is 99 % noise with three tenths of the steps to go
 - what matters is that the noise levels are spaced **evenly in SNR**; the cosine schedule does about 3 dB per tenth
+
+
+---
+
+## Pitfall: the last step is not pure noise
+
+Training reaches its noisiest level at t = 1; sampling starts from **pure** noise. If ᾱ(1) > 0 the two differ:
+
+```text
+   DDPM's linear schedule, 1000 steps:   ᾱ(1) = 4.0 × 10⁻⁵,   √ᾱ = 0.0064
+      a trace of the image's mean brightness survives at t = 1 in training, never at sampling
+   the cosine schedule, run to t = 0.999 in this course:   ᾱ = 2.4 × 10⁻⁶,   √ᾱ = 0.0016
+```
+
+- the network learns to **read** that trace at the noisiest step; at sampling it is absent, so the model cannot make very dark or very bright images (Lin et al. 2023, arXiv:2305.08891)
+- fixes: a schedule that reaches exactly zero signal, and starting samples at the **same** noise level used in training
 
 
 ---
@@ -175,12 +325,79 @@ Two training scalars, x⁽¹⁾ = −1 and x⁽²⁾ = +1; a time where ᾱ = ¼
 
 ---
 
+## When the data is Gaussian, the denoiser is linear
+
+Suppose the data itself is one standard Gaussian, x₀ ~ N(0, 1). Then x_t is Gaussian too, and the posterior mean is a straight line:
+
+```text
+   x̂₀ = √ᾱ · x_t / (ᾱ + (1 − ᾱ)) = √ᾱ · x_t
+   ᾱ = 0.494,  x_t = 0.3:   x̂₀ = 0.703 · 0.3 = 0.211
+```
+
+- the best denoiser **shrinks** the observation toward the mean, more at higher noise: the **Wiener filter**
+- real data is not Gaussian, so the true denoiser bends; but at very high noise every dataset looks Gaussian and the learned denoiser is close to this line
+
+
+---
+
+## Pitfall: the exact denoiser underflows
+
+The weights are a softmax of `−‖x_t − √ᾱ x⁽ⁱ⁾‖² / (2(1 − ᾱ))`. For digits at small noise:
+
+```text
+   t = 0.1:   1 − ᾱ = 0.0279
+   a squared distance of 96 (a digit's nearest neighbor sits at about 9.8)
+   logit = −96 / (2 · 0.0279) = −1720
+   exp(−1720) = 0 in double precision, for EVERY training digit
+   naive softmax: 0 / 0 = NaN
+```
+
+- subtract the **largest logit** first (log-sum-exp), as in the networks lecture's softmax pitfall; the nearest digit then gets weight ≈ 1
+- the demos compute the exact denoiser this way
+
+
+---
+
 ## Two limits
 
 - **t → 0** (little noise): 1 − ᾱ → 0, the weights become **one-hot**, and x̂₀ is exactly the nearest training point: the exact denoiser **memorizes**
 - **t → 1** (all noise): the weights become **equal**, and x̂₀ is the **data mean**: at high noise the best guess is the average image
 - every sampling run therefore starts as a **gray blur** and sharpens as the noise falls
 - the left panel of the figure: nearly a step at ᾱ = 0.9, nearly flat at ᾱ = 0.05
+
+
+---
+
+## The noised data is the data, blurred
+
+The distribution of x_t is the data's distribution **scaled by √ᾱ and blurred** by a Gaussian of variance 1 − ᾱ:
+
+```text
+   two data points ±1:
+   ᾱ = 0.9:    bumps at ±0.949, width 0.316    two bumps   (density at 0: 2 % of the peak)
+   ᾱ = 0.25:   bumps at ±0.500, width 0.866    one bump    (density at 0 above the bumps)
+```
+
+- blurring makes the density **smooth and positive everywhere**, so its gradient, the score, is defined at every x
+- denoising at level t is estimating the data from this blurred version; sampling walks from heavy blur to none
+
+
+---
+
+## Tweedie's formula, checked
+
+The posterior mean is a step up the log-density's gradient:
+
+```text
+   x̂₀ = ( x_t + (1 − ᾱ) · ∇ log p_t(x_t) ) / √ᾱ
+
+   the two-point example (ᾱ = ¼, x_t = 0.3, x̂₀ = 0.197):
+   score  ∇ log p_t = (√ᾱ x̂₀ − x_t) / (1 − ᾱ) = (0.5 · 0.197 − 0.3) / 0.75 = −0.268
+   back   (0.3 + 0.75 · (−0.268)) / 0.5 = 0.197                                  the same x̂₀
+```
+
+- a denoiser and a score model are **the same model** in different units
+- this is why "denoising score matching" and "diffusion" turned out to be one method
 
 
 ---
@@ -213,7 +430,34 @@ The 50-step spiral run, first particle, step 15: t = 0.6993, √ᾱ = 0.4517, �
    check                0.4517·x_t − 0.8922·v̂  = (0.037, 0.149)  = x̂₀
 ```
 
-<img src="../../textbook/figures/diff-score-field.svg" class="media-shot" style="max-height: 250px;" alt="arrows from grid points to their denoised estimates at t = 0.5 on the spiral">
+
+
+---
+
+## The score field
+
+<img src="../../textbook/figures/diff-score-field.svg" class="media-shot" style="max-height: 330px;" alt="arrows from grid points to their denoised estimates at t = 0.5 on the spiral">
+
+- each arrow runs from a grid point to its denoised estimate at t = 0.5; the arrows are the score, scaled
+- far from the spiral they point toward its **center of mass**; near it, toward the **nearest arm**
+- a sampler follows these arrows, re-evaluated at a lower noise level after each step
+
+
+---
+
+## Pitfall: recovering x̂₀ from ε̂ at high noise
+
+A network that predicts ε̂ gives `x̂₀ = (x_t − √(1 − ᾱ) ε̂) / √ᾱ`: any error in ε̂ is multiplied by √(1 − ᾱ)/√ᾱ:
+
+```text
+   t      √(1 − ᾱ)/√ᾱ        an error of 0.1 in ε̂ becomes
+   0.1    0.169               0.017 in x̂₀
+   0.5    1.012               0.101
+   0.9    6.365               0.64           larger than the whole signal range of a pixel
+```
+
+- predicting ε is **ill-conditioned at high noise**; predicting x₀ is ill-conditioned at low noise
+- the v-parameterization of the four-coordinates table is **balanced at both ends**; the course's network predicts x₀ and clamps it
 
 
 ---
@@ -232,6 +476,22 @@ The 50-step spiral run, first particle, step 15: t = 0.6993, √ᾱ = 0.4517, �
 
 - every step is a small, well-posed **regression** against a target the trainer generated itself; no adversary
 - the course's network: 3 hidden layers of 512 SiLU units, **1,002,064 weights**, trained with Adam on 60,000 digits for fifteen minutes on a laptop CPU (41,210 steps of batch 512), predicting x₀
+
+
+---
+
+## The training, counted
+
+```text
+   the data                  60,000 MNIST digits, 20 × 20, values in [−1, 1]
+   the network               3 hidden layers of 512 SiLU units, 1,002,064 weights, predicts x₀
+   its inputs                400 noisy pixels + 64-number time code + 64-number class code = 528
+   the run                   41,210 steps × batch 512 = 21.1 million examples ≈ 351.7 epochs
+   the time                  about fifteen minutes on a laptop CPU, Adam
+```
+
+- every one of the 21 million training examples was **new**: a fresh t and fresh noise on a known digit
+- **15 %** of the time the label is replaced by the **no class** row of the embedding (tools/train-mlp.py), so the same network also samples unconditionally; the next lecture uses both for guidance
 
 
 ---
@@ -270,6 +530,29 @@ Start from x ~ N(0, I) and step t down a sequence `t_K > … > t_0 = 0`. At each
 
 ---
 
+## The sampler, in code
+
+```js
+// DDIM (sigma = 0) or DDPM (eta = 1), from the course library's rule
+let x = gaussianNoise(d, rng);
+const ts = timeline(steps, 0.999);                 // 0.999 … 0
+for (let k = 0; k < steps; k++) {
+  const t = ts[k], tn = ts[k + 1];
+  const a = alphaBar(t), an = alphaBar(tn);
+  const x0 = denoise(x, t);                        // the network or the exact posterior mean
+  const eps = x.map((v, i) => (v - Math.sqrt(a) * x0[i]) / Math.sqrt(1 - a));
+  const sig = eta * Math.sqrt((1 - an) / (1 - a)) * Math.sqrt(1 - a / an);
+  const z = gaussianNoise(d, rng);
+  x = x0.map((v, i) => Math.sqrt(an) * v + Math.sqrt(1 - an - sig * sig) * eps[i] + sig * z[i]);
+}
+// x is the sample (at tn = 0, an = 1 and x = x0)
+```
+
+- one **denoise** call per step: the step count is the cost of a sample
+
+
+---
+
 ## One DDIM step, worked
 
 The same particle, step 15 of 50: t = 0.6993 → t′ = 0.6793.
@@ -285,6 +568,38 @@ The same particle, step 15 of 50: t = 0.6993 → t′ = 0.6793.
 
 - the particle moved (−0.013, −0.012): a small step toward the estimate, because ᾱ changed by only 0.026
 - fifty such steps carry it from the Gaussian cloud onto the spiral
+
+
+---
+
+## One DDPM step, worked
+
+The same particle and step, now with fresh noise (η = 1) and a fixed draw z = (0.5, −0.3):
+
+```text
+   σ  = √((1 − ᾱ′)/(1 − ᾱ)) · √(1 − ᾱ/ᾱ′)                         = 0.329
+   the ε̂ coefficient  √(1 − ᾱ′ − σ²)                               = 0.814
+   x_t′ = 0.4792 · x̂₀ + 0.814 · ε̂ + 0.329 · z                      = (0.957, 0.875)
+
+   DDIM from the same state:                                        (0.853, 1.044)
+```
+
+- the particle moved about **0.2**, ten times the DDIM move: most of that is the fresh noise, which later steps correct
+- the stochastic sampler **forgets** part of its past each step; the deterministic one carries it all the way
+
+
+---
+
+## The cost of a sample
+
+```text
+   the course's network        1,002,064 multiply-adds per call
+   30 DDIM steps               ≈ 30 million multiply-adds per digit
+   50 steps                    ≈ 50 million
+```
+
+- the sampler calls the network once per step, so **steps are the cost**; the table two slides on is the trade-off
+- ways to cut it: better ODE solvers (Heun, DPM-Solver), and **distillation** into models that sample in one to four steps (consistency models, Song et al. 2023, arXiv:2303.01469)
 
 
 ---
@@ -333,6 +648,29 @@ The same particle, step 15 of 50: t = 0.6993 → t′ = 0.6793.
 
 ---
 
+## Euler's method, and why steps matter
+
+Solve dx/dt = f(x, t) by stepping: `x ← x + h · f(x, t)`.
+
+- Euler's error per step is O(h²), over the whole run **O(h)**: halve the step, halve the error (first order)
+- DDIM is this first-order method on the probability-flow ODE; the spiral table's **0.064 → 0.020 → 0.009** at 10, 20, 50 steps is its convergence, until the floor set by the data's spacing
+- **Heun's** method (predict with Euler, then average the slopes at both ends) is second order: error O(h²), the choice in EDM
+- the fewer steps you can afford, the more a higher-order solver pays
+
+
+---
+
+## DDIM inversion
+
+A deterministic sampler is **invertible**: run the same ODE forward in time, from an image to a noise.
+
+- image → noise (inversion) → the **same** noise → the same image back, up to solver error
+- edit in between: change the condition (the class, a caption) and sample from the inverted noise; layout and pose survive, content changes
+- this is the basis of many diffusion image editors; DDPM, which injects fresh noise, has no such inverse
+
+
+---
+
 ## Flow matching: the straight-line version
 
 Replace the diffusion by a **straight line** between data and noise (Lipman et al. 2022, arXiv:2210.02747; rectified flow, Liu et al. 2022, arXiv:2209.03003):
@@ -348,6 +686,21 @@ Replace the diffusion by a **straight line** between data and noise (Lipman et a
 ```
 
 - an Euler step along a straight line is exact, so nearly straight paths sample in **few steps**; Stable Diffusion 3 uses this
+
+
+---
+
+## Interpolating between two noises
+
+Two starting noises for digits, `ε_a` and `ε_b`, each of length ≈ **20** (d = 400). Their straight-line midpoint:
+
+```text
+   ‖(ε_a + ε_b)/2‖ ≈ 20 / √2 = 14.1          independent noises are nearly perpendicular
+   no real noise is that short: the model never saw such inputs, and the result is washed out
+```
+
+- **spherical interpolation** (slerp) moves along the great circle between the two, keeping the length at 20
+- the same slerp as the rotation lecture's quaternions: interpolate **directions**, not points
 
 
 ---
@@ -391,6 +744,17 @@ Add a floor h² to the kernel variance, 1 − ᾱ → 1 − ᾱ + h², so the we
 | what you get | copies | still copies | novel blends, thick and soft | one blur of the whole set |
 
 - **no bandwidth gives crisp and new digits**: a kernel average cannot invent a stroke, only mix strokes
+
+
+---
+
+## Memorization in large models
+
+The exact denoiser memorizes by construction; trained networks mostly do not, but not never:
+
+- Carlini et al. (2023, arXiv:2301.13188) extracted **more than a thousand** training images from state-of-the-art diffusion models by generating many samples and searching for near-copies
+- duplicated training images were the most likely to be regurgitated
+- the course's check is the same idea on digits: the distance from a sample to its **nearest training example**, with a memorization threshold
 
 
 ---
@@ -442,6 +806,64 @@ A network is smooth between examples in the space of **functions**, not of pixel
 
 - top: drawing a 5, x(t) above and x̂₀ below, t = 1.0 … 0. At step 0, from pure static and the label, the estimate is already a **soft 5**; by step 9 the slant and loop are decided; the last steps add edges
 - bottom: 3, 5, 10 and 30 steps from the same noises; mean distance to the nearest training digit **0.48 to 0.51** in every row: nearest-neighbor distance measures **novelty, not quality**
+
+
+---
+
+## Three sources of error in a sample
+
+| error | where it comes from | seen on |
+| ----- | ------------------- | ------- |
+| **solver** error | too few, too large steps | the spiral with the exact denoiser: 0.103 at 5 steps, 0.009 at 50 |
+| **denoiser** error | the network is not the posterior mean | the network's samples: new digits, some malformed |
+| **data** limits | finite data, memorization, gaps | the exact denoiser on digits: copies |
+
+- the exact denoiser isolates the first; the network trades the third for the second
+- every improvement in the literature targets one row: better solvers, better networks, more and cleaner data
+
+
+---
+
+## The reverse step is Gaussian only when it is small
+
+The two-point example at ᾱ = ¼, x_t = 0.3: the true posterior over x₀ is **two spikes**, at −1 (weight 0.401) and +1 (weight 0.599).
+
+```text
+   a single Gaussian with the same mean and variance:  mean 0.197,  standard deviation 0.980
+   it puts its peak between the two points, where there is no data
+```
+
+- a **large** reverse step would need that two-spike distribution; a model that outputs one Gaussian cannot represent it
+- over a **small** step the true reverse move is close to Gaussian, which is why DDPM uses many small steps and why few-step samplers need special training
+
+
+---
+
+## From 2015 to image generators
+
+| year | milestone |
+| ---- | --------- |
+| 2015 | Sohl-Dickstein et al.: diffusion probabilistic models, on small images |
+| 2020 | DDPM: sample quality competitive with GANs (CIFAR-10 FID 3.17) |
+| 2021 | Dhariwal & Nichol, arXiv:2105.05233: diffusion models beat GANs on ImageNet |
+| 2022 | DALL·E 2 (Ramesh et al., arXiv:2204.06125); Stable Diffusion released publicly in August (Rombach et al., arXiv:2112.10752) |
+| 2023 to 2024 | transformer denoisers, flow matching at scale, video models |
+
+- five years from a paper about small images to generators anyone could run on a gaming GPU
+
+
+---
+
+## The whole method, one slide
+
+```text
+   destroy    x_t = √ᾱ x₀ + √(1 − ᾱ) ε                     ᾱ(0.5) = 0.494, SNR −0.1 dB
+   learn      minimize ‖net(x_t, t) − x₀‖² over random (x₀, t, ε)     1,002,064 weights
+   sample     x̂₀ = net(x, t);  ε̂ = (x − √ᾱ x̂₀)/√(1 − ᾱ)
+              x ← √ᾱ′ x̂₀ + √(1 − ᾱ′ − σ²) ε̂ + σ z                 30 steps, 30 M multiply-adds
+```
+
+- the exact denoiser **memorizes**; the network, smooth between examples, **draws**
 
 
 ---

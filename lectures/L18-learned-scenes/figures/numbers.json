@@ -84,5 +84,310 @@
    2.236,
    1.414
   ]
+ },
+ "dense": {
+  "tri": {
+   "A": [
+    -1,
+    0
+   ],
+   "B": [
+    1,
+    0
+   ],
+   "P": [
+    0.3,
+    2
+   ],
+   "angA": 33.02,
+   "angB": -19.29,
+   "recovered": [
+    0.3,
+    2
+   ],
+   "withHalfDeg": [
+    0.313,
+    2.02
+   ],
+   "err": 0.024
+  },
+  "ray": {
+   "camAngleX": 0.6911,
+   "fovDeg": 39.6,
+   "W": 800,
+   "focal": 1111.11,
+   "pixel": [
+    600,
+    250
+   ],
+   "dir": [
+    0.18,
+    0.135,
+    -1
+   ]
+  },
+  "strat": {
+   "near": 2,
+   "far": 6,
+   "N": 64,
+   "width": 0.0625,
+   "bin": 10,
+   "u": 0.37,
+   "s": 2.6481
+  },
+  "params": {
+   "inPos": 63,
+   "inDir": 27,
+   "trunk": 493056,
+   "sigma": 257,
+   "bottleneck": 65792,
+   "view": 36352,
+   "rgb": 387,
+   "total": 595844,
+   "perSample": 595844
+  },
+  "pe": {
+   "L": 10,
+   "top": 512,
+   "period": 0.00391
+  },
+  "delta": {
+   "sigma": 4,
+   "a02": 0.551,
+   "a01": 0.33,
+   "twoHalves": 0.551
+  },
+  "bg": {
+   "C": [
+    0.791,
+    0.217,
+    0.226
+   ],
+   "T": 0.0672,
+   "white": [
+    0.858,
+    0.284,
+    0.293
+   ],
+   "black": [
+    0.791,
+    0.217,
+    0.226
+   ]
+  },
+  "grad": {
+   "dRed_dSigma3": 0.0142,
+   "dRed_dSigma2": -0.0582,
+   "dRed_dC3": 0.498
+  },
+  "ngp": {
+   "levels": 8,
+   "features": 4,
+   "tableSize": 524288,
+   "base": 16,
+   "params": 16777216,
+   "bytesHalf": 33554432,
+   "res64": 274625,
+   "res128": 2146689,
+   "mlpNeurons": 64,
+   "mlpHidden": 1
+  },
+  "ipe": {
+   "sigma": 0.002,
+   "rows": [
+    {
+     "k": 0,
+     "omega": "1π",
+     "atten": 1
+    },
+    {
+     "k": 3,
+     "omega": "8π",
+     "atten": 0.9987
+    },
+    {
+     "k": 6,
+     "omega": "64π",
+     "atten": 0.9223
+    },
+    {
+     "k": 8,
+     "omega": "256π",
+     "atten": 0.2743
+    },
+    {
+     "k": 9,
+     "omega": "512π",
+     "atten": 0.0057
+    }
+   ]
+  },
+  "contract": {
+   "rows": [
+    {
+     "x": 0.5,
+     "c": 0.5
+    },
+    {
+     "x": 1,
+     "c": 1
+    },
+    {
+     "x": 2,
+     "c": 1.5
+    },
+    {
+     "x": 4,
+     "c": 1.75
+    },
+    {
+     "x": 10,
+     "c": 1.9
+    },
+    {
+     "x": 100,
+     "c": 1.99
+    }
+   ]
+  },
+  "psnr": {
+   "a": 27.69,
+   "b": 27.21,
+   "mseRatio": 1.117
+  },
+  "mem": {
+   "floats": 59,
+   "bytes": 236,
+   "bonsai": 240000,
+   "bonsaiMB": 56.6,
+   "avgMB": 734,
+   "avgSplats": 3.11
+  },
+  "tiles": {
+   "W": 1920,
+   "H": 1080,
+   "tx": 120,
+   "ty": 68,
+   "total": 8160
+  },
+  "splatTiles": {
+   "lambda1": 1608.8,
+   "radius": 121,
+   "center": [
+    125,
+    75
+   ],
+   "rmin": [
+    0,
+    0
+   ],
+   "rmax": [
+    16,
+    13
+   ],
+   "tiles": 208
+  },
+  "dilate": {
+   "var": 0.01,
+   "after": 0.31,
+   "radius": 2
+  },
+  "zoom": {
+   "r": 1,
+   "zoomOut": 4,
+   "rNew": 0.25,
+   "varNew": 0.0625,
+   "withDil": 0.3625,
+   "widen": 2.41,
+   "dilShare": 0.83
+  },
+  "shCount": [
+   {
+    "l": 0,
+    "fns": 1,
+    "floats": 3
+   },
+   {
+    "l": 1,
+    "fns": 4,
+    "floats": 12
+   },
+   {
+    "l": 2,
+    "fns": 9,
+    "floats": 27
+   },
+   {
+    "l": 3,
+    "fns": 16,
+    "floats": 48
+   }
+  ],
+  "pop": {
+   "alpha": 0.7,
+   "redFirst": [
+    0.7,
+    0.21
+   ],
+   "greenFirst": [
+    0.21,
+    0.7
+   ]
+  },
+  "neus": {
+   "s": 64,
+   "rows": [
+    {
+     "f": -0.05,
+     "phi": 0.039
+    },
+    {
+     "f": 0,
+     "phi": 0.5
+    },
+    {
+     "f": 0.05,
+     "phi": 0.961
+    }
+   ]
+  },
+  "capture": {
+   "step": 5,
+   "perRing": 72,
+   "rings": 3,
+   "total": 216,
+   "fov": 60,
+   "overlap": 0.917
+  },
+  "split": {
+   "s": [
+    0.16,
+    0.04,
+    0.04
+   ],
+   "factor": 1.6,
+   "after": [
+    0.1,
+    0.025,
+    0.025
+   ],
+   "gradThreshold": 0.0002,
+   "interval": 100,
+   "from": 500,
+   "until": 15000,
+   "percentDense": 0.01
+  },
+  "evals": {
+   "rays": 4096,
+   "samples": 192,
+   "perStep": 786432,
+   "madds": 468590788608
+  },
+  "q3": {
+   "var": 0.35,
+   "radius": 2,
+   "noDilation": 1,
+   "noCeil": 1.775
+  }
  }
 }

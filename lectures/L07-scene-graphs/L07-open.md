@@ -5,7 +5,7 @@
   Plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Opening                                       2 min
     0:02  Scene graphs and hierarchical modeling      78 min
-    1:20  Discussion: two questions                   12 min
+    1:20  Discussion: three questions                 14 min
     1:32  HW3 walk-through and wrap                    8 min
     1:40  Quiz 3, on paper                            20 min
 

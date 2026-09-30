@@ -11,8 +11,8 @@
 
   Minute plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Title and tonight                                   2 min
-    0:02  The space of images (topic)                        78 min
-    1:20  Discussion: two questions                          12 min
+    0:02  The space of images (topic, 48 slides)             78 min
+    1:20  Discussion: three questions                        12 min
     1:32  HW7 walk-through                                    6 min
     1:38  Wrap                                                2 min
     1:40  Quiz 6, on paper                                   20 min
@@ -31,12 +31,12 @@
 
 ## Tonight
 
-- an image is a **point**, and a **function**; sampling connects the two
-- **bases**: the same image in cosine and Fourier coordinates
-- what linear algebra does to images: **filters**, **pyramids**, **histograms**, **JPEG**
-- comparing two images: **PSNR** and **SSIM**, and what they reward
-- the sheet of meaningful images, **measured** on 2,000 digits
-- why a concept has **no inverse**, and what must supply the missing choices
+- an image is a **point** in a space too large to count, and a **function**; pixels are samples; sRGB is not light
+- high dimensions: distances concentrate, the cube is all corners
+- **bases**: cosine, Fourier and the data's own (PCA, eigenfaces); the convolution theorem
+- what linear algebra does to images: **filters**, borders, sharpening, **pyramids**, resampling, **histograms**, noise, **JPEG**
+- comparing two images: **PSNR** and **SSIM** worked, what they reward, and averaging
+- the sheet of meaningful images, **measured**; inverse problems, null spaces and priors; why a concept has **no inverse**
 
 Reading: [The Space of Images](../../textbook/image-space.html)
 

@@ -1,12 +1,12 @@
 <!--
   CSS 551 · Lecture 11 (Thursday November 5, in person): Illumination.
-  Mounts, in order: L11-open.md, ../../topics/illumination.md (~76 min),
+  Mounts, in order: L11-open.md, ../../topics/illumination.md (~78 min, 56 slides),
   L11-discuss.md (discussion, HW5 walk-through, wrap). Then Quiz 5 on paper.
 
   Minute plan (120 min, Thu 5:45–7:45 PM in person):
     0:00  opening                                     2 min
-    0:02  illumination (topic)                       76 min
-    1:18  discussion: two questions                  12 min
+    0:02  illumination (topic)                       78 min
+    1:20  discussion: two questions                  10 min
     1:30  HW5 walk-through                            8 min
     1:38  wrap                                        2 min
     1:40  Quiz 5 (paper, 20 min): meshes, texture mapping, illumination, HW4
@@ -28,10 +28,11 @@
 
 ## Tonight
 
-- **What you see**: light, normal, eye; the local model and what it leaves out
-- **Diffuse**: Lambert's cosine, worked on the demo's marked point (N·L = 0.988); normals under a non-uniform scale
-- **Specular and ambient**: the mirror vector, R·V to a power, Blinn's half vector
-- **Light sources**: directional, point, spot; attenuation; many lights; tone mapping
+- **What you see**: light, normal, eye; the three terms pictured; the local model and what it leaves out
+- **Diffuse**: Lambert's cosine, worked on the demo's marked point (N·L = 0.988) in color; normals under a non-uniform scale
+- **Specular and ambient**: the mirror vector, R·V to a power, Blinn's half vector and its exponent, energy, four models in eleven years, per vertex or per pixel; ambient occlusion, a sky in nine numbers, why π
+- **Light sources**: directional, point, spot worked; falloff; many lights and their cost; area lights; tone mapping a real scene
+- **Color in rendering**: shade in linear light; the sRGB curve; the pitfall of lighting codes
 - **Discussion**, the **HW5** walk-through, then **Quiz 5**
 
 Reading: [Local Illumination](../../textbook/illumination.html); for the Unity track, [Unity Shaders](../../textbook/unity-shaders.html).

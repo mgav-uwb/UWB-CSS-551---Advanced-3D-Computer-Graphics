@@ -3,7 +3,7 @@
   Plan C (planning/css551-au26-plan-c-2026-09-29.md), week 11. Quiz 8 follows the discussion.
 
   COMPOSITION: index.html mounts L20-open.md (title + tonight), then
-  ../../topics/synthesis-review.md (~74 min), then L20-discuss.md (two questions,
+  ../../topics/synthesis-review.md (~78 min), then L20-discuss.md (three questions,
   open discussion, wrap; 20 min). The last 20 minutes are Quiz 8, on paper.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
@@ -11,11 +11,11 @@
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Opening                                          2 min
-    0:02  Synthesis and review (topic)                    74 min
-    1:16  Discussion: two questions                       10 min
-    1:26  Open discussion                                  8 min
-    1:34  Wrap                                             2 min
-    1:36  (buffer 4 min)  1:40  Quiz 8, 20 min             2:00 end
+    0:02  Synthesis and review (topic, 50 slides)         78 min
+    1:20  Discussion: three questions                     10 min
+    1:30  Open discussion                                  5 min
+    1:35  Wrap                                             2 min
+    1:37  (buffer 3 min)  1:40  Quiz 8, 20 min             2:00 end
 -->
 
 ## CSS 551
@@ -33,7 +33,7 @@
 
 - **The map and the thread**: eight eras, one chain from model coordinates to learned scenes, and where the foundations came back
 - **The final**: format and scope
-- **Twelve problems**, one per major topic, each posed and then worked: vectors, a plane, a rotation, composition order, a scene graph, depth, perspective-correct interpolation, shading, Monte Carlo, a gradient, a DDIM step, two splats
+- **Twenty-three problems**, each posed and then worked: the first twelve one per major topic; then the rigid inverse, look-at, `P`, the viewport, barycentric weights, bilinear filtering, the mip level, a ray and a sphere, importance sampling, attention, guidance
 - **Discussion**, then **Quiz 8**
 
 <small>Reading: the course text, <a href="../../textbook/history-of-graphics.html#era-map">A History of Computer Graphics, Section 10</a>, and the pitfall blocks of every chapter.</small>

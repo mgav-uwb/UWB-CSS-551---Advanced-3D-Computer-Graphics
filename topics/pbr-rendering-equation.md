@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~40 min).
+  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~46 min, 29 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/pbr-rendering-equation.md"> among others; it
   carries no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -33,7 +33,7 @@
 
 ### Honest light: from Phong to the rendering equation
 
-<small>(~40 min)</small>
+<small>(~46 min)</small>
 
 
 ---
@@ -64,6 +64,52 @@ The balance is a statement about **radiance**, so the unit comes first:
 
    a uniform sky of radiance 1:    E = ∫ cos θ dω = π = 3.1416
 ```
+
+
+---
+
+## Solid angle: area on the unit sphere
+
+A **solid angle** is to a sphere what an angle is to a circle: the area it covers on the **unit** sphere, in **steradians**.
+
+```text
+   the whole sphere          4π  = 12.566 sr
+   a hemisphere              2π  =  6.283 sr         (every direction above a surface)
+   the sun, seen from Earth  2π(1 − cos 0.2666°) = 0.000068 sr
+```
+
+Radiance is per steradian because a light's effect depends on **how big it looks**, not how big it is: the sun covers 0.000068 sr and still outshines the whole sky.
+
+
+---
+
+
+## Why a pixel measures radiance
+
+Radiance is **constant along a ray** in empty space. A consequence you can check with your eyes:
+
+```text
+   a white wall, 2 m away:   a pixel sees an area A of wall, each unit sending light toward you
+   the same wall, 4 m away:  the pixel sees 4A of wall (the area grows with d²)
+                             each unit's light reaching you drops to ¼ (inverse square)
+                             4 × ¼ = 1:   the wall looks exactly as bright
+```
+
+A camera pixel collects light from a small **solid angle**: it measures radiance, and radiance does not fade with distance. Only the **size** of things on the screen changes.
+
+
+---
+
+## Four radiometric quantities, one table
+
+| quantity | symbol | unit | what it answers | a light meter that reads it |
+| -------- | ------ | ---- | --------------- | --------------------------- |
+| flux | Φ | W | how much power in total | an integrating sphere around the bulb |
+| intensity | I | W/sr | how much power per direction, from a point | a meter far away, pointed at the bulb |
+| irradiance | E | W/m² | how much arrives per area | a meter lying flat on the table |
+| radiance | L | W/(m²·sr) | how much travels along one ray | a camera pixel |
+
+A point light's I is constant; the E it puts on a table falls as I cos θ / d²; the L a camera sees from the table does not fall with the camera's distance.
 
 
 ---
@@ -119,6 +165,17 @@ Li on the right is **some other point's Lo**. The unknown appears on **both side
 
 ---
 
+## Reciprocity: paths can run backward
+
+A physical BRDF is **reciprocal**: f(ωi, ωo) = f(ωo, ωi) (Helmholtz). Consequence: the light carried along a path is the same in either direction.
+
+- a camera ray traced **from the eye** finds the same light as a photon traveling **from the lamp** along the same path
+- so renderers may trace from the eye (path tracing), from the lights (photon mapping), or **both and connect** (bidirectional path tracing)
+- Phong's specular term is **not** reciprocal: with it, the choice of direction changes the answer
+
+
+---
+
 ## The BRDF: the material's answer
 
 Pull one factor out of the integral: `f(p, ωi, ωo)`, the **B**idirectional **R**eflectance **D**istribution **F**unction. Given light from `ωi`, it returns the fraction that leaves toward `ωo`. It **is** the material:
@@ -133,6 +190,19 @@ A **physical** BRDF must obey exactly the rules Phong broke:
 - **non-negative**: no negative light
 - **reciprocal**: `f(ωi, ωo) = f(ωo, ωi)`; swap light and eye, same value (Helmholtz)
 - **energy-conserving**: `∫ f · (n·ωi) dωi ≤ 1`; it reflects **at most** what arrived
+
+
+---
+
+## BRDF lobes, drawn
+
+<img src="../../textbook/figures/pbr-lobes.svg" class="media-shot" style="max-height: 280px;" alt="polar plots of reflectance for a fixed incoming direction: a Lambertian half-circle, a glossy lobe around the mirror direction, and a sharp specular spike">
+
+For light from one direction, the BRDF's value in every outgoing direction:
+
+- **Lambertian**: a half-circle, the same everywhere: matte
+- **glossy**: a lobe around the mirror direction: roughness sets its width
+- **mirror**: a spike: all the light in one direction
 
 
 ---
@@ -167,6 +237,39 @@ The physical specular BRDF models a rough surface as a field of microscopic **pe
 - **Cook-Torrance** multiplies three factors: **D** (how many facets face the half vector; **roughness** lives here), **G** (facets shadowing each other at grazing angles), **F** (**Fresnel**: every surface is mirror-like edge-on)
 - `f = D · G · F / (4 (n·ωi)(n·ωo))`
 - engines expose two sliders on top: **metallic** and **smoothness** (Unity's name for 1 − roughness)
+
+
+---
+
+## D: how many facets face the half vector
+
+<img src="../../textbook/figures/pbr-d-and-fresnel.svg" class="media-shot" style="max-height: 200px;" alt="the GGX distribution D against the angle of the half vector from the normal for several roughness values, and the Fresnel reflectance against angle for glass and gold">
+
+GGX (Walter et al., 2007) is the distribution engines use. Its peak, at the normal, is **1/(πα²)**:
+
+```text
+   α = 0.1    31.83         α = 0.3     3.537
+   α = 0.6     0.884        α = 1.0     0.318 = 1/π    (a perfectly rough surface: flat)
+```
+
+D integrates to one over the projected hemisphere: a smooth surface has **all** its facets near the normal, so its peak is **tall and narrow**.
+
+
+---
+
+
+## G: facets hide each other
+
+<img src="../../textbook/figures/pbr-geometry.svg" class="media-shot" style="max-height: 200px;" alt="the Smith masking term G1 against the angle from the normal for several roughness values, falling toward zero at grazing angles">
+
+At grazing angles a facet's light is blocked by its neighbors (**shadowing**) or its reflection hidden from the eye (**masking**). Smith's G1 per direction, multiplied for the two:
+
+```text
+   G1 = 2(n·x) / ((n·x) + √(α² + (1 − α²)(n·x)²))
+   α = 0.3:   at 30° from the normal 0.993;   at 80° it falls steeply;   at 90°, 0
+```
+
+Without G, a rough surface would glow at its **silhouette**: the 1/(n·ωo) of the BRDF's denominator blows up there.
 
 
 ---
@@ -208,6 +311,34 @@ Schlick's `F0 + (1 − F0)(1 − cos θ)⁵` is an approximation. The exact refl
 
 ---
 
+## Fresnel for glass: exact against Schlick
+
+| angle | 0° | 30° | 45° | 56.3° (Brewster) | 60° | 75° | 85° |
+| ----- | -- | --- | --- | ---------------- | --- | --- | --- |
+| exact | 0.040 | 0.042 | 0.050 | 0.074 | 0.089 | 0.253 | 0.613 |
+| Schlick | 0.040 | 0.040 | 0.042 | 0.057 | 0.070 | 0.255 | 0.649 |
+
+Schlick is low in the middle (21 % at 60°) and a little high at grazing. It survives because it costs one fifth power and matches the shape.
+
+
+---
+
+
+## Metals and dielectrics: the metallic slider
+
+The same base color means two different things:
+
+```text
+   dielectric (metallic 0):   diffuse = base color          specular F0 = 0.04, white
+   metal      (metallic 1):   diffuse = 0 (no body)         specular F0 = base color
+   in between:                F0 = mix(0.04, base, metallic),  diffuse = base × (1 − metallic)
+```
+
+Gold's F0 is (0.967, 0.803, 0.324) head-on, rising toward white at grazing: the reflection is **gold** because the metal's reflectance is.
+
+
+---
+
 ## Energy: the furnace test
 
 <img src="../../textbook/figures/pbr-furnace.svg" class="media-shot" style="max-height: 205px;" alt="directional albedo of the single-scattering microfacet model against roughness, for several viewing angles, falling well below one at high roughness">
@@ -229,6 +360,40 @@ The lost light bounced **between facets**, which the model ignores. Multiple-sca
 <img src="../../textbook/figures/pbr-sphere-grid.svg" class="media-shot" style="max-height: 400px;" alt="a five by five grid of shaded spheres: roughness increasing left to right, metallic increasing top to bottom; the plastic row keeps its color in shadow, the metal row goes dark except for tinted reflections">
 
 <small>Computed by the course-text figure generator: one directional light plus a two-tone sky/ground, Lambert + GGX D + Smith G + Schlick F. Across: roughness 0.1 to 0.9. Down: metallic 0 to 1.</small>
+
+
+---
+
+## Lighting from an environment: the split sum
+
+An environment map is light from **every** direction: the rendering equation's integral, with a picture as Li. Karis (2013, Unreal Engine 4) splits it into two precomputed pieces:
+
+```text
+   ∫ f · Li · cos  ≈  (prefiltered environment at roughness α)  ×  (F0 · A + B)
+   A, B: a 2D table over (n·v, α)           at n·v = 0.5, α = 0.5:   A = 0.679,  B = 0.0097
+   plastic, F0 = 0.04:    0.04 × 0.679 + 0.0097 = 0.037
+   gold:                  (0.689, 0.492, 0.207)
+```
+
+<img src="../../textbook/figures/pbr-split-sum-lut.png" class="media-shot" style="max-height: 150px;" alt="the split-sum lookup table: two channels over n dot v and roughness">
+
+
+---
+
+
+## Importance sampling the lobe
+
+To estimate the integral with random directions, draw them **where the BRDF is large**. For GGX, two uniform numbers give a half vector:
+
+```text
+   α = 0.3,  u = (0.3, 0.25):   cos θh = √((1 − u1) / (1 + (α² − 1) u1)) = 0.981   → θh = 11.1°
+                                φh = 2π u2 = 90°
+   reflect the view about that half vector → the light direction to trace
+```
+
+<img src="../../textbook/figures/pbr-ggx-sampling.svg" class="media-shot" style="max-height: 150px;" alt="sample directions drawn by GGX importance sampling clustering around the mirror direction, against uniform samples spread over the hemisphere">
+
+Samples cluster in the lobe; the weight f·cos/pdf stays near constant, so the noise is small.
 
 
 ---
@@ -276,4 +441,31 @@ Engines square the slider: **α = roughness²**. A shader that uses the slider a
 ```
 
 The two conventions agree only at 0 and 1. A material exported from one and rendered by the other looks wrong exactly in the middle of the slider.
+
+
+---
+
+## Measured materials, and the principled BRDF
+
+- **MERL** (Matusik, Pfister, Brand and McMillan, 2003): **100 real materials** measured on a gonioreflectometer, each a dense table of BRDF values; the ground truth analytic models are fitted against
+- **Disney's principled BRDF** (Burley, 2012): a small set of artist-friendly parameters (base color, metallic, roughness, specular, sheen, clearcoat, anisotropy, subsurface) chosen by fitting the MERL materials
+- nearly every engine and film renderer since uses a descendant of it
+
+The two sliders of this topic are its core; the rest handle cloth (sheen), car paint (clearcoat), brushed metal (anisotropy).
+
+
+---
+
+
+## Light that goes under the surface
+
+Skin, marble, milk, wax: light **enters**, scatters, and exits elsewhere. Inside, it fades by Beer–Lambert:
+
+```text
+   transmittance T = e^(−σ d)
+   σ = 0.5 per cm:   1 cm → 0.607     3 cm → 0.223
+   σ = 4 per cm:     1 cm → 0.018     3 cm → 0.000006
+```
+
+A BRDF cannot express it (light leaves from a **different point**); the full model is the BSSRDF. Jensen et al. (2001) made it practical with a diffusion approximation: the soft, glowing look of skin in film since.
 

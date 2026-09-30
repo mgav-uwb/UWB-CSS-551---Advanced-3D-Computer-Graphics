@@ -23,6 +23,7 @@
            80-minute Thursday lecture) with the textbook chapter's properties, log map, conversions,
            composition, slerp, double cover, drift and Euler-convention sections. Real C# excerpts are
            from Kelvin Sung's CSS 451 ClassExamples.
+  DENSIFIED 2026-09-29 (Plan C; Marcel: 60+ slides per two hours): history (Euler, Rodrigues, Hamilton), small angles and angular velocity with the drift of a linear step, Hamilton's rules and the product written out, matrix to quaternion worked, nlerp, the matrix-lerp failure, squad, both APIs and the degrees pitfall, Euler orders and ambiguity, Apollo's gimbal, a check-yourself slide. Numbers from numbers-foundations.json (rot) and numbers-motion.json (anim) or node.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -41,6 +42,19 @@
 ### Rotation about an axis
 
 <small>(~16 min)</small>
+
+---
+
+## Three names, seventy years
+
+| year | who | what |
+| --- | --- | --- |
+| 1775 | Leonhard Euler | every rotation of a rigid body about a fixed point is a single turn about **one axis** |
+| 1840 | Olinde Rodrigues | the formula that turns a vector about that axis (tonight's split-and-turn) |
+| 1843 | William Rowan Hamilton | **quaternions**, a four-number algebra whose products are rotations |
+
+Tonight follows the same order: the matrix, the axis and angle, then the four numbers engines store.
+
 
 ---
 
@@ -271,6 +285,54 @@ At 180° you divide noise by noise: the "axis" points anywhere. The diagonal sti
 
 ---
 
+## Small rotations are almost linear
+
+For a small angle θ (radians), `R ≈ I + θ K`, where `K v = axis × v`: a rotation is **first order** a cross product.
+
+| angle | error of `I + θK` | error of `I + θK + ½θ²K²` | column length of `I + θK` |
+| --- | --- | --- | --- |
+| 1° | 0.000152 | 0.00000089 | 1.0002 |
+| 5° | 0.00381 | 0.000111 | 1.0038 |
+| 10° | 0.0152 | 0.000885 | 1.0151 |
+| 30° | 0.134 | 0.0236 | 1.1288 |
+| 60° | 0.500 | 0.181 | 1.448 |
+
+<img src="../../textbook/figures/rot-small-angle.svg" alt="error of the first- and second-order approximations to a rotation against angle" style="height:150px">
+
+
+---
+
+## Pitfall: stepping with the linear rule grows the object
+
+Spin at `ω = 90°/s` about y and step a point with `p ← p + (ω × p) Δt` at 60 frames per second:
+
+```text
+   p = (1, 0, 0),  ω = (0, 1.5708, 0),  ω × p = (0, 0, −1.5708),  Δt = 1/60
+   one step:     p = (1, 0, −0.0262)       length 1.000343     exact: (0.9997, 0, −0.0262)
+   after 1 s:    length 1.0208             after 10 s: length 1.2282
+```
+
+- each step multiplies the length by `√(1 + (ωΔt)²)`; the error **compounds**
+- fix: step the rotation itself (a quaternion or axis-angle for `ωΔt`), or renormalize every frame
+
+
+---
+
+## Angular velocity is an axis times a rate
+
+`ω` is a vector: its **direction** is the spin axis, its **length** the rate in radians per second. A point on the body moves at `v = ω × p`.
+
+```text
+   ω = (0, 1.5708, 0)          a quarter turn per second about +y
+   p = (1, 0, 0):   v = ω × p = (0, 0, −1.5708)     speed 1.5708 = |ω| · (distance from the axis)
+   one frame's turn:  ω Δt = 1.5708 / 60 = 0.0262 rad = 1.5°  →  q = (0, sin 0.75°, 0, cos 0.75°)
+```
+
+The step that does not drift: turn by the **quaternion of `ωΔt`** each frame, `q ← q_step · q`.
+
+
+---
+
 ### Quaternions
 
 <small>(~26 min)</small>
@@ -303,6 +365,22 @@ q = ( sin(θ/2) n ,  cos(θ/2) ) = ( x, y, z, w )
 - always **unit length**: `x² + y² + z² + w² = sin²(θ/2) + cos²(θ/2) = 1`
 
 Worked, `R_y(30°)`: half angle 15°, `q = (0, 0.259, 0, 0.966)`; `0.259² + 0.966² = 0.067 + 0.933 = 1`.
+
+
+---
+
+## Hamilton's rules
+
+Three imaginary units, one rule, carved into Broom Bridge, Dublin, on 16 October 1843:
+
+```text
+   i² = j² = k² = ijk = −1
+   so   ij = k,  jk = i,  ki = j        but   ji = −k,  kj = −i,  ik = −j        (order matters)
+```
+
+- a quaternion is `w + x i + y j + z k`; engines store `(x, y, z, w)`
+- the **non-commutative** product is exactly why it can hold rotations: rotations do not commute either
+- Hamilton called `w` the **scalar** part and `(x, y, z)` the **vector** part; the words come from here
 
 
 ---
@@ -356,6 +434,24 @@ All nine give `R_y(30°)`, with no cosine evaluated.
 
 ---
 
+## The product, written out
+
+With `q = (v, w)` and `r = (u, s)` (vector part, scalar part):
+
+```text
+   q r = ( w u + s v + v × u ,   w s − v · u )
+
+   components:  x = w·ux + s·vx + (vy·uz − vz·uy)
+                y = w·uy + s·vy + (vz·ux − vx·uz)
+                z = w·uz + s·vz + (vx·uy − vy·ux)
+                w = w·s − (vx·ux + vy·uy + vz·uz)
+```
+
+A dot, a cross, and two scalings: 16 multiplies, against 27 for a `3×3` matrix product. The cross product is where the order enters.
+
+
+---
+
 ## Composing rotations = multiplying quaternions
 
 ```csharp [1-6]
@@ -368,7 +464,7 @@ Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
 }
 ```
 
-<small>EX_8_1_MyScript.cs. Like matrix multiply, the product is **not commutative**: order is the rotation order.</small>
+<small>`EX_8_1_MyScript.cs`. Like matrix multiply, the product is **not commutative**: order is the rotation order.</small>
 
 
 ---
@@ -383,6 +479,64 @@ sandwich on (1, 2, 3)                   -> (2.366, 0.683, 2.817)
 R_x(30°) R_y(30°) on (1, 2, 3)          -> (2.366, 0.683, 2.817)
 angle 2 acos(0.933) = 42.2°, axis (0.695, 0.695, 0.186)
 ```
+
+
+---
+
+## Matrix to quaternion: read the trace
+
+The trace of `R` is `1 + 2 cos θ`, and `w = cos(θ/2)`, so `w` falls out of the trace:
+
+```text
+   s = 2 √(1 + trace)          w = s / 4
+   x = (m21 − m12) / s         y = (m02 − m20) / s         z = (m10 − m01) / s
+```
+
+- when the trace is near `−1` (a half turn) `s` is near 0: switch to the branch of the **largest diagonal entry** (Shepperd's method)
+- this is how `Quaternion.LookRotation`, `Matrix4x4.rotation` and three.js `setFromRotationMatrix` get their answer
+
+
+---
+
+## Worked: the composed rotation back to four numbers
+
+The product `R_y(30)·R_x(30)` from the composition slide:
+
+```text
+   R = [ 0.866   0      0.5   ]      trace = 0.866 + 0.866 + 0.75 = 2.4821
+       [ 0.25    0.866 −0.433 ]      s = 2 √3.4821 = 3.7321      w = 0.933
+       [−0.433   0.5    0.75  ]      x = (0.5 − (−0.433)) / 3.7321 = 0.25
+                                     y = (0.5 − (−0.433)) / 3.7321 = 0.25
+                                     z = (0.25 − 0) / 3.7321       = 0.067
+```
+
+`(0.25, 0.25, 0.067, 0.933)`: the **same** four numbers as the quaternion product `q_y q_x`. Angle `2 acos 0.933 = 42.18°`.
+
+
+---
+
+## The shortest arc from one direction to another
+
+To turn unit vector `a` onto unit vector `b` by the smallest rotation: axis `a × b`, angle `acos(a · b)`, and a quaternion with no trigonometry:
+
+```text
+   q = normalize( a × b ,  1 + a · b )            (vector part, scalar part)
+
+   a = (0.6, 0.8, 0),  b = (0, 0.6, 0.8):   a · b = 0.48,  a × b = (0.64, −0.48, 0.36)
+   q = normalize(0.64, −0.48, 0.36, 1.48) = (0.372, −0.279, 0.209, 0.860)          angle 61.3°
+   check: q applied to a gives (0, 0.6, 0.8) = b
+```
+
+
+---
+
+## Pitfall: turning a vector onto its opposite
+
+```text
+   a = (1, 0, 0),  b = (−1, 0, 0):   a × b = (0, 0, 0),  1 + a · b = 0     q = normalize(0, 0, 0, 0): undefined
+```
+
+Every axis perpendicular to `a` gives a valid half turn, so the formula has nothing to pick. Robust code detects `1 + a · b < ε` and chooses **any** perpendicular axis (for example `a × (0, 1, 0)`, or `a × (1, 0, 0)` if that is also near zero).
 
 
 ---
@@ -414,6 +568,47 @@ fix: if q1 . q2 < 0, negate q2 first
 
 ---
 
+## nlerp: cheaper, almost as good
+
+Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((1 − t) q1 + t q2)`.
+
+`q1` = identity, `q2` = 120° about y (`q1·q2 = 0.5`, arc `Ω = 60°`):
+
+| t | slerp angle | nlerp angle |
+| --- | --- | --- |
+| 0.25 | 30.0° | 27.8° |
+| 0.5 | 60.0° | 60.0° |
+
+- same path, **uneven speed**: at most 1.1 times the average rate for this pair
+- no `sin`, no `acos`: games blend thousands of bones per frame with nlerp and renormalize
+
+
+---
+
+## Never lerp the matrices
+
+Blend the identity and `R_z(90)` entry by entry at `t = 0.5`:
+
+```text
+   M = ½ I + ½ R = [ 0.5  −0.5 ]      columns of length 0.707, det 0.5: the object SHRINKS to half its area
+                   [ 0.5   0.5 ]      at a half turn (R_z(180)) the blend is the zero matrix: det 0, gone
+```
+
+- a matrix blend is not a rotation; the columns stop being unit and orthogonal
+- blend **the parts**: translations by lerp, rotations by slerp or nlerp, scales by lerp (or in log space)
+
+
+---
+
+## More than two keys: squad
+
+<img src="../../textbook/figures/anim-squad.svg" alt="a chain of slerps with a corner at each key, and a squad curve through the same keys without the corner" style="height:190px">
+
+A chain of slerps turns at constant speed between keys but **kinks** at each key: the angular speed jumps from 60 to 82.8 degrees per unit at the middle key of the chapter's example. **Squad** (spherical quadrangle) adds inner control quaternions and holds the speed across the key: 65.1 before, 65.2 after.
+
+
+---
+
 ## Drift, measured
 
 <img src="../../textbook/figures/rot-drift.svg" alt="error growth over 200,000 float32 compositions: matrix, quaternion, renormalized quaternion" style="height:220px">
@@ -438,6 +633,39 @@ fix: if q1 . q2 < 0, negate q2 first
 - three.js: `Quaternion.setFromAxisAngle`, `multiply`, `slerp`, same layout
 
 You *read* Euler angles in the Inspector, but the engine *stores* a quaternion.
+
+
+---
+
+## The same rotation in two APIs
+
+```js
+// three.js: radians; q1.multiply(q2) is q1·q2 (q2 acts first)
+const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 6);
+const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.5)
+```
+
+```csharp
+// Unity: degrees; q1 * q2 applies q2 first; q * v rotates a vector
+Quaternion q = Quaternion.AngleAxis(30f, Vector3.up);
+Vector3 p = q * new Vector3(1, 0, 0);                         // (0.866, 0, −0.5)
+```
+
+Same four numbers `(0, 0.259, 0, 0.966)`, same image of `+x`; **units differ**: radians in three.js, degrees in Unity.
+
+
+---
+
+## Pitfall: degrees where radians were expected
+
+```text
+   Math.sin(30)             = −0.988      (30 radians: 4.77 full turns and a bit)
+   Math.sin(30 · π / 180)   =  0.5
+```
+
+- a rotation built from `30` radians turns the object by `30 mod 2π = 4.867 rad = 278.9°`
+- the bug is silent: the result is still a valid rotation, just the wrong one
+- rule: convert at the boundary (`THREE.MathUtils.degToRad`, `Mathf.Deg2Rad`), never inside the math
 
 
 ---
@@ -495,6 +723,47 @@ At the lock, `(90°, 45°, 10°)` and `(90°, 60°, 25°)` are the **same orient
 
 ---
 
+## Six orders, six different rotations
+
+The triple `(x, y, z) = (20°, 45°, 10°)`, read in three conventions:
+
+| convention | product | where `+x` lands |
+| --- | --- | --- |
+| Unity (`Z`, then `X`, then `Y`) | `R_y R_x R_z` | (0.738, 0.163, −0.654) |
+| three.js default `XYZ` | `R_x R_y R_z` | (0.696, 0.401, −0.595) |
+| extrinsic `X`, `Y`, `Z` | `R_z R_y R_x` | (0.696, 0.123, −0.707) |
+
+Unity's and three.js's results differ by **15.2°**. An Euler triple means nothing without its order.
+
+
+---
+
+## Two triples, one rotation
+
+```text
+   (20°, 45°, 10°)   and   (160°, 225°, 190°)   give the SAME matrix in Unity's ZXY order
+```
+
+- every orientation has **two** Euler triples (away from the lock), and infinitely many at the lock
+- so "interpolate the three angles" can take the long way: from `(20, 45, 10)` to `(160, 225, 190)` is a large motion between identical poses
+- store and interpolate quaternions; show Euler angles only in the inspector
+
+
+---
+
+## Gimbal lock, in flight
+
+The Apollo guidance platform held its orientation on **three gimbals**. Near lock, the crew was warned to steer away; on Apollo 11, when Houston warned that Columbia was close to gimbal lock, Michael Collins answered:
+
+> "How about sending me a fourth gimbal for Christmas?"
+
+<small>Apollo 11 air-to-ground transcript, 1969.</small>
+
+Three gimbals are three Euler angles in hardware; the fourth gimbal Collins asked for is the extra degree of freedom a quaternion has for free.
+
+
+---
+
 ## Why quaternions dodge it
 
 Gimbal lock is a disease of the **representation**, not of rotation itself:
@@ -502,6 +771,16 @@ Gimbal lock is a disease of the **representation**, not of rotation itself:
 - three sequential angles have singular configurations: the 90° collapse
 - a **quaternion** names axis and angle **directly**: no gimbals to align
 - engines **store** quaternions and only **show** Euler angles for editing
+
+
+---
+
+## Check yourself
+
+1. `R` has columns `(0, 1, 0)`, `(−1, 0, 0)`, `(0, 0, 1)`. About which axis, by how much?
+2. `q = (0, 0, 0.707, 0.707)`. Where does `(1, 0, 0)` go?
+3. You slerp from `q` to `−q'`, where `q · q' = 0.5`. How far does the object turn?
+4. Unity reads `transform.eulerAngles = (90, 45, 10)`. Which single number can you change without effect if you also change another?
 
 
 ---

@@ -14,7 +14,7 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Diffusion models I (topic)                         88 min
+    0:02  Diffusion models I (topic, 54 slides)              88 min
     1:30  Discussion: four questions                         27 min
     1:57  Wrap                                                3 min
 -->
@@ -32,11 +32,12 @@
 
 ## Tonight
 
-- **destroy**: the forward process and the noise schedule
-- **the denoiser**: the exact answer for a finite dataset, in four coordinates
-- **learn**: the training loop, and where its loss comes from
-- **sample**: DDPM and DDIM, how many steps, the ODE underneath, flow matching
-- from **lookup table** to **network**: digits memorized, blended, then drawn
+- where diffusion sits among the **generative model families**
+- **destroy**: the forward process in code and by hand, the schedule, the noise shell, the terminal-SNR pitfall
+- **the denoiser**: the exact answer for a finite dataset, its Gaussian case, Tweedie, four coordinates, the score field
+- **learn**: the training loop, counted, and where its loss comes from
+- **sample**: DDIM and DDPM worked, the sampler in code, its cost, the ODE and Euler, inversion, flow matching, slerp
+- from **lookup table** to **network**: digits memorized, blended, then drawn; three sources of error; 2015 to 2022
 
 Reading: [Diffusion Models](../../textbook/diffusion-models.html), Sections 1 to 6
 

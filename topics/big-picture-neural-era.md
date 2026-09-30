@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: The big picture, part 3: the neural era and the map of the field (~40 min).
+  CSS 551 · TOPIC DECK: The big picture, part 3: the neural era and the map of the field (~30 min).
   Mounted as <section data-markdown="../../topics/big-picture-neural-era.md">. No logistics.
 
   TEACHES: era 8 of the history chapter at survey depth: learned scenes
@@ -29,7 +29,7 @@
 
 ### The neural era, and the map of the field
 
-<small>(~40 min) · reading: <a href="../../textbook/history-of-graphics.html#era-neural">History, Sections 8 to 10</a></small>
+<small>(~30 min) · reading: <a href="../../textbook/history-of-graphics.html#era-neural">History, Sections 8 to 10</a></small>
 
 
 ---

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Texture mapping, detail without geometry (~48 min).
+  CSS 551 · TOPIC DECK: Texture mapping, detail without geometry (~45 min, 33 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/texture-mapping.md"> among others; no
   lecture logistics, no "Part N" numbering.
@@ -28,7 +28,7 @@
 
 ### Texture mapping: detail without geometry
 
-<small>(~48 min)</small>
+<small>(~45 min)</small>
 
 
 ---
@@ -416,6 +416,22 @@ The sampler measures how far `(u, v)` moves per pixel, in texels, from the scree
 
 ---
 
+## Texture compression: 4 bits per texel
+
+GPUs sample **compressed** textures directly. BC1 (DXT1) stores each 4×4 block as two colors and sixteen 2-bit indices:
+
+```text
+   one block: 2 endpoint colors in 5:6:5 bits (32 bits) + 16 × 2-bit indices (32 bits) = 64 bits
+   palette: the two endpoints and two colors between them at ⅓ and ⅔
+   64 bits / 16 texels = 4 bits per texel,  against 24 uncompressed:   6 times smaller
+   the chapter's block: RMS error 8.1 codes (of 255), worst texel 20.4
+```
+
+Fixed-rate blocks mean the GPU can find any texel's block by arithmetic: random access, unlike JPEG.
+
+
+---
+
 ## Bump mapping: detail in the normal
 
 A texture can store not a color but a **height** `h(u, v)`. Its slope tilts the normal, and the lighting does the rest; the geometry stays flat.
@@ -429,6 +445,21 @@ A texture can store not a color but a **height** `h(u, v)`. Its slope tilts the 
 ```
 
 <img src="../../textbook/figures/tex-bump.png" class="media-shot" style="max-height: 200px;" alt="a flat quad lit with a brick height map: without bump mapping it is uniformly lit; with it the mortar grooves shade as if recessed">
+
+
+---
+
+## Normal maps and tangent space
+
+A normal map stores a tilted normal per texel, in the triangle's own **tangent frame** (T along u, B along v, N out of the surface):
+
+```text
+   the grid's triangle (0, 3, 1):  T = (1, 0, 0),  B = (0, 0, 1),  N = (0, 1, 0)      handedness −1
+   a texel stores RGB (186, 186, 225)  →  decode c/255·2 − 1  →  tangent-space (0.457, 0.457, 0.762)
+   to world:  0.457·T + 0.457·B + 0.762·N  =  (0.457, 0.762, 0.457)
+```
+
+Tangent space makes one normal map reusable on any surface, and it is why normal maps look **blue**: most normals point along +N, the blue channel.
 
 
 ---
@@ -447,4 +478,37 @@ Every texture so far was an **image**: stored texels. But sampling only needs a 
 - the trade: an **arbitrary** picture (a face) is easier to paint than to derive
 
 The checker in the demo is exactly this: a function of `(u,v)`, the parity of `⌊u·8⌋ + ⌊v·8⌋`, precomputed into a texture.
+
+
+---
+
+## Cube maps: a texture indexed by direction
+
+<img src="../../textbook/figures/tex-cubemap.svg" class="media-shot" style="max-height: 200px;" alt="a direction vector from the center of a cube, hitting the minus-Y face at a marked texel">
+
+Six square faces around the origin; a **direction** picks a face by its largest component, then a texel:
+
+```text
+   d = (0.303, −0.808, 0.505):   largest |component| is y, negative   →   face −Y
+   s, t = (sc / |ma| + 1) / 2, (tc / |ma| + 1) / 2 = (0.688, 0.188)   →   texel (176, 48) of 256
+   512 × 512 × 6 faces × 3 bytes = 4.7 MB;  with mips 6.3 MB
+```
+
+Used for skies, reflections (look up the reflected direction R), and the lighting of image-based and physically based rendering.
+
+
+---
+
+
+## Shadow maps: a depth texture from the light
+
+<img src="../../textbook/figures/tex-shadowmap.svg" class="media-shot" style="max-height: 200px;" alt="a box on a floor lit by a directional light; the light's depth map and two floor points, one in the box's shadow">
+
+Williams (1978): render the scene's **depth from the light** into a texture. When shading a point, transform it to the light's view and compare:
+
+```text
+   a point in the box's shadow:   stored depth 9.333,  its own depth 10.833   farther → in shadow
+   a lit floor point:             stored 8.333,        its own 8.333          equal   → lit
+   bias 0.0197 (the depth change across one texel on a floor at 48°) stops a surface shadowing itself
+```
 

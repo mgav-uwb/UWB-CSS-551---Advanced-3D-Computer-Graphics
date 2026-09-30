@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L06 discussion and wrap (~30 min). Four peer-instruction questions; answers ONLY
+  CSS 551 · L06 discussion and wrap (~30 min). Six peer-instruction questions; answers ONLY
   in the notes. Numbers computed by node against lib/core/xform.js (makeTRS, axisAngleMatrix,
   matMul, applyMat4) and from textbook/figures/numbers-foundations.json (aff.obliqueScale).
 -->
@@ -55,6 +55,30 @@ A node's linear part is `[[1.5, 0.5, 0], [0.5, 1.5, 0], [0, 0, 1]]`. What does i
 - **B.** `2, 1, 1`
 - **C.** `1.5, 1.5, 1`
 - **D.** `2, 2, 1`
+
+
+---
+
+## Question 5: the determinant
+
+A node's model matrix is `R_y(90°) · S(-1, 2, 1)`. What is `det` of its linear part, and what must the renderer do?
+
+- **A.** `-2`: the mesh is mirrored and doubled in volume; flip the culling (front-face) mode
+- **B.** `2`: doubled in volume; nothing special
+- **C.** `-1`: mirrored, same volume; flip the culling mode
+- **D.** `0`: the scale collapsed a dimension; skip the draw
+
+
+---
+
+## Question 6: into the object's frame
+
+`M = T(0, 0, 4) · S(2, 2, 2)`. A ray hits the world point `(2, 0, 4)`. What are its coordinates in the object's own frame?
+
+- **A.** `(1, 0, 0)`
+- **B.** `(1, 0, -2)`
+- **C.** `(2, 0, 0)`
+- **D.** `(4, 0, 0)`
 
 
 ---

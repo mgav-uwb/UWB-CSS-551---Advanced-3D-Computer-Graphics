@@ -110,6 +110,15 @@ The course walks this bar left to right; the bands **overlap on purpose**: resea
 
 ---
 
+## The name itself
+
+- **1960**, Boeing: **William Fetter**, in Verne Hudson's design group, used the phrase **"computer graphics"** for drawings made by computer to lay out a cockpit
+- his most famous image is a **wireframe pilot**, a human figure for checking reach and visibility
+- sources credit both Fetter and Hudson with the phrase; the field named itself in an aircraft factory
+
+
+---
+
 ## The Ultimate Display
 
 **1965**, Sutherland's manifesto: the display is *"a looking glass into a mathematical wonderland."*
@@ -156,6 +165,16 @@ Every model, hand-built cube or scanned rabbit, is *the same data*: vertices plu
 
 - drag `wire`: cross-fade the skin away; the triangles were under there all along
 - `spin` it: 3D data, not a picture; the readout counts vertices and triangles
+
+
+---
+
+## A mesh, drawn by hand: the 1972 hand
+
+- **Ed Catmull and Fred Parke**, University of Utah, 1972: *A Computer Animated Hand*, a class project
+- Catmull made a plaster model of his left hand and drew **about 350 triangles and polygons** on it in ink; each corner was measured and typed in
+- the hand opens, closes and turns, rendered with the shading of the day
+- added to the U.S. **National Film Registry** in **2011**
 
 
 ---
@@ -446,6 +465,20 @@ Watch for: the readout's triangle count; it never leaves 2.
 
 ---
 
+## Where Utah's students went
+
+| student | known for | went on to found or lead |
+| --- | --- | --- |
+| **Ed Catmull** | the z-buffer, texture mapping (1974) | Pixar; Walt Disney Animation Studios |
+| **John Warnock** | hidden-surface work at Utah | Adobe (PostScript, PDF) |
+| **Jim Clark** | head-mounted display and geometry hardware | Silicon Graphics; Netscape |
+| **Alan Kay** | the Dynabook idea, object-oriented Smalltalk | Xerox PARC |
+
+One graduate program, late 1960s and 1970s, under **David Evans and Ivan Sutherland**.
+
+
+---
+
 ### Era 3 · Chasing the photograph
 
 <small>1975–1990 · ~12 min · <a href="../../textbook/history-of-graphics.html#era-photograph">History §3</a></small>
@@ -491,6 +524,16 @@ Same room, same light. Top: **direct only** (Utah's world). Bottom: **radiosity*
 - *radiosity*: let light diffuse between surface patches; soft, matte worlds (Cornell, 1984)
 
 One line each: these are *names to recognize*, not algorithms to learn yet.
+
+
+---
+
+## Whitted's frame, in numbers
+
+- **1980**: Turner Whitted, Bell Labs, *An Improved Illumination Model for Shaded Display*: recursive rays for reflection, refraction and shadows
+- the famous image, glass and mirror spheres over a checkerboard, took **74 minutes** on a DEC **VAX-11/780**
+- at that speed one second of film, 24 frames, takes **29.6 hours**
+- the same scene now runs interactively; the next lecture asks how many doublings of speed that took
 
 
 ---

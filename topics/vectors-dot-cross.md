@@ -11,6 +11,13 @@
   Gram-Schmidt, coordinates in a frame; parametric lines and segments (the clamp table), point to line
   in 3D by one cross; planes and signed distance, which side, ray against plane (four cases);
   barycentric coordinates in a triangle.
+  ADDED 2026-09-29 (densification): where the products came from (Hamilton 1843, Gibbs
+  1881 to 1884); the law of cosines as the dot product; reflection and projection onto
+  a plane, worked; two more precision pitfalls (normalizing a tiny vector, cancellation
+  far from the origin); a predict-first poke; Newell's polygon normal; polygon area by
+  crosses; the 2D perp-dot product and line-line intersection; the distance between
+  skew lines; ray against sphere; Unity's Vector3 and its traps. Numbers from
+  tools/gen-lecture-figures-a.mjs and textbook/vectors.html Section 8.
   NEEDS:   nothing beyond high-school vectors; the demo state a=(2,1,0), b=(1,2,1) is reused in every worked example.
   DEMOS:   data-demo="dot-cross" data-controls="ax,ay,bx,by" (under the lecture page's 200px crop).
            Fallback numbers: a.b = 4, |a| = 2.24, |b| = 2.45, theta = 43.1 deg, a x b = (1, -2, 3).
@@ -128,6 +135,16 @@ Reverse the subtraction (`A - R`) and the ball flies **away** from the target.
 
 ---
 
+## Where the two products came from
+
+- **1843**: William Rowan Hamilton's **quaternions**; the product of two pure quaternions (0, **a**) and (0, **b**) is ( −**a · b**, **a × b** )
+- both products were born as the **two halves of one multiplication**
+- **1881 to 1884**: Josiah Willard Gibbs (and Oliver Heaviside, independently) split them apart as **vector analysis**, the notation used today
+- the rotation lecture puts them back together
+
+
+---
+
 ### The dot product
 
 <small>(~22 min)</small>
@@ -162,6 +179,22 @@ a . b  =  |a| * |b| * cos(theta)
 ```
 
 The two are **equal**; that equality is the entire use of the dot product.
+
+
+---
+
+## The law of cosines is the dot product
+
+Expand the squared length of **a − b**:
+
+```text
+   |a − b|² = (a − b)·(a − b) = a·a − 2 a·b + b·b = |a|² + |b|² − 2 |a||b| cos θ
+
+   a = (2, 1, 0), b = (1, 2, 1):  a − b = (1, −1, −1),  |a − b|² = 3
+                                  |a|² + |b|² − 2 a·b = 5 + 6 − 8 = 3
+```
+
+The geometric definition **follows** from the algebraic one: the triangle with sides a, b, a − b.
 
 
 ---
@@ -245,6 +278,38 @@ Check perpendicularity: `a-perp . b` must be **0**:
 
 ---
 
+## Reflection: flip the along part
+
+Split **d** into the part along a unit normal **n** and the part across it; reflection keeps the across part and **negates** the along part:
+
+```text
+   r = d − 2 (d·n) n
+
+   d = (1, 0, 0), a mirror tilted 45°: n = (1, 1, 0)/√2 = (0.707, 0.707, 0)
+   d·n = 0.707   →   r = (1, 0, 0) − 2 · 0.707 · (0.707, 0.707, 0) = (0, −1, 0)
+```
+
+A ray going right, off a 45° mirror, goes straight down. Mirrors, bounces, specular highlights, ray-traced reflections: all this line.
+
+
+---
+
+## Project onto a plane: remove the normal part
+
+Keep only the across part: **v − (v·n) n**, for a unit normal n.
+
+```text
+   v = a = (2, 1, 0),  n = (1, 2, 2)/3
+   v·n = (2 + 2 + 0)/3 = 1.333
+   v − 1.333 · (0.333, 0.667, 0.667) = (1.556, 0.111, −0.889)
+   check: (1.556, 0.111, −0.889)·n = 0
+```
+
+A shadow direction on the ground, a camera sliding along a wall, a velocity after hitting a floor.
+
+
+---
+
 ## Sign = the in-front-of test
 
 <img src="../../textbook/figures/vec-dot-sign.svg" alt="the sign of the dot product splits space into front and behind" style="height:220px">
@@ -270,6 +335,55 @@ Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, in float32:
 | 0.0001 | 1.00000000 | 1 (returns 0) | 2.9e-8 |
 
 Below θ = sqrt(2ε) ≈ 4.9e-4 rad (0.03°) the dot rounds to exactly 1 and acos returns **0**.
+
+
+---
+
+## Pitfall: normalizing a tiny vector
+
+- normalize = divide by the length, and the length is √(x² + y² + z²)
+- in float32, (10⁻²⁰)² = 10⁻⁴⁰ still exists (a denormal); **(10⁻²⁵)² = 0 exactly**
+- a vector of length 10⁻²⁵ normalizes to **0 / 0 = NaN**, which then spreads through every later computation
+- short vectors come from **cross products of nearly parallel inputs** and **differences of nearly equal points**: guard the length before dividing
+
+
+---
+
+## Pitfall: cancellation far from the origin
+
+```text
+   (10⁶, 1, 0) · (1, −10⁶, 0) = 10⁶ − 10⁶ = 0          in exact arithmetic
+   in float32, each product is known to about ± 0.1   → the computed 0 is noise of that size
+```
+
+- the relative error of float32 is about **1.2 × 10⁻⁷**; at 10⁶ that is **0.1** absolute
+- positions a million units from the origin lose everything below a tenth of a unit
+- **subtract a nearby reference point first**, then compute: the view matrix does exactly this for every vertex
+
+
+---
+
+## Pitfall: testing with ==
+
+```text
+   0.1 + 0.2 == 0.3                      → false   (0.30000000000000004 in doubles)
+   dot(n, n) == 1   for n = normalize(1, 1, 1) in float32   → false   (0.99999994)
+   dot(v, n) == 0   for a vector "in the plane"             → false after any rotation
+```
+
+- test against a **tolerance**: |x − y| < ε, with ε chosen for the scale (1e-6 near 1, larger for big coordinates)
+- "is this vector unit length?" and "is this point on the plane?" are **always** tolerance tests
+
+
+---
+
+## Predict first: a perpendicular pair
+
+Set the demo to **a = (2, 1, 0)** and **b = (−1, 2, 1)**. Before running, predict:
+
+- a · b = ?
+- θ = ?
+- a × b = ?  (and is it perpendicular to both?)
 
 
 ---
@@ -357,6 +471,54 @@ check:    sqrt(5) sqrt(6) sin(43.1°) = 5.477 * 0.683 ~= 3.742
 
 ---
 
+## The area of any polygon: sum the crosses
+
+For a polygon in the plane, twice the area is the sum over its edges of `x_i · y_next − x_next · y_i`, the z part of each edge's cross product:
+
+```text
+   pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5)
+
+   area = ½ · Σ (x_i · y_next − x_next · y_i) = 16.875
+```
+
+The sign tells the winding: **positive** counterclockwise, **negative** clockwise.
+
+
+---
+
+## In 2D: the perp-dot product
+
+For plane vectors, keep only the cross product's **z** part: `u ⊥ v = u_x · v_y − u_y · v_x`.
+
+```text
+   (2, 1) ⊥ (1, 2) =  2·2 − 1·1 =  3    v is counterclockwise from u: a LEFT turn
+   (1, 2) ⊥ (2, 1) =  1·1 − 2·2 = −3    clockwise: a RIGHT turn
+```
+
+- **zero**: parallel · **sign**: which side · **size**: the parallelogram's area
+- the edge functions of the rasterization lecture are this, one per triangle edge
+
+
+---
+
+## Two lines in 2D, intersected
+
+Lines p + t r and q + s u. Cross both sides with u, then with r:
+
+```text
+   t = (q − p) ⊥ u / (r ⊥ u),     s = (q − p) ⊥ r / (r ⊥ u)
+
+   p = (0, 0), r = (4, 2);  q = (0, 3), u = (2, −1)
+   r ⊥ u = 4·(−1) − 2·2 = −8
+   t = ((0, 3) ⊥ (2, −1)) / −8 = (0 − 6) / −8 = 0.75     → p + 0.75 r = (3, 1.5)
+   s = ((0, 3) ⊥ (4, 2)) / −8 = (0 − 12) / −8 = 1.5      → q + 1.5 u  = (3, 1.5)
+```
+
+**r ⊥ u = 0**: parallel lines, no single answer. For segments, accept only **0 ≤ t, s ≤ 1**.
+
+
+---
+
 ## Worked: a face normal from two edges
 
 `P0 = (0,0,0)`, `P1 = (2,0,0)`, `P2 = (0,0,-2)`:
@@ -373,6 +535,23 @@ e1 x e2 = (0*(-2) - 0*0,  0*0 - 2*(-2),  0) = (0, 4, 0)    ->  n = (0, 1, 0)
 Vector3 n = Vector3.Cross(v1, v2);
 if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen side
 ```
+
+
+---
+
+## Newell's method: the normal of a polygon
+
+A four-sided face whose corner is lifted, (0, 0, 0), (1, 0, 0), (1, 1, **0.2**), (0, 1, 0), is not flat. Crosses at different corners **disagree**:
+
+```text
+   cross at vertex 0:  (0, 0, 1)          cross at vertex 2:  (−0.192, −0.192, 0.962)
+
+   Newell: sum over edges (p → q) of
+      Nx += (p_y − q_y)(p_z + q_z),  Ny += (p_z − q_z)(p_x + q_x),  Nz += (p_x − q_x)(p_y + q_y)
+   = (−0.2, −0.2, 2)  →  normalized (−0.099, −0.099, 0.990)
+```
+
+One normal from every edge at once: the average orientation, robust to a bent face (Tampieri, Graphics Gems III, 1992).
 
 
 ---
@@ -512,6 +691,23 @@ The across distance is `|a-perp|` from the projection split, **without building 
 
 ---
 
+## Two skew lines: one cross, one dot
+
+Lines through **p1** along **d1** and **p2** along **d2**. The shortest segment between them is along **d1 × d2**:
+
+```text
+   distance = | (p2 − p1) · (d1 × d2) | / | d1 × d2 |
+
+   p1 = (0, 0, 0), d1 = (1, 0, 0);   p2 = (0, 1, 2), d2 = (0, 1, 1)
+   d1 × d2 = (0, −1, 1),  (p2 − p1)·(0, −1, 1) = −1 + 2 = 1
+   distance = 1 / √2 = 0.707
+```
+
+Motion capture triangulation: two camera rays through one marker **nearly** meet; the midpoint of this segment is the estimate.
+
+
+---
+
 ## A plane is a point and a normal
 
 <img src="../../textbook/figures/vec-plane-distance.svg" alt="a plane with its normal and a point's signed distance" style="height:240px">
@@ -570,6 +766,23 @@ Ray `o + t d`, plane `n . P = D`: `t = (D - n . o) / (n . d)`. With the plane ab
 
 ---
 
+## Ray against sphere: a quadratic of dots
+
+A ray **o + t d** (unit d) against a sphere of radius r at the origin: |o + t d|² = r², so
+
+```text
+   t² + 2 (o·d) t + (o·o − r²) = 0       b = o·d,  c = o·o − r²,  t = −b ± √(b² − c)
+
+   o = (3, 3, 6), r = 1.2, d = (−0.372, −0.370, −0.852)  (the ray-tracing lecture's pixel)
+   b = −7.334,  c = 52.56,  b² − c = 1.222
+   t = 7.334 − 1.105 = 6.228 (enters)      t = 8.439 (leaves)
+```
+
+**b² − c < 0**: a miss. Every ray tracer's first test, built from **two dot products**.
+
+
+---
+
 ## Barycentric coordinates: weights in a triangle
 
 <img src="../../textbook/figures/vec-barycentric.svg" alt="a triangle with a point and its three sub-triangles" style="height:240px">
@@ -614,6 +827,17 @@ console.log(dot(n, [4, 1, 0]) - D);               // 1.6666666666666667
 ```
 
 Replace any library call with your own three-line version and compare.
+
+
+---
+
+## Unity's Vector3: the same atoms, three traps
+
+| the text | Unity | watch for |
+| --- | --- | --- |
+| a · b, a × b | `Vector3.Dot(a, b)`, `Vector3.Cross(a, b)` | same formulas; Unity's frame is **left-handed**, so the cross product obeys the **left-hand rule** on screen |
+| \|a\|, â | `a.magnitude`, `a.normalized` | a vector too short to normalize comes back as **(0, 0, 0)**, silently |
+| θ | `Vector3.Angle(a, b)` | **degrees**, not radians; arccos of the dot, with its small-angle loss |
 
 
 ---

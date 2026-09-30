@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~78 min).
+  CSS 551 · TOPIC DECK · The space of images (~78 min, 48 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -13,6 +13,13 @@
   histograms and equalization; JPEG (one block at quality 50; the quality table); PSNR and SSIM (four
   comparisons) and their pitfalls; the PSNR exhibit; the thin sheet measured on 2,000 digits; PCA;
   the concept map is not invertible; counting the missing choices; every inverse problem is one.
+  DENSIFIED (2026-09-29): counting images (10^120.4); pixels as samples; linear light (0.214,
+  0.735); memory and precision; distance concentration and the empty ball; a 1D DCT worked (99.65 %);
+  PCA (80/20; digits 10.4/7.4 %); eigenfaces; the convolution theorem; separable filters; border
+  handling (0.444 corner); unsharp masking; moiré on the zone plate (60.4 px); prefiltered
+  downsampling; resamplers and bicubic overshoot (1.0625); stretch and gamma; shot noise; chroma
+  subsampling; lossless vs lossy; PSNR by the numbers; SSIM on two patches (0.934); averaging
+  frames; the render's many buffers; inverse problems, the null space (737,280), priors; papers.
   NEEDS:   vectors and dot products; the neural-nets-embeddings topic for "encoder" and "embedding";
            the antialiasing lecture for the sampling slide (named, not required).
            Companion of topics/diffusion-1.md, which picks up "noise is the missing choice".
@@ -54,6 +61,30 @@ An m × n RGB image is a point of ℝ³ᵐⁿ: list its numbers in a fixed order
 
 ---
 
+## How many images are there?
+
+```text
+   20 × 20 black-and-white images       2⁴⁰⁰    ≈ 10^120.4
+   20 × 20 images with 256 gray levels  256⁴⁰⁰  ≈ 10^963.3
+   atoms in the observable universe     roughly 10^80          (the usual estimate)
+```
+
+- every photograph ever taken, every frame of every film, is a vanishing fraction of the second number
+- the space is not the problem; **finding the tiny part of it that looks like something** is
+
+
+---
+
+## Pixels are samples, not little squares
+
+- a pixel value is a **sample** of a continuous image at a point (Alvy Ray Smith, *A Pixel Is Not A Little Square*, Microsoft technical memo 6, 1995)
+- the little square is how one kind of **display** reconstructs the samples; a monitor, a printer and a resampling filter each reconstruct differently
+- what the image is **between** samples is decided by a **reconstruction filter**: box (the squares), tent (bilinear), wider kernels (bicubic, Lanczos)
+- this is why resizing, rotating and texture filtering are **filtering problems**, and why the antialiasing lecture's rules apply to every one of them
+
+
+---
+
 ## Operations become linear algebra
 
 - **averaging** two images: add the vectors and halve
@@ -63,6 +94,37 @@ An m × n RGB image is a point of ℝ³ᵐⁿ: list its numbers in a fixed order
 - **brightness** ×2: a scalar multiple; **crossfade**: a straight line between two points
 
 The question the rest of the lecture keeps asking: which of these points **look like anything**?
+
+
+---
+
+## Pitfall: average in linear light
+
+Stored pixel values are **sRGB codes**, not light. The code 0.5 is not half the light:
+
+```text
+   decode(0.5) = 0.214          code 0.5 emits 21 % of white's light      (code 128: 0.216)
+   mix black and white, half and half, correctly:  light 0.5  →  code encode(0.5) = 0.735
+   averaging the codes instead:                    code 0.5   →  light 0.214            too dark
+```
+
+- blurring, resizing, antialiasing and blending **in code space** darken every edge between bright and dark
+- the rule: **decode to linear, operate, encode for display**; the color chapter derives both curves
+
+
+---
+
+## Memory and precision
+
+```text
+   512 × 512 RGB, 8 bits per channel          786,432 bytes
+   the same, 16-bit half floats             1,572,864 bytes
+   the same, 32-bit floats                  3,145,728 bytes
+   one 4K frame (3840 × 2160), RGBA 8-bit  33,177,600 bytes      ≈ 2 GB per second at 60 fps
+```
+
+- 8 bits per channel is enough for **display**; renders and HDR images need **floats**, because light values exceed 1
+- networks work in floats in [−1, 1] or [0, 1]: the course's digits are 400 numbers in [−1, 1]
 
 
 ---
@@ -92,6 +154,42 @@ A 3 and an 8 as vectors in [−1, 1]⁴⁰⁰: ‖a − b‖ = **18.5**, 0.925 p
 
 ---
 
+## High dimensions: distances concentrate
+
+Two random points of the cube [−1, 1]ᵈ:
+
+```text
+   d          mean distance      relative spread of the squared distance
+   2          1.16               0.84
+   20         3.65               0.26
+   400        16.3               0.059
+   49,152     181.1              0.0053       (a 128 × 128 RGB image)
+```
+
+- in high dimensions **every random pair is about equally far apart**: "nearest" means little among random points
+- the digits break this: nearest neighbors at **9.8** where random pairs sit at **16.3**; structure is exactly what random data lacks
+
+
+---
+
+## High dimensions: the cube is all corners
+
+The fraction of the cube [−1, 1]ᵈ inside the unit ball:
+
+```text
+   d = 2       0.785           a disk in a square
+   d = 3       0.524
+   d = 10      0.0025
+   d = 20      2.5 × 10⁻⁸
+   d = 400     10^−395.9
+```
+
+- almost all of a high-dimensional cube's volume is **far from its center**, out in the corners
+- a Gaussian cloud in d dimensions is a thin **shell** at radius about √d, not a solid ball (the diffusion lecture uses this)
+
+
+---
+
 ## The image as a function
 
 A continuous image is a function f : [0, 1]² → [0, 1]³. With finite energy these form a vector space with an inner product:
@@ -105,6 +203,24 @@ A continuous image is a function f : [0, 1]² → [0, 1]³. With finite energy t
 
 - sample both on an m × n grid: the per-pixel mean squared error converges to the same ¼. **Resolution changes the count of numbers, not the geometry**
 - why it matters here: antialiasing is filtering a function before sampling it; a texture is a function on [0, 1]²; a NeRF is a network standing in for a function on ℝ³ × S²
+
+
+---
+
+## A render is many images
+
+A renderer produces, per pixel, more than a color:
+
+| buffer | what each pixel stores | used by |
+| ------ | ---------------------- | ------- |
+| color | radiance, often in floats | display, after tone mapping |
+| depth | distance along the view ray | depth testing, fog, depth of field |
+| normals | the surface normal | deferred lighting, denoisers |
+| albedo | the surface's base color | denoisers, relighting |
+| motion vectors | where the pixel was last frame | temporal antialiasing, upscaling |
+
+- each buffer is a point in its own image space; learned denoisers and upscalers read **several at once**
+- a **G-buffer** is exactly this stack, written by a rasterizer before lighting (deferred shading)
 
 
 ---
@@ -127,6 +243,17 @@ A raster is the function sampled at pixel centers, `x_i = f((i − ½)/m)`. Stri
 
 ---
 
+## Moiré: aliasing in two dimensions
+
+<img src="../../textbook/figures/aa-zoneplate.png" class="media-shot" style="max-height: 230px;" alt="a zone plate of rings getting finer toward the edges, rendered with 1, 16 and 256 samples per pixel; the one-sample panel shows false rings beyond a radius">
+
+- a **zone plate**: rings whose frequency rises with the radius; in the 200-pixel image it passes the Nyquist limit at radius **60.4 px**
+- beyond it, one sample per pixel draws **false rings** that are not in the pattern; 16 and 256 samples per pixel average them to gray
+- fabrics, brick walls and screen doors photographed or rendered at the wrong scale show the same moiré
+
+
+---
+
 ## Bases: the same image, different coordinates
 
 The raster is the list of coefficients in the **box-function basis**. Other bases hold the same image in other numbers.
@@ -136,6 +263,22 @@ The raster is the list of coefficients in the **box-function basis**. Other base
 - the 64 basis images of the 8 × 8 **discrete cosine transform** (DCT), the basis JPEG uses; frequency rises across and down
 - any 8 × 8 patch is a weighted sum of these 64 pictures, exactly as it is a weighted sum of 64 single-pixel pictures
 - choosing a basis is choosing **which numbers come first**
+
+
+---
+
+## A cosine basis in one dimension, worked
+
+The ramp x = (0, 1, 2, 3, 4, 5, 6, 7) in the orthonormal 8-point DCT:
+
+```text
+   coefficients   9.90  −6.44  0  −0.67  0  −0.20  0  −0.05
+   energy         Σ xᵢ² = 140 = Σ Xₖ²          (Parseval: an orthonormal basis keeps length)
+   the first two coefficients hold 99.65 % of the energy
+```
+
+- a smooth signal's energy piles into the **low** coefficients; the odd ones vanish by the ramp's symmetry about its middle
+- keep two numbers and rebuild a line that is within a fraction of a unit of the ramp everywhere
 
 
 ---
@@ -153,6 +296,37 @@ Transform the 20 × 20 digit (400 coefficients) and rebuild it from only the K �
 - one coefficient is the mean gray; nine give a blob; **64 of 400** give a 3 anyone can read
 - the pixel basis spends its numbers evenly; the cosine basis puts **what matters first**
 - a noise schedule does the same thing in time: the coarse structure survives longest
+
+
+---
+
+## Principal components: the data's own basis
+
+The cosine basis is fixed in advance. **PCA** finds the basis that fits **this** data: the eigenvectors of its covariance, in order of variance.
+
+```text
+   four points (2, 0), (0, 1), (−2, 0), (0, −1): mean 0
+   covariance  [2  0; 0  0.5]      eigenvectors: the x and y axes
+   variance explained: 2 / 2.5 = 80 %,   0.5 / 2.5 = 20 %
+
+   the 2,000 digits in ℝ⁴⁰⁰: first two components 10.4 % and 7.4 %
+```
+
+- the first component is the direction of **greatest spread**; each later one the greatest spread perpendicular to the earlier ones
+- PCA is a **linear** encoder; the learned encoders of the networks lecture are its nonlinear generalization
+
+
+---
+
+## Eigenfaces
+
+Turk and Pentland (1991) ran PCA on aligned face photographs:
+
+- each principal component, displayed as an image, is a ghostly face: an **eigenface**
+- a new face is described by its coordinates on the top few dozen eigenfaces instead of by its pixels
+- recognition becomes **nearest neighbor** among those short coordinate vectors
+
+It worked on aligned, frontal, evenly lit faces and failed under changes of pose and light: a **linear** subspace cannot follow a **curved** sheet. Learned embeddings replaced it.
 
 
 ---
@@ -178,6 +352,22 @@ For an m × n image, the coefficient at horizontal frequency u and vertical freq
 
 ---
 
+## The convolution theorem
+
+Convolution in space is **multiplication** in frequency:
+
+```text
+   F{ k * x } = F{k} · F{x}           each frequency is scaled by the kernel's response there
+```
+
+- a **Gaussian** blur's spectrum is a Gaussian: high frequencies fade smoothly, no ringing
+- a **box** blur's spectrum is a sinc with **negative lobes**: some frequencies are inverted, which shows as ringing and faint stripes
+- for a large kernel, transform, multiply and transform back: cost O(n log n) instead of O(n·k²)
+- read backward: **sampling** multiplies by a comb, so the spectrum **repeats**, and overlapping copies are aliasing
+
+
+---
+
 ## Filters: convolution
 
 Replace each pixel by a weighted sum of its neighborhood: `y_ij = Σ K_ab · x_(i+a, j+b)`. Linear and shift-invariant; **every** linear shift-invariant operation is one.
@@ -193,6 +383,56 @@ Replace each pixel by a weighted sum of its neighborhood: `y_ij = Σ K_ab · x_(
 ```
 
 <img src="../../textbook/figures/img-filters-render.png" class="media-shot" style="max-height: 150px;" alt="the Cornell render, blurred, and its Sobel edge magnitude">
+
+
+---
+
+## Separable filters
+
+A 2D Gaussian is a 1D Gaussian along rows, then along columns: `G(u, v) = g(u)·g(v)`.
+
+```text
+   kernel size     full 2D (multiply-adds per pixel)     separable (rows, then columns)
+   3 × 3           9                                      6
+   5 × 5           25                                     10
+   15 × 15         225                                    30
+```
+
+- the saving grows with the kernel: **k² → 2k**
+- the box and the Gaussian are separable; Sobel is too (`[1 2 1]ᵀ · [−1 0 1]`); a rotated or disk-shaped kernel is not
+- the GPU version: two passes through a framebuffer, the standard bloom and depth-of-field blur in games
+
+
+---
+
+## Pitfall: what happens at the border
+
+A 3 × 3 box blur of an image that is **1 everywhere**, with the outside treated as **0** (zero padding):
+
+```text
+   interior pixel   9/9 = 1.000
+   edge pixel       6/9 = 0.667
+   corner pixel     4/9 = 0.444           a dark frame appears around the image
+```
+
+- **clamp** (repeat the edge pixel), **mirror** (reflect), or **wrap** (the torus, right for tiling textures) avoid the dark frame
+- the same choice is the texture topic's **wrap mode**; convolutional networks usually zero-pad, and their outputs are subtly worse at the borders
+
+
+---
+
+## Sharpening: the unsharp mask
+
+Add back the detail a blur removes: `y = x + k·(x − blur(x))`.
+
+```text
+   a 1D edge            x    = (0,  0,     1,     1)
+   blur [1 2 1]/4       b    = (0,  0.25,  0.75,  1)          ends clamped
+   k = 1                y    = (0, −0.25,  1.25,  1)          steeper; under- and overshoot
+```
+
+- the over- and undershoot are the visible **halo** of oversharpening
+- displayed values must be clamped to [0, 1]; the halo remains as a bright and a dark line along the edge
 
 
 ---
@@ -214,6 +454,38 @@ Replace each pixel by a weighted sum of its neighborhood: `y_ij = Σ K_ab · x_(
 
 ---
 
+## Downsampling needs a prefilter
+
+Stripes one pixel wide, alternating 1 and 0, halved by **dropping** every other column:
+
+```text
+   keep the even columns:   all 1   (white)
+   keep the odd columns:    all 0   (black)      which one depends on a half-pixel shift
+   average each pair:       all 0.5 (gray)       correct: the stripes are finer than the new pixels
+```
+
+- dropping pixels is sampling **without** a prefilter; averaging (or blurring first) is sampling **with** one
+- measured on the render: dropped **26.9 dB**, blurred then dropped **29.4 dB**, against the exact area average
+
+
+---
+
+## Upsampling: nearest, bilinear, bicubic
+
+Reconstruct a value halfway between samples:
+
+```text
+   samples 0 and 1:              nearest 0 or 1        bilinear 0.5
+   samples (0, 1, 1, 1), between the two 1s, Catmull-Rom bicubic:
+                                 t = 0.5: 1.0625       t = 0.25: 1.070       above both neighbors
+```
+
+- **nearest**: blocky; **bilinear**: smooth but soft; **bicubic**: sharper, with **overshoot** next to edges
+- none of them adds detail that was not sampled: upsampling can only **interpolate**; making up plausible detail is the job of a learned prior (the inverse-problem slides)
+
+
+---
+
 ## Histograms and equalization
 
 The **histogram** counts pixels by value: nothing about content, a great deal about exposure. The render: **28.6 %** of pixels below 0.25, **65.6 %** below 0.5.
@@ -223,6 +495,38 @@ The **histogram** counts pixels by value: nothing about content, a great deal ab
 - **equalization**: map each value v to C(v), the fraction of pixels at or below v; monotone, so brighter stays brighter
 - worked, from the render's cumulative distribution: 0.1 ↦ 0.28, 0.3 ↦ 0.29, 0.5 ↦ 0.71, 0.8 ↦ 0.96; the mean rises from 0.404 to 0.555
 - the black spike cannot be spread: equalization maps **values**, not pixels
+
+
+---
+
+## Contrast stretch and gamma
+
+Two simpler tone curves than equalization:
+
+```text
+   linear stretch of [0.1, 0.8] to [0, 1]:   y = (v − 0.1) / 0.7
+       0.1 ↦ 0      0.45 ↦ 0.5      0.8 ↦ 1
+   power curve:  y = v^γ;   γ < 1 lifts the shadows,   γ > 1 deepens them
+```
+
+- all three curves are **monotone**: order is kept, only spacing changes
+- a stretch **clips** everything outside the chosen range; a power curve never clips but bends every value
+
+
+---
+
+## Noise in real cameras
+
+A pixel that collects N photons has **shot noise** with standard deviation √N:
+
+```text
+   N = 100 photons         SNR = 100 / 10  = 10       20 dB
+   N = 10,000 photons      SNR = 10,000 / 100 = 100    40 dB
+```
+
+- dark images are noisy because they have **few photons**, not because the sensor is bad
+- the path tracer's noise has the same form: few samples, large relative error
+- phones fight it by merging a **burst** of frames (Hasinoff et al., SIGGRAPH Asia 2016): the averaging slide ahead
 
 
 ---
@@ -249,6 +553,36 @@ Cut into 8 × 8 blocks, transform each to the cosine basis, **divide by a quanti
 
 ---
 
+## JPEG's color trick: chroma subsampling
+
+Before the cosine transform, JPEG converts RGB to **Y** (brightness) and **Cb, Cr** (color differences), then stores the color at **half resolution** in each direction (4:2:0):
+
+```text
+   per 2 × 2 block of pixels:   RGB: 4 × 3 = 12 numbers
+                                 4:2:0: 4 Y + 1 Cb + 1 Cr = 6 numbers    half, before any DCT
+```
+
+- the eye resolves **brightness** detail far better than **color** detail, so the loss is rarely visible
+- it shows on sharp red or blue edges, and on text over color: a **color fringe** one or two pixels wide
+- video codecs make the same choice; render targets stored for later processing should not
+
+
+---
+
+## Lossless and lossy
+
+| format | method | after saving | use for |
+| ------ | ------ | ------------ | ------- |
+| PNG | prediction plus DEFLATE, exact | identical pixels | screenshots, figures, masks, normal maps |
+| JPEG | color subsampling, DCT, quantization | an approximation | photographs for viewing |
+| EXR | floating point, lossless or lossy options | HDR values kept | renders, environment maps |
+
+- a JPEG saved again is **quantized again**: errors accumulate across edits
+- a network trained on JPEGs learns JPEG's blocking; many training pipelines store images losslessly for that reason
+
+
+---
+
 ## Comparing two images: PSNR and SSIM
 
 ```text
@@ -269,12 +603,63 @@ Cut into 8 × 8 blocks, transform each to the cosine basis, **divide by a quanti
 
 ---
 
+## PSNR by the numbers
+
+```text
+   PSNR = −20 log₁₀(RMS error)        for values in [0, 1]
+   halving the RMS error adds 20 log₁₀ 2 = 6.02 dB
+
+   Gaussian noise σ = 0.1     20.0 dB
+   σ = 0.05                   26.0 dB
+   σ = 0.01                   40.0 dB
+```
+
+- rough reading: below 20 dB clearly damaged; 30 to 40 dB good; above 40 dB hard to tell apart
+- dB compares **errors**, and only on the **same content**: 30 dB on a flat sky and 30 dB on foliage look different
+
+
+---
+
+## SSIM on two small patches, worked
+
+Patches p = (0.2, 0.4, 0.6, 0.8) and q = (0.3, 0.4, 0.6, 0.7), C₁ = 0.01², C₂ = 0.03²:
+
+```text
+   means        μp = 0.5,  μq = 0.5                         brightness term = 1
+   variances    σp² = 0.05,  σq² = 0.025    (population)
+   covariance   σpq = 0.035
+   SSIM = (2·0.25 + C₁)(2·0.035 + C₂) / ((0.25 + 0.25 + C₁)(0.05 + 0.025 + C₂)) = 0.934
+   MSE = 0.005,  PSNR = 23.0 dB
+```
+
+- q is p with its **contrast reduced**; SSIM names what changed (the variance, not the mean), where PSNR only counts
+
+
+---
+
 ## Pitfall: what the metrics reward
 
 - **PSNR rewards blur.** The blurred 3 scores 18.8 dB, better than the noisy one at 14.1: blurring removes energy, noise adds it, and mean squared error counts energy. A model trained to maximize PSNR learns to **hedge toward the average**
 - **Both are blind to alignment.** A one-pixel shift costs 12.7 dB, worse than the visibly noisy copy, and drops SSIM to 0.85
 - neither can judge whether a generated image is a **good different image**: a reference is required
 - learned metrics (LPIPS: distances between a trained network's feature maps; Zhang et al. 2018, arXiv:1801.03924) track human judgment better, at the price of depending on that network
+
+
+---
+
+## Averaging frames beats noise
+
+Average N independent noisy copies of the same image:
+
+```text
+   N        noise divided by √N        PSNR gain
+   4        2                          +6.0 dB
+   16       4                          +12.0 dB
+   64       8                          +18.1 dB
+```
+
+- the same **1/√N** as the path tracer's samples and the mini-batch's gradients: one law, three lectures
+- averaging needs the copies **aligned**: a shifted average is the blur the metrics reward
 
 
 ---
@@ -322,6 +707,54 @@ All 1,999,000 pairwise distances between the 2,000 digits (pixels in [−1, 1]):
 
 ---
 
+## Inverse problems, one table
+
+| operator applied to the true image | what the observation lost |
+| ---------------------------------- | ------------------------- |
+| blur | the high frequencies the kernel's spectrum zeroes or shrinks |
+| downsample 4 × in each direction | 737,280 of 786,432 numbers of a 512 × 512 RGB image |
+| JPEG | the rounding of every quantized coefficient |
+| masking a region (inpainting) | every pixel under the mask |
+| adding noise | nothing is removed, but the signal is uncertain |
+
+- each operator is **many-to-one**; every observation is consistent with a whole set of true images
+- choosing one from the set needs knowledge of **what images look like**: a prior
+
+
+---
+
+## The null space of downsampling
+
+Downsampling by 4 in each direction, by averaging 4 × 4 blocks:
+
+```text
+   512 × 512 × 3   =  786,432 numbers in
+   128 × 128 × 3   =   49,152 numbers out
+   lost                737,280 dimensions: any pattern that averages to 0 over every block
+```
+
+- add any of those patterns to an image and its downsampled version **does not change**
+- a super-resolution method must choose **one** of the images that downsample to the observation: interpolation picks the smoothest; a learned prior picks one that **looks like a photograph**
+
+
+---
+
+## A prior picks the plausible one
+
+Every inverse problem becomes an optimization with two terms:
+
+```text
+   x̂ = argmin over x of   ‖A x − y‖²   +   λ · R(x)
+                          fit the data     prefer likely images
+```
+
+- R = **smoothness** (penalize gradients): stable, but every answer is soft
+- R = a **learned prior** (the thin sheet of real images): sharp, plausible answers; the diffusion lectures build one
+- with noise as the operator, the best answer under squared error is the **posterior mean**, the denoiser of the next lecture
+
+
+---
+
 ## The concept map is not invertible
 
 <img src="../../textbook/figures/img-concept-map.svg" class="media-shot" style="max-height: 200px;" alt="five different photographs mapping to one embedding">
@@ -346,4 +779,21 @@ All 1,999,000 pairwise distances between the 2,000 digits (pixels in [−1, 1]):
 
 - the same asymmetry in every inverse problem tonight: **deconvolution** cannot recover what a blur removed; **JPEG decoding** cannot recover rounded coefficients; **upsampling** cannot recover a Laplacian level
 - each is many-to-one, with the same honest answer: a **distribution** over the inputs, from which a prior over natural images picks the plausible ones
+
+
+---
+
+## The papers and the dates
+
+| year | source | what it added |
+| ---- | ------ | ------------- |
+| 1822 | Fourier, *Théorie analytique de la chaleur* | functions as sums of sinusoids |
+| 1901 | Pearson, *Philosophical Magazine* | principal components |
+| 1928, 1949 | Nyquist; Shannon, *Proc. IRE* 37 | the sampling limit |
+| 1965 | Cooley & Tukey, *Math. Comp.* 19 | the fast Fourier transform |
+| 1991 | Turk & Pentland, *J. Cognitive Neuroscience* 3 | eigenfaces |
+| 1992 | ITU-T T.81 | the JPEG standard |
+| 1995 | Smith, Microsoft technical memo 6 | a pixel is not a little square |
+| 2004 | Wang, Bovik, Sheikh & Simoncelli, *IEEE TIP* 13 | SSIM |
+| 2018 | Zhang et al., arXiv:1801.03924 | LPIPS |
 

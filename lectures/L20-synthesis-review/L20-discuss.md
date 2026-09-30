@@ -1,13 +1,13 @@
 <!--
   CSS 551 · L20 discussion (10 min), open discussion (8 min), wrap (2 min).
-  Two peer-instruction questions; answers only in the notes. Numbers from
+  Three peer-instruction questions; answers only in the notes. Numbers from
   lectures/L20-synthesis-review/figures/numbers.json (tools/gen-lecture-figures-d2.mjs),
   which match textbook/figures/numbers-unity.json (normalHack) and numbers-systems.json (col.blend).
 -->
 
 ### Discussion
 
-<small>(~20 min · two questions, then open discussion)</small>
+<small>(~20 min · three questions, then open discussion)</small>
 
 
 ---
@@ -32,6 +32,18 @@ A pixel is half pure red `(255, 0, 0)` and half pure green `(0, 255, 0)`, stored
 - **B.** `(188, 188, 0)`
 - **C.** `(255, 255, 0)`
 - **D.** `(64, 64, 0)`
+
+
+---
+
+## Question 3: decoding sRGB
+
+An 8-bit sRGB texture stores the code value 128. What linear value should the shader use for lighting?
+
+- **A.** 0.502
+- **B.** 0.216
+- **C.** 0.735
+- **D.** 0.252
 
 
 ---

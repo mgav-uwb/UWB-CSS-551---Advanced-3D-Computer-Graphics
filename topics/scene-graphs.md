@@ -23,6 +23,7 @@
            flags, frames, camera node, bounds and shear sections added from the textbook chapter.
            Real C# excerpts are from Kelvin Sung's CSS 451 ClassExamples, Topic5-SceneNode+HierarchicalModeling
            (5.1.SceneNode+PrimitiveList, 5.3.PointOnHierarchy).
+  DENSIFIED 2026-09-29 (Plan C; 55+ slides per Thursday): sixty years of trees, the arm-poses figure and a predict slide, the arm as glTF nodes and joint versus mesh nodes, both tracks' parent APIs and debugging, the reparenting pitfall, aim constraints, the two-array tree, the frame order, the culling-tree distinction and the bounding sphere, transparency order, matrix ownership, import conventions, FK and two-link IK worked, linear blend skinning worked and the candy wrapper, a check-yourself slide. Numbers from numbers-pipeline.json (sg) and numbers-motion.json (anim) or node.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -81,6 +82,19 @@ Place each part with its **own** world transform. Now yaw the base 30°:
 - **characters**: a skeleton is a tree of bones; the hand rides the forearm rides the upper arm
 - **solar systems**: moon orbits planet orbits star
 - **every scene file**: glTF, USD and FBX store a node tree with a local transform per node
+
+
+---
+
+## Sixty years of trees
+
+| year | system | the tree |
+| --- | --- | --- |
+| 1963 | Sketchpad (Sutherland) | master drawings and instances: edit the master, every copy changes |
+| 1992 | OpenGL 1.0 | `glPushMatrix` / `glPopMatrix`: the tree walked as a matrix stack (removed from core in OpenGL 3.1, 2009) |
+| 1994 | VRML 1.0 | the first web 3D format, built on SGI's Open Inventor scene-graph files |
+| 2016 | USD (Pixar, open-sourced) | film's scene description: layered trees of prims |
+| 2017 | glTF 2.0 (Khronos) | the web and engine interchange format: nodes with TRS or a matrix |
 
 
 ---
@@ -166,6 +180,35 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 ---
 
+## The same arm as glTF nodes
+
+```json
+{ "nodes": [
+  { "name": "base",  "translation": [0, 0.2, 0], "rotation": [0, 0.2588, 0, 0.9659], "children": [1] },
+  { "name": "joint", "translation": [0, 0.2, 0], "rotation": [0, 0, 0.342, 0.9397],  "children": [2] },
+  { "name": "arm",   "translation": [0, 0.7, 0], "mesh": 0, "children": [3] },
+  { "name": "hand",  "translation": [0, 0.7, 0], "mesh": 1 } ] }
+```
+
+- rotations are **quaternions** `(x, y, z, w)`: 30° about y, 40° about z
+- the **joint** is its own node: it rotates; the **arm** node below it only offsets the mesh, so the bend happens at the joint
+
+
+---
+
+## Joint nodes and mesh nodes
+
+```text
+   base  ── joint (rotates) ── arm (offset 0.7, draws the box) ── hand (offset 0.7, draws the box)
+```
+
+- put the **rotation** on a node whose origin is at the hinge
+- put the **geometry** on a child that shifts the mesh so the hinge is at its end
+- then animators key one rotation per joint and never touch a pivot
+
+
+---
+
 ## Base-arm-hand, live
 
 <div class="cockpit" data-demo="scene-graph" data-controls="baseRy,armBend"><pre class="viz-fallback">  model {baseRy, armBend} -> W_base, W_arm, W_hand through the chain
@@ -192,6 +235,27 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 - the **bend** moves the hand in the base's own plane: `-1.4 sin(bend)`, `0.4 + 1.4 cos(bend)`
 - the **yaw** swings that point about the vertical: same height 1.47, radius 0.90
+
+
+---
+
+## The arm across poses, pictured
+
+<img src="../../textbook/figures/sg-arm-poses.svg" alt="the base, arm and hand drawn at several bend angles, the hand tracing an arc about the joint" style="height:300px">
+
+The hand traces a **circle of radius 1.4 about the joint** as the bend changes; the base yaw swings that circle about the vertical.
+
+
+---
+
+## Predict, then check
+
+Set `baseRy = 90`, `armBend = 80`. Where is the hand, in world coordinates?
+
+```text
+   hint 1: at baseRy = 0, armBend = 80 the hand is at (−1.38, 0.64, 0)
+   hint 2: the base yaw rotates that point about +y
+```
 
 
 ---
@@ -328,6 +392,52 @@ Vector3 forward = mCombinedParentXform.GetColumn(2).normalized;   // world forwa
 
 ---
 
+## Parents and children in both tracks
+
+```csharp
+// Unity
+hand.transform.SetParent(arm.transform, false);   // keep the LOCAL values
+Vector3 w = hand.transform.position;               // world
+Vector3 l = hand.transform.localPosition;          // in the parent's frame
+Vector3 q = hand.transform.TransformPoint(0, 0.3f, 0);          // local → world
+Vector3 r = arm.transform.InverseTransformPoint(Vector3.up);    // world → local
+```
+
+```js
+// three.js
+arm.add(hand);                                  // keep the LOCAL values
+hand.updateMatrixWorld();
+const w = hand.getWorldPosition(new THREE.Vector3());
+const q = hand.localToWorld(new THREE.Vector3(0, 0.3, 0));
+const r = arm.worldToLocal(new THREE.Vector3(0, 1, 0));
+```
+
+
+---
+
+## Debugging a hierarchy: draw the frames
+
+- draw each node's **axes** at its world origin: three.js `new THREE.AxesHelper(0.3)` added to the node; Unity `Debug.DrawRay(t.position, t.right)` (and `up`, `forward`)
+- print a node's **world columns**: they are its axes and origin (the affine topic's frame reading)
+- a wrong frame is visible at once: an axis pointing the wrong way, an origin in the wrong place, axes of the wrong length (hidden scale)
+
+
+---
+
+## Pitfall: reparenting keeps world or local?
+
+| call | keeps | the child |
+| --- | --- | --- |
+| Unity `SetParent(p)` (default `worldPositionStays = true`) | **world** pose | stays where it is on screen; its local values are recomputed |
+| Unity `SetParent(p, false)` | **local** values | jumps into the new parent's frame |
+| three.js `p.add(child)` | **local** values | jumps |
+| three.js `p.attach(child)` | **world** pose | stays |
+
+Keeping the world pose means computing `L = W_newParent⁻¹ · W_child`, which **fails under shear** (the previous pitfall).
+
+
+---
+
 ## Worked: the hand, seen from three frames
 
 At the demo's default pose, the hand's origin:
@@ -361,6 +471,20 @@ The **view matrix** is the inverse of the camera node's world matrix; its rows a
 
 ---
 
+## Aim constraints: a look-at inside the tree
+
+A spotlight on the hand must point at a target `g` in the world. The look-at gives a **world** rotation; the node stores a **local** one:
+
+```text
+   R_world = lookAt(eye = hand light position, at = g)          (the viewing lecture's basis)
+   R_local = R_parentWorld⁻¹ · R_world = R_parentWorld^T · R_world
+```
+
+Every "follow", "aim", and "look at" constraint in an animation system is this line, run after the parent's world matrix is known.
+
+
+---
+
 ### Engineering the tree
 
 <small>(~12 min)</small>
@@ -384,6 +508,35 @@ The demo: hand yaw recomputes 1, the bend 2, the base yaw 3.
 
 ---
 
+## Where the tree sits in the frame
+
+```text
+   input  →  update locals (gameplay, animation, constraints)
+          →  propagate world matrices (dirty nodes only)
+          →  cull (bounds, frustum)  →  sort (transparent back to front)  →  draw
+```
+
+Everything that **writes** a local runs before propagation; everything that **reads** a world matrix runs after.
+
+
+---
+
+## The tree as two arrays
+
+Store nodes **parent before child**; then one forward loop updates every world matrix:
+
+```text
+   parent = [ −1,  0,  1 ]          base, arm, hand
+   for i in 0 … n−1:
+       W[i] = (parent[i] < 0) ? L[i] : W[parent[i]] · L[i]
+```
+
+- no recursion, no pointers: cache-friendly, and trivially one product per node
+- animation runtimes and GPU skinning store skeletons this way
+
+
+---
+
 ## Bounding volumes up the tree
 
 <img src="../../textbook/figures/sg-bounds.svg" alt="world boxes for base, arm and hand, and the subtree boxes that contain them" style="height:230px">
@@ -392,6 +545,66 @@ Each node stores a box around **its whole subtree**. Culling tests the tree top 
 
 - plane `x = 1` (keep `x < 1`): the root box is inside: **one test** accepts all three parts
 - plane `x = -0.6` (keep `x < -0.6`): root straddles; base rejected; arm subtree straddles; arm and hand tested: **five tests**
+
+
+---
+
+## Worked: a sphere is cheaper and looser
+
+The whole arm's bounding **sphere**: center `(−0.312, 0.853, 0.143)`, radius `1.318`. Test against the plane `x = 1` (keep `x < 1`):
+
+```text
+   signed distance of the center:  −0.312 − 1 = −1.312
+   inside if distance < −r:        −1.312 < −1.318 ?   no, by 0.006: the sphere STRADDLES
+   the box test said: max x = 0.478 < 1: inside, accept all
+```
+
+One subtraction instead of six box corners, at the price of false "maybe"s that send the test down the tree.
+
+
+---
+
+## The transform tree is not the culling tree
+
+- the **scene graph** groups by *what moves with what* (arm under base)
+- a **bounding volume hierarchy** groups by *what is near what* (the ray-tracing lecture's BVH)
+- a character's hand and a lamp on a far table can be siblings in the scene graph and far apart in space
+
+Engines keep **both**: the hierarchy for transforms, a spatial structure (BVH, octree, grid) rebuilt or refit from the world boxes for culling and picking.
+
+
+---
+
+## Pitfall: transparency ignores the tree order
+
+A depth-first traversal draws in **tree order**. Opaque surfaces do not care, because the depth buffer sorts them. Transparent surfaces blend with what is **already drawn**, so they must be drawn **back to front** by distance from the camera, regardless of where they sit in the tree.
+
+Renderers therefore traverse to collect `(world matrix, mesh, material)`, then **sort** the transparent list by view depth before drawing.
+
+
+---
+
+## Pitfall: who owns the matrix?
+
+| engine | edit through | if you set the matrix directly |
+| --- | --- | --- |
+| three.js | `position`, `quaternion`, `scale` | set `matrixAutoUpdate = false`, or the next render **overwrites** it from TRS |
+| Unity | `localPosition`, `localRotation`, `localScale` | no setter: decompose into TRS (shear is lost) |
+
+The demo builds its matrices with our own `makeTRS` and turns three.js's update **off**, so the library, not three.js, owns them.
+
+
+---
+
+## Importing: a conversion node at the root
+
+| system | up | handedness | units |
+| --- | --- | --- | --- |
+| glTF 2.0 | +Y | right-handed | meters |
+| three.js | +Y | right-handed | (scene units) |
+| Unity | +Y | **left-handed** | meters |
+
+Going from glTF to Unity flips one axis (`det = −1`): importers insert that mirror at the root, or convert every node, so that windings stay right.
 
 
 ---
@@ -419,6 +632,107 @@ Parent `S(2, 1, 1)`, child `R_z(45°)`. The child's world columns:
    (1.414, 0.707, 0) and (-1.414, 0.707, 0):  lengths 1.581, 1.581;  126.9° apart, not 90°
    read back as TRS:  rotation 26.6° (not 45°), scale (1.581, 1.581):  rebuilt entry error 0.707
 ```
+
+
+---
+
+## Kinematics: the tree run forward and backward
+
+<img src="../../textbook/figures/anim-ik.svg" alt="a two-link arm reaching for a target, with the elbow-up and elbow-down solutions drawn" style="height:210px">
+
+- **forward kinematics**: joint angles in, hand position out: the composite rule, as tonight
+- **inverse kinematics**: hand position in, joint angles out: solve the composite rule **backward**
+
+
+---
+
+## Worked: two-link inverse kinematics
+
+Links `l1 = 1`, `l2 = 0.8`; target `(1.2, 0.9)`, distance `d = 1.5`:
+
+```text
+   law of cosines at the elbow:  cos θ2 = (d² − l1² − l2²) / (2 l1 l2) = (2.25 − 1 − 0.64) / 1.6 = 0.3812
+                                 θ2 = 67.6°
+   shoulder:  θ1 = atan2(0.9, 1.2) − atan2(l2 sin θ2, l1 + l2 cos θ2) = 36.87° − 29.54° = 7.3°
+   elbow at (cos 7.3°, sin 7.3°) = (0.992, 0.128);  forward kinematics back to the tip: (1.2, 0.9)
+```
+
+
+---
+
+## IK has two answers, or none
+
+```text
+   elbow down:  θ1 = 7.3°,   θ2 = 67.6°      elbow at (0.992, 0.128)
+   elbow up:    θ1 = 66.4°,  θ2 = −67.6°     elbow at (0.4, 0.916)
+   target (2, 0.5):  d = 2.062 > l1 + l2 = 1.8   unreachable: acos of a number above 1
+```
+
+Solvers pick a branch (a pole vector for knees and elbows) and **clamp** unreachable targets to the reach circle.
+
+
+---
+
+## Skinning: one mesh, many bones
+
+<img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms" style="height:210px">
+
+A character is **one** mesh; each vertex follows a **weighted blend** of a few bones' transforms. Near a joint the weights share; far from it one bone owns the vertex.
+
+
+---
+
+## Linear blend skinning
+
+```text
+   v' = Σ  wᵢ · Wᵢ · Bᵢ⁻¹ · v          Σ wᵢ = 1
+         i
+
+   Bᵢ   bone i's world matrix in the bind pose (when the mesh was attached)
+   Wᵢ   bone i's world matrix now
+   Bᵢ⁻¹ takes the vertex into bone i's frame; Wᵢ carries it back out, posed
+```
+
+Games cap influences at **4 bones per vertex** (glTF stores `JOINTS_0` and `WEIGHTS_0` as four each).
+
+
+---
+
+## Worked: one vertex, two bones
+
+Vertex `(1.5, 0.1, 0)`, weights `0.5 / 0.5`. Bone A rotates `30°` about z at the origin; bone B (bind at `x = 1`) adds a local `45°` at its joint:
+
+```text
+   under A:   (1.249, 0.837, 0)
+   under B:   (0.899, 1.009, 0)
+   blended:   (1.074, 0.923, 0)          distance to the joint: 0.51 at rest → 0.471 posed
+```
+
+The blended point lies **between** the two rigid answers, and **closer to the joint** than either.
+
+
+---
+
+## Pitfall: the candy wrapper
+
+2D vertex `(2, 0.4)`, weight `0.5`, bone B turns about `(2, 0)`:
+
+```text
+   B turns 90°:    B's image (1.6, 0),   blend (1.8, 0.2):   distance from the pivot 0.4 → 0.283
+   B turns 180°:   B's image (2, −0.4),  blend (2, 0):       distance 0: the limb collapses to its axis
+```
+
+Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion skinning** (Kavan et al., 2007) blends rotations on the sphere and keeps the volume.
+
+
+---
+
+## Check yourself
+
+1. `L_base = T(0, 1, 0)`, `L_child = R_z(90)`. Where does the child's local `(1, 0, 0)` land?
+2. A node has `L = S(1, 3, 1)`; its child has `L = R_z(45)`. Can the child's world transform be stored as TRS?
+3. You call three.js `parent.add(child)` on a child already placed in the world. What happens?
+4. A skinned vertex has weights `0.7, 0.2, 0.1, 0.05`. What is wrong?
 
 
 ---
