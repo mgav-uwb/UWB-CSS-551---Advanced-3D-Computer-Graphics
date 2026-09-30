@@ -216,7 +216,7 @@
   </header>
 
   <div class="toprow">
-    <div data-strip="5" class="stripbox"></div>
+    <div data-strip="5" data-gallery="gallery/index.html" class="stripbox"></div>
     <div class="wisdom2">
       <div data-quote></div>
       <div data-fact></div>
@@ -487,6 +487,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=8"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=9"; mountExtras({ base: "./" });</script>
 </body>
 </html>
