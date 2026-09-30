@@ -570,7 +570,10 @@ A hair is a thin **cylinder**; it has no single normal. Kajiya and Kay light it 
 
 ---
 
-## The fur, live
+## The fur, live: explicit strands
+
+Not texels, not shells: every hair is real geometry, lit with the Kajiya-Kay rule.
+
 
 <div class="cockpit" data-demo="fur" data-controls="lightAz"><pre class="viz-fallback">  the Stanford bunny grown with 100,000 hairs, 5 segments each, Kajiya-Kay lit
   controls:  light azimuth (instant, a shader uniform); in the full demo also elevation,
