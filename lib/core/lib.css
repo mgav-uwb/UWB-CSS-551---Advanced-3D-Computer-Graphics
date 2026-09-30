@@ -1,4 +1,4 @@
-/* Cockpit UI stylesheet — the ONE stylesheet every demo/deck links.
+/* Cockpit UI stylesheet: the ONE stylesheet every demo/deck links.
    Every selector is namespaced under .cockpit so it can't bleed into deck
    styles when a deck embeds a demo alongside its own CSS. */
 
@@ -71,7 +71,7 @@
 .cockpit .slider-row input[type='range'] {
   flex: 1;
   /* min-width:0 lets the range shrink below its ~129px UA intrinsic width so
-     the row fits the narrow rail card — without it a flex item's default
+     the row fits the narrow rail card, without it a flex item's default
      min-width:auto floors the range and pushes the readout past the card edge
      (a 22px horizontal overflow in every demo's rail). */
   min-width: 0;
@@ -86,7 +86,7 @@
   color: #8b93a7;
 }
 
-/* ButtonRow (cockpit.js) — a SliderRow-shaped row (same label width/type,
+/* ButtonRow (cockpit.js): a SliderRow-shaped row (same label width/type,
    same card-colored pill background) whose control is a group of mutually-
    exclusive option buttons instead of a range input: the shared model
    selector every S01 demo mounts in its rail. .btn-row-btn reuses
@@ -143,7 +143,7 @@
 }
 
 /* demo-shell: the shared scene-dominant layout every demo mounts into
-   (lib/core/demo-shell.js) — a large scene viewport + a compact rail of
+   (lib/core/demo-shell.js): a large scene viewport + a compact rail of
    cards, with the help, settings, and legend overlays anchored to the scene
    corners. First extracted from gsplat (still its heaviest user: the free-fly
    camera cockpit). The overlay classes below (demo-shell-help-*,
@@ -302,7 +302,7 @@
   font-size: 12px;
 }
 
-/* gsplat sandbox full-screen sizing (stage:'full' only — the bare
+/* gsplat sandbox full-screen sizing (stage:'full' only; the bare
    .demo-shell-root, never .demo-shell-root--embed): fill the viewport below
    demo.html's title (measured ~58px title bottom + margin -> 90px budget)
    so the scene viewport reads as a full working canvas, not a small inset.
@@ -352,14 +352,14 @@
 }
 
 /* gsplat embed layout (Task 5, overflow fix): stage!=='full' (a deck slide,
-   or lib/_gsplat-embed-test/) renders lib/demos/gsplat.js's compact rail —
+   or lib/_gsplat-embed-test/) renders lib/demos/gsplat.js's compact rail:
    the FOV SliderRow + Live-dashboard cards only, NOT the View/Camera-boxes/
    Viewpoints cockpit cards (those are gated to stage:'full' in gsplat.js
    itself; the sandbox's plain .demo-shell-root/.demo-shell-scene/.demo-shell-rail rules
    above are untouched). A slide budget is 700px total including the title,
    so the embed's own footprint targets roughly 400-450px: a capped overall
    width (so it reads as an inset teaser, not a full-bleed sandbox) and a
-   much shorter scene min-height (220px vs the sandbox's 420px) — the fov
+   much shorter scene min-height (220px vs the sandbox's 420px): the fov
    SliderRow + a 9-row ValueTable comfortably fit the remaining rail height
    at that scene height. Modifier classes (not overrides of the bare
    .demo-shell-root/.demo-shell-scene/.demo-shell-rail rules) so stage:'full' is
@@ -386,7 +386,7 @@
 /* gsplat embed activation gate (Task 4): stage!=='full' (a deck slide, or
    lib/_gsplat-embed-test/) stays inert until this overlay is clicked, so
    reveal.js keeps its own arrow-key/space navigation until the presenter
-   opts in — see lib/demos/gsplat.js make()'s stage!=='full' branch.
+   opts in, see lib/demos/gsplat.js make()'s stage!=='full' branch.
    Deliberately NOT scoped under .cockpit (unlike the rest of this file's
    .gsplat-* rules): the bare embed-test fixture mounts .demo-shell-scene without
    a .cockpit-classed host, and this gate must render there too. .gsplat-
@@ -412,15 +412,15 @@
   background: rgba(20, 22, 29, 0.92);
 }
 
-/* gsplat controls legend: SANDBOX (stage:'full') ONLY — see lib/demos/
+/* gsplat controls legend: SANDBOX (stage:'full') ONLY, see lib/demos/
    gsplat.js make()'s stage==='full' gate just above the InputController
    section; never built in the embed stage. Deliberately NOT scoped under
    .cockpit, same reasoning as .demo-shell-explore/.demo-shell-exit above (the bare
    lib/_gsplat-embed-test/ fixture mounts .demo-shell-scene without a .cockpit
-   ancestor — though this legend never mounts there anyway, since that
+   ancestor, though this legend never mounts there anyway, since that
    fixture only exercises the embed stage). Anchored top-LEFT (right:72px
    reserves the top-right corner already claimed by .demo-shell-settings-btn +
-   .demo-shell-help-btn — 8 (help) + 22 (help width) + 4 (gap) + 22 (settings
+   .demo-shell-help-btn: 8 (help) + 22 (help width) + 4 (gap) + 22 (settings
    width) + 8 (gap) = 64, plus a few px of breathing room) so it can never
    overlap those buttons. */
 /* Picture-in-picture slots (demo-shell.js pip:true). The big slot fills the
@@ -501,7 +501,7 @@
   /* Shifted left of the plain 8px corner (Fix 3) to leave room for
      .demo-shell-help-btn AND .demo-shell-settings-btn, which both claim the
      top-right corner (in that left-to-right order: settings, help) in both
-     stages — 8 (help) + 22 (help width) + 4 (gap) + 22 (settings width) + 8
+     stages: 8 (help) + 22 (help width) + 4 (gap) + 22 (settings width) + 8
      (gap) = 64. */
   right: 64px;
   padding: 3px 8px;
@@ -513,7 +513,7 @@
   z-index: 5;
 }
 
-/* gsplat help button + panel (Fix 3): present in BOTH stages — see
+/* gsplat help button + panel (Fix 3): present in BOTH stages, see
    lib/demos/gsplat.js make(), built unconditionally (unlike the stage:
    'full'-only cockpit cards). Deliberately NOT scoped under .cockpit, same
    reasoning as .demo-shell-explore/.demo-shell-exit just above. */
@@ -571,7 +571,7 @@
 }
 
 /* Provenance & credits (Dataset section) is a <ul> of separately-sourced
-   claims (scene / reconstruction / viewer-author usage / license terms) —
+   claims (scene / reconstruction / viewer-author usage / license terms):
    a list reads more accurately than one run-on paragraph. Matches
    .demo-shell-help-panel p's color/spacing so it doesn't look like a distinct
    component. */
@@ -619,7 +619,7 @@
 }
 
 /* gsplat settings ("⚙") button + panel: same closeable-panel idiom as
-   .demo-shell-help-btn/.demo-shell-help-panel just above — see lib/demos/gsplat.js
+   .demo-shell-help-btn/.demo-shell-help-panel just above, see lib/demos/gsplat.js
    make(), built unconditionally in BOTH stages. Positioned immediately left
    of the help button (34px vs help's 8px: 8 + 22 width + 4 gap = 34) so
    both sit in the scene's top-right corner without overlapping. Namespaced
@@ -627,7 +627,7 @@
    reasoning as .demo-shell-explore/.demo-shell-help-btn above (the bare
    lib/_gsplat-embed-test/ fixture mounts .demo-shell-scene without a
    .cockpit-classed ancestor). Unlike the help panel (a full inset reader),
-   this is a small anchored form (5 number fields) — sized to its content
+   this is a small anchored form (5 number fields): sized to its content
    rather than filling the viewport. */
 .demo-shell-settings-btn {
   position: absolute;
@@ -680,7 +680,7 @@
 /* Un-scoped-under-.cockpit duplicates of the .demo-shell-field* rules (lib.css's
    originals are all `.cockpit .demo-shell-field...`) so the Settings panel's
    number fields still render styled inside the bare embed-test fixture
-   (which has no .cockpit ancestor) — every OTHER caller of bindNumberField
+   (which has no .cockpit ancestor): every OTHER caller of bindNumberField
    (Camera card) only ever renders inside stage:'full', which always has a
    .cockpit ancestor, so this gap never showed up before the Settings panel
    (present in the embed stage too) existed. */
@@ -715,7 +715,7 @@
   text-align: right;
 }
 
-/* "⚙" display-toggle rows (bindToggleField): a checkbox, not a number box —
+/* "⚙" display-toggle rows (bindToggleField): a checkbox, not a number box:
    left-align it right after the label rather than stretching it like the
    number inputs. Un-scoped, same as the settings-field rules above. */
 .demo-shell-field--toggle {
