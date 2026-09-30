@@ -48,6 +48,18 @@ At the default pose the hand's world matrix is `W_hand` (origin `(-0.78, 1.47, 0
 
 ---
 
+## Question 4: the platform and the crate
+
+In Unity, a moving platform carries a crate. The platform's script sets its **Transform** position every frame; it has no Rigidbody. The crate has a Rigidbody and a box collider. The crate **jitters and slides off**. What is the fix?
+
+- **A.** give the crate a mesh collider instead of a box collider
+- **B.** give the platform a Rigidbody marked **kinematic** and move it through the Rigidbody (`MovePosition`)
+- **C.** make the crate a child of the platform in the hierarchy
+- **D.** raise the crate's friction to its maximum
+
+
+---
+
 ## HW3: affine and scene graphs
 
 Out tonight, due **Wed Oct 28, 11:59 PM**; Unity or WebGL. [HW3 page](../../homework/hw03/index.html)

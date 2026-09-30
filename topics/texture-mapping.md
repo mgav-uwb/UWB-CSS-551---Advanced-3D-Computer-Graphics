@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Texture mapping, detail without geometry (~45 min, 33 slides).
+  CSS 551 · TOPIC DECK: Texture mapping, detail without geometry (~60 min, 43 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/texture-mapping.md"> among others; no
   lecture logistics, no "Part N" numbering.
@@ -13,7 +13,10 @@
   a texture as a function.
   NEEDS:   the affine topic (homogeneous matrices, rotate about a point); the
            meshes topic (the 2×2 grid); rasterization (interpolation).
-  DEMOS:   data-demo="uv-placement" data-controls="offU,tile" (under the page's crop).
+  DEMOS:   data-demo="uv-placement" data-controls="offU,tile"; data-demo="fur" data-controls="lightAz" (under the page's crop).
+  FUR AND HAIR (added 2026-09-30): Kajiya-Kay texels (SIGGRAPH 1989), shells and fins
+           (Lengyel et al., I3D 2001), tangent lighting, strand simulation with guides and
+           follow-the-leader (Muller, Kim and Chentanez, VRIPHYS 2012), Brave (fxguide).
   FIGURES: ../../textbook/figures/tex-mipmap.png, tex-bump.png (textbook generators).
   NUMBERS: textbook/figures/numbers-surfaces.json (tex.*) and
            numbers-systems.json (aa.mip).
@@ -511,4 +514,102 @@ Williams (1978): render the scene's **depth from the light** into a texture. Whe
    a lit floor point:             stored 8.333,        its own 8.333          equal   → lit
    bias 0.0197 (the depth change across one texel on a floor at 48°) stops a surface shadowing itself
 ```
+
+
+---
+
+### Beyond the surface: fur and hair
+
+<small>(~15 min)</small>
+
+
+---
+
+## Why a flat texture cannot make fur
+
+- a texture changes the **color** (or the normal) of a surface point; the surface stays where it is
+- fur is **volume**: thousands of hairs standing off the surface, with gaps you see through
+- at the **silhouette** a painted fur texture shows a hard edge where real fur is fuzzy
+- a bump or normal map fakes relief **facing** you, and fails edge-on for the same reason
+
+
+---
+
+## Kajiya and Kay: textures in 3D
+
+Kajiya and Kay (SIGGRAPH 1989, "Rendering Fur with Three Dimensional Textures"):
+
+- fill a thin **volume** over the surface with **texels**: tiny 3D textures
+- each texel stores **density** (how much fur is here), a **direction** (which way the hairs run) and a **lighting frame**
+- render by **marching rays** through the volume, accumulating color and opacity
+- their example: a **furry teddy bear**, ray traced
+
+
+---
+
+## Shells: fur as a stack of textures
+
+Lengyel, Praun, Finkelstein and Hoppe (I3D 2001): the real-time version.
+
+- draw the surface several times, each copy **pushed out** along its normals: **shells**
+- each shell carries a 2D texture that is **opaque where a hair crosses** that height and transparent elsewhere
+- stacked, the dots line up into hairs; **fins** (thin quads at the silhouette) fix the edge-on view
+- 16 to 32 shells are enough to read as fur on a GPU
+
+
+---
+
+## Lighting a hair: the tangent, not the normal
+
+A hair is a thin **cylinder**; it has no single normal. Kajiya and Kay light it by its **tangent** T (the direction the hair runs):
+
+- **diffuse** is brightest when the light is **across** the hair, zero when it runs along it
+- the **specular** highlight is a band where the light and the eye make **mirror angles** with the hair
+- result: fur and hair **glow at the edges** and show a bright band that moves with the light
+
+
+---
+
+## The fur, live
+
+<div class="cockpit" data-demo="fur" data-controls="lightAz"><pre class="viz-fallback">  the Stanford bunny grown with 100,000 hairs, 5 segments each, Kajiya-Kay lit
+  controls:  light azimuth (instant, a shader uniform); in the full demo also elevation,
+             shine, root darkening (instant) and hairs, length, gravity, curl (regrow)
+  readout:   light direction, hairs, segments, vertices, regrow time, draw time</pre></div>
+
+
+---
+
+## Hair that moves: strands you simulate
+
+- model hair as **strands**: chains of particles joined by links, rooted on the scalp
+- simulate a few thousand **guide hairs**; draw many more **children** interpolated between guides
+- each frame: gravity and **wind** push the particles, links keep each hair its length, particles that enter the head are **pushed back out**
+- **follow the leader** (Müller, Kim and Chentanez, VRIPHYS 2012): fix each particle's distance to its parent, root to tip, so hair never stretches
+
+<img src="../../media/icons/sim-hair.webp" class="media-shot" style="max-height: 190px;" alt="a pastel figure's long hair streaming back in a gusting wind">
+
+
+---
+
+## Hair at film scale
+
+- **Brave** (Pixar, 2012): Merida has more than **1,500** sculpted curls making about **111,700** hairs, simulated with a new solver, **Taz**
+- film simulates **every** strand, with stiffness, twist and hair-to-hair collision; games simulate **guides** or a few cards
+- the same trade as cloth: accuracy per frame against a frame budget
+
+
+---
+
+## An aside: from a simulation to a photograph
+
+<div style="display:flex; gap:14px; justify-content:center; align-items:center;">
+<img src="../../media/icons/sim-hair.webp" style="width: 30%; border-radius: 8px;" alt="the course's simulated hair render">
+<img src="../../media/icons/ai-hair-realistic.jpg" style="width: 30%; border-radius: 8px;" alt="a photoreal woman in the same pose with the same pink-tipped hair">
+</div>
+
+- left: this course's strand simulation; right: an image model asked to "make a more realistic version"
+- the render gave the **pose, light and hair shape**; the model gave **skin, face, fabric**
+
+<small class="credit">right: AI-generated by Marcel Gavriliu with Google Gemini, 2026</small>
 

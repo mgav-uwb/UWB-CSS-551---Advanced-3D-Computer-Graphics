@@ -1,5 +1,9 @@
 <!--
-  CSS 551 · TOPIC DECK: Scene graphs and hierarchical modeling (~78 min).
+  CSS 551 · TOPIC DECK: Scene graphs and hierarchical modeling (~93 min).
+  RIGID BODIES (added 2026-09-30, conceptual): state and the engine step, broad and narrow
+  phase, restitution and friction, stacking and sleeping (Baraff, SIGGRAPH 1989), kinematic
+  vs dynamic and ragdolls, Unity PhysX vs three.js libraries, film vs games; media
+  ../../media/icons/sim-rigid.webp.
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/scene-graphs.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -727,6 +731,103 @@ Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion
 
 ---
 
+### When the tree meets physics: rigid bodies
+
+<small>(~15 min)</small>
+
+
+---
+
+## A rigid body is a node that physics moves
+
+- **state**: position, orientation (a quaternion), **linear** velocity, **angular** velocity
+- **properties**: mass, how the mass is spread (the inertia), a **collider** shape
+- every fixed step the engine: adds forces (gravity, springs, your pushes), **integrates** velocity and position, then **resolves contacts**
+- the result is written back into the node's **local transform**, and the scene graph carries it from there
+
+
+---
+
+## Collisions, step one: who might touch?
+
+- testing every pair is **n²**: 1,000 bodies make about 500,000 pairs
+- **broad phase**: wrap each body in a simple **bounding volume** (a box or sphere) and keep only pairs whose volumes overlap
+- boxes are kept in a structure (a sorted list, a grid or a **tree**) so overlaps are found without checking every pair
+- the bounding-volume tree is the same idea as the **BVH** of the ray tracing lecture
+
+
+---
+
+## Collisions, step two: where exactly?
+
+- **narrow phase**: for each surviving pair, compute the actual **contact**: the points, the direction to separate them (the **contact normal**) and how deep they overlap
+- simple shapes have exact tests: sphere against sphere, box against box, capsule against mesh
+- complex meshes are approximated by **convex pieces** or simple collider shapes, never tested triangle by triangle every frame
+
+
+---
+
+## Response: bounce, slide, stop
+
+- **restitution**: how much of the approach speed comes back as bounce (0 for clay, near 1 for a rubber ball)
+- **friction**: resists sliding along the contact; high friction makes objects stick and tumble, low friction makes them skate
+- engines apply short **impulses** (instant velocity changes) at the contact points, which is how a box hit on its corner starts to **spin**
+
+
+---
+
+## Tumbling cubes, simulated for this course
+
+<img src="../../media/icons/sim-rigid.webp" class="media-shot" style="max-height: 300px;" alt="nine pastel cubes falling, colliding with the floor and each other, and settling on a pastel checkerboard">
+
+- nine cubes fall, hit the floor and **each other**, tumble and settle
+- each cube is a cluster of particles kept rigid by **shape matching**, the approach of NVIDIA's unified particle solver
+- a check confirms no two cubes overlap by more than **1 % of an edge** at rest
+
+
+---
+
+## Why stacking is hard
+
+- a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
+- small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
+- engines add tricks: **sleeping** (freeze bodies that stopped moving), many **solver iterations**, a small allowed overlap (a contact **slop**)
+- Baraff (SIGGRAPH 1989) treated resting contact analytically, as forces found all at once for bodies that touch at many points
+
+
+---
+
+## Kinematic, dynamic, and the ragdoll
+
+- **kinematic** body: moved by animation or code; it pushes others but nothing pushes it (a moving platform, an animated character)
+- **dynamic** body: moved by the physics engine (a crate, debris)
+- a **ragdoll** is a character's skeleton as a chain of dynamic bodies joined by joints: when a character falls, the game switches its bones from **animated to simulated**
+- blending the two (animation driving the bones as targets, physics reacting to hits) is **active ragdoll** or physics-based animation
+
+
+---
+
+## Physics engines you will meet
+
+| | Unity (the Unity track) | three.js (the WebGL track) |
+| --- | --- | --- |
+| built in | **yes**: NVIDIA PhysX | **no** physics |
+| a body | add a `Rigidbody` component | a library body, e.g. cannon-es or Rapier |
+| a shape | a `Collider` (box, sphere, capsule, mesh) | the library's shapes |
+| who moves the node | the engine writes the `Transform` | you copy the body's position and quaternion to the mesh each frame |
+
+
+---
+
+## Film and games want different physics
+
+- **games**: a few milliseconds per frame, must never explode, must respond to the player; approximations are fine if they look plausible
+- **film**: no frame budget, but close-ups, directors and continuity; accuracy, many substeps, and **art direction** (the simulation is re-run until the shot looks right)
+- both simulate **what cannot be keyframed** economically: debris, stacks, crowds of objects
+
+
+---
+
 ## Check yourself
 
 1. `L_base = T(0, 1, 0)`, `L_child = R_z(90)`. Where does the child's local `(1, 0, 0)` land?
@@ -744,4 +845,5 @@ Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion
 - **Local to world** is the composite; **world to local** its inverse; A to B is `W_B⁻¹ W_A`
 - The **camera** is a node: `V` is the inverse of its world matrix
 - **Dirty flags**, **subtree bounds**, and **shared meshes** make big trees cheap; non-uniform scale above a rotation makes **shear**
+- Animation, IK or **physics** may write a node's TRS; a **rigid body** is a node the engine moves
 

@@ -51,6 +51,9 @@
           <li><a href="#particles">Particles and cloth</a></li>
           <li><a href="#collision">Collisions</a></li>
           <li><a href="#mocap">Motion capture, retargeting, and blend trees</a></li>
+          <li><a href="#rigid">Rigid bodies in an engine</a></li>
+          <li><a href="#cloth-practice">Cloth in practice</a></li>
+          <li><a href="#hair">Hair and fur</a></li>
           <li><a href="#exercises">Exercises</a></li>
         </ol>
       </div>
@@ -631,7 +634,111 @@ blend   [ 1.074, 0.923, 0 ]</pre>
       </div>
 
 <!-- ============================================================ -->
-      <h2 id="exercises">12 &middot; Exercises</h2>
+      <h2 id="rigid">12 &middot; Rigid bodies in an engine</h2>
+      <p>
+        A rigid body is a node of the scene graph (<a href="scene-graphs.html">the scene-graphs chapter</a>)
+        whose transform is written by a physics engine instead of by an animator. Its state is a position,
+        an orientation kept as a unit quaternion (<a href="rotation.html">the rotation chapter</a>), a linear
+        velocity and an angular velocity; its properties are a mass, the way that mass is spread through the
+        body (its inertia), and a collider: a simple shape such as a box, a sphere, a capsule or a convex hull
+        that stands in for the rendered mesh. Every fixed step the engine adds the forces, advances the
+        velocities and positions as in Section 8, finds the contacts, and corrects the velocities so that
+        nothing interpenetrates, then writes the result back into the node&rsquo;s transform.
+      </p>
+      <p>
+        Finding contacts has two phases. The <em>broad phase</em> discards pairs that cannot touch by testing
+        their bounding boxes, kept sorted along an axis or in a tree of boxes: the bounding-volume hierarchy
+        of <a href="ray-tracing.html">the ray-tracing chapter</a>, asked which boxes overlap a box rather than
+        which a ray enters. The <em>narrow phase</em> computes the contact points, the contact normal and the
+        overlap depth for the pairs that remain, with exact tests for simple shapes. The response of
+        Section 10 then acts at each contact point; applied off the center of mass it changes the angular
+        velocity as well, which is why a box landing on a corner starts to spin. Baraff&rsquo;s SIGGRAPH 1989
+        paper on non-penetrating rigid bodies treated resting contact, the case of a stack of boxes that must
+        neither sink nor jitter, by solving for all the contact forces of a frame together; real-time engines
+        approximate that with many solver iterations and by putting bodies that have stopped moving to sleep.
+      </p>
+      <figure>
+        <img src="../media/icons/sim-rigid.webp" alt="Nine pastel cubes falling onto a checkerboard, hitting the floor and each other, tumbling and settling into a pile." style="max-width: 360px;" />
+        <figcaption>Nine cubes, simulated for this course as clusters of particles kept rigid by shape matching (Macklin, M&uuml;ller, Chentanez and Kim, SIGGRAPH 2014). A check confirms no two cubes overlap by more than 1&nbsp;% of an edge at rest.</figcaption>
+      </figure>
+      <div class="aside">
+        <span class="tag">In the two tracks</span>
+        Unity&rsquo;s built-in 3D physics is an integration of NVIDIA PhysX: a <code>Rigidbody</code> component makes
+        an object dynamic, and a <code>Collider</code> gives it a shape. A body moved by the engine should be
+        pushed through the <code>Rigidbody</code> API, not by writing its <code>Transform</code>, or the script and the
+        engine fight over who owns the node. A body marked <em>kinematic</em> is moved by animation or code and
+        pushes others without being pushed. three.js has no physics; a library such as cannon-es or Rapier
+        keeps the bodies, and the program copies each body&rsquo;s position and quaternion to its mesh every frame.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="cloth-practice">13 &middot; Cloth in practice</h2>
+      <p>
+        Section 9 showed why stiff springs need tiny steps. Real-time cloth avoids the problem by replacing
+        each spring with a <em>distance constraint</em> and moving the particles to satisfy it directly:
+        predict where every particle would go under gravity and wind, push particles out of obstacles,
+        project each link back toward its rest length, and read the velocities off the moves (position-based
+        dynamics, and its stiffness-aware form XPBD). A constraint cloth cannot explode; too few substeps
+        only make it stretchy. Many short substeps per frame beat many solver passes in one long step.
+        Film uses the other answer of Section 9, implicit integration (Baraff and Witkin, SIGGRAPH 1998),
+        which stays stable at large steps at the price of a linear solve.
+      </p>
+      <figure>
+        <img src="../media/icons/sim-cloth.webp" alt="A pastel checkered cloth falling onto a sphere, draping over it and swaying in a breeze." style="max-width: 360px;" />
+        <figcaption>A 48&times;48 constraint cloth dropped on a sphere, simulated with the course library <code>lib/core/sim-cloth.js</code>: 24 substeps per frame, two constraint passes each.</figcaption>
+      </figure>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        Open the cloth demo (<a href="../lib/demo.html?demo=cloth">lib/demo.html?demo=cloth</a>). With links set to
+        springs, raise the stiffness until the cloth explodes, press reset, and raise the substeps until it
+        holds. Switch to constraints and drop the substeps to 1: the cloth stretches but stays in one piece.
+        The readout&rsquo;s <em>h&middot;&radic;(k/m)</em> is the stability number of Section 9.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall (a contact that launches)</span>
+        When a particle is pushed out of an obstacle, the push is a correction of position. If the velocity is
+        then read from the total move, the push becomes an outward velocity: a 1&nbsp;cm push in a substep of
+        1/960&nbsp;s reads as about 10&nbsp;m/s. On a fine cloth these kicks add energy until it explodes. The course
+        library drops the outward normal velocity a contact creates, which makes contacts inelastic.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="hair">14 &middot; Hair and fur</h2>
+      <p>
+        A texture colors a surface; fur and hair stand off it. Kajiya and Kay (SIGGRAPH 1989, &ldquo;Rendering
+        Fur with Three Dimensional Textures&rdquo;) filled a thin volume over the surface with <em>texels</em>,
+        small 3D textures storing fur density, hair direction and a lighting frame, and ray traced a furry
+        teddy bear through them. The real-time descendant (Lengyel, Praun, Finkelstein and Hoppe, I3D 2001)
+        slices that volume into <em>shells</em>: copies of the surface pushed outward, each carrying an ordinary
+        2D texture that is opaque where a hair crosses its height, plus <em>fins</em> at the silhouette so the
+        edge view does not show the layers (<a href="texture-mapping.html">the texture-mapping chapter</a>).
+      </p>
+      <p>
+        A hair has no single normal, so Kajiya and Kay lit it by its tangent: diffuse light is brightest when
+        the light crosses the hair and vanishes along it, and the highlight is a band where the light and the
+        eye make mirror angles with the strand. That is why fur glows at its edges. Hair that moves is
+        simulated as strands, chains of particles joined by links and rooted on the scalp. A few thousand
+        <em>guide</em> hairs are simulated and many more <em>children</em> are drawn between them; each step,
+        gravity and wind move the particles, the links restore each hair&rsquo;s length, and particles inside
+        the head are pushed back out. <em>Follow the leader</em> (M&uuml;ller, Kim and Chentanez, VRIPHYS 2012)
+        restores length by moving each particle to exactly one link from its parent, root to tip, so the hair
+        never stretches. Film simulates every strand: Merida in Pixar&rsquo;s <em>Brave</em> (2012) has about
+        111,700 hairs in more than 1,500 curls, simulated with a solver the team built for her.
+      </p>
+      <figure>
+        <img src="../media/icons/furbunny.png" alt="The Stanford bunny covered in dense cream fur, glowing at its edges." style="max-width: 300px;" />
+        <img src="../media/icons/sim-hair.webp" alt="A pastel figure whose long hair streams back in a gusting wind." style="max-width: 300px;" />
+        <figcaption>Left: about 110,000 grown hairs on the Stanford bunny, Kajiya-Kay lit. Right: about 1,800 simulated guide strands with 9 children each, blown by a gusting wind. Both rendered for this course.</figcaption>
+      </figure>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        Open the fur demo (<a href="../lib/demo.html?demo=fur">lib/demo.html?demo=fur</a>). Swing the light azimuth and
+        watch the bright band travel along the hairs: it depends on the tangent. Raise gravity and the hairs
+        droop; drop the hair count to 10,000 and individual strands appear.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="exercises">15 &middot; Exercises</h2>
       <div class="ex">
         <span class="tag">Exercise 1 (in-betweening)</span>
         Where is the linear path of Section 1 at \(t = 0.8\)? And with smoothstep easing applied first?
@@ -704,7 +811,7 @@ blend   [ 1.074, 0.923, 0 ]</pre>
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Animation and Interpolation v2.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-motion.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Animation and Interpolation v2.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-motion.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

@@ -59,6 +59,18 @@ A 1024 × 1024 texture. Across one pixel, `u` changes by **0.004** in x and `v` 
 
 ---
 
+## Question 5: fur that looks wrong
+
+A game draws fur on a character with **16 shells**. Seen from the front it reads as fur; at the **silhouette** it looks like a stack of thin, slightly offset outlines. What is the standard fix?
+
+- **A.** add a normal map to every shell
+- **B.** add **fins**: thin textured quads standing on the silhouette edges
+- **C.** switch the shading to Kajiya-Kay
+- **D.** raise the shell texture's mipmap level
+
+
+---
+
 ## Wrap
 
 - A mesh is a **vertex array** plus **index triples**; the **cross product** of two edges is the face normal, and winding picks its sign

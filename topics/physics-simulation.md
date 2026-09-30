@@ -26,7 +26,7 @@
     - cloth 24 x 24, 0.3 kg: particle mass 0.000521 kg; k = 2000 N/m:
       h = 4.167 / 1.042 / 0.260 ms at 4 / 16 / 64 substeps; h sqrt(k/m) = 8.16 / 2.04 / 0.51
       springs: explode at 16 substeps, 1.2 % stretch at 64 (24.8 ms per frame in node)
-      constraints: stretch 369.9 / 31.6 / 3.6 / 1.3 % at 1 / 4 / 16 / 64 substeps
+      constraints (2 passes per substep): stretch 125.3 / 5.3 / 2.0 / 1.2 % at 1 / 4 / 16 / 64 substeps
         (0.45 / 1.64 / 6.96 / 27.8 ms per frame in node)
     - one XPBD projection: masses 1 kg (w = 1), rest 1 m, now 1.2 m, h = 1/60 s,
       k = 1000 N/m: alpha~ = 1/(k h^2) = 3.6; dlambda = -0.2 / 5.6 = -0.0357;
@@ -288,7 +288,7 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
   controls:  stiffness k (N/m), substeps per 1/60 s frame, links = constraints | springs
   readout:   step h, h·√(k/m), max stretch, kinetic energy, step time, state
   k = 2000:  springs explode at 16 substeps and hold at 64;
-             constraints stretch 369.9 % at 1 substep, 3.6 % at 16</pre></div>
+             constraints stretch 125.3 % at 1 substep, 2.0 % at 16</pre></div>
 
 
 ---
@@ -412,4 +412,12 @@ The dam breaks with viscosity **2.5**. Drop it to **0.2**; what changes first?
 - stiff springs need short steps; **constraints** (XPBD) trade that for softness and never explode
 - contacts are **projections**; substeps also stop **tunneling**
 - fluids are particles with **density and pressure** in place of links, under a **CFL** step limit
+
+
+---
+
+## Where this returns
+
+- **Scene graphs** (lecture 7): kinematics, inverse kinematics and skinning, then **rigid bodies and collisions**: broad and narrow phase, bounce and friction, ragdolls
+- **Meshes and texture mapping** (lecture 10): **fur** as 3D textures and shells, lit by the strand's tangent, and **hair** as simulated strands with guides and wind
 
