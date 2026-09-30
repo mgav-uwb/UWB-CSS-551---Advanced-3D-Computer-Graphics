@@ -235,7 +235,7 @@
     One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
     then open <code>http://localhost:8551/</code>.
     <div style="margin-top:8px">The icon strip mixes renders made for this course (the Utah teapot from Martin Newell's 1975 data;
-    the Stanford bunny and dragon, Stanford Computer Graphics Laboratory; our own Cornell box, spheres, furry teddy, voxel
+    the Stanford bunny and dragon, Stanford Computer Graphics Laboratory; our own Cornell box, spheres, fur bunny, voxel
     world, physics simulations, and technique homages to landmark film effects and VR, which reproduce no frame, character or logo) with freely licensed stills from Big Buck Bunny and Sintel (Blender Foundation, CC BY 3.0), SuperTuxKart (CC BY 3.0)
     and 0 A.D. (Wildfire Games, CC BY-SA 3.0): <a href="media/icons/CREDITS.md">icon credits</a>. Comics: xkcd by Randall Munroe,
     CC BY-NC 2.5: <a href="media/comics/CREDITS.md">comic credits</a>.</div>
@@ -487,6 +487,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=7"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=8"; mountExtras({ base: "./" });</script>
 </body>
 </html>

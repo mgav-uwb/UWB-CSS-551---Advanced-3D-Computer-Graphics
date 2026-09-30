@@ -1,6 +1,6 @@
 ---
 title: "CSS 551 · Site icons: credits and provenance"
-version: "1.3"
+version: "1.4"
 status: final
 created_by: "Claude"
 created_at: "2026-09-29T18:00"
@@ -35,7 +35,7 @@ They are generated; regenerate rather than edit.
 | `dragon.png` | The Stanford dragon | Stanford Computer Graphics Laboratory, Stanford 3D Scanning Repository (1996) | as above |
 | `cornell.png` | A Cornell box | our own scene after Goral, Torrance, Greenberg and Battaile, SIGGRAPH 1984 | original render |
 | `whitted.png` | Spheres over a checkerboard | our own scene after Whitted, “An Improved Illumination Model for Shaded Display,” CACM 1980 | original render |
-| `teddy.png` | A furry teddy | our own shell-fur scene after Kajiya and Kay, “Rendering Fur with Three Dimensional Textures,” SIGGRAPH 1989 (the original image is not reproduced) | original render |
+| `furbunny.png` | A fur bunny | the Stanford bunny (Stanford Computer Graphics Laboratory) grown with about 110,000 strands, lit with the Kajiya-Kay model; after Kajiya and Kay (SIGGRAPH 1989) and Augusto Roman's fur bunny (Stanford CS348b rendering competition, 2003, whose image is not reproduced) | original render |
 | `voxel.png` | A voxel world | our own scene | original render |
 
 ## Film and game stills
@@ -71,6 +71,7 @@ primitives and procedural geometry. Each shows a technique, not the film's image
 
 | Version | Date             | Author | Summary |
 | ------- | ---------------- | ------ | ------- |
+| 1.4     | 2026-09-30T10:00 | Claude | The shell-fur teddy replaced by a strand-fur bunny (about 110,000 hairs, Kajiya-Kay shading). |
 | 1.3     | 2026-09-29T23:30 | Claude | Six homage renders of film effects and VR (liquid metal, bullet time, lamp, tentacles, performance capture, stereo pair). |
 | 1.2     | 2026-09-29T21:30 | Claude | Two more renders: a shell-fur teddy after Kajiya and Kay, and a pastel voxel world. |
 | 1.1     | 2026-09-29T21:00 | Claude | Four film and game stills (Big Buck Bunny, Sintel, SuperTuxKart, 0 A.D.), freely licensed and credited. |
