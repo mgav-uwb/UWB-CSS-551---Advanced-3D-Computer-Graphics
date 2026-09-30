@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<!-- CSS 551 glossary: the course's terms, each defined in the course's conventions (column vectors,
+     right-handed, radians in formulas unless stated) with links to the textbook section and the lectures
+     that cover it. Every entry has an id "term-<slug>" so other pages can deep-link to it.
+     Data: the TERMS array below; the page renders, searches and filters it. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSS 551 · Glossary</title>
+<style>
+  :root{ --ink:#2d2640; --dim:#6c6584; --line:#e9def8; --accent:#7a58d6; }
+  *{box-sizing:border-box}
+  html{scroll-padding-top:120px}
+  body{margin:0;color:var(--ink);font:15px/1.55 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+       padding:28px clamp(14px,4vw,56px) 64px;
+       background:radial-gradient(900px 520px at 8% -6%, #ffe3ef 0%, transparent 60%),
+                  radial-gradient(760px 480px at 96% 4%, #dff4ff 0%, transparent 62%),
+                  radial-gradient(900px 700px at 50% 108%, #e8fbef 0%, transparent 60%), #fcf8ff;
+       background-attachment:fixed}
+  header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:12px}
+  h1{font-size:28px;margin:0;background:linear-gradient(90deg,#d0508a,#7a58d6 55%,#1c8766);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .meta{color:var(--dim);font-size:13.5px}
+  a{color:var(--accent)}
+  .bar{position:sticky;top:0;z-index:10;background:#fcf8ffee;backdrop-filter:blur(6px);padding:10px 0 8px;margin:0 0 6px;border-bottom:1px solid var(--line)}
+  .search{width:100%;max-width:520px;font:inherit;padding:7px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  .search:focus{outline:2px solid #c9b8f3;border-color:var(--accent)}
+  .filters{display:flex;gap:6px;margin:8px 0 6px;flex-wrap:wrap}
+  .filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 12px;font-size:12.5px;color:var(--ink);cursor:pointer}
+  .filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .az{display:flex;flex-wrap:wrap;gap:2px;font-size:12.5px}
+  .az a{display:inline-block;min-width:21px;text-align:center;padding:1px 3px;border-radius:6px;text-decoration:none;font-weight:700}
+  .az a:hover{background:#f4edff}
+  .az span{display:inline-block;min-width:21px;text-align:center;padding:1px 3px;color:#cfc6e0;font-weight:700}
+  #count{color:var(--dim);font-size:12.5px;margin-left:8px}
+  h2.letter{font-size:15px;color:var(--accent);margin:22px 0 6px;border-bottom:1px solid var(--line);padding-bottom:2px}
+  dl{margin:0}
+  .entry{background:#ffffffd9;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:8px 0}
+  .entry:target{border-color:var(--accent);box-shadow:0 0 0 3px #e4d9fb}
+  dt{font-weight:700;font-size:15.5px}
+  dt .abbr{font-weight:400;color:var(--dim);font-size:13.5px}
+  dt .topic{float:right;font-size:10.5px;font-weight:700;border-radius:999px;padding:1px 8px;margin-left:8px}
+  .t-F{background:#eafaf2;color:#1c8766} .t-R{background:#fff0f6;color:#c2457e} .t-A{background:#fff3e6;color:#a4580c}
+  .t-T{background:#eaf6ff;color:#23699a} .t-N{background:#f3eeff;color:#6a47c9} .t-V{background:#fdf2dc;color:#8a6a10}
+  dd{margin:4px 0 0}
+  .links{font-size:12.5px;color:var(--dim);margin-top:5px}
+  .links b{color:var(--ink);font-weight:600}
+  .none{color:var(--dim);margin:30px 0}
+  footer{margin-top:30px;color:var(--dim);font-size:12.5px}
+  @media (max-width:560px){ dt .topic{float:none;display:inline-block;margin:2px 0 0} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Glossary</h1>
+  <div class="meta"><a href="../index.html">course hub</a> · every term with its textbook section and lectures · <a href="../textbook/index.html">textbook</a></div>
+</header>
+
+<div class="bar">
+  <input id="q" class="search" type="search" placeholder="Search terms and definitions" aria-label="search the glossary" autocomplete="off">
+  <span id="count"></span>
+  <div class="filters" role="group" aria-label="topic filter" id="filters"></div>
+  <nav class="az" id="az" aria-label="jump to letter"></nav>
+</div>
+
+<div id="list"></div>
+
+<footer>
+  Conventions: vectors are column vectors, frames are right-handed, and angles in formulas are in radians unless a slider says degrees, as in the textbook.
+  Terms link to the <a href="../textbook/index.html">course text</a> and to the lecture decks.
+</footer>
+
+<script>
+const TOPICS = { F: 'Foundations', R: 'Rendering', A: 'Animation and physics', T: 'Tools', N: 'Neural', V: 'Film and VR' };
+const LECT = {
+  1: 'L01-big-picture-1', 2: 'L02-big-picture-2', 3: 'L03-loop-mvc-tool', 4: 'L04-vectors', 5: 'L05-rotation',
+  6: 'L06-affine', 7: 'L07-scene-graphs', 8: 'L08-viewing', 9: 'L09-rasterization-antialiasing', 10: 'L10-meshes-textures',
+  11: 'L11-illumination', 12: 'L12-light-transport-ray-tracing', 13: 'L13-path-tracing', 14: 'L14-neural-nets-embeddings',
+  15: 'L15-image-space', 16: 'L16-diffusion-1', 17: 'L17-diffusion-2', 18: 'L18-learned-scenes', 19: 'L19-generative-3d-video',
+  20: 'L20-synthesis-review',
+};
+const CHAP = {
+  'affine-transforms': 'Affine Transformations', animation: 'Animation', antialiasing: 'Antialiasing', color: 'Color',
+  'curves-surfaces': 'Curves and Surfaces', 'diffusion-models': 'Diffusion Models', 'history-of-graphics': 'History',
+  illumination: 'Local Illumination', 'image-space': 'The Space of Images', interaction: 'Interactive Systems',
+  'learned-scenes': 'Learned Scenes', 'light-transport-pbr': 'Light Transport and PBR', meshes: 'Polygonal Meshes',
+  'neural-nets-embeddings': 'Neural Networks and Embeddings', rasterization: 'Rasterization', 'ray-tracing': 'Ray Tracing',
+  rotation: 'Rotation', 'scene-graphs': 'Scene Graphs', 'texture-mapping': 'Texture Mapping', 'unity-basics': 'Unity for This Course',
+  'unity-shaders': 'Unity Shaders', vectors: 'Vectors', viewing: 'Viewing',
+};
+
+// section numbers of each chapter's h2 anchors, generated from textbook/*.html
+const SEC = {"affine-transforms":{"affine":1,"homogeneous":2,"composition":3,"inverse":4,"frames":5,"trs":6,"normals":7,"pivots":8,"projective":9,"code":10,"exercises":11},"animation":{"keyframes":1,"editor":2,"easing":3,"rotations":4,"transforms":5,"kinematics":6,"skinning":7,"simulation":8,"particles":9,"collision":10,"mocap":11,"exercises":12},"antialiasing":{"theorem":1,"aliasing":2,"fourier":3,"remedies":4,"filters":5,"edges":6,"lines":7,"textures":8,"shading":9,"patterns":10,"time":11,"exercises":12},"color":{"spectrum":1,"observer":2,"chromaticity":3,"srgb":4,"transfer":5,"linear":6,"perceptual":7,"adaptation":8,"deficiency":9,"gamuts":10,"hdr":11,"dither":12,"video":13,"displays":14,"exercises":15},"curves-surfaces":{"parametric":1,"bezier":2,"matrix":3,"render":4,"arclength":5,"continuity":6,"bspline":7,"rational":8,"chaikin":9,"patch":10,"subdivision":11,"implicit":12,"exercises":13},"diffusion-models":{"diffusion":1,"denoiser":2,"training":3,"sampling":4,"flow":5,"network":6,"guidance":7,"scaling":8,"evaluation":9,"limits":10,"papers":11,"exercises":12},"history-of-graphics":{"era-birth":1,"era-utah":2,"era-photograph":3,"era-raster":4,"era-programmable":5,"era-capture":6,"era-realtime":7,"era-neural":8,"era-patterns":9,"era-map":10,"exercises":11},"illumination":{"directions":1,"lambert":2,"specular":3,"sum":4,"normals":5,"lights":6,"ibl":7,"tonemap":8,"cost":9,"limits":10,"exercises":11},"image-space":{"image-space":1,"function-view":2,"bases":3,"fourier":4,"filters":5,"pyramids":6,"histograms":7,"compression":8,"metrics":9,"sheet":10,"concept-map":11,"exercises":12},"interaction":{"loop":1,"timestep":2,"mvc":3,"events":4,"unproject":5,"picking":6,"hit2d":7,"drag":8,"rotate":9,"latency":10,"exercises":11},"learned-scenes":{"learned-scenes":1,"volume":2,"sampling":3,"training":4,"splats":5,"splat-anatomy":6,"splat-training":7,"extraction":8,"contrast":9,"papers":10,"exercises":11},"light-transport-pbr":{"honest-light":1,"rendering-equation":2,"brdf":3,"microfacets":4,"fresnel":5,"furnace":6,"metal-rough":7,"sampling":8,"ibl":9,"beyond":10,"solving":11,"exercises":12},"meshes":{"arrays":1,"grid":2,"adjacency":3,"topology":4,"normals":5,"shading":6,"editing":7,"sweep":8,"marching":9,"simplify":10,"lod":11,"files":12,"exercises":13},"neural-nets-embeddings":{"networks":1,"training":2,"deep":3,"optimizers":4,"approx":5,"layers":6,"embeddings":7,"encoders":8,"papers":9,"exercises":10},"rasterization":{"edge":1,"setup":2,"fill-rule":3,"barycentric":4,"clipping":5,"aliasing":6,"zbuffer":7,"early-z":8,"perspective-correct":9,"blending":10,"lines":11,"pipeline":12,"deferred":13,"loop":14,"hands":15,"exercises":16},"ray-tracing":{"rays":1,"intersections":2,"instancing":3,"whitted":4,"distributed":5,"acceleration":6,"montecarlo":7,"pathtracing":8,"media":9,"others":10,"exercises":11},"rotation":{"invariants":1,"matrix":2,"rodrigues":3,"quaternions":4,"slerp":5,"euler":6,"drift":7,"choosing":8,"code":9,"exercises":10},"scene-graphs":{"problem":1,"rule":2,"chain":3,"joints":4,"recursion":5,"stack":6,"dirty":7,"both-ways":8,"frames":9,"camera":10,"bounds":11,"reuse":12,"shear":13,"gltf":14,"hands":15,"exercises":16},"texture-mapping":{"uv":1,"unwrap":2,"wrap":3,"placement":4,"magnification":5,"minification":6,"compression":7,"procedural":8,"bump":9,"cubemap":10,"shadowmap":11,"exercises":12},"unity-basics":{"install":1,"editor":2,"objects":3,"scripts":4,"csharp":5,"transform":6,"mathtypes":7,"assets":8,"input":9,"projects":10,"rule":11,"exercises":12},"unity-shaders":{"pipeline":1,"anatomy":2,"programs":3,"matrices":4,"uniforms":5,"textures":6,"lighting":7,"state":8,"debugging":9,"exercises":10},"vectors":{"displacements":1,"dot":2,"cross":3,"frames":4,"lines":5,"planes":6,"barycentric":7,"precision":8,"code":9,"exercises":10},"viewing":{"frame":1,"view":2,"pinhole":3,"fov":4,"projection":5,"depth":6,"precision":7,"chain":8,"frustum":9,"offaxis":10,"ortho":11,"lens":12,"controls":13,"hands":14,"exercises":15}};
+
+// t: term, a: abbreviation or other name, g: topic, d: definition, x: text refs "chapter#anchor",
+// l: lecture numbers, s: see-also terms (by t)
+const TERMS = [
+// ── Foundations: vectors, transforms, viewing ─────────────────────────────────────────────────
+{ t: 'Vector', g: 'F', d: 'A displacement: a direction and a length, with no fixed position. In the course, vectors are 3 by 1 columns of numbers, and points are vectors from an origin.', x: ['vectors#displacements'], l: [4], s: ['Dot product', 'Homogeneous coordinates'] },
+{ t: 'Dot product', a: 'inner product', g: 'F', d: 'a · b = |a| |b| cos θ, the sum of the products of matching components. It measures alignment: zero for perpendicular vectors, and a · n for a unit n is the length of a along n.', x: ['vectors#dot'], l: [4], s: ['Projection (of a vector)', 'Cosine similarity'] },
+{ t: 'Cross product', g: 'F', d: 'a × b is perpendicular to both a and b, with length |a| |b| sin θ (the area of their parallelogram) and direction given by the right-hand rule. Defined only in 3D.', x: ['vectors#cross'], l: [4], s: ['Normal', 'Right-handed'] },
+{ t: 'Projection (of a vector)', g: 'F', d: 'The part of a along a unit direction n is (a · n) n; the rest, a − (a · n) n, is perpendicular to n. The split underlies Rodrigues\' formula, reflection and Gram-Schmidt.', x: ['vectors#dot'], l: [4, 5], s: ['Dot product', 'Gram-Schmidt', 'Rodrigues\' formula'] },
+{ t: 'Normalize', a: 'unit vector', g: 'F', d: 'Divide a vector by its length to get a unit vector in the same direction. Normalizing a vector of length near zero is the classic source of NaN in graphics code.', x: ['vectors#displacements', 'vectors#precision'], l: [4], s: ['Vector'] },
+{ t: 'Right-handed', g: 'F', d: 'A frame where x × y = z: curl the right hand from x to y and the thumb points along z. The course, OpenGL and three.js are right-handed; Unity is left-handed.', x: ['vectors#cross', 'unity-basics#mathtypes'], l: [4, 3], s: ['Cross product', 'Frame'] },
+{ t: 'Frame', a: 'coordinate frame, basis', g: 'F', d: 'An origin and three axes. A 4 by 4 affine matrix is a frame: its first three columns are where the axes land, the fourth is where the origin lands.', x: ['vectors#frames', 'affine-transforms#frames'], l: [4, 6], s: ['Affine map', 'Object space'] },
+{ t: 'Gram-Schmidt', g: 'F', d: 'Turn two non-parallel vectors into an orthonormal pair by removing from the second its projection onto the first, then normalizing both; a cross product gives the third axis.', x: ['vectors#frames'], l: [4], s: ['Frame', 'Look-at'] },
+{ t: 'Line', a: 'ray, segment', g: 'F', d: 'The points p(t) = o + t d. A ray keeps t ≥ 0; a segment keeps t between 0 and 1. The closest point on a line to q uses a projection onto d.', x: ['vectors#lines'], l: [4], s: ['Ray', 'Plane'] },
+{ t: 'Plane', g: 'F', d: 'The points p with n · p = D for a normal n. For a unit n, n · q − D is the signed distance from q to the plane: its sign says which side q is on.', x: ['vectors#planes'], l: [4], s: ['Signed distance', 'Normal'] },
+{ t: 'Signed distance', g: 'F', d: 'The distance to a surface with a sign that says which side a point is on. For a plane with unit normal n it is n · q − D; for a sphere, |q − c| − r.', x: ['vectors#planes'], l: [4], s: ['Plane'] },
+{ t: 'Barycentric coordinates', g: 'F', d: 'Weights (w0, w1, w2) that sum to 1 and write a point of a triangle\'s plane as w0 v0 + w1 v1 + w2 v2. Inside the triangle all three are non-negative; each is a ratio of sub-triangle areas.', x: ['vectors#barycentric', 'rasterization#barycentric'], l: [4, 9], s: ['Edge function', 'Perspective-correct interpolation'] },
+{ t: 'Floating point', a: 'precision', g: 'F', d: 'Numbers with about 7 significant decimal digits in 32-bit float. Subtracting nearly equal numbers and acos near ±1 lose accuracy; compare with tolerances, never with ==.', x: ['vectors#precision'], l: [4], s: ['Depth precision'] },
+{ t: 'Rotation matrix', g: 'F', d: 'An orthonormal 3 by 3 matrix with determinant +1. Its columns are where the x, y and z axes land; its inverse is its transpose.', x: ['rotation#matrix'], l: [5], s: ['Quaternion', 'Axis-angle'] },
+{ t: 'Axis-angle', g: 'F', d: 'A rotation given by a unit axis and an angle about it (right-hand rule). Any 3D rotation has this form, by Euler\'s rotation theorem.', x: ['rotation#rodrigues'], l: [5], s: ['Rodrigues\' formula', 'Quaternion'] },
+{ t: 'Rodrigues\' formula', g: 'F', d: 'Rotates v about unit axis k by θ: v cos θ + (k × v) sin θ + k (k · v)(1 − cos θ). It is the projection split plus a cross product.', x: ['rotation#rodrigues'], l: [5], s: ['Axis-angle', 'Projection (of a vector)'] },
+{ t: 'Quaternion', g: 'F', d: 'Four numbers (x, y, z, w) that store a rotation as (k sin(θ/2), cos(θ/2)) for axis k and angle θ. Unit quaternions compose by multiplication, interpolate well, and q and −q are the same rotation.', x: ['rotation#quaternions'], l: [5], s: ['Slerp', 'Double cover'] },
+{ t: 'Double cover', g: 'F', d: 'Every rotation has two unit quaternions, q and −q. Interpolation must pick the one with a non-negative dot product, or it takes the long way round.', x: ['rotation#slerp'], l: [5], s: ['Quaternion', 'Slerp'] },
+{ t: 'Euler angles', g: 'F', d: 'A rotation stored as three successive rotations about coordinate axes (for example yaw, pitch, roll). There are 12 orderings; all suffer gimbal lock.', x: ['rotation#euler'], l: [5], s: ['Gimbal lock'] },
+{ t: 'Gimbal lock', g: 'F', d: 'The loss of one rotational degree of freedom when the middle Euler angle reaches ±90°, making the first and third axes line up. It is a property of the parameterization, not of rotations.', x: ['rotation#euler'], l: [5], s: ['Euler angles', 'Quaternion'] },
+{ t: 'Slerp', a: 'spherical linear interpolation', g: 'A', d: 'Interpolates two unit quaternions along the great arc between them at constant angular speed. Nlerp (normalized linear) is cheaper and close for small angles.', x: ['rotation#slerp', 'animation#rotations'], l: [5], s: ['Quaternion', 'Keyframe'] },
+{ t: 'Affine map', a: 'affine transformation', g: 'F', d: 'x ↦ A x + t: a linear part A plus a translation t. It keeps lines straight and parallel lines parallel, and preserves ratios along a line, but not lengths or angles in general.', x: ['affine-transforms#affine'], l: [6], s: ['Homogeneous coordinates', 'TRS'] },
+{ t: 'Homogeneous coordinates', g: 'F', d: 'Append a fourth coordinate w: points get w = 1, vectors w = 0. Then an affine map is one 4 by 4 matrix product, translation moves points and leaves vectors alone.', x: ['affine-transforms#homogeneous'], l: [6], s: ['Affine map', 'Perspective divide'] },
+{ t: 'Composition (of transforms)', g: 'F', d: 'Applying one transform after another multiplies their matrices; with column vectors the first applied is rightmost, so T R rotates first, then translates. Order matters.', x: ['affine-transforms#composition'], l: [6], s: ['TRS', 'Scene graph'] },
+{ t: 'TRS', a: 'translate, rotate, scale', g: 'F', d: 'The factored form M = T R S that engines store per object. Nine numbers of it (plus translation) cannot represent a shear, which appears when a non-uniform scale sits above a rotation.', x: ['affine-transforms#trs', 'scene-graphs#shear'], l: [6, 7], s: ['Affine map', 'Inherited shear'] },
+{ t: 'Inverse transpose', g: 'F', d: 'Normals transform by (A⁻¹)ᵀ, not by A, so they stay perpendicular to the surface under non-uniform scale. For a pure rotation the two are equal.', x: ['affine-transforms#normals', 'illumination#normals'], l: [6, 11], s: ['Normal'] },
+{ t: 'Pivot', a: 'conjugation', g: 'F', d: 'To rotate about a point p, translate p to the origin, rotate, translate back: T(p) R T(−p). The same sandwich puts any transform in another frame.', x: ['affine-transforms#pivots', 'scene-graphs#joints'], l: [6, 7], s: ['Composition (of transforms)'] },
+{ t: 'Object space', a: 'model space, local space', g: 'F', d: 'The frame a mesh is authored in. The model matrix takes it to world space; a scene graph composes local transforms up to the root.', x: ['affine-transforms#frames'], l: [6, 7], s: ['World space', 'Model matrix'] },
+{ t: 'World space', g: 'F', d: 'The shared frame of the whole scene, in which objects, lights and the camera are placed.', x: ['affine-transforms#frames'], l: [6, 7, 8], s: ['Object space', 'View matrix'] },
+{ t: 'Model matrix', g: 'F', d: 'The 4 by 4 matrix that takes an object\'s vertices from object space to world space; in a scene graph it is the product of the local matrices from the root down.', x: ['scene-graphs#rule', 'viewing#chain'], l: [7, 8], s: ['Scene graph', 'View matrix'] },
+{ t: 'Scene graph', g: 'F', d: 'A tree of nodes, each with a local transform; a node\'s world transform is its parent\'s world transform times its own local one, so moving a parent moves its children.', x: ['scene-graphs#rule'], l: [7], s: ['Model matrix', 'Forward kinematics'] },
+{ t: 'Inherited shear', g: 'F', d: 'A child under a rotated, non-uniformly scaled parent gets a world matrix with shear, which TRS fields cannot store; read-back of rotation and scale then gives wrong values.', x: ['scene-graphs#shear'], l: [7], s: ['TRS'] },
+{ t: 'Instancing', g: 'R', d: 'Drawing one mesh many times with different model matrices, from one upload; in a scene graph, one subtree reused under several parents.', x: ['scene-graphs#reuse', 'ray-tracing#instancing'], l: [7], s: ['Scene graph'] },
+{ t: 'Look-at', g: 'F', d: 'Building a camera frame from an eye, a target and an up vector with two cross products: w = normalize(eye − target), u = normalize(up × w), v = w × u.', x: ['viewing#frame'], l: [8], s: ['View matrix', 'Gram-Schmidt'] },
+{ t: 'View matrix', a: 'V', g: 'F', d: 'The inverse of the camera\'s frame: it takes world space to camera space, where the camera sits at the origin looking down −z. Its rows are the camera axes u, v, w.', x: ['viewing#view'], l: [8], s: ['Look-at', 'Projection matrix'] },
+{ t: 'Projection matrix', a: 'P', g: 'F', d: 'The 4 by 4 matrix that maps the view frustum to clip space; for perspective its last row is (0, 0, −1, 0), so w becomes the depth and the divide by w makes far things small.', x: ['viewing#projection'], l: [8], s: ['Perspective divide', 'Frustum'] },
+{ t: 'Field of view', a: 'FOV', g: 'F', d: 'The angle the camera sees, usually vertical. The projection\'s focal factor is f = 1 / tan(fov/2); a narrower field of view is a longer lens.', x: ['viewing#fov'], l: [8], s: ['Projection matrix'] },
+{ t: 'Frustum', a: 'view frustum', g: 'F', d: 'The truncated pyramid a perspective camera sees, between the near and far planes. Objects outside it are culled; triangles crossing the near plane are clipped.', x: ['viewing#frustum'], l: [8, 9], s: ['Clipping', 'Near and far planes'] },
+{ t: 'Near and far planes', g: 'F', d: 'The depths where the frustum starts and ends. Depth precision depends mostly on the near distance: pushing it closer wastes precision.', x: ['viewing#depth'], l: [8], s: ['Depth precision', 'Frustum'] },
+{ t: 'Clip space', g: 'F', d: 'The 4D coordinates after the projection matrix and before the divide; clipping against the frustum happens here, where the frustum is −w ≤ x, y, z ≤ w.', x: ['viewing#chain', 'rasterization#clipping'], l: [8, 9], s: ['Perspective divide', 'NDC'] },
+{ t: 'Perspective divide', g: 'F', d: 'Dividing x, y and z by w after projection. It is the only non-linear step of the pipeline and the reason attributes need perspective-correct interpolation.', x: ['viewing#pinhole'], l: [8], s: ['NDC', 'Perspective-correct interpolation'] },
+{ t: 'NDC', a: 'normalized device coordinates', g: 'F', d: 'Coordinates after the perspective divide: the visible volume is the cube from −1 to 1 on each axis (OpenGL convention).', x: ['viewing#chain'], l: [8], s: ['Viewport transform', 'Clip space'] },
+{ t: 'Viewport transform', g: 'F', d: 'Maps NDC x and y to pixel coordinates: x_pixel = (x + 1) width / 2, and y flipped when pixel rows count down from the top.', x: ['viewing#chain'], l: [8, 9], s: ['NDC'] },
+{ t: 'Depth precision', g: 'R', d: 'A depth buffer stores a non-linear function of distance, dense near the camera and sparse far away; with a close near plane, distant surfaces fight (z-fighting).', x: ['viewing#precision'], l: [8, 9], s: ['Z-buffer', 'Near and far planes'] },
+{ t: 'Orthographic projection', g: 'F', d: 'A projection without the divide by depth: parallel lines stay parallel and size does not shrink with distance. Used in CAD and shadow maps.', x: ['viewing#ortho'], l: [8], s: ['Projection matrix'] },
+{ t: 'Off-axis projection', g: 'V', d: 'A frustum whose center of view is not the center of the image; used for each eye in stereo displays and for tiled walls.', x: ['viewing#offaxis'], l: [8, 19], s: ['Stereo rendering'] },
+{ t: 'Unprojection', g: 'T', d: 'Running the viewing chain backwards: from a mouse pixel through the inverse of P V to a ray in world space, for picking.', x: ['interaction#unproject'], l: [3, 8], s: ['Picking'] },
+{ t: 'Normal', a: 'surface normal', g: 'F', d: 'A unit vector perpendicular to a surface at a point. A face normal is the normalized cross product of two triangle edges; vertex normals average the faces around a vertex.', x: ['meshes#normals', 'illumination#directions'], l: [10, 11], s: ['Inverse transpose', 'Cross product'] },
+
+// ── Rendering: rasterization, sampling, meshes, textures, shading ─────────────────────────────
+{ t: 'Rasterization', g: 'R', d: 'Turning a projected triangle into the pixels it covers, then interpolating its attributes at each. It is the core of real-time rendering on GPUs.', x: ['rasterization#edge'], l: [9], s: ['Edge function', 'Z-buffer'] },
+{ t: 'Edge function', g: 'R', d: 'E(p) = (b − a) × (p − a) in 2D (a perp-dot): twice the signed area of triangle a, b, p. A pixel center is inside when all three edge functions have the same sign.', x: ['rasterization#edge'], l: [9], s: ['Barycentric coordinates', 'Top-left rule'] },
+{ t: 'Top-left rule', a: 'fill rule', g: 'R', d: 'A tie-break so a pixel center lying exactly on an edge shared by two triangles is drawn by exactly one of them: no gaps and no double blends.', x: ['rasterization#fill-rule'], l: [9], s: ['Edge function'] },
+{ t: 'Perspective-correct interpolation', g: 'R', d: 'Interpolate attribute/w and 1/w linearly in screen space, then divide. Plain screen-space interpolation makes textures swim and bend in perspective.', x: ['rasterization#perspective-correct'], l: [9], s: ['Perspective divide', 'Barycentric coordinates'] },
+{ t: 'Z-buffer', a: 'depth buffer', g: 'R', d: 'One depth per pixel; a fragment is written only if it is nearer than what is stored. Catmull described it in 1974. It makes visibility order-independent for opaque surfaces.', x: ['rasterization#zbuffer'], l: [9], s: ['Depth precision', 'Early z'] },
+{ t: 'Early z', a: 'overdraw', g: 'R', d: 'Testing depth before shading so hidden fragments are never shaded; overdraw is how many times a pixel is shaded per frame.', x: ['rasterization#early-z'], l: [9], s: ['Z-buffer'] },
+{ t: 'Clipping', g: 'R', d: 'Cutting triangles against the frustum planes, above all the near plane, so no vertex behind the camera reaches the divide.', x: ['rasterization#clipping', 'viewing#frustum'], l: [8, 9], s: ['Frustum', 'Clip space'] },
+{ t: 'Over operator', a: 'alpha blending', g: 'R', d: 'Porter and Duff\'s composite of a front layer over a back: with premultiplied colors, C = C_front + (1 − α_front) C_back. The basis of transparency and of film compositing.', x: ['rasterization#blending'], l: [9, 2], s: ['Premultiplied alpha', 'Compositing'] },
+{ t: 'Premultiplied alpha', g: 'R', d: 'Storing color already multiplied by its coverage α. Blending and filtering then work correctly and the over operator becomes one multiply-add.', x: ['rasterization#blending'], l: [9, 2], s: ['Over operator'] },
+{ t: 'GPU pipeline', a: 'graphics pipeline', g: 'R', d: 'Vertex shader, clipping and divide, rasterization, fragment shader, depth test and blending, in order. Shaders are programmable; the rest is fixed hardware.', x: ['rasterization#pipeline', 'unity-shaders#pipeline'], l: [9, 11], s: ['Vertex shader', 'Fragment shader'] },
+{ t: 'Deferred shading', g: 'R', d: 'Rasterize geometry attributes (normal, albedo, depth) into buffers first, then light each pixel once; lighting cost stops depending on overdraw.', x: ['rasterization#deferred', 'illumination#cost'], l: [9, 11], s: ['GPU pipeline'] },
+{ t: 'Frame budget', g: 'T', d: 'The time for one frame: 16.7 ms at 60 frames per second, 11.1 ms at 90 (VR). Everything the loop does has to fit.', x: ['rasterization#loop', 'interaction#latency'], l: [3, 19], s: ['Frame loop', 'Motion-to-photon latency'] },
+{ t: 'Sampling', g: 'R', d: 'Measuring a continuous signal at discrete points, such as a scene at pixel centers. Reconstruction turns samples back into a continuous signal.', x: ['antialiasing#theorem'], l: [9], s: ['Aliasing', 'Nyquist rate'] },
+{ t: 'Nyquist rate', a: 'sampling theorem', g: 'R', d: 'A signal can be reconstructed exactly from samples taken at more than twice its highest frequency; below that, high frequencies fold into false low ones.', x: ['antialiasing#theorem'], l: [9], s: ['Aliasing'] },
+{ t: 'Aliasing', g: 'R', d: 'Frequencies above half the sampling rate masquerading as lower ones: jagged edges, moiré on fine textures, wagon wheels turning backwards.', x: ['antialiasing#aliasing', 'rasterization#aliasing'], l: [9], s: ['Nyquist rate', 'Supersampling'] },
+{ t: 'Supersampling', a: 'SSAA', g: 'R', d: 'Shading several samples per pixel and averaging them; simple and robust, and it multiplies the shading cost by the sample count.', x: ['antialiasing#remedies'], l: [9], s: ['MSAA', 'Aliasing'] },
+{ t: 'MSAA', a: 'multisample antialiasing', g: 'R', d: 'Tests coverage and depth at several samples per pixel but shades once per pixel per triangle; it smooths edges cheaply but not shading or texture aliasing.', x: ['antialiasing#edges'], l: [9], s: ['Supersampling', 'Coverage'] },
+{ t: 'Coverage', g: 'R', d: 'The fraction of a pixel a triangle covers; antialiased edges blend by it.', x: ['antialiasing#edges'], l: [9], s: ['MSAA'] },
+{ t: 'Temporal antialiasing', a: 'TAA', g: 'R', d: 'Jitter the sample position a little every frame and blend with the reprojected history, so samples accumulate over time; neural upscalers build on it.', x: ['antialiasing#time'], l: [9, 19], s: ['Jitter'] },
+{ t: 'Jitter', g: 'R', d: 'A small sub-pixel offset of the sample position, different each frame or each sample, so repeated samples see different parts of the pixel.', x: ['antialiasing#patterns', 'antialiasing#time'], l: [9, 19], s: ['Temporal antialiasing', 'Stratified sampling'] },
+{ t: 'Stratified sampling', g: 'R', d: 'One random sample in each cell of a grid over the pixel instead of fully random samples; the error falls faster for the same count.', x: ['antialiasing#patterns', 'ray-tracing#montecarlo'], l: [9, 13], s: ['Monte Carlo integration'] },
+{ t: 'Mesh', a: 'polygon mesh', g: 'R', d: 'A surface stored as two arrays: vertex positions (and attributes) and triangles as triples of vertex indices.', x: ['meshes#arrays'], l: [10], s: ['Half-edge', 'Normal'] },
+{ t: 'Half-edge', a: 'adjacency', g: 'R', d: 'A mesh structure that stores each edge twice, once per adjacent face, with links to the next half-edge and its twin, so neighbors can be walked in constant time.', x: ['meshes#adjacency'], l: [10], s: ['Mesh'] },
+{ t: 'Manifold', g: 'R', d: 'A mesh where every edge has one or two faces and the faces around each vertex form one fan; most algorithms assume it.', x: ['meshes#topology'], l: [10], s: ['Euler characteristic'] },
+{ t: 'Euler characteristic', a: 'V − E + F', g: 'R', d: 'For a closed manifold mesh, V − E + F = 2 − 2g, with g the number of handles; a closed triangle mesh has about twice as many faces as vertices.', x: ['meshes#topology'], l: [10], s: ['Manifold'] },
+{ t: 'Flat shading', g: 'R', d: 'One normal and one color per triangle, so facets show. Gouraud shading interpolates vertex colors; Phong shading interpolates normals and lights each pixel.', x: ['meshes#shading'], l: [10], s: ['Normal', 'Phong reflection model'] },
+{ t: 'Level of detail', a: 'LOD', g: 'R', d: 'Versions of a mesh at several triangle counts, the coarser used when the object covers fewer pixels.', x: ['meshes#lod'], l: [10], s: ['Edge collapse', 'Progressive mesh'] },
+{ t: 'Edge collapse', g: 'R', d: 'Merging an edge\'s two vertices into one, removing two triangles; repeated in order of least error, it simplifies a mesh.', x: ['meshes#simplify'], l: [10], s: ['Quadric error metric'] },
+{ t: 'Quadric error metric', a: 'QEM', g: 'R', d: 'Garland and Heckbert\'s cost for an edge collapse: the sum of squared distances to the original planes around the vertices, stored as a 4 by 4 matrix per vertex.', x: ['meshes#simplify'], l: [10], s: ['Edge collapse'] },
+{ t: 'Progressive mesh', g: 'R', d: 'Hoppe\'s representation: a coarse base mesh plus a sequence of vertex splits that restore detail one step at a time.', x: ['meshes#lod'], l: [10], s: ['Level of detail'] },
+{ t: 'Marching cubes', g: 'R', d: 'Extracts a triangle mesh from a sampled field by deciding, cube by cube, which edges the surface crosses; used for medical scans and learned fields.', x: ['meshes#marching', 'learned-scenes#extraction'], l: [10, 18], s: ['Signed distance'] },
+{ t: 'Sweep', a: 'surface of revolution', g: 'R', d: 'A surface made by moving a profile curve along a path or rotating it about an axis, with rings of vertices joined by triangles.', x: ['meshes#sweep'], l: [10], s: ['Mesh'] },
+{ t: 'Texture coordinates', a: 'UV', g: 'R', d: 'Per-vertex (u, v) positions in the texture image, interpolated across the triangle to look up a color per pixel.', x: ['texture-mapping#uv'], l: [10], s: ['UV unwrapping', 'Wrap mode'] },
+{ t: 'UV unwrapping', g: 'R', d: 'Cutting a surface open and flattening it into the texture square with little stretch; the seams are where it was cut.', x: ['texture-mapping#unwrap'], l: [10], s: ['Texture coordinates'] },
+{ t: 'Wrap mode', a: 'repeat, clamp, mirror', g: 'R', d: 'What a texture returns outside [0, 1]: repeat tiles it, clamp holds the edge texel, mirror reflects it.', x: ['texture-mapping#wrap'], l: [10], s: ['Texture coordinates'] },
+{ t: 'Texel', g: 'R', d: 'One pixel of a texture image.', x: ['texture-mapping#magnification'], l: [10], s: ['Bilinear filtering'] },
+{ t: 'Bilinear filtering', g: 'R', d: 'Blending the four texels nearest a lookup point by their distances; smooth under magnification, but it still aliases under minification.', x: ['texture-mapping#magnification'], l: [10], s: ['Mipmap'] },
+{ t: 'Mipmap', g: 'R', d: 'A pyramid of prefiltered textures, each half the size of the last (Williams 1983, from "multum in parvo"); the sampler picks the level whose texels match the pixel\'s footprint.', x: ['texture-mapping#minification', 'antialiasing#textures'], l: [10, 9], s: ['Aliasing', 'Trilinear filtering'] },
+{ t: 'Trilinear filtering', g: 'R', d: 'Bilinear lookups in the two mipmap levels nearest the footprint, blended by the fractional level.', x: ['texture-mapping#minification'], l: [10], s: ['Mipmap'] },
+{ t: 'Bump mapping', a: 'normal map', g: 'R', d: 'Perturbing the shading normal from a texture so a flat surface lights as if grooved; the geometry and silhouette do not change.', x: ['texture-mapping#bump'], l: [10], s: ['Normal'] },
+{ t: 'Environment map', a: 'cube map', g: 'R', d: 'An image of the surroundings in every direction, looked up by a direction vector; used for reflections and image-based lighting.', x: ['texture-mapping#cubemap'], l: [10, 12], s: ['Image-based lighting'] },
+{ t: 'Shadow map', g: 'R', d: 'A depth image rendered from the light; a point is in shadow if it is farther from the light than the stored depth.', x: ['texture-mapping#shadowmap'], l: [10, 11], s: ['Z-buffer'] },
+{ t: 'Procedural texture', a: 'Perlin noise', g: 'R', d: 'A texture computed from a formula instead of stored, such as a checkerboard or Perlin noise (for which Ken Perlin received a 1997 technical Academy Award).', x: ['texture-mapping#procedural'], l: [10], s: ['Texture coordinates'] },
+{ t: 'Lambert\'s cosine law', a: 'diffuse, Lambertian', g: 'R', d: 'A matte surface reflects light in proportion to max(0, N · L): brightness follows the projected area the surface presents to the light, and does not depend on the viewer.', x: ['illumination#lambert'], l: [11], s: ['Phong reflection model', 'Normal'] },
+{ t: 'Phong reflection model', a: 'Phong', g: 'R', d: 'Ambient plus diffuse k_d max(0, N · L) plus specular k_s max(0, R · V)^s, with R the mirror direction of L. A shape, not a physically based BRDF.', x: ['illumination#specular', 'illumination#sum'], l: [11], s: ['Blinn-Phong', 'BRDF'] },
+{ t: 'Blinn-Phong', g: 'R', d: 'Replaces R · V with N · H, where H is the half vector between L and V; cheaper and better behaved at grazing angles. Its exponent must be larger to match a Phong highlight.', x: ['illumination#specular'], l: [11], s: ['Phong reflection model', 'Half vector'] },
+{ t: 'Half vector', g: 'R', d: 'H = normalize(L + V), the direction halfway between the light and the viewer; the highlight is brightest where N lines up with H.', x: ['illumination#specular'], l: [11], s: ['Blinn-Phong', 'Microfacet model'] },
+{ t: 'Mirror direction', a: 'reflection vector', g: 'R', d: 'R = 2 (N · L) N − L, the direction L reflects to about the normal.', x: ['illumination#specular', 'ray-tracing#whitted'], l: [11, 12], s: ['Phong reflection model'] },
+{ t: 'Attenuation', g: 'R', d: 'How a point light dims with distance, physically as 1/d²; spotlights also dim with angle from their axis.', x: ['illumination#lights'], l: [11], s: ['Point light'] },
+{ t: 'Point light', a: 'directional light, spotlight', g: 'R', d: 'Light sources of the local model: a directional light has one direction everywhere (the sun), a point light radiates from a position, a spotlight is a point light limited to a cone.', x: ['illumination#lights'], l: [11], s: ['Attenuation'] },
+{ t: 'Ambient occlusion', g: 'R', d: 'How much of the hemisphere above a point is blocked by nearby geometry; it darkens creases and contacts that a constant ambient term misses.', x: ['illumination#ibl'], l: [11], s: ['Image-based lighting'] },
+{ t: 'HDR', a: 'high dynamic range', g: 'R', d: 'Radiance values without a ceiling at 1. Rendering is done in HDR, then tone mapped to the display\'s range.', x: ['illumination#tonemap', 'color#hdr'], l: [11], s: ['Tone mapping'] },
+{ t: 'Tone mapping', g: 'R', d: 'Compressing HDR values into the displayable range, for example Reinhard\'s x / (1 + x), after exposure and before encoding to sRGB.', x: ['illumination#tonemap'], l: [11], s: ['HDR', 'sRGB'] },
+{ t: 'Linear light', g: 'R', d: 'Values proportional to physical light. Shading, blending and filtering must happen in linear light; sRGB-encoded values must be decoded first.', x: ['color#linear'], l: [11], s: ['sRGB', 'Gamma'] },
+{ t: 'sRGB', g: 'R', d: 'The standard color space of displays and the web: a primaries matrix from CIE XYZ plus a transfer curve (about a 2.2 power) that spends 8 bits where the eye is most sensitive.', x: ['color#srgb', 'color#transfer'], l: [11, 15], s: ['Gamma', 'Linear light'] },
+{ t: 'Gamma', a: 'transfer function', g: 'R', d: 'The non-linear encoding between stored code values and light; decoding an sRGB value of 128 gives about 0.216 in linear light, not 0.5.', x: ['color#transfer'], l: [11, 15], s: ['sRGB', 'Linear light'] },
+{ t: 'CIE XYZ', a: 'color matching functions', g: 'R', d: 'The 1931 standard observer: three weighting curves that turn any spectrum into three numbers; every other color space is defined from it.', x: ['color#observer'], l: [11], s: ['Chromaticity', 'sRGB'] },
+{ t: 'Chromaticity', a: 'gamut', g: 'R', d: 'Color with brightness removed, (x, y) = (X, Y)/(X + Y + Z). A display\'s gamut is the triangle of chromaticities its three primaries can mix.', x: ['color#chromaticity', 'color#gamuts'], l: [11], s: ['CIE XYZ'] },
+{ t: 'BRDF', a: 'bidirectional reflectance distribution function', g: 'R', d: 'f(ω_i, ω_o): how much light arriving from ω_i leaves toward ω_o. A physical BRDF is reciprocal and conserves energy; Phong is neither.', x: ['light-transport-pbr#brdf'], l: [12], s: ['Rendering equation', 'Microfacet model'] },
+{ t: 'Rendering equation', g: 'R', d: 'Kajiya (1986): outgoing radiance = emitted + the integral over the hemisphere of BRDF × incoming radiance × cos θ. Global illumination is solving it.', x: ['light-transport-pbr#rendering-equation'], l: [12, 13], s: ['BRDF', 'Path tracing'] },
+{ t: 'Radiance', g: 'R', d: 'Power per unit area per unit solid angle, the quantity a camera pixel measures and that stays constant along a ray in empty space.', x: ['light-transport-pbr#rendering-equation'], l: [12], s: ['Rendering equation'] },
+{ t: 'Microfacet model', a: 'Cook-Torrance, GGX', g: 'R', d: 'A surface as tiny mirrors: the BRDF is D (facet orientations, such as GGX), G (shadowing) and F (Fresnel) over 4 (N · L)(N · V).', x: ['light-transport-pbr#microfacets'], l: [12], s: ['BRDF', 'Fresnel'] },
+{ t: 'Fresnel', g: 'R', d: 'Reflectance rises toward grazing angles; Schlick\'s approximation F = F0 + (1 − F0)(1 − cos θ)^5 is used in real time.', x: ['light-transport-pbr#fresnel'], l: [12], s: ['Microfacet model'] },
+{ t: 'Metallic-roughness', a: 'PBR material', g: 'R', d: 'The common physically based material: base color, metallic (0 or 1 in practice) and roughness drive a microfacet BRDF.', x: ['light-transport-pbr#metal-rough'], l: [12], s: ['Microfacet model'] },
+{ t: 'Furnace test', g: 'R', d: 'Render a white surface inside a uniform white environment: an energy-conserving BRDF can at most return the environment\'s value, never exceed it.', x: ['light-transport-pbr#furnace'], l: [12], s: ['BRDF'] },
+{ t: 'Image-based lighting', a: 'IBL', g: 'R', d: 'Lighting a scene with an environment map of real or rendered surroundings, prefiltered by roughness (the split-sum approximation in real time).', x: ['light-transport-pbr#ibl', 'illumination#ibl'], l: [12], s: ['Environment map', 'HDR light probe'] },
+{ t: 'Ray', g: 'R', d: 'A half-line o + t d, t ≥ 0. Ray tracing shoots one through each pixel and follows it through the scene.', x: ['ray-tracing#rays'], l: [12], s: ['Ray tracing', 'Unprojection'] },
+{ t: 'Ray tracing', g: 'R', d: 'Rendering by following rays from the eye into the scene; Whitted (1980) added recursive shadow, reflection and refraction rays.', x: ['ray-tracing#rays', 'ray-tracing#whitted'], l: [12], s: ['Whitted ray tracing', 'Path tracing'] },
+{ t: 'Whitted ray tracing', g: 'R', d: 'At each hit, shade from the lights with shadow rays and recurse along the mirror and refracted directions; sharp shadows and perfect mirrors, no soft indirect light.', x: ['ray-tracing#whitted'], l: [12], s: ['Ray tracing', 'Snell\'s law'] },
+{ t: 'Snell\'s law', a: 'refraction', g: 'R', d: 'n₁ sin θ₁ = n₂ sin θ₂ at a boundary between media; beyond the critical angle, light reflects totally.', x: ['ray-tracing#whitted'], l: [12], s: ['Fresnel'] },
+{ t: 'BVH', a: 'bounding volume hierarchy', g: 'R', d: 'A tree of boxes around groups of primitives; a ray skips every subtree whose box it misses, making intersection roughly logarithmic in scene size.', x: ['ray-tracing#acceleration'], l: [12], s: ['Ray tracing'] },
+{ t: 'Monte Carlo integration', g: 'R', d: 'Estimating an integral by averaging random samples of the integrand divided by their probability density; the error falls as 1/√N, so halving it takes four times the samples.', x: ['ray-tracing#montecarlo'], l: [13], s: ['Importance sampling', 'Path tracing'] },
+{ t: 'Importance sampling', g: 'R', d: 'Drawing Monte Carlo samples more often where the integrand is large (such as along the BRDF lobe), which lowers noise for the same count.', x: ['ray-tracing#montecarlo', 'light-transport-pbr#sampling'], l: [13], s: ['Monte Carlo integration'] },
+{ t: 'Path tracing', g: 'R', d: 'Solving the rendering equation with Monte Carlo: each pixel averages many random light paths that bounce until they reach a light. Unbiased, and noisy until enough samples.', x: ['ray-tracing#pathtracing', 'light-transport-pbr#solving'], l: [13], s: ['Rendering equation', 'Russian roulette'] },
+{ t: 'Russian roulette', g: 'R', d: 'Ending a path at random with probability q and dividing survivors by 1 − q, which stops paths without biasing the estimate.', x: ['ray-tracing#pathtracing'], l: [13], s: ['Path tracing'] },
+{ t: 'Cornell box', g: 'R', d: 'A box with a red and a green wall and a ceiling light, built for real and rendered side by side (Goral et al., 1984); the standard test scene for global illumination.', x: ['ray-tracing#pathtracing'], l: [13, 1], s: ['Path tracing', 'Color bleeding'] },
+{ t: 'Color bleeding', a: 'global illumination', g: 'R', d: 'Light bouncing off a colored surface tints its neighbors, as the red wall tints the box in the Cornell box; local models miss it.', x: ['light-transport-pbr#honest-light'], l: [12, 13], s: ['Cornell box', 'Rendering equation'] },
+{ t: 'Radiosity', g: 'R', d: 'A global illumination method for diffuse scenes that solves for the light leaving each patch as a linear system.', x: ['ray-tracing#others'], l: [13], s: ['Cornell box'] },
+{ t: 'Vertex shader', g: 'T', d: 'The program run once per vertex; it outputs the clip-space position (P V M times the vertex) and values to interpolate.', x: ['unity-shaders#programs'], l: [11, 3], s: ['Fragment shader', 'GPU pipeline'] },
+{ t: 'Fragment shader', a: 'pixel shader', g: 'T', d: 'The program run once per covered pixel sample; it receives the interpolated values and outputs a color.', x: ['unity-shaders#programs'], l: [11, 3], s: ['Vertex shader'] },
+{ t: 'Uniform', a: 'shader property', g: 'T', d: 'A value that is the same for every vertex and pixel of a draw call, such as a matrix or a light direction, set from the application.', x: ['unity-shaders#uniforms'], l: [11], s: ['Vertex shader'] },
+{ t: 'Bézier curve', g: 'A', d: 'A polynomial curve defined by control points and evaluated by de Casteljau\'s repeated interpolation; it starts and ends at the first and last control points.', x: ['curves-surfaces#bezier'], l: [2], s: ['Spline', 'B-spline'] },
+{ t: 'B-spline', a: 'NURBS', g: 'A', d: 'A piecewise polynomial curve with local control and built-in smoothness; NURBS add weights and can represent circles exactly.', x: ['curves-surfaces#bspline', 'curves-surfaces#rational'], l: [2], s: ['Bézier curve'] },
+{ t: 'Subdivision surface', a: 'Catmull-Clark', g: 'R', d: 'A smooth surface defined as the limit of repeatedly refining a coarse mesh; Catmull-Clark (quads) is the film standard.', x: ['curves-surfaces#subdivision'], l: [2], s: ['Mesh'] },
+
+// ── Animation and physics ────────────────────────────────────────────────────────────────────
+{ t: 'Keyframe', g: 'A', d: 'A value set by the animator at a chosen time; the frames in between are computed by interpolation (in-betweening).', x: ['animation#keyframes'], l: [2], s: ['Spline', 'Easing'] },
+{ t: 'Spline', a: 'Catmull-Rom', g: 'A', d: 'A smooth piecewise curve through or near given points; the Catmull-Rom spline passes through every key, which makes it a common keyframe interpolant.', x: ['animation#keyframes', 'curves-surfaces#continuity'], l: [2], s: ['Keyframe', 'Bézier curve'] },
+{ t: 'Easing', g: 'A', d: 'Reshaping time so motion accelerates and decelerates (ease in, ease out) instead of moving at constant speed.', x: ['animation#easing'], l: [2], s: ['Keyframe'] },
+{ t: 'Forward kinematics', a: 'FK', g: 'A', d: 'Computing where every joint of a skeleton ends up from its joint angles, by composing transforms down the hierarchy.', x: ['animation#kinematics'], l: [7], s: ['Inverse kinematics', 'Scene graph'] },
+{ t: 'Inverse kinematics', a: 'IK', g: 'A', d: 'Finding joint angles that put an end effector (a hand, a foot) at a target; solved in closed form for two links, iteratively for chains.', x: ['animation#kinematics'], l: [7], s: ['Forward kinematics'] },
+{ t: 'Skinning', a: 'linear blend skinning', g: 'A', d: 'Moving each mesh vertex by a weighted blend of the transforms of the bones that influence it; plain linear blending collapses twisting joints (the candy-wrapper artifact).', x: ['animation#skinning'], l: [7], s: ['Forward kinematics'] },
+{ t: 'Bind pose', g: 'A', d: 'The pose a skin is attached to a skeleton in; skinning multiplies by each bone\'s current transform times the inverse of its bind transform.', x: ['animation#skinning'], l: [7], s: ['Skinning'] },
+{ t: 'Motion capture', a: 'mocap', g: 'V', d: 'Recording real movement, usually by triangulating reflective markers seen by several calibrated cameras, then retargeting it onto a digital character.', x: ['animation#mocap'], l: [2], s: ['Performance capture', 'Retargeting'] },
+{ t: 'Retargeting', g: 'A', d: 'Transferring motion recorded on one skeleton to another with different proportions.', x: ['animation#mocap'], l: [2], s: ['Motion capture'] },
+{ t: 'Explicit Euler', g: 'A', d: 'Advancing a simulation with the values at the start of the step: x += h v, v += h a. Simple, and it adds energy to springs until they explode.', x: ['animation#simulation'], l: [3], s: ['Semi-implicit Euler', 'Timestep'] },
+{ t: 'Semi-implicit Euler', a: 'symplectic Euler', g: 'A', d: 'Update velocity first, then position with the new velocity; one reordering that keeps oscillators bounded when h √(k/m) stays below 2.', x: ['animation#simulation'], l: [3], s: ['Explicit Euler', 'Stiffness'] },
+{ t: 'Timestep', a: 'h, fixed timestep', g: 'A', d: 'The simulated time per step. A fixed timestep, stepped by an accumulator in the frame loop, keeps physics the same on every machine and frame rate.', x: ['interaction#timestep', 'animation#simulation'], l: [3], s: ['Substep', 'Frame loop'] },
+{ t: 'Substep', g: 'A', d: 'Splitting one frame\'s simulation into several shorter steps; stiff systems need small steps to stay stable (explicit) or stiff (constraints).', x: ['animation#particles'], l: [3], s: ['Timestep', 'XPBD'] },
+{ t: 'Stiffness', a: 'spring constant k', g: 'A', d: 'How strongly a spring resists stretch; with mass m it sets the oscillation frequency √(k/m), and with the step h decides whether explicit integration is stable.', x: ['animation#simulation'], l: [3], s: ['Semi-implicit Euler'] },
+{ t: 'Particle system', g: 'A', d: 'Many point masses with positions, velocities and forces, stepped together; the basis of cloth, fluids, hair and effects.', x: ['animation#particles'], l: [3], s: ['Mass-spring cloth', 'SPH'] },
+{ t: 'Mass-spring cloth', g: 'A', d: 'Cloth as a grid of particles joined by structural, shear and bend springs.', x: ['animation#particles'], l: [3], s: ['Position based dynamics', 'Particle system'] },
+{ t: 'Position based dynamics', a: 'PBD', g: 'A', d: 'Müller et al. (2007): predict positions, then move particles directly to satisfy constraints such as fixed distances, and read velocities off the moves. Too few iterations make it soft, not unstable.', x: ['animation#particles'], l: [3], s: ['XPBD', 'Constraint'] },
+{ t: 'XPBD', a: 'extended position based dynamics', g: 'A', d: 'PBD with a compliance per constraint (Macklin et al., 2016), so stiffness no longer depends on the step size or iteration count.', x: ['animation#particles'], l: [3], s: ['Position based dynamics', 'Substep'] },
+{ t: 'Constraint', g: 'A', d: 'A condition the simulation enforces, written C(x) = 0, such as a distance equal to a rest length or a point staying outside a sphere.', x: ['animation#particles', 'animation#collision'], l: [3], s: ['Position based dynamics'] },
+{ t: 'Collision response', g: 'A', d: 'Detecting that a particle or body entered an obstacle, moving it back out, and adjusting its velocity (with friction and restitution).', x: ['animation#collision'], l: [3], s: ['Constraint'] },
+{ t: 'SPH', a: 'smoothed particle hydrodynamics', g: 'A', d: 'A fluid as particles: density at each particle is a kernel-weighted sum over neighbors, and pressure pushes particles from dense regions to sparse ones.', x: ['animation#particles'], l: [3], s: ['Particle system'] },
+{ t: 'Follow the leader', a: 'hair simulation', g: 'A', d: 'A hair strand simulated as particles, each moved to exactly one segment length from its parent (Müller, Kim and Chentanez, 2012), so strands never stretch.', x: ['animation#particles'], l: [3], s: ['Position based dynamics'] },
+
+// ── Tools: the loop, MVC, Unity ──────────────────────────────────────────────────────────────
+{ t: 'Frame loop', a: 'game loop, render loop', g: 'T', d: 'The cycle every interactive program runs: read input, update the state, draw, present, repeat, once per display refresh.', x: ['interaction#loop', 'rasterization#loop'], l: [3], s: ['Frame budget', 'Timestep'] },
+{ t: 'MVC', a: 'model, view, controller', g: 'T', d: 'Keeping the state (model) apart from how it is shown (views) and how input changes it (controllers), so one model can drive several views that never disagree.', x: ['interaction#mvc'], l: [3], s: ['Frame loop'] },
+{ t: 'Undo', a: 'command pattern', g: 'T', d: 'Recording each change as a command that can be applied and reverted; the controller pushes commands, undo pops them.', x: ['interaction#mvc'], l: [3], s: ['MVC'] },
+{ t: 'Picking', g: 'T', d: 'Finding which object is under the mouse: by a ray from the unprojected pixel, or by reading an ID buffer rendered with one color per object.', x: ['interaction#picking'], l: [3], s: ['Unprojection', 'Ray'] },
+{ t: 'Arcball', a: 'trackball, orbit camera', g: 'T', d: 'Rotating an object or camera by dragging on a virtual sphere, so a mouse drag maps to an axis and an angle.', x: ['interaction#rotate'], l: [3], s: ['Axis-angle'] },
+{ t: 'Device pixel ratio', g: 'T', d: 'Physical pixels per CSS pixel (2 or 3 on high-density screens); canvases must be sized in device pixels and mouse positions converted.', x: ['interaction#events'], l: [3], s: ['Viewport transform'] },
+{ t: 'Scene (Unity)', a: 'GameObject, component', g: 'T', d: 'A Unity scene is a hierarchy of GameObjects; each object is an empty container given behavior by components such as a Transform, a MeshRenderer or a script.', x: ['unity-basics#objects'], l: [3], s: ['Transform (Unity)', 'MonoBehaviour'] },
+{ t: 'Transform (Unity)', g: 'T', d: 'The component every GameObject has: local position, rotation (a quaternion) and scale relative to its parent, with world values derived from the hierarchy.', x: ['unity-basics#transform'], l: [3, 7], s: ['Scene graph', 'TRS'] },
+{ t: 'MonoBehaviour', a: 'Update, FixedUpdate', g: 'T', d: 'The base class of Unity scripts. Update runs once per rendered frame (scale motion by Time.deltaTime); FixedUpdate runs on the fixed physics clock.', x: ['unity-basics#scripts'], l: [3], s: ['Frame loop', 'Delta time'] },
+{ t: 'Delta time', a: 'Time.deltaTime', g: 'T', d: 'The seconds since the last frame. Multiplying per-frame motion by it makes speed independent of the frame rate.', x: ['unity-basics#scripts'], l: [3], s: ['Timestep'] },
+{ t: 'Prefab', g: 'T', d: 'A saved GameObject with its components and children, instantiated many times in a Unity scene.', x: ['unity-basics#assets'], l: [3], s: ['Instancing'] },
+{ t: 'Implement and replace', g: 'T', d: 'The course rule: build an operation from primitives (dot, cross, matrix products) and use the engine\'s helper (such as LookAt) only to check the answer.', x: ['unity-basics#rule'], l: [3], s: ['Look-at'] },
+{ t: 'ShaderLab', g: 'T', d: 'Unity\'s shader file format: properties, subshaders and passes wrapping the vertex and fragment programs written in HLSL.', x: ['unity-shaders#anatomy'], l: [11], s: ['Vertex shader', 'Fragment shader'] },
+{ t: 'glTF', g: 'T', d: 'The standard transmission format for 3D scenes: meshes, materials (metallic-roughness), a node hierarchy and animations.', x: ['meshes#files', 'scene-graphs#gltf'], l: [10], s: ['Scene graph', 'Metallic-roughness'] },
+
+// ── Neural era ───────────────────────────────────────────────────────────────────────────────
+{ t: 'Neural network', a: 'multilayer perceptron, MLP', g: 'N', d: 'A function built from layers, each a matrix multiply plus a bias followed by a non-linear activation; its weights are learned from data.', x: ['neural-nets-embeddings#networks'], l: [14], s: ['Activation function', 'Gradient descent'] },
+{ t: 'Activation function', a: 'ReLU, sigmoid', g: 'N', d: 'The non-linearity after each layer, such as ReLU max(0, x). Without it a stack of layers collapses into one linear map.', x: ['neural-nets-embeddings#networks'], l: [14], s: ['Neural network'] },
+{ t: 'Loss', a: 'loss function', g: 'N', d: 'One number that says how wrong the network is on the data, such as the mean squared error; training minimizes it.', x: ['neural-nets-embeddings#training'], l: [14], s: ['Gradient descent'] },
+{ t: 'Gradient descent', g: 'N', d: 'Repeatedly moving the weights a small step (the learning rate) against the gradient of the loss. Stochastic gradient descent uses a random batch per step.', x: ['neural-nets-embeddings#training'], l: [14], s: ['Backpropagation', 'Learning rate'] },
+{ t: 'Learning rate', g: 'N', d: 'The step size of gradient descent; too large diverges, too small crawls.', x: ['neural-nets-embeddings#training', 'neural-nets-embeddings#optimizers'], l: [14], s: ['Gradient descent', 'Adam'] },
+{ t: 'Backpropagation', g: 'N', d: 'Computing the gradient of the loss with respect to every weight by the chain rule, from the output layer backwards (Rumelhart, Hinton and Williams, 1986).', x: ['neural-nets-embeddings#deep'], l: [14], s: ['Gradient descent'] },
+{ t: 'Adam', a: 'momentum', g: 'N', d: 'An optimizer that keeps running averages of the gradient and its square, giving each weight its own step size (Kingma and Ba, 2015).', x: ['neural-nets-embeddings#optimizers'], l: [14], s: ['Gradient descent'] },
+{ t: 'Overfitting', g: 'N', d: 'Fitting the training data so closely that the network does worse on new data; held-out validation data shows it.', x: ['neural-nets-embeddings#approx'], l: [14], s: ['Loss'] },
+{ t: 'Convolution', a: 'CNN', g: 'N', d: 'Sliding a small weight kernel over an image and taking a weighted sum at each position; a convolutional network stacks such layers.', x: ['neural-nets-embeddings#layers', 'image-space#filters'], l: [14, 15], s: ['Attention'] },
+{ t: 'Attention', a: 'transformer', g: 'N', d: 'Each token computes weights over all tokens from the dot products of its query with their keys (after softmax) and takes the weighted sum of their values; transformers stack attention layers.', x: ['neural-nets-embeddings#layers'], l: [14, 17, 19], s: ['Token', 'Softmax'] },
+{ t: 'Softmax', g: 'N', d: 'Turns scores into positive weights that sum to 1: exp(s_i) / Σ exp(s_j). Subtract the largest score first, or exp overflows.', x: ['neural-nets-embeddings#layers'], l: [14], s: ['Attention'] },
+{ t: 'Token', g: 'N', d: 'One unit a transformer processes: a word piece, or a patch of an image or of a video\'s latent.', x: ['neural-nets-embeddings#layers'], l: [14, 19], s: ['Attention'] },
+{ t: 'Embedding', g: 'N', d: 'A learned vector for an item (a word, an image, a caption), placed so that similar items land near each other.', x: ['neural-nets-embeddings#embeddings'], l: [14], s: ['Cosine similarity', 'CLIP'] },
+{ t: 'Cosine similarity', g: 'N', d: 'a · b / (|a| |b|), the cosine of the angle between two embeddings: 1 for the same direction, 0 for unrelated.', x: ['neural-nets-embeddings#embeddings'], l: [14], s: ['Embedding', 'Dot product'] },
+{ t: 'CLIP', g: 'N', d: 'A pair of encoders trained so that an image and its caption get nearby embeddings (Radford et al., 2021); used to condition and to score image generators.', x: ['neural-nets-embeddings#encoders'], l: [14, 17], s: ['Embedding', 'Text conditioning'] },
+{ t: 'Encoder and decoder', a: 'autoencoder', g: 'N', d: 'An encoder maps data to a compact code; a decoder maps codes back. An autoencoder trains both so decode(encode(x)) ≈ x.', x: ['neural-nets-embeddings#encoders'], l: [14, 17], s: ['Latent'] },
+{ t: 'Image as a vector', a: 'the space of images', g: 'N', d: 'A W by H RGB image is one point in a space of 3WH dimensions; natural images occupy a thin sheet of that space.', x: ['image-space#image-space', 'image-space#sheet'], l: [15], s: ['PCA', 'Diffusion model'] },
+{ t: 'DCT', a: 'discrete cosine transform', g: 'N', d: 'Writes an image block as a sum of cosine patterns; most of a natural image\'s energy sits in a few low frequencies, which JPEG keeps.', x: ['image-space#fourier', 'image-space#compression'], l: [15], s: ['Fourier transform', 'PSNR'] },
+{ t: 'Fourier transform', g: 'N', d: 'Rewrites a signal as a sum of sinusoids of different frequencies; it explains aliasing, filtering and compression.', x: ['image-space#fourier', 'antialiasing#fourier'], l: [9, 15], s: ['Aliasing', 'DCT'] },
+{ t: 'PCA', a: 'principal component analysis', g: 'N', d: 'Finds the orthogonal directions of greatest variance in a data set; keeping the top few gives the best linear compression in squared error.', x: ['image-space#bases'], l: [15], s: ['Image as a vector'] },
+{ t: 'Image pyramid', g: 'N', d: 'An image at a sequence of halved resolutions (Gaussian pyramid), or the details lost at each level (Laplacian pyramid).', x: ['image-space#pyramids'], l: [15], s: ['Mipmap'] },
+{ t: 'PSNR', a: 'peak signal-to-noise ratio', g: 'N', d: '10 log₁₀(peak² / MSE) in decibels; higher is closer. Each 6 dB halves the RMS error. It does not track perceived quality well.', x: ['image-space#metrics'], l: [15], s: ['SSIM', 'LPIPS'] },
+{ t: 'SSIM', g: 'N', d: 'The structural similarity index: compares local means, contrasts and structure, closer to perception than PSNR.', x: ['image-space#metrics'], l: [15], s: ['PSNR', 'LPIPS'] },
+{ t: 'LPIPS', g: 'N', d: 'A learned perceptual distance between images from the features of a trained network (Zhang et al., 2018).', x: ['image-space#metrics'], l: [15, 18], s: ['PSNR'] },
+{ t: 'Diffusion model', g: 'N', d: 'A generator trained to reverse gradual noising: it learns to denoise, and sampling starts from pure noise and denoises step by step (Sohl-Dickstein 2015; Ho et al. 2020).', x: ['diffusion-models#diffusion'], l: [16, 17], s: ['Forward process', 'DDPM'] },
+{ t: 'Forward process', a: 'noise schedule', g: 'N', d: 'x_t = √ᾱ_t x_0 + √(1 − ᾱ_t) ε: the clean image faded and mixed with Gaussian noise, with ᾱ_t falling from 1 to near 0 by a schedule (linear or cosine).', x: ['diffusion-models#diffusion'], l: [16], s: ['Diffusion model', 'Denoiser'] },
+{ t: 'Denoiser', a: 'ε-prediction, x0-prediction', g: 'N', d: 'The network at the heart of diffusion: given a noisy x_t and t, it predicts the noise ε (or equivalently the clean x_0, the score or the velocity).', x: ['diffusion-models#denoiser', 'diffusion-models#network'], l: [16], s: ['Tweedie\'s formula', 'Forward process'] },
+{ t: 'Tweedie\'s formula', g: 'N', d: 'The best estimate of the clean image from a noisy one is its conditional mean, which the score gives directly; it makes the exact denoiser a weighted average of the data.', x: ['diffusion-models#denoiser'], l: [16], s: ['Denoiser', 'Score'] },
+{ t: 'Score', a: 'score function', g: 'N', d: 'The gradient of the log probability density, ∇ log p(x); it points toward more likely images. Denoisers and scores are two views of the same thing.', x: ['diffusion-models#denoiser'], l: [16], s: ['Tweedie\'s formula'] },
+{ t: 'DDPM', a: 'denoising diffusion probabilistic models', g: 'N', d: 'Ho et al. (2020): the stochastic sampler that adds fresh noise at each of about 1000 reverse steps.', x: ['diffusion-models#sampling'], l: [16], s: ['DDIM', 'Diffusion model'] },
+{ t: 'DDIM', g: 'N', d: 'Song, Meng and Ermon (2021): a deterministic sampler (σ = 0) that predicts x_0 and re-noises it to the next level, allowing 20 to 50 steps instead of 1000.', x: ['diffusion-models#sampling'], l: [16], s: ['DDPM'] },
+{ t: 'Flow matching', a: 'rectified flow', g: 'N', d: 'Training a velocity field that moves noise to data along straight lines (Lipman et al.; Liu et al., 2022); straight paths allow very few sampling steps.', x: ['diffusion-models#flow'], l: [17], s: ['Diffusion model'] },
+{ t: 'Classifier-free guidance', a: 'CFG', g: 'N', d: 'Run the denoiser with and without the condition and extrapolate: ε = ε_uncond + w (ε_cond − ε_uncond). Larger w follows the prompt more closely and loses variety.', x: ['diffusion-models#guidance'], l: [17], s: ['Text conditioning', 'Negative prompt'] },
+{ t: 'Negative prompt', g: 'N', d: 'Replacing the unconditional branch of guidance with a prompt to steer away from.', x: ['diffusion-models#guidance'], l: [17], s: ['Classifier-free guidance'] },
+{ t: 'Text conditioning', a: 'cross-attention', g: 'N', d: 'Feeding a caption\'s embedding into the denoiser, usually through cross-attention from image tokens to text tokens.', x: ['diffusion-models#scaling'], l: [17], s: ['CLIP', 'Attention'] },
+{ t: 'Latent', a: 'latent space', g: 'N', d: 'The compact code an encoder produces. Latent diffusion (Rombach et al., 2022; Stable Diffusion) denoises a 64 × 64 × 4 latent instead of a 512 × 512 image, then decodes.', x: ['diffusion-models#scaling'], l: [17], s: ['Encoder and decoder', 'Diffusion model'] },
+{ t: 'ControlNet', g: 'N', d: 'A trainable copy of a diffusion model\'s encoder that injects a structure image (depth, edges, pose) through zero-initialized convolutions (Zhang et al., 2023).', x: ['diffusion-models#guidance'], l: [17], s: ['SDEdit', 'Inpainting'] },
+{ t: 'Inpainting', g: 'N', d: 'Regenerating only a masked region of an image so it blends with the rest.', x: ['diffusion-models#guidance'], l: [17], s: ['ControlNet'] },
+{ t: 'SDEdit', g: 'N', d: 'Meng et al. (2021): noise an input image partway, to time t₀, then run the ordinary sampler; small t₀ keeps the input\'s structure, large t₀ forgets it (the "strength" knob).', x: ['diffusion-models#sampling'], l: [17], s: ['ControlNet', 'Diffusion model'] },
+{ t: 'Score distillation', a: 'SDS, DreamFusion', g: 'N', d: 'Poole et al. (2022): optimize a 3D representation so its renders look likely to a 2D diffusion model, using the denoiser\'s error as a gradient; text to 3D without 3D data.', x: ['diffusion-models#limits', 'learned-scenes#contrast'], l: [17], s: ['NeRF', 'Diffusion model'] },
+{ t: 'FID', a: 'Fréchet inception distance', g: 'N', d: 'Compares the statistics of network features of generated and real images; lower is better, and it depends on the sample count.', x: ['diffusion-models#evaluation'], l: [17], s: ['PSNR'] },
+{ t: 'Memorization', g: 'N', d: 'A generator reproducing training images nearly exactly; Carlini et al. (2023) extracted over a thousand from diffusion models.', x: ['diffusion-models#limits'], l: [17], s: ['Diffusion model'] },
+{ t: 'NeRF', a: 'neural radiance field', g: 'N', d: 'Mildenhall et al. (2020): a network that maps a 3D position and view direction to density and color, rendered by volume rendering and trained from photographs.', x: ['learned-scenes#learned-scenes', 'learned-scenes#training'], l: [18], s: ['Volume rendering', 'Positional encoding'] },
+{ t: 'Volume rendering', g: 'N', d: 'The color along a ray as the integral of emitted color weighted by density and by transmittance; in NeRF, a sum over samples of T_i α_i c_i.', x: ['learned-scenes#volume'], l: [18], s: ['Transmittance', 'NeRF'] },
+{ t: 'Transmittance', g: 'N', d: 'The fraction of light that survives from the camera to a point along a ray: the product of (1 − α) of everything in front.', x: ['learned-scenes#volume'], l: [18], s: ['Volume rendering', 'Over operator'] },
+{ t: 'Positional encoding', g: 'N', d: 'Feeding a network sines and cosines of its input at many frequencies so it can represent fine detail; without it an MLP blurs.', x: ['learned-scenes#training'], l: [18], s: ['NeRF'] },
+{ t: 'Hash grid', a: 'Instant-NGP', g: 'N', d: 'Müller et al. (2022): learned feature tables indexed by hashed grid cells at many resolutions, which let a tiny network train a NeRF in minutes.', x: ['learned-scenes#papers'], l: [18], s: ['NeRF'] },
+{ t: '3D Gaussian splatting', a: '3DGS', g: 'N', d: 'Kerbl et al. (2023): a scene as millions of 3D Gaussians with position, covariance, opacity and color, projected to 2D ellipses and alpha-blended front to back; trains fast and renders in real time.', x: ['learned-scenes#splats', 'learned-scenes#splat-anatomy'], l: [18], s: ['Covariance', 'Spherical harmonics'] },
+{ t: 'Covariance', a: 'splat shape', g: 'N', d: 'A 3 by 3 symmetric matrix Σ = R S Sᵀ Rᵀ giving a Gaussian\'s orientation and extent; projected to the screen as J W Σ Wᵀ Jᵀ.', x: ['learned-scenes#splat-anatomy'], l: [18], s: ['3D Gaussian splatting'] },
+{ t: 'Spherical harmonics', a: 'SH', g: 'N', d: 'A basis of smooth functions on the sphere; 3DGS stores a splat\'s color as SH coefficients so it can change with view direction.', x: ['learned-scenes#splat-anatomy', 'illumination#ibl'], l: [18, 11], s: ['3D Gaussian splatting'] },
+{ t: 'Densification', g: 'N', d: 'During 3DGS training, cloning or splitting Gaussians where the reconstruction error gradient is large, and pruning transparent ones.', x: ['learned-scenes#splat-training'], l: [18], s: ['3D Gaussian splatting'] },
+{ t: 'Multi-view diffusion', g: 'N', d: 'A diffusion model that generates several views of one object together, with attention across views so they agree, then a reconstruction step fits 3D to them.', x: ['learned-scenes#contrast'], l: [19], s: ['Score distillation', 'Video diffusion'] },
+{ t: 'Video diffusion', g: 'N', d: 'Diffusion over a block of frames (or frame latents), with temporal attention tying the frames together (Ho et al., 2022).', x: ['diffusion-models#scaling'], l: [19], s: ['Temporal attention', 'Flicker'] },
+{ t: 'Temporal attention', g: 'N', d: 'Attention between tokens at the same place in different frames of a clip, which keeps objects consistent over time.', x: ['diffusion-models#scaling'], l: [19], s: ['Video diffusion', 'Attention'] },
+{ t: 'Flicker', a: 'temporal inconsistency', g: 'N', d: 'Details that change from frame to frame when they should not; measured by warping one frame to the next along optical flow and comparing.', x: ['antialiasing#time'], l: [19], s: ['Video diffusion'] },
+{ t: 'World model', g: 'N', d: 'A generative model that predicts the next frames from past frames and actions, so it can be played like a game (for example GameNGen, Genie).', x: ['history-of-graphics#era-neural'], l: [19], s: ['Video diffusion'] },
+{ t: 'Neural rendering', a: 'DLSS, neural upscaling', g: 'N', d: 'Networks inside the renderer: upscaling and frame generation from low-resolution frames and motion vectors, denoising path-traced images, neural materials and caches.', x: ['antialiasing#time', 'light-transport-pbr#solving'], l: [19], s: ['Temporal antialiasing', 'Motion vectors'] },
+{ t: 'Motion vectors', g: 'R', d: 'Per-pixel screen motion from the previous frame to this one, output by the renderer and used to reuse history (TAA, upscaling, frame generation).', x: ['antialiasing#time'], l: [19], s: ['Temporal antialiasing', 'Reprojection'] },
+
+// ── Film and VR ──────────────────────────────────────────────────────────────────────────────
+{ t: 'Film pipeline', g: 'V', d: 'The stages a film frame passes through: capture, layout and previs, modeling, animation, FX simulation, lighting and rendering, and compositing.', x: ['history-of-graphics#era-realtime'], l: [2], s: ['Previs', 'Compositing'] },
+{ t: 'Previs', a: 'previsualization', g: 'V', d: 'A rough animated version of a sequence made before shooting or final animation, to plan cameras and timing.', x: ['history-of-graphics#era-realtime'], l: [2], s: ['Film pipeline'] },
+{ t: 'Compositing', g: 'V', d: 'Combining rendered and filmed layers into the final frame with the over operator, mattes and color correction; deep compositing keeps several depths per pixel.', x: ['rasterization#blending'], l: [2], s: ['Over operator', 'Premultiplied alpha'] },
+{ t: 'Render farm', g: 'V', d: 'A cluster of machines that renders a film\'s frames in parallel; film frames often take hours each.', x: ['history-of-graphics#era-realtime'], l: [2], s: ['Path tracing'] },
+{ t: 'Photogrammetry', g: 'V', d: 'Reconstructing 3D geometry and texture from many overlapping photographs by matching features and triangulating; it feeds film assets and learned scenes.', x: ['history-of-graphics#era-capture', 'learned-scenes#learned-scenes'], l: [2, 18], s: ['NeRF', 'Volumetric capture'] },
+{ t: 'HDR light probe', g: 'V', d: 'A high dynamic range photograph of the surroundings (such as a mirror ball), used to light CG so it matches the plate (Debevec, 1998).', x: ['history-of-graphics#era-capture', 'light-transport-pbr#ibl'], l: [2, 12], s: ['Image-based lighting'] },
+{ t: 'Performance capture', g: 'V', d: 'Motion capture of an actor\'s body and face together, often on set with head-mounted face cameras, to drive a digital character.', x: ['animation#mocap'], l: [2], s: ['Motion capture'] },
+{ t: 'Volumetric capture', g: 'V', d: 'Recording a performer with many synchronized cameras around them and reconstructing a moving 3D model of every instant.', x: ['history-of-graphics#era-capture'], l: [2, 18], s: ['Photogrammetry', 'Bullet time'] },
+{ t: 'Bullet time', g: 'V', d: 'A frozen or slowed moment seen from a moving viewpoint, shot with a line of still cameras fired together (The Matrix, 1999).', x: ['history-of-graphics#era-capture'], l: [2], s: ['Volumetric capture'] },
+{ t: 'ACES', a: 'Academy Color Encoding System', g: 'V', d: 'The film industry\'s color management standard: a scene-linear working space and standard transforms from cameras in and to displays out.', x: ['color#linear'], l: [2], s: ['Linear light', 'Tone mapping'] },
+{ t: 'Stereo rendering', g: 'V', d: 'Rendering the scene twice per frame, once per eye, with view matrices offset by the interpupillary distance and off-axis frusta.', x: ['viewing#offaxis', 'interaction#latency'], l: [8, 19], s: ['Off-axis projection', 'Head-mounted display'] },
+{ t: 'Head-mounted display', a: 'HMD, VR headset', g: 'V', d: 'A display worn on the head that shows each eye its own image and tracks head motion (Sutherland, 1968).', x: ['interaction#latency', 'history-of-graphics#era-birth'], l: [19], s: ['Stereo rendering', 'Motion-to-photon latency'] },
+{ t: 'Motion-to-photon latency', g: 'V', d: 'The time from a head movement to the updated image reaching the eye; VR aims for about 20 ms or less to avoid discomfort.', x: ['interaction#latency'], l: [19], s: ['Reprojection', 'Frame budget'] },
+{ t: 'Reprojection', a: 'timewarp', g: 'V', d: 'Warping the last rendered frame by the newest head pose just before display, to hide late frames and cut latency.', x: ['interaction#latency'], l: [19], s: ['Motion-to-photon latency', 'Motion vectors'] },
+{ t: 'Foveated rendering', g: 'V', d: 'Rendering full resolution only where the eye is looking and less toward the periphery, often with eye tracking.', x: ['interaction#latency'], l: [19], s: ['Head-mounted display'] },
+{ t: 'Vergence-accommodation conflict', g: 'V', d: 'In a headset the eyes converge on a virtual depth while focusing at the fixed optical distance of the screen, a source of eye strain.', x: ['interaction#latency'], l: [19], s: ['Stereo rendering'] },
+];
+
+// ── render ──
+const slug = (t) => 'term-' + t.toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const known = new Set(TERMS.map((e) => e.t));
+const letterOf = (t) => { const c = t.normalize('NFD').replace(/[^A-Za-z0-9]/g, '')[0].toUpperCase(); return /[0-9]/.test(c) ? '#' : c; };
+TERMS.sort((a, b) => a.t.localeCompare(b.t, 'en', { sensitivity: 'base' }));
+
+const list = document.getElementById('list');
+const entryHTML = (e) => {
+  // one chapter name per chapter, then its sections as numbered links
+  const byChap = new Map();
+  for (const r of e.x || []) { const [c, a] = r.split('#'); if (!byChap.has(c)) byChap.set(c, []); if (a) byChap.get(c).push(a); }
+  const text = [...byChap].map(([c, as]) => {
+    const secs = as.map((a) => `<a href="../textbook/${c}.html#${a}">§${(SEC[c] || {})[a] ?? a}</a>`).join(', ');
+    return `<a href="../textbook/${c}.html">${esc(CHAP[c] || c)}</a>${secs ? ' ' + secs : ''}`;
+  }).join('; ');
+  const lec = (e.l || []).map((n) => `<a href="../lectures/${LECT[n]}/index.html">L${String(n).padStart(2, '0')}</a>`).join(', ');
+  const see = (e.s || []).filter((s) => known.has(s)).map((s) => `<a href="#${slug(s)}">${esc(s)}</a>`).join(', ');
+  return `<div class="entry" id="${slug(e.t)}" data-g="${e.g}" data-letter="${letterOf(e.t)}">
+    <dt>${esc(e.t)}${e.a ? ` <span class="abbr">(${esc(e.a)})</span>` : ''}<span class="topic t-${e.g}">${TOPICS[e.g]}</span></dt>
+    <dd>${esc(e.d)}
+      <div class="links">${text ? `<b>Text:</b> ${text}` : ''}${lec ? `${text ? ' · ' : ''}<b>Lecture:</b> ${lec}` : ''}${see ? ` · <b>See also:</b> ${see}` : ''}</div></dd></div>`;
+};
+let html = '', cur = '';
+for (const e of TERMS) {
+  const L = letterOf(e.t);
+  if (L !== cur) { if (cur) html += '</dl>'; cur = L; html += `<h2 class="letter" id="letter-${L === '#' ? 'num' : L}">${L}</h2><dl>`; }
+  html += entryHTML(e);
+}
+list.innerHTML = html + '</dl><p class="none" id="none" hidden>No term matches.</p>';
+
+// filters and A to Z
+let topic = 'all', query = '';
+const filt = document.getElementById('filters');
+filt.innerHTML = [['all', 'All'], ...Object.entries(TOPICS)].map(([k, v]) => `<button type="button" data-g="${k}" aria-pressed="${k === 'all'}">${v}</button>`).join('');
+const letters = ['#', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'];
+const az = document.getElementById('az');
+function apply() {
+  const q = query.trim().toLowerCase();
+  let n = 0; const present = new Set();
+  list.querySelectorAll('.entry').forEach((el) => {
+    const ok = (topic === 'all' || el.dataset.g === topic) && (!q || el.textContent.toLowerCase().includes(q));
+    el.hidden = !ok; if (ok) { n++; present.add(el.dataset.letter); }
+  });
+  list.querySelectorAll('h2.letter').forEach((h) => { const L = h.textContent; h.hidden = !present.has(L); });
+  document.getElementById('none').hidden = n > 0;
+  document.getElementById('count').textContent = `${n} of ${TERMS.length} terms`;
+  az.innerHTML = letters.map((L) => present.has(L) ? `<a href="#letter-${L === '#' ? 'num' : L}">${L}</a>` : `<span>${L}</span>`).join('');
+}
+filt.querySelectorAll('button').forEach((b) => b.onclick = () => {
+  topic = b.dataset.g; filt.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); apply();
+});
+document.getElementById('q').addEventListener('input', (e) => { query = e.target.value; apply(); });
+apply();
+// a deep link to a term that a filter hid: clear the filters so it shows
+function reveal() {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const el = id && document.getElementById(id);
+  if (el && el.classList.contains('entry') && el.hidden) { topic = 'all'; query = ''; document.getElementById('q').value = ''; filt.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.g === 'all'))); apply(); el.scrollIntoView(); }
+}
+window.addEventListener('hashchange', reveal);
+if (location.hash) { const el = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (el) el.scrollIntoView(); }
+</script>
+</body>
+</html>
