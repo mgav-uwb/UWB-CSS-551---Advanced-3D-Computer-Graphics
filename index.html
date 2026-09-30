@@ -195,6 +195,31 @@
   .toprow .wisdom2 .sx-quote .sx-by{display:none}
   .toprow .wisdom2 > div:hover .sx-quote .sx-by,.toprow .wisdom2 > div:focus-within .sx-quote .sx-by{display:block}
   @media (max-width: 760px){ .toprow{grid-template-columns:1fr} .toprow .wisdom2 > div{height:auto} .stripbox .sx-tile:nth-child(n+5){display:none} }
+
+  /* layout v7: a rotating picture beside the title, the links on the right (as in CSS 343);
+     below, the quote over the fact beside a rotating xkcd panel */
+  header.hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px;margin-bottom:12px}
+  .brand{display:flex;align-items:center;gap:18px;min-width:0}
+  .picview{width:118px;height:118px}
+  header.hdr h1{font-size:44px;line-height:1.05}
+  header.hdr .course-sub{font-size:17px;margin:4px 0 2px}
+  nav.quick{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin:0}
+  nav.quick a.qc{flex-direction:row;align-items:center;gap:6px;padding:7px 12px;border-radius:12px}
+  nav.quick a.qc .qd{display:none}
+  nav.quick a.qc .qt{font-size:14px}
+  .row2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:stretch;margin:6px 0 4px}
+  .wisdom3{display:flex;flex-direction:column;gap:8px;justify-content:center;min-width:0}
+  .wisdom3 .sx-quote,.wisdom3 .sx-fact{padding:7px 13px}
+  .comicview{width:240px;height:128px}
+  @media (max-width: 900px){ nav.quick{justify-content:flex-start;max-width:none} }
+  @media (max-width: 640px){
+    .picview{width:84px;height:84px} header.hdr h1{font-size:30px} header.hdr .course-sub{font-size:15px} header.hdr .meta{font-size:11.5px}
+    nav.quick{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;width:100%}
+    nav.quick a.qc{flex-direction:column;gap:0;padding:5px 2px;text-align:center} nav.quick a.qc .qt{font-size:10.5px} nav.quick a.qc .qe{font-size:17px}
+    .row2{grid-template-columns:minmax(0,1fr) 92px;gap:8px} .comicview{width:92px;height:auto;min-height:92px}
+    .wisdom3 .sx-quote p{-webkit-line-clamp:2;font-size:13px} .wisdom3 .sx-fact{font-size:12.5px} .wisdom3 .sx-ft{-webkit-line-clamp:2}
+    h2.sech{margin-top:10px}
+  }
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 
@@ -209,21 +234,25 @@
 </style>
 </head>
 <body>
-  <header>
-    <h1>CSS 551 <span style="color:var(--dim);font-weight:400">&lt;/&gt;</span></h1>
-    <div class="course-sub">Advanced 3D Computer Graphics</div>
-    <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online / Thu 5:45–7:45 PM in person (lecture, discussion, and the weekly quiz) · Dr. Marcel Gavriliu</div>
+  <header class="hdr">
+    <div class="brand">
+      <div data-viewer="pics" data-gallery="gallery/index.html" class="picview"></div>
+      <div>
+        <h1>CSS 551 <span style="color:var(--dim);font-weight:400">&lt;/&gt;</span></h1>
+        <div class="course-sub">Advanced 3D Computer Graphics</div>
+        <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM online · Thu 5:45–7:45 PM in person · Dr. Marcel Gavriliu</div>
+      </div>
+    </div>
+    <nav class="quick" id="quick"></nav>
   </header>
 
-  <div class="toprow">
-    <div data-strip="5" data-gallery="gallery/index.html" class="stripbox"></div>
-    <div class="wisdom2">
+  <div class="row2">
+    <div class="wisdom3">
       <div data-quote></div>
       <div data-fact></div>
     </div>
+    <div data-viewer="comics" data-gallery="gallery/index.html" class="comicview"></div>
   </div>
-
-  <div class="quick" id="quick"></div>
 
   <h2 class="sech">Weeks <span>click a week to open it; the current week is open</span></h2>
   <div id="weeks"></div>
@@ -245,11 +274,11 @@
 // ───────── course-wide quick links (bar under the header) ─────────
 // href:null renders as an unlinked (dashed) chip until that page exists.
 const QUICKLINKS = [
-  { href:"textbook/index.html", emo:"📖", title:"Course text", desc:"24 topic chapters with worked examples and exercises" },
-  { href:"schedule/index.html", emo:"🗓️", title:"Schedule", desc:"every meeting, quiz and homework on the calendar" },
-  { href:"homework/index.html", emo:"🛠️", title:"Homework", desc:"eight assignments, Unity or WebGL (Python for the neural two)" },
-  { href:"#demos", emo:"🎛️", title:"Demos", desc:"every interactive demo, one click each" },
-  { href:"syllabus/index.html", emo:"📜", title:"Syllabus", desc:"format, grading, tracks, policies" },
+  { href:"textbook/index.html", emo:"📖", title:"Textbook", desc:"24 topic chapters" },
+  { href:"syllabus/index.html", emo:"📜", title:"Syllabus", desc:"format, grading, policies" },
+  { href:"schedule/index.html", emo:"🗓️", title:"Schedule", desc:"every meeting, quiz, homework" },
+  { href:"homework/index.html", emo:"🛠️", title:"Homework", desc:"eight assignments, two tracks" },
+  { href:"#demos", emo:"🎛️", title:"Demos", desc:"every interactive demo" },
 ];
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
@@ -427,7 +456,7 @@ const WEEKS = [
 ];
 
 const quickCell = q => `
-  <a class="qc" href="${q.href}"><span class="qe">${q.emo}</span><span class="qt">${q.title}</span><span class="qd">${q.desc}</span></a>`;
+  <a class="qc" href="${q.href}" title="${q.desc}"><span class="qe">${q.emo}</span><span class="qt">${q.title}</span><span class="qd">${q.desc}</span></a>`;
 
 const lecChip = (day, key) => {
   if (!key) return `<span class="chip lec off"><span class="t">${day}</span><span class="d">no meeting</span></span>`;
@@ -489,6 +518,6 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
   <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=12"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=13"; mountExtras({ base: "./" });</script>
 </body>
 </html>
