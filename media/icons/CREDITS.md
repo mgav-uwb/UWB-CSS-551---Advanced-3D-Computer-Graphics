@@ -1,6 +1,6 @@
 ---
 title: "CSS 551 · Site icons: credits and provenance"
-version: "1.4"
+version: "1.5"
 status: final
 created_by: "Claude"
 created_at: "2026-09-29T18:00"
@@ -48,6 +48,7 @@ Cropped to 640 × 640 from freely licensed files; the credit line must accompany
 | `film-sintel.jpg` | Sintel (2010), the heroine | Blender Foundation (Project Durian) | https://commons.wikimedia.org/wiki/File:Sintel-screenshot-4.jpg | CC BY 3.0 | © Blender Foundation · sintel.org · CC BY 3.0 |
 | `game-supertuxkart.jpg` | SuperTuxKart 0.9, the start line | STK dev team | https://commons.wikimedia.org/wiki/File:Supertuxkart-0.9-screenshot-2.jpg | CC BY 3.0 | SuperTuxKart team · CC BY 3.0 · via Wikimedia Commons |
 | `game-0ad.jpg` | 0 A.D. alpha 25, a Spartan city | Wildfire Games | https://commons.wikimedia.org/wiki/File:0_A.D._alpha_25_-_playing_as_Spartans.jpg | CC BY-SA 3.0 | Wildfire Games · CC BY-SA 3.0 · via Wikimedia Commons |
+| `photo-bullet-time-rig.jpg` | A bullet-time camera rig around a dancer (Sony RX0 launch, 2017) | Sony Europe | https://commons.wikimedia.org/wiki/File:Sony_RX0_Lifestyle_Bullet-time_ballet_EU03.jpg | CC BY 4.0 | Sony Europe · CC BY 4.0 · via Wikimedia Commons |
 
 `game-0ad.jpg` carries a share-alike obligation: a derivative of it stays under CC BY-SA 3.0 or a compatible license.
 
@@ -71,6 +72,7 @@ primitives and procedural geometry. Each shows a technique, not the film's image
 
 | Version | Date             | Author | Summary |
 | ------- | ---------------- | ------ | ------- |
+| 1.5     | 2026-09-30T11:00 | Claude | A real bullet-time rig photo (Sony Europe, CC BY 4.0), cropped square. |
 | 1.4     | 2026-09-30T10:00 | Claude | The shell-fur teddy replaced by a strand-fur bunny (about 110,000 hairs, Kajiya-Kay shading). |
 | 1.3     | 2026-09-29T23:30 | Claude | Six homage renders of film effects and VR (liquid metal, bullet time, lamp, tentacles, performance capture, stereo pair). |
 | 1.2     | 2026-09-29T21:30 | Claude | Two more renders: a shell-fur teddy after Kajiya and Kay, and a pastel voxel world. |
