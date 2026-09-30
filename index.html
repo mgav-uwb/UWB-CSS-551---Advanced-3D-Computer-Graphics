@@ -118,7 +118,6 @@
   .icons img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px}
   .icons figcaption{font-size:12px;font-weight:700;color:#3a2f55;line-height:1.25;margin-top:4px}
   .icons figcaption span{display:block;font-weight:400;color:#8d86a3;font-size:11px}
-  .comicrow{max-width:760px;margin:16px auto 0}
   .icons figure{position:relative}
   .icons figure:has(.sx-pop:not([hidden])){transform:none}
   .extras{display:flex;flex-direction:column;gap:12px;justify-content:center}
@@ -134,6 +133,42 @@
   a.chip.lec{background:#ffffff}
   .qm{background:#fff}
   .qm.exam{background:#fff4e6}
+
+  /* layout v2: comic + icon strip, wisdom band, cards, week accordion */
+  .hero{grid-template-columns:minmax(280px,1fr) 1.35fr;align-items:start}
+  .comicpane .sx-comic{height:100%}
+  .comicpane .sx-comic img{max-height:360px}
+  .icons{grid-template-columns:repeat(3,1fr)}
+  .wisdom{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;margin:16px 0 4px}
+  .quick{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:18px 0 8px}
+  a.qc{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink);background:#ffffffd9;border:1px solid var(--line);border-radius:16px;padding:14px 16px;transition:transform .15s,border-color .15s,background .15s}
+  a.qc:nth-child(1){background:linear-gradient(135deg,#fff0f6,#fff)} a.qc:nth-child(2){background:linear-gradient(135deg,#eafaf2,#fff)}
+  a.qc:nth-child(3){background:linear-gradient(135deg,#fff5ea,#fff)} a.qc:nth-child(4){background:linear-gradient(135deg,#eaf6ff,#fff)}
+  a.qc:nth-child(5){background:linear-gradient(135deg,#f3eeff,#fff)}
+  a.qc:hover{transform:translateY(-3px);border-color:#e6a8c8}
+  .qe{font-size:24px} .qt{font-weight:700;font-size:15.5px} .qc .qd{font-size:12.5px;color:var(--dim)}
+  h2.sech{font-size:14px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin:30px 0 10px;font-weight:700}
+  h2.sech span{text-transform:none;letter-spacing:0;font-weight:400;margin-left:8px;font-size:13px}
+  details.wk{background:#ffffffcc;border:1px solid var(--line);border-left:4px solid #9fdcc0;border-radius:12px;margin:8px 0;overflow:hidden}
+  details.wk.bridge{border-left-color:#f5c48e} details.wk.neural{border-left-color:#c3b1f3}
+  details.wk.now{box-shadow:0 2px 14px #7a58d61f;border-color:#dccdf6}
+  details.wk summary{list-style:none;display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;user-select:none}
+  details.wk summary::-webkit-details-marker{display:none}
+  details.wk summary::before{content:"▸";color:#7a58d6;font-size:13px;transition:transform .15s;width:10px}
+  details.wk[open] summary::before{transform:rotate(90deg)}
+  details.wk summary:hover{background:#fbf6ff}
+  .wn{font-weight:700;min-width:72px;color:#3a2f55}
+  .wt{flex:1;color:var(--ink);font-size:14.5px}
+  .wm{display:flex;gap:6px;align-items:center}
+  .hwtag,.nowtag{font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px}
+  .hwtag{background:#eafaf2;color:#1c8766;border:1px solid #cdeedd}
+  .nowtag{background:#7a58d6;color:#fff}
+  .wkbody{display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(180px,.6fr) minmax(210px,.8fr);gap:12px 16px;padding:4px 16px 16px}
+  .wkbody .card.static{border-left:none;background:#fff}
+  #alldemos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  @media (max-width: 1000px){ .quick{grid-template-columns:repeat(3,1fr)} }
+  @media (max-width: 920px){ .hero,.wisdom,.wkbody{grid-template-columns:1fr} .wm .hwtag{display:none} }
+  @media (max-width: 560px){ .quick{grid-template-columns:repeat(2,1fr)} .icons{grid-template-columns:repeat(2,1fr)} .icons figure:nth-child(n+5){display:none} .wn{min-width:auto} }
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 
@@ -155,41 +190,42 @@
   </header>
 
   <div class="hero">
-    <div class="icons">
-      <figure data-icon="teapot"><img src="media/icons/teapot.png" alt="the Utah teapot, pastel pink"><figcaption>Utah teapot<span>Newell, 1975</span></figcaption></figure>
-      <figure data-icon="bunny"><img src="media/icons/bunny.png" alt="the Stanford bunny, mint"><figcaption>Stanford bunny<span>Turk &amp; Levoy, 1994</span></figcaption></figure>
-      <figure data-icon="cornell"><img src="media/icons/cornell.png" alt="a Cornell box with rose and mint walls"><figcaption>Cornell box<span>Goral et al., 1984</span></figcaption></figure>
-      <figure data-icon="whitted"><img src="media/icons/whitted.png" alt="glass and glossy spheres over a pastel checkerboard"><figcaption>Spheres on a checkerboard<span>after Whitted, 1980</span></figcaption></figure>
-      <figure data-icon="dragon"><img src="media/icons/dragon.png" alt="the Stanford dragon, lavender"><figcaption>Stanford dragon<span>Stanford, 1996</span></figcaption></figure>
-    </div>
-    <div class="extras">
-      <div data-quote></div>
-      <div data-fact></div>
-    </div>
+    <div class="comicpane"><div data-comic></div></div>
+    <div data-icons="6"></div>
+  </div>
+
+  <div class="wisdom">
+    <div data-quote></div>
+    <div data-fact></div>
   </div>
 
   <div class="quick" id="quick"></div>
 
-  <div class="comicrow"><div data-comic></div></div>
+  <h2 class="sech">Weeks <span>click a week to open it; the current week is open</span></h2>
+  <div id="weeks"></div>
 
-  <div id="sessions"></div>
+  <h2 class="sech" id="demos">All demos <span>every interactive demo in the course library</span></h2>
+  <div id="alldemos"></div>
 
   <footer>
     One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
     then open <code>http://localhost:8551/</code>.
-    <div style="margin-top:8px">Icons rendered for this course from the Utah teapot data (Martin Newell, 1975, public domain) and the
-    Stanford bunny and dragon (Stanford Computer Graphics Laboratory, Stanford 3D Scanning Repository); the Cornell box and
-    the spheres are our own scenes after Goral et al. (1984) and Whitted (1980). <a href="media/icons/CREDITS.md">Credits</a>.</div>
+    <div style="margin-top:8px">The icon strip mixes renders made for this course (the Utah teapot from Martin Newell's 1975 data;
+    the Stanford bunny and dragon, Stanford Computer Graphics Laboratory; our own Cornell box, spheres, furry teddy and voxel
+    world) with freely licensed stills from Big Buck Bunny and Sintel (Blender Foundation, CC BY 3.0), SuperTuxKart (CC BY 3.0)
+    and 0 A.D. (Wildfire Games, CC BY-SA 3.0): <a href="media/icons/CREDITS.md">icon credits</a>. Comics: xkcd by Randall Munroe,
+    CC BY-NC 2.5: <a href="media/comics/CREDITS.md">comic credits</a>.</div>
   </footer>
 
 <script>
 // ───────── course-wide quick links (bar under the header) ─────────
 // href:null renders as an unlinked (dashed) chip until that page exists.
 const QUICKLINKS = [
-  { href:"textbook/index.html", title:"Course text", desc:"topic chapters, independent of the week schedule" },
-  { href:"schedule/index.html", title:"Schedule", desc:"every meeting, quiz and homework on the calendar" },
-  { href:"syllabus/index.html", title:"Syllabus", desc:"format, grading, tracks, policies" },
-  { href:"homework/index.html", title:"Homework", desc:"eight assignments, Unity or WebGL (Python for the neural two)" },
+  { href:"textbook/index.html", emo:"📖", title:"Course text", desc:"24 topic chapters with worked examples and exercises" },
+  { href:"schedule/index.html", emo:"🗓️", title:"Schedule", desc:"every meeting, quiz and homework on the calendar" },
+  { href:"homework/index.html", emo:"🛠️", title:"Homework", desc:"eight assignments, Unity or WebGL (Python for the neural two)" },
+  { href:"#demos", emo:"🎛️", title:"Demos", desc:"every interactive demo, one click each" },
+  { href:"syllabus/index.html", emo:"📜", title:"Syllabus", desc:"format, grading, tracks, policies" },
 ];
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
@@ -360,9 +396,8 @@ const WEEKS = [
   { id:"F",   title:"Final examination, Thursday December 17, 5:45 PM", tue:null, thu:null, hw:null, quiz:"Final", handouts:[], demos:[] },
 ];
 
-const quickCell = q => q.href ? `
-  <a class="q" href="${q.href}">${q.title} <span class="qd">· ${q.desc}</span></a>` : `
-  <span class="q">${q.title} <span class="qd">· ${q.desc}</span></span>`;
+const quickCell = q => `
+  <a class="qc" href="${q.href}"><span class="qe">${q.emo}</span><span class="qt">${q.title}</span><span class="qd">${q.desc}</span></a>`;
 
 const lecChip = (day, key) => {
   if (!key) return `<span class="chip lec off"><span class="t">${day}</span><span class="d">no meeting</span></span>`;
@@ -399,11 +434,30 @@ const demoCell = s => {
 
 document.getElementById("quick").innerHTML = QUICKLINKS.map(quickCell).join("");
 
-document.getElementById("sessions").innerHTML =
-  `<div class="colhead">Weeks: lectures · homework · quiz</div>
-   <div class="colhead">Handouts</div>
-   <div class="colhead">Demos</div>` +
-  WEEKS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
+// the current week: week 1 is the week of Monday September 28, 2026; before it, week 1 opens;
+// after the last class, the final's row opens
+const TERM_MON = new Date(2026, 8, 28);
+const weekNow = (() => {
+  const d = Math.floor((new Date() - TERM_MON) / 864e5);
+  if (d < 0) return "W1";
+  const w = Math.floor(d / 7) + 1;
+  return w > 11 ? "F" : "W" + w;
+})();
+const topicLine = w => w.id === "F" ? w.title
+  : [w.tue, w.thu].filter(Boolean).map(k => LECTURES[k].title).join(", ");
+const weekName = w => w.id === "F" ? "Final" : "Week " + w.id.slice(1);
+document.getElementById("weeks").innerHTML = WEEKS.map(w => `
+  <details class="wk${w.neural ? " neural" : ""}${w.bridge ? " bridge" : ""}${w.id === weekNow ? " now" : ""}"${w.id === weekNow ? " open" : ""}>
+    <summary>
+      <span class="wn">${weekName(w)}</span>
+      <span class="wt">${topicLine(w)}</span>
+      <span class="wm">${w.id === weekNow ? '<span class="nowtag">this week</span>' : ""}${w.hw ? `<span class="hwtag">HW${w.hw.n}</span>` : ""}${w.quiz ? `<span class="qm${/Midterm|Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</span>
+    </summary>
+    <div class="wkbody">${sessionCell(w) + handoutCell(w) + demoCell(w)}</div>
+  </details>`).join("");
+
+document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
+  <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
 </script>
 <script type="module">import { mountExtras } from "./lib/site-extras.js"; mountExtras({ base: "./" });</script>
 </body>
