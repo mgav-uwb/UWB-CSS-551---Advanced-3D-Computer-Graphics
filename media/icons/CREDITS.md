@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Site icons: credits and provenance"
-version: "1.2"
+version: "1.3"
 status: final
 created_by: "Claude"
 created_at: "2026-09-29T18:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-09-29T21:30"
+last_modified_at: "2026-09-29T23:30"
 contributors:
   - "Claude"
 tags:
@@ -51,12 +51,27 @@ Cropped to 640 × 640 from freely licensed files; the credit line must accompany
 
 `game-0ad.jpg` carries a share-alike obligation: a derivative of it stays under CC BY-SA 3.0 or a compatible license.
 
+## Film and VR homage renders
+
+Our own renders, made by `tools/gen-site-icons-film.mjs` (through `tools/site-icons-film.html`) from
+primitives and procedural geometry. Each shows a technique, not the film's imagery.
+
+| File | Subject | Terms |
+| ---- | ------- | ----- |
+| `film-homage-liquid-metal.png` | Liquid metal | our own render, after Terminator 2: Judgment Day (1991); no frame, character or logo from the film is reproduced |
+| `film-homage-bullet-time.png` | Bullet time | our own render, after The Matrix (1999); no frame, character or logo from the film is reproduced |
+| `film-homage-lamp.png` | An articulated desk lamp | our own render, after Luxo Jr. (1986); a generic lamp; no frame, character or logo from the film is reproduced |
+| `film-homage-tentacles.png` | Simulated tentacles | our own render, after Pirates of the Caribbean: Dead Man's Chest (2006); no frame, character or logo from the film is reproduced |
+| `film-homage-mocap.png` | Performance capture | our own render, after The Lord of the Rings (2002) and Avatar (2009); no frame, character or logo from the films is reproduced |
+| `film-homage-vr.png` | A stereo pair | our own render, after head-mounted displays (Sutherland, 1968) |
+
 ---
 
 ## Change Log
 
 | Version | Date             | Author | Summary |
 | ------- | ---------------- | ------ | ------- |
+| 1.3     | 2026-09-29T23:30 | Claude | Six homage renders of film effects and VR (liquid metal, bullet time, lamp, tentacles, performance capture, stereo pair). |
 | 1.2     | 2026-09-29T21:30 | Claude | Two more renders: a shell-fur teddy after Kajiya and Kay, and a pastel voxel world. |
 | 1.1     | 2026-09-29T21:00 | Claude | Four film and game stills (Big Buck Bunny, Sintel, SuperTuxKart, 0 A.D.), freely licensed and credited. |
 | 1.0     | 2026-09-29T18:00 | Claude | Five pastel icons rendered from the course's own models and scenes. |

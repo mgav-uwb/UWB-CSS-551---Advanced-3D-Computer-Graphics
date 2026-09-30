@@ -169,6 +169,89 @@
   @media (max-width: 1000px){ .quick{grid-template-columns:repeat(3,1fr)} }
   @media (max-width: 920px){ .hero,.wisdom,.wkbody{grid-template-columns:1fr} .wm .hwtag{display:none} }
   @media (max-width: 560px){ .quick{grid-template-columns:repeat(2,1fr)} .icons{grid-template-columns:repeat(2,1fr)} .icons figure:nth-child(n+5){display:none} .wn{min-width:auto} }
+
+  /* layout v3: everything above the weeks fits in about a third of a laptop screen;
+     each piece is small and opens on hover (or keyboard focus) as an overlay */
+  header{margin-bottom:4px} h1{font-size:32px} .course-sub{font-size:16px;margin:2px 0 0}
+  .band{display:grid;grid-template-columns:200px auto minmax(260px,1fr);gap:12px;margin:12px 0 0;align-items:start;height:128px}
+  .mini{position:relative;height:128px}
+  .comicbox > div{position:absolute;top:0;left:0;width:200px;z-index:5;transition:width .2s}
+  .comicbox > div:hover,.comicbox > div:focus-within{width:min(620px,92vw);z-index:60;box-shadow:0 12px 36px #3a2f5533;border-radius:12px}
+  .iconbox{display:flex;align-items:flex-start;gap:6px}
+  .iconbox .icons{display:grid;grid-template-columns:repeat(6,92px);gap:8px;background:none;border:none;padding:0}
+  .iconbox .icons figure{padding:3px;border-radius:12px;height:114px}
+  .iconbox .icons img{width:86px;height:86px}
+  .iconbox .icons figcaption{font-size:10.5px;line-height:1.2;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .iconbox .icons figcaption span,.iconbox .icons figcaption em,.iconbox .icons figcaption .sx-watch{display:none}
+  .iconbox .icons figure:hover{transform:scale(2.15);z-index:40;box-shadow:0 10px 30px #3a2f5533;height:auto}
+  .iconbox .icons figure:hover figcaption{white-space:normal}
+  .iconbox .icons figure:hover figcaption span,.iconbox .icons figure:hover figcaption em,.iconbox .icons figure:hover .sx-watch{display:block;font-size:7px}
+  .iconbox .icons figure:first-child:hover{transform-origin:left top} .iconbox .icons figure:last-child:hover{transform-origin:right top}
+  .iconbox .icons figure:not(:first-child):not(:last-child):hover{transform-origin:center top}
+  .iconbox .sx-ask{width:20px;height:20px;font-size:11px;top:4px;right:4px}
+  .iconbox .icons figure:hover .sx-ask{transform:scale(.5);transform-origin:top right}
+  .iconbox > .sx-icons-next{writing-mode:vertical-rl;padding:8px 2px;margin:0;align-self:stretch}
+  .textbox{display:flex;flex-direction:column;gap:8px}
+  .slot{position:relative;height:60px}
+  .slot > div{position:absolute;top:0;left:0;right:0;z-index:5}
+  .slot > div:hover,.slot > div:focus-within{z-index:60;box-shadow:0 10px 30px #3a2f5522;border-radius:12px}
+  .slot .sx-quote,.slot .sx-fact{min-height:60px;box-sizing:border-box}
+  .slot.q .sx-quote .sx-by{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .quick{grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 4px}
+  a.qc{flex-direction:row;align-items:center;gap:8px;padding:8px 12px;border-radius:12px}
+  a.qc .qd{display:none} .qe{font-size:18px} .qt{font-size:14px}
+  a.qc:hover .qd{display:none}
+  h2.sech{margin:18px 0 8px}
+  @media (max-width: 1180px){ .iconbox .icons{grid-template-columns:repeat(3,92px)} .iconbox .icons figure:nth-child(n+4){display:none} }
+
+  /* layout v4: thumbnails. The band is under 90 px; each piece opens on hover or focus. */
+  .band{grid-template-columns:150px auto minmax(260px,1fr);height:88px;gap:10px}
+  .mini{height:88px}
+  .comicbox > div{width:150px}
+  .comicbox .sx-comic{padding:4px 6px}
+  .comicbox .sx-comic figcaption{font-size:10.5px;margin-bottom:2px}
+  .comicbox .sx-comic figcaption span{display:none}
+  .comicbox .sx-comic figcaption .sx-next{font-size:10px;padding:0 6px}
+  .comicbox .sx-comic img{max-height:56px}
+  .comicbox > div:hover .sx-comic img,.comicbox > div:focus-within .sx-comic img{max-height:560px}
+  .comicbox > div:hover .sx-comic figcaption span{display:inline}
+  .iconbox .icons{grid-template-columns:repeat(8,64px);gap:6px}
+  .iconbox .icons figure{height:72px;padding:2px;border-radius:10px}
+  .iconbox .icons img{width:60px;height:60px;border-radius:8px}
+  .iconbox .icons figcaption{display:none}
+  .iconbox .icons figure:hover{transform:scale(3.2);height:auto}
+  .iconbox .icons figure:hover figcaption{display:block;font-size:4.5px;line-height:1.25}
+  .iconbox .icons figure:hover figcaption span,.iconbox .icons figure:hover figcaption em,.iconbox .icons figure:hover .sx-watch{font-size:3.6px}
+  .iconbox .sx-ask{width:16px;height:16px;font-size:9px;top:2px;right:2px}
+  .iconbox .icons figure:hover .sx-ask{transform:scale(.4)}
+  .iconbox > .sx-icons-next{font-size:10px;padding:4px 1px}
+  .slot{height:40px}
+  .slot .sx-quote,.slot .sx-fact{min-height:40px;padding:4px 10px}
+  .slot .sx-quote p{-webkit-line-clamp:1;font-size:13px;margin:0}
+  .slot .sx-quote .sx-by{font-size:10.5px}
+  .slot .sx-fact{font-size:12.5px;align-items:center}
+  .slot .sx-ft{-webkit-line-clamp:1}
+  .slot .sx-dot{font-size:14px;width:16px}
+  @media (max-width: 1180px){ .iconbox .icons{grid-template-columns:repeat(5,64px)} .iconbox .icons figure:nth-child(n+6){display:none} }
+  @media (max-width: 760px){
+    .band{grid-template-columns:1fr;height:auto;gap:8px}
+    .mini,.slot{height:auto} .comicbox > div,.slot > div{position:static;width:auto}
+    .comicbox .sx-comic img,.comicbox .sx-credit{display:none}
+    .comicbox .sx-comic:focus-within img,.comicbox .sx-comic:hover img{display:inline;max-height:none}
+    .comicbox .sx-comic figcaption{margin:0}
+    body{padding-top:16px !important} h1{font-size:26px} .course-sub{font-size:14px} .meta{font-size:12px}
+    .band,.quick,.iconbox,.textbox,.slot{min-width:0} .iconbox .icons{min-width:0}
+    .iconbox > .sx-icons-next{font-size:0;padding:4px 6px} .iconbox > .sx-icons-next::after{content:'↻';font-size:14px}
+    .quick{margin-top:10px} a.qc{padding:4px 2px} h2.sech{margin-top:12px} h2.sech span{display:none}
+    .iconbox .icons{grid-template-columns:repeat(4,1fr);flex:1;gap:6px} .iconbox .icons figure{height:auto;padding:2px} .iconbox .icons img{width:100%;height:auto}
+    .iconbox .icons figure:nth-child(4){display:block} .iconbox .icons figure:nth-child(n+5){display:none} .iconbox .icons figcaption{display:none} .band{height:auto} .mini,.slot{height:auto}
+    .iconbox > .sx-icons-next{writing-mode:horizontal-tb;align-self:center;padding:2px 6px}
+    .slot.q .sx-quote p{-webkit-line-clamp:1}
+    .wkbody .cell a.chip{flex:1 1 100%}
+    .iconbox .icons figure:hover{transform:none}
+    .slot.f{display:none}
+    .quick{grid-template-columns:repeat(5,1fr);gap:6px} a.qc{flex-direction:column;gap:0;padding:6px 2px;text-align:center} .qt{font-size:11px}
+  }
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 
@@ -189,14 +272,13 @@
     <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online / Thu 5:45–7:45 PM in person (lecture, discussion, and the weekly quiz) · Dr. Marcel Gavriliu</div>
   </header>
 
-  <div class="hero">
-    <div class="comicpane"><div data-comic></div></div>
-    <div data-icons="6"></div>
-  </div>
-
-  <div class="wisdom">
-    <div data-quote></div>
-    <div data-fact></div>
+  <div class="band">
+    <div class="mini comicbox"><div data-comic></div></div>
+    <div class="mini iconbox"><div data-icons="8"></div></div>
+    <div class="mini textbox">
+      <div class="slot q"><div data-quote></div></div>
+      <div class="slot f"><div data-fact></div></div>
+    </div>
   </div>
 
   <div class="quick" id="quick"></div>
@@ -211,8 +293,8 @@
     One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
     then open <code>http://localhost:8551/</code>.
     <div style="margin-top:8px">The icon strip mixes renders made for this course (the Utah teapot from Martin Newell's 1975 data;
-    the Stanford bunny and dragon, Stanford Computer Graphics Laboratory; our own Cornell box, spheres, furry teddy and voxel
-    world) with freely licensed stills from Big Buck Bunny and Sintel (Blender Foundation, CC BY 3.0), SuperTuxKart (CC BY 3.0)
+    the Stanford bunny and dragon, Stanford Computer Graphics Laboratory; our own Cornell box, spheres, furry teddy, voxel
+    world, physics simulations, and technique homages to landmark film effects and VR, which reproduce no frame, character or logo) with freely licensed stills from Big Buck Bunny and Sintel (Blender Foundation, CC BY 3.0), SuperTuxKart (CC BY 3.0)
     and 0 A.D. (Wildfire Games, CC BY-SA 3.0): <a href="media/icons/CREDITS.md">icon credits</a>. Comics: xkcd by Randall Munroe,
     CC BY-NC 2.5: <a href="media/comics/CREDITS.md">comic credits</a>.</div>
   </footer>
@@ -341,6 +423,10 @@ const DEMOS = {
     desc:"orbit a real ~240K-splat Mip-NeRF 360 bonsai scene; drag orbitAz/dist; a rasterizer, not a mesh (attribution in media/gsplat/)" },
   "simplify-compare": { title:"Mesh Simplification: QEM vs Progressive Meshes vs Gavriliu 2001",
     desc:"drag tris: the same bunny scan simplified three ways at once (QEM snapped levels, PM's exact continuous stream, MG2001's mesh-graph adaptive extraction); per-algorithm tris/maxErr/minAspect readout" },
+  "cloth": { title:"Cloth: Springs vs Constraints, and Why Stiff Springs Explode",
+    desc:"drag stiffness/substeps/wind: a cloth over a sphere; switch springs vs constraints; live h·√(k/m), stretch, energy, step time" },
+  "fluid": { title:"Fluids as Particles: A 2D SPH Dam Break, Live",
+    desc:"drag viscosity/stiffness/particles/steps: a particle fluid, dam break or drop into a pool; live density error and step time" }
 };
 
 // ───────── the lectures (Plan C: planning/css551-au26-plan-c-2026-09-29.md) ─────────
@@ -374,7 +460,7 @@ const WEEKS = [
   { id:"W1",  title:"The Big Picture", tue:null, thu:"L01", hw:null, quiz:null,
     handouts:["history"], demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map"] },
   { id:"W2",  title:"The Big Picture; the loop and the tool", tue:"L02", thu:"L03", hw:HW(1), quiz:"Q1",
-    handouts:["history","interaction","unity"], demos:["mvc-transform"] },
+    handouts:["history","interaction","unity","animation"], demos:["mvc-transform","cloth","fluid"] },
   { id:"W3",  title:"Vectors and rotation", tue:"L04", thu:"L05", hw:HW(2), quiz:"Q2",
     handouts:["vectors","rotation"], demos:["dot-cross","axis-angle"] },
   { id:"W4",  title:"Affine transformations and scene graphs", tue:"L06", thu:"L07", hw:HW(3), quiz:"Q3",
