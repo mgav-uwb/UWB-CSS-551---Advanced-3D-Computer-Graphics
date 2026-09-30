@@ -71,7 +71,7 @@
 </footer>
 
 <script type="module">
-import { loadPool, comicItem, linksHTML, GROUPS } from '../lib/site-extras.js?v=21';
+import { loadPool, comicItem, linksHTML, SECTIONS } from '../lib/site-extras.js?v=22';
 import { COMICS } from '../lib/site-data.js';
 
 const base = '../';
@@ -91,11 +91,11 @@ document.getElementById('count').textContent = `${pics.length} pictures and ${CO
 
 let filter = 'all', shown = [], cur = -1;
 const grid = document.getElementById('grid');
-// sections: each group of related items together (an item shows once, under its first group),
+// sections: the gallery's sections (SECTIONS in site-extras.js) (an item shows once, under its first group),
 // then the pictures in no group, then the comics
 const sections = () => {
   const seen = new Set(), out = [];
-  for (const [name, ids] of Object.entries(GROUPS)) {
+  for (const [name, ids] of Object.entries(SECTIONS)) {
     const its = ids.map((x) => byId[x]).filter((x) => x && !seen.has(x.id));
     its.forEach((x) => seen.add(x.id));
     if (its.length) out.push([name, its]);
