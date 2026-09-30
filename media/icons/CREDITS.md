@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Site icons: credits and provenance"
-version: "1.5"
+version: "1.6"
 status: final
 created_by: "Claude"
 created_at: "2026-09-29T18:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-09-29T23:30"
+last_modified_at: "2026-09-30T13:00"
 contributors:
   - "Claude"
 tags:
@@ -37,6 +37,7 @@ They are generated; regenerate rather than edit.
 | `whitted.png` | Spheres over a checkerboard | our own scene after Whitted, “An Improved Illumination Model for Shaded Display,” CACM 1980 | original render |
 | `furbunny.png` | A fur bunny | the Stanford bunny (Stanford Computer Graphics Laboratory) grown with about 110,000 strands, lit with the Kajiya-Kay model; after Kajiya and Kay (SIGGRAPH 1989) and Augusto Roman's fur bunny (Stanford CS348b rendering competition, 2003, whose image is not reproduced) | original render |
 | `voxel.png` | A voxel world | our own scene | original render |
+| `sim-splash.webp` | A splash, animated (about 2.6 s loop, 79 frames, 640 × 640) | our own simulation and render: a wave-equation height field after Kass and Miller (SIGGRAPH 1990), a crown sheet shedding ballistic droplets and a Worthington jet, physically based water material (`tools/site-splash.html`, `tools/gen-site-splash.mjs`); `sim-splash.png` stays as the still | original render |
 
 ## Film and game stills
 
@@ -72,6 +73,7 @@ primitives and procedural geometry. Each shows a technique, not the film's image
 
 | Version | Date             | Author | Summary |
 | ------- | ---------------- | ------ | ------- |
+| 1.6     | 2026-09-30T13:00 | Claude | The splash tile becomes an animated loop (`sim-splash.webp`): a height-field wave simulation with a crown, droplets and a Worthington jet. |
 | 1.5     | 2026-09-30T11:00 | Claude | A real bullet-time rig photo (Sony Europe, CC BY 4.0), cropped square. |
 | 1.4     | 2026-09-30T10:00 | Claude | The shell-fur teddy replaced by a strand-fur bunny (about 110,000 hairs, Kajiya-Kay shading). |
 | 1.3     | 2026-09-29T23:30 | Claude | Six homage renders of film effects and VR (liquid metal, bullet time, lamp, tentacles, performance capture, stereo pair). |
