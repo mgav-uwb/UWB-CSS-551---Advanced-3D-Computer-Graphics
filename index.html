@@ -147,7 +147,10 @@
   .nowtag{background:#7a58d6;color:#fff}
   .wkbody{display:grid;grid-template-columns:minmax(300px,1.15fr) minmax(180px,.6fr) minmax(210px,.8fr);gap:12px 16px;padding:4px 16px 16px}
   .wkbody .card.static{border-left:none;background:#fff}
-  #alldemos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  #alldemos{display:block}
+  #alldemos .dgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  #alldemos h3.dsec{font-size:13px;color:#3a2f55;margin:16px 0 8px;font-weight:700}
+  #alldemos h3.dsec:first-child{margin-top:0}
   @media (max-width: 1000px){ .quick{grid-template-columns:repeat(3,1fr)} }
   @media (max-width: 920px){ .wm .hwtag{display:none} }
   @media (max-width: 560px){ .quick{grid-template-columns:repeat(2,1fr)} .wn{min-width:auto} }
@@ -402,7 +405,19 @@ const DEMOS = {
   "fluid": { title:"Fluids as Particles: A 2D SPH Dam Break, Live",
     desc:"drag viscosity/stiffness/particles/steps: a particle fluid, dam break or drop into a pool; live density error and step time" },
   "fur": { title:"Fur: 100,000 Hairs, Kajiya-Kay Lit, Live",
-    desc:"drag lightAz/lightEl/shine/rootShade (instant) or hairs/length/gravity/curl (regrows): strands on the Stanford bunny; live hair, vertex and timing readout" }
+    desc:"drag lightAz/lightEl/shine/rootShade (instant) or hairs/length/gravity/curl (regrows): strands on the Stanford bunny; live hair, vertex and timing readout" },
+  "mlp-fit": { title:"A Neural Network Is a Function: Train One to Fit a Curve, Live",
+    desc:"drag epochs/hidden: a two-layer network trained in the browser by gradient descent on twelve points; the curve bends as the loss falls" },
+  "embed-map": { title:"Embeddings: The Trained Denoiser's Class Vectors, Mapped",
+    desc:"pick a digit: the trained denoiser's 64-D class embeddings projected to 2D; nearest neighbors by cosine similarity" },
+  "diffusion-image": { title:"Diffusion Models: The Forward Process on a Real Image",
+    desc:"drag t: a render of our Cornell scene drowns in scheduled noise; live ᾱ(t), SNR and PSNR" },
+  "diffusion-2d": { title:"Diffusion Models: Noise a Shape, Then Learn to Undo It",
+    desc:"drag t or steps: a spiral dissolves into noise and reassembles; DDIM vs DDPM steps, arrows and ghost" },
+  "diffusion-digits": { title:"Diffusion Models: Real Digits, Conditioning, Guidance, and the Memorization Knob",
+    desc:"drag steps/guide/smooth, pick a digit: the exact denoiser on 2,000 MNIST digits; memorized or novel" },
+  "diffusion-net": { title:"Diffusion Models: A Trained Denoiser, Live in the Browser",
+    desc:"drag steps/guide, pick a digit: a small learned network samples new digits; the nearest training digit proves they are new" }
 };
 
 // ───────── the lectures (Plan C: planning/css551-au26-plan-c-2026-09-29.md) ─────────
@@ -448,7 +463,7 @@ const WEEKS = [
   { id:"W7",  title:"The bridge: light transport and ray tracing", tue:"L12", thu:"L13", hw:HW(6), quiz:"Midterm", bridge:true,
     handouts:["pbr","raytracing","color"], demos:["brdf-lobe"] },
   { id:"W8",  title:"Networks, embeddings, the space of images", tue:"L14", thu:"L15", hw:HW(7), quiz:"Q6", neural:true,
-    handouts:["nets","images"], demos:["mlp-fit","embed-map","digit-view"] },
+    handouts:["nets","images"], demos:["mlp-fit","embed-map","diffusion-image"] },
   { id:"W9",  title:"Diffusion models I (Thanksgiving Thursday)", tue:"L16", thu:null, hw:null, quiz:null, neural:true,
     handouts:["diffusion"], demos:["diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
   { id:"W10", title:"Diffusion models II and learned scenes", tue:"L17", thu:"L18", hw:HW(8), quiz:"Q7", neural:true,
@@ -518,8 +533,26 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
     <div class="wkbody">${sessionCell(w) + handoutCell(w) + demoCell(w)}</div>
   </details>`).join("");
 
-document.getElementById("alldemos").innerHTML = Object.entries(DEMOS).map(([k, d]) => `
-  <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${d.title}</span><span class="d">${d.desc}</span></a>`).join("");
+// the catalog in course order, grouped by part of the course
+const CATALOG = [
+  ["The big picture", ["our-scene", "raster", "mesh-view", "lod"]],
+  ["The interactive loop and physics", ["mvc-transform", "cloth", "fluid"]],
+  ["Vectors and rotation", ["dot-cross", "axis-angle"]],
+  ["Transformations and scene graphs", ["trs-order", "scene-graph", "keyframe"]],
+  ["Viewing", ["view-matrix", "projection"]],
+  ["Meshes, textures, fur", ["mesh-grid", "simplify-compare", "uv-placement", "bump-map", "fur"]],
+  ["Illumination and light transport", ["illumination", "brdf-lobe"]],
+  ["Networks and the space of images", ["mlp-fit", "embed-map", "diffusion-image"]],
+  ["Diffusion models", ["diffusion-2d", "diffusion-digits", "diffusion-net"]],
+  ["Learned scenes", ["gsplat"]],
+];
+const listed = new Set(CATALOG.flatMap(([, ks]) => ks));
+const extra = Object.keys(DEMOS).filter((k) => !listed.has(k));
+if (extra.length) CATALOG.push(["More", extra]);
+const demoChip = (k) => DEMOS[k] ? `
+  <a class="chip demo" href="lib/demo.html?demo=${k}"><span class="t">${DEMOS[k].title}</span><span class="d">${DEMOS[k].desc}</span></a>` : "";
+document.getElementById("alldemos").innerHTML = CATALOG.map(([name, ks]) => `
+  <h3 class="dsec">${name}</h3><div class="dgrid">${ks.map(demoChip).join("")}</div>`).join("");
 </script>
 <script type="module">import { mountExtras } from "./lib/site-extras.js?v=15"; mountExtras({ base: "./" });</script>
 </body>
