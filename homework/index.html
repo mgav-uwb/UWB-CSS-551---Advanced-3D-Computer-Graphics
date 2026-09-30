@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CSS 551 · Homework</title>
 <style>
-  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7; --accent:#00e58a; --accent2:#5cd47a; --neural:#8f7dff; --warn:#ffcf5c; }
+  :root{ --bg:#fcf8ff; --panel:#ffffff; --line:#e9def8; --ink:#2d2640; --dim:#6c6584; --accent:#1c8766; --accent2:#c2457e; --neural:#7a58d6; --warn:#bf6a14; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;padding:36px clamp(14px,4vw,64px) 72px;max-width:1020px;margin:0 auto}
   header{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:10px}
@@ -15,16 +15,25 @@
   .sub{color:var(--accent2);font-size:18px;font-weight:600}
   .meta{color:var(--dim);font-size:13.5px;margin-top:6px}
   a{color:var(--accent)}
-  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:13px}
+  code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:13px}
   .tw{overflow-x:auto}
   table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px}
   th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
-  th{background:#181b24;color:#fff}
+  th{background:#f4edff;color:#2d2640}
   td.n{font-weight:700;color:var(--accent);white-space:nowrap}
   tr.neural td.n{color:var(--neural)}
   tr.bridge td.n{color:var(--warn)}
   .box{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:12px 18px;margin:14px 0}
   footer{margin-top:40px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:13px}
+
+  /* pastel backdrop (site theme, 2026-09-29) */
+  body{background:
+    radial-gradient(900px 520px at 8% -6%, #ffe3ef 0%, transparent 60%),
+    radial-gradient(760px 480px at 96% 4%, #dff4ff 0%, transparent 62%),
+    radial-gradient(900px 700px at 50% 108%, #e8fbef 0%, transparent 60%),
+    #fcf8ff !important;background-attachment:fixed !important}
+  h1{color:#2d2640}
+  a{text-decoration-thickness:1.5px;text-underline-offset:2px}
 </style>
 </head>
 <body>
@@ -33,6 +42,7 @@
   <h1>Homework, Autumn 2026</h1>
   <div class="meta">Eight assignments, 2.5 % each · out Thursday, due the next Wednesday 11:59 PM on Canvas · two late tokens · <a href="../index.html">hub</a> · <a href="../schedule/index.html">schedule</a> · <a href="../syllabus/index.html">syllabus</a></div>
 </header>
+<div data-quote style="margin:14px 0 6px"></div>
 
 <p>Every assignment names the functions to write and the numbers a correct build reproduces, taken from the
 course text's worked examples. You choose a track per assignment: <b>WebGL</b> (a JavaScript file that mounts
@@ -58,5 +68,6 @@ neural assignments offer <b>Python</b> notebooks instead of Unity. Both tracks a
 runner draws the scene from your functions and prints every check with your value and the expected one.</div>
 
 <footer>Canvas governs every due date.</footer>
+<script type="module">import { mountExtras } from "../lib/site-extras.js"; mountExtras();</script>
 </body>
 </html>

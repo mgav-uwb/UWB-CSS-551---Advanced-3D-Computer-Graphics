@@ -17,8 +17,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CSS 551 · Course Hub</title>
 <style>
-  :root{ --bg:#0b0c10; --panel:#14161d; --line:#262a35; --ink:#e7eaf0; --dim:#8b93a7;
-         --accent:#00e58a; --accent2:#5cd47a; }
+  :root{ --bg:#fcf8ff; --panel:#ffffff; --line:#e9def8; --ink:#2d2640; --dim:#6c6584;
+         --accent:#1c8766; --accent2:#c2457e; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);
        font:15px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
@@ -33,7 +33,7 @@
   a.q{display:inline-block;text-decoration:none;color:var(--ink);background:var(--panel);
       border:1px solid var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;
       font-weight:600;transition:border-color .15s,background .15s}
-  a.q:hover{border-color:var(--accent);background:#181b24}
+  a.q:hover{border-color:var(--accent);background:#f4edff}
   a.q .qd{color:var(--dim);font-weight:400}
   span.q{display:inline-block;color:var(--dim);background:transparent;
       border:1px dashed var(--line);border-radius:9px;padding:8px 14px;font-size:13.5px;
@@ -52,11 +52,11 @@
          border:1px solid var(--line);border-left:3px solid var(--line);border-radius:11px;
          padding:15px 17px;transition:border-color .15s,transform .15s,background .15s}
   a.card:hover{border-color:var(--accent);border-left-color:var(--accent);
-               transform:translateY(-2px);background:#181b24}
+               transform:translateY(-2px);background:#f4edff}
   .lec{display:flex;gap:14px;align-items:flex-start}
   .badge{flex:0 0 auto;font-weight:700;font-size:14px;color:var(--accent);
          border:1px solid var(--accent);border-radius:8px;padding:6px 9px;letter-spacing:.5px;
-         background:#00e58a14}
+         background:#e3f7ee}
   .ctitle{font-size:16.5px;font-weight:600;margin:0 0 4px}
   .go{color:var(--accent2);font-size:13px;margin-top:9px;font-weight:600}
 
@@ -69,12 +69,12 @@
   a.chip{display:block;text-decoration:none;color:var(--ink);background:var(--panel);
          border:1px solid var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;
          line-height:1.35;transition:border-color .15s,background .15s}
-  a.chip:hover{border-color:var(--accent);background:#181b24}
+  a.chip:hover{border-color:var(--accent);background:#f4edff}
   a.chip .t{font-weight:600}
   a.chip .d{color:var(--dim);font-size:11.5px;display:block;margin-top:1px}
   .chip.h .t::before{content:"📄 "}
   .chip.demo .t::before{content:"▶ ";color:var(--accent2);font-size:10.5px;vertical-align:1px}
-  .none{color:#3a3f4d;font-size:12.5px;padding:8px 2px}
+  .none{color:#c7bdda;font-size:12.5px;padding:8px 2px}
 
   /* session cell: deck card + optional lab chip, stacked */
   .card-wrap{display:flex;flex-direction:column;gap:8px}
@@ -95,8 +95,8 @@
 
   /* Plan C week cards: two lecture chips, a homework chip, a quiz marker */
   .card.static{display:block;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:11px;padding:13px 15px}
-  .week.neural .card.static{border-left-color:#8f7dff} .week.neural .badge{color:#8f7dff;border-color:#8f7dff;background:#8f7dff14}
-  .week.bridge .card.static{border-left-color:#ffcf5c} .week.bridge .badge{color:#ffcf5c;border-color:#ffcf5c;background:#ffcf5c14}
+  .week.neural .card.static{border-left-color:#7a58d6} .week.neural .badge{color:#7a58d6;border-color:#7a58d6;background:#efe8ff}
+  .week.bridge .card.static{border-left-color:#bf6a14} .week.bridge .badge{color:#bf6a14;border-color:#bf6a14;background:#fff0e0}
   .pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
   span.chip.lec{display:block;border:1px dashed var(--line);border-radius:9px;padding:8px 11px;font-size:12.5px;color:var(--dim)}
   .chip.lec .t{font-weight:600} .chip.lec .d{display:block;font-size:11.5px;color:var(--dim)}
@@ -104,9 +104,44 @@
   .marks:empty{display:none}
   a.chip.hwc{padding:4px 11px} .chip.hwc .t::before{content:"🛠 "}
   .qm{font-size:12px;font-weight:700;border:1px solid var(--line);border-radius:7px;padding:3px 9px;color:var(--ink)}
-  .qm.exam{border-color:#ffcf5c;color:#ffcf5c}
+  .qm.exam{border-color:#bf6a14;color:#bf6a14}
+
+  /* hero: the icon strip, a quote and a fact */
+  h1{font-size:40px;background:linear-gradient(90deg,#d0508a,#7a58d6 55%,#1c8766);-webkit-background-clip:text;background-clip:text;color:transparent !important;display:inline-block}
+  .hero{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin:20px 0 6px;align-items:stretch}
+  .icons{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:start;align-content:center;background:#ffffffb3;border:1px solid #efe4fa;border-radius:18px;padding:12px}
+  .icons figure{margin:0;text-align:center;border-radius:14px;padding:6px 4px;transition:transform .2s,background .2s}
+  .icons figure:nth-child(1){background:#fff0f6} .icons figure:nth-child(2){background:#eafaf2}
+  .icons figure:nth-child(3){background:#fff5ea} .icons figure:nth-child(4){background:#eaf6ff}
+  .icons figure:nth-child(5){background:#f3eeff}
+  .icons figure:hover{transform:translateY(-4px) rotate(-1.5deg)}
+  .icons img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:10px}
+  .icons figcaption{font-size:12px;font-weight:700;color:#3a2f55;line-height:1.25;margin-top:4px}
+  .icons figcaption span{display:block;font-weight:400;color:#8d86a3;font-size:11px}
+  .extras{display:flex;flex-direction:column;gap:12px;justify-content:center}
+  @media (max-width: 920px){ .hero{grid-template-columns:1fr} .icons{grid-template-columns:repeat(5,1fr)} }
+  @media (max-width: 520px){ .icons{grid-template-columns:repeat(3,1fr)} }
+
+  /* pastel week tints and chips */
+  .card.static{background:#ffffffd9;box-shadow:0 1px 0 #efe4fa}
+  .week .card.static{background:linear-gradient(135deg,#f0fbf5,#ffffff 70%)}
+  .week.bridge .card.static{background:linear-gradient(135deg,#fff3e6,#ffffff 70%)}
+  .week.neural .card.static{background:linear-gradient(135deg,#f3eeff,#ffffff 70%)}
+  a.chip,a.q{background:#ffffffd9} a.chip:hover,a.q:hover{background:#fff4fa;border-color:#e6a8c8}
+  a.chip.lec{background:#ffffff}
+  .qm{background:#fff}
+  .qm.exam{background:#fff4e6}
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
-  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
+  code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
+
+  /* pastel backdrop (site theme, 2026-09-29) */
+  body{background:
+    radial-gradient(900px 520px at 8% -6%, #ffe3ef 0%, transparent 60%),
+    radial-gradient(760px 480px at 96% 4%, #dff4ff 0%, transparent 62%),
+    radial-gradient(900px 700px at 50% 108%, #e8fbef 0%, transparent 60%),
+    #fcf8ff !important;background-attachment:fixed !important}
+  h1{color:#2d2640}
+  a{text-decoration-thickness:1.5px;text-underline-offset:2px}
 </style>
 </head>
 <body>
@@ -116,6 +151,20 @@
     <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online / Thu 5:45–7:45 PM in person (lecture, discussion, and the weekly quiz) · Dr. Marcel Gavriliu</div>
   </header>
 
+  <div class="hero">
+    <div class="icons">
+      <figure><img src="media/icons/teapot.png" alt="the Utah teapot, pastel pink"><figcaption>Utah teapot<span>Newell, 1975</span></figcaption></figure>
+      <figure><img src="media/icons/bunny.png" alt="the Stanford bunny, mint"><figcaption>Stanford bunny<span>Turk &amp; Levoy, 1994</span></figcaption></figure>
+      <figure><img src="media/icons/cornell.png" alt="a Cornell box with rose and mint walls"><figcaption>Cornell box<span>Goral et al., 1984</span></figcaption></figure>
+      <figure><img src="media/icons/whitted.png" alt="glass and glossy spheres over a pastel checkerboard"><figcaption>Spheres on a checkerboard<span>after Whitted, 1980</span></figcaption></figure>
+      <figure><img src="media/icons/dragon.png" alt="the Stanford dragon, lavender"><figcaption>Stanford dragon<span>Stanford, 1996</span></figcaption></figure>
+    </div>
+    <div class="extras">
+      <div data-quote></div>
+      <div data-fact></div>
+    </div>
+  </div>
+
   <div class="quick" id="quick"></div>
 
   <div id="sessions"></div>
@@ -123,6 +172,9 @@
   <footer>
     One server for the whole course: <code>cd css551 &amp;&amp; python3 -m http.server 8551</code>
     then open <code>http://localhost:8551/</code>.
+    <div style="margin-top:8px">Icons rendered for this course from the Utah teapot data (Martin Newell, 1975, public domain) and the
+    Stanford bunny and dragon (Stanford Computer Graphics Laboratory, Stanford 3D Scanning Repository); the Cornell box and
+    the spheres are our own scenes after Goral et al. (1984) and Whitted (1980). <a href="media/icons/CREDITS.md">Credits</a>.</div>
   </footer>
 
 <script>
@@ -348,5 +400,6 @@ document.getElementById("sessions").innerHTML =
    <div class="colhead">Demos</div>` +
   WEEKS.map(s => sessionCell(s) + handoutCell(s) + demoCell(s)).join("");
 </script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js"; mountExtras({ base: "./" });</script>
 </body>
 </html>
