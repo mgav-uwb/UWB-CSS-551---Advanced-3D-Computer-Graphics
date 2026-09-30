@@ -252,6 +252,21 @@
     .slot.f{display:none}
     .quick{grid-template-columns:repeat(5,1fr);gap:6px} a.qc{flex-direction:column;gap:0;padding:6px 2px;text-align:center} .qt{font-size:11px}
   }
+
+  /* layout v5: the strip (equal tiles, comic first, one refresh, overlay on hover), then quote
+     and fact side by side, one line each, full width */
+  .stripbox{margin:12px 0 0}
+  .wisdom2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 0;position:relative}
+  .wisdom2 > div{position:relative;height:40px}
+  .wisdom2 > div > *{position:absolute;top:0;left:0;right:0;z-index:5}
+  .wisdom2 > div:hover > *,.wisdom2 > div:focus-within > *{z-index:60;box-shadow:0 10px 30px #3a2f5522}
+  .wisdom2 .sx-quote,.wisdom2 .sx-fact{min-height:40px;box-sizing:border-box;padding:5px 12px}
+  .wisdom2 .sx-quote p{-webkit-line-clamp:1;font-size:13.5px;margin:0}
+  .wisdom2 .sx-quote .sx-by{font-size:11px}
+  .wisdom2 .sx-fact{font-size:13px;align-items:center}
+  .wisdom2 .sx-ft{-webkit-line-clamp:1}
+  .wisdom2 .sx-dot{font-size:14px;width:16px}
+  @media (max-width: 760px){ .wisdom2{grid-template-columns:1fr} .wisdom2 > div{height:auto} .wisdom2 > div > *{position:static} .sx-tile{flex-basis:64px;width:64px;height:64px} .sx-refresh{height:64px} }
   footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim);font-size:13px}
   code{background:#f6f0ff;border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:var(--accent2);font-size:12.5px}
 
@@ -272,13 +287,10 @@
     <div class="meta">Autumn 2026 · Tue 5:45–7:45 PM synchronous online / Thu 5:45–7:45 PM in person (lecture, discussion, and the weekly quiz) · Dr. Marcel Gavriliu</div>
   </header>
 
-  <div class="band">
-    <div class="mini comicbox"><div data-comic></div></div>
-    <div class="mini iconbox"><div data-icons="8"></div></div>
-    <div class="mini textbox">
-      <div class="slot q"><div data-quote></div></div>
-      <div class="slot f"><div data-fact></div></div>
-    </div>
+  <div data-strip class="stripbox"></div>
+  <div class="wisdom2">
+    <div data-quote></div>
+    <div data-fact></div>
   </div>
 
   <div class="quick" id="quick"></div>
