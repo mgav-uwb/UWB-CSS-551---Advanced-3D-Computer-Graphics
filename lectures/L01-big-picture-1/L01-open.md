@@ -72,7 +72,7 @@ How a computer turns a description of a 3D world into a picture, and, increasing
 | Midterm | 200 | Thursday November 12, first 75 minutes, 25 questions × 8 points, weeks 1 to 6 |
 | Homework, 8 | 200 | 25 points each; run and compared against the numbers the assignment names |
 
-**Exams**: one **handwritten** cheat sheet, both sides, handed in with the exam; otherwise **50 %** off.
+**Exams**: one **handwritten** cheat sheet, both sides. **Everyone hands in a sheet**: the cheat sheet, or your name and "I did not use a cheat sheet". Otherwise **50 %** off.
 
 
 ---

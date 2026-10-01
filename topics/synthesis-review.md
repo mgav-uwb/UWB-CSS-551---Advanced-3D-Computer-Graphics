@@ -75,7 +75,7 @@
 
 - **Thursday December 17, 5:45 PM**, in person, two hours
 - **45 multiple-choice questions**, 8 points each (360 points), on paper; pencil; no devices
-- one **handwritten** cheat sheet allowed (one page, both sides), **handed in with the exam**; not handwritten or not handed in: **50 %** off
+- one **handwritten** cheat sheet allowed (one page, both sides); **everyone hands in a sheet**: the cheat sheet, or your name and "I did not use a cheat sheet"; otherwise **50 %** off
 - **cumulative**, with weeks 7 to 11 weighted more heavily
 - items are **computational**: which entry of the matrix, which pixel wins the depth test, what N·L is after the light moves, how many samples halve the error
 - the wrong options are the **pitfalls**: the normal pushed through `M`, the sheared read-back, the code-space blend, the per-frame step, Euler angles near 90°, the raw depth buffer, the clamped guidance, the thin surface between samples
