@@ -1,0 +1,500 @@
+<!doctype html>
+<!-- CSS 551 course text: WebGL and three.js for This Course. Topic chapter for the tool the WebGL track of the
+     homework uses; the counterpart of unity-basics.html, independent of any offering's schedule (the hub
+     attaches it). Shared stylesheet: textbook.css. Figures in figures/webgl-*.svg are laid out or computed by
+     tools/gen-textbook-figures-webgl.mjs; the numbers quoted come from figures/numbers-webgl.json, computed with
+     lib/core/xform.js and the vendored three.js (lib/vendor/three.module.js, r170). Every hands-on output
+     below was produced by running the command shown. Never hand-edit the figures. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebGL and three.js for This Course - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and uses MathJax for its
+        formulas. Read it through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the math.
+        <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>WebGL and three.js for This Course: the Server, the Scene Graph, and the Course Library</h1>
+      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
+      <div class="src">
+        Course text &middot; everything the WebGL track of the homework assumes about the tools: how to serve the course and why a page opened from disk fails, how ES modules find each other, the browser&rsquo;s developer tools, three.js&rsquo;s scene, objects, geometry, materials and render loop mapped to their Unity counterparts, three.js&rsquo;s conventions against the text&rsquo;s (one trap in <code>Matrix4.set</code>), the course&rsquo;s own library, and how a homework skeleton runs and reports. Read before the first homework (HW1); return to Sections 6 and 7 before HW3 (affine and scene graphs) and to <a href="webgl-shaders.html">the shader chapter</a> before HW5.
+      </div>
+
+      <p class="lead">
+        Each homework (HW1 to HW6) can be done in either of two tracks, Unity or WebGL, and HW7 and HW8 in JavaScript or Python. <a href="unity-basics.html">The Unity chapter</a> serves the first track; this chapter serves the second. The WebGL track runs in a browser on the course&rsquo;s own JavaScript library, the same code behind every demo in this text, drawn with three.js, a widely used library over the browser&rsquo;s WebGL interface. There is nothing to install beyond a browser and Python. The price is that a browser is a stricter host than an editor: a page must be served, modules must be imported by exact relative paths, and errors appear in a console rather than a window. The chapter covers that ground first, then the four things a graphics course needs from three.js (the transform hierarchy, the frame loop, the matrix type and its storage, and the difference between its conventions and the text&rsquo;s), then the course library and the homework runner. It is not a three.js tutorial: lights, shadows, post-processing and loaders are left out.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#serve">Serving the course: one folder, one server</a></li>
+          <li><a href="#modules">ES modules and import paths</a></li>
+          <li><a href="#devtools">The browser&rsquo;s developer tools</a></li>
+          <li><a href="#objects">three.js&rsquo;s object model, against Unity&rsquo;s</a></li>
+          <li><a href="#loop">The render loop and the clock</a></li>
+          <li><a href="#transform">Object3D: local, world, parent</a></li>
+          <li><a href="#conventions">Conventions, against the text&rsquo;s</a></li>
+          <li><a href="#assets">Geometry, materials, textures, cameras</a></li>
+          <li><a href="#library">The course library</a></li>
+          <li><a href="#homework">How a homework runs and reports</a></li>
+          <li><a href="#rule">The course rule: implement and replace</a></li>
+          <li><a href="#exercises">Exercises</a></li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="serve">1 &middot; Serving the course: one folder, one server</h2>
+      <p>
+        Download the course site (its repository, as the homework pages describe: the folder that holds
+        <code>index.html</code>, <code>lib/</code> and <code>homework/</code>; this chapter calls it <code>css551/</code>)
+        and, in a terminal, start a static web server in it:
+      </p>
+      <pre>cd css551
+python3 -m http.server 8000</pre>
+      <p>
+        Then open <code>http://localhost:8000/</code> for the course hub, or
+        <code>http://localhost:8000/homework/run.html?hw=hw01</code> for the first homework. The server does
+        nothing but hand files to the browser; stop it with Ctrl-C. Any port works, but every page of the course
+        uses relative paths, so the server must be started in <code>css551/</code> itself, not in a subfolder,
+        or the pages will not find the library.
+      </p>
+      <figure>
+        <img src="figures/webgl-server.svg" alt="A diagram: the course folder on disk is read by a static server started with python3 -m http.server 8000, which answers the browser's requests for http://localhost:8000 pages; run.html's import of ../lib/skeletons/runner.js is resolved against run.html's URL. A dashed red box below: a page opened as file:// has origin null, and the browser refuses every module import from it with a CORS error." />
+        <figcaption>One folder, one server, one browser. The course&rsquo;s pages are ES modules, and a browser loads modules only over HTTP.</figcaption>
+      </figure>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        Double-clicking <code>run.html</code> opens it as <code>file:///&hellip;/run.html</code>, and the page stays
+        blank. The browser treats a file page&rsquo;s origin as <code>null</code> and refuses to load modules from it.
+        The console says so, and it is worth recognizing the message, because it names the file it refused rather
+        than the cause:
+        <pre>Access to script at 'file:///&hellip;/css551/lib/skeletons/runner.js' from origin 'null' has been
+blocked by CORS policy: Cross origin requests are only supported for protocol schemes: chrome,
+chrome-untrusted, data, http, https.</pre>
+        The fix is never to change the code; it is to serve the folder.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="modules">2 &middot; ES modules and import paths</h2>
+      <p>
+        Every file of the course library is an ES module: it says what it shares with <code>export</code> and what
+        it needs with <code>import</code>. A page starts the chain with <code>&lt;script type="module"&gt;</code>.
+      </p>
+      <pre>// lib/skeletons/hw01.js, the file you edit in HW1
+import { dot, cross, normalize, sub } from '../core/xform.js';
+
+export function advance(p, velocity, dt) { /* yours */ }</pre>
+      <div class="def">
+        <span class="tag">Definition (how an import is found)</span>
+        A relative import (<code>'./x.js'</code>, <code>'../core/xform.js'</code>) is resolved against the URL of
+        the <em>importing file</em>, not the page and not the folder the server runs in. From
+        <code>lib/skeletons/hw01.js</code>, <code>'../core/xform.js'</code> is <code>lib/core/xform.js</code>. The
+        extension is required; a missing <code>.js</code> or a wrong case is a 404 on a case-sensitive server.
+        Each module runs once per page however many times it is imported, and its top-level names are private
+        unless exported.
+      </div>
+      <p>
+        The browser caches modules aggressively. After editing a file, reload with the cache bypassed
+        (Shift-reload, or Cmd-Shift-R on a Mac, Ctrl-Shift-R elsewhere), or keep the developer tools open with
+        &ldquo;Disable cache&rdquo; checked in the Network tab. The homework runner adds a fresh query string to
+        your file&rsquo;s URL on every load, so your own file is never stale; the library files can be.
+      </p>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        A syntax error in a module stops the whole chain: nothing that imports it runs, so the page looks dead
+        rather than broken. The console names the file and line. The homework runner catches the most common
+        case, a syntax error in your own file, and prints it above the scene in place of the checks.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="devtools">3 &middot; The browser&rsquo;s developer tools</h2>
+      <p>
+        Open them with F12, or Cmd-Option-I on a Mac. Three panels do almost all the work.
+      </p>
+      <ul>
+        <li><strong>Console</strong> shows <code>console.log</code> output, warnings and every uncaught error with its file and line (click the link to jump there). It is also a live JavaScript prompt in the page&rsquo;s context: after the homework runner loads, <code>window.__hwResults</code> holds the check rows.</li>
+        <li><strong>Sources</strong> (Chrome) or <strong>Debugger</strong> (Firefox) shows the loaded files. Click a line number to set a breakpoint; reload or trigger the code, and execution stops there with every local variable inspectable. A <code>debugger;</code> statement in your file does the same from code.</li>
+        <li><strong>Network</strong> shows every request. A red 404 for <code>xform.js</code> is a wrong import path; a module that never appears was never imported.</li>
+      </ul>
+      <div class="ex">
+        <span class="tag">Worked example (inspecting a matrix)</span>
+        A <code>THREE.Matrix4</code> logged with <code>console.log(m)</code> shows an object whose
+        <code>elements</code> array is the sixteen numbers in storage order, down the columns. To see it the way the
+        text prints a matrix, log its rows:
+        <pre>for (let r = 0; r &lt; 4; r++) console.log([0, 1, 2, 3].map((c) =&gt; m.elements[4 * c + r].toFixed(3)));</pre>
+        The same line works on the course library&rsquo;s plain 16-element arrays, since the two share one layout
+        (Section 7). <code>console.table</code> on a 4-by-4 array of rows is another readable form.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="objects">4 &middot; three.js&rsquo;s object model, against Unity&rsquo;s</h2>
+      <div class="def">
+        <span class="tag">Definition (the object model)</span>
+        A <strong>Scene</strong> is the root of a tree of <strong>Object3D</strong> nodes. Every node has a
+        transform (<code>position</code>, <code>quaternion</code> or <code>rotation</code>, <code>scale</code>) and
+        children. A <strong>Mesh</strong> is an Object3D that also holds a <strong>BufferGeometry</strong> (the
+        arrays of <a href="meshes.html#arrays">the meshes chapter</a>) and a <strong>Material</strong> (how to shade
+        it); a <strong>PerspectiveCamera</strong> is an Object3D that also holds the projection parameters; lights
+        and groups are Object3Ds too. A <strong>WebGLRenderer</strong> owns the canvas, and
+        <code>renderer.render(scene, camera)</code> draws the tree once from that camera.
+      </div>
+      <figure>
+        <img src="figures/webgl-object-model.svg" alt="A diagram: Scene, the root Object3D, above Object3D with position, quaternion and scale; below it Mesh, PerspectiveCamera, and Group or Light; Mesh points to a BufferGeometry with attributes and an index, and to a Material, a shader with uniforms; a WebGLRenderer box draws every visible Mesh with its camera. A side table maps Scene to scene, Object3D to GameObject plus Transform, Mesh to MeshFilter plus MeshRenderer, Material to Material, and WebGLRenderer to the engine's render loop." />
+        <figcaption>three.js&rsquo;s classes and their Unity counterparts. A Unity GameObject carries components; a three.js node is the component, by subclass.</figcaption>
+      </figure>
+      <p>
+        The largest difference from Unity is that nothing runs by itself. There is no editor, no Play button and
+        no script lifecycle: your code creates the scene, adds objects, and calls <code>render</code> when the
+        picture should change. The course&rsquo;s demos are built that way, and so is every homework view.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="loop">5 &middot; The render loop and the clock</h2>
+      <p>
+        An animation in a browser is a function that asks to be called before the next screen refresh, does one
+        frame&rsquo;s work, and asks again. <code>requestAnimationFrame(f)</code> calls <code>f</code> once, with a
+        timestamp in milliseconds; the loop is the function scheduling itself. It is <a href="rasterization.html#loop">the
+        rasterization chapter</a>&rsquo;s loop, written by hand:
+      </p>
+      <pre>let last = 0;
+function frame(t) {                       // t: milliseconds since the page loaded
+  const dt = last ? (t - last) / 1000 : 0;  // the frame's length in seconds
+  last = t;
+  cube.position.x += 3 * dt;              // 3 units per second, at any frame rate
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);           // ask for the next frame
+}
+requestAnimationFrame(frame);</pre>
+      <div class="ex">
+        <span class="tag">Worked example (per frame against per second)</span>
+        <code>cube.position.x += 1</code> in <code>frame</code> moves one unit per refresh: 60 units a second on a
+        60 Hz display, 144 on a 144 Hz one. <code>+= 3 * dt</code> moves 0.1 per frame at 30 Hz, 0.05 at 60 Hz and
+        0.0208 at 144 Hz, and 3 units after one second on all three. This is the same arithmetic as Unity&rsquo;s
+        <code>Time.deltaTime</code> (<a href="unity-basics.html#scripts">the Unity chapter</a> draws it); the
+        difference is that the browser hands you a timestamp and you compute the step yourself.
+        <code>THREE.Clock</code>&rsquo;s <code>getDelta()</code> does the subtraction for you.
+      </div>
+      <p>
+        There is no <code>FixedUpdate</code>. A simulation that needs a constant step, such as the cloth and fluid of
+        <a href="animation.html">the animation chapter</a>, runs the accumulator of <a href="interaction.html#timestep">the
+        interactive-systems chapter</a> inside <code>frame</code>: add <code>dt</code> to a bank and take fixed steps
+        while the bank holds one. Two browser behaviors matter. A hidden tab gets no animation frames at all, so the
+        first <code>dt</code> after returning can be seconds long and should be clamped. And a page that calls
+        <code>requestAnimationFrame</code> forever keeps the graphics card busy even when nothing changes; the
+        course&rsquo;s demos render on demand instead, running the loop only while a key is held and drawing once
+        per slider change.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="transform">6 &middot; Object3D: local, world, parent</h2>
+      <div class="def">
+        <span class="tag">Definition (an Object3D&rsquo;s transform)</span>
+        <code>position</code>, <code>quaternion</code> and <code>scale</code> are the node&rsquo;s transform relative
+        to its parent, the \(L\) of <a href="scene-graphs.html#rule">the scene-graph chapter</a>; <code>rotation</code>
+        is the same rotation as Euler angles in <em>radians</em>, kept in step with <code>quaternion</code>.
+        <code>matrix</code> is \(L = T\,R\,S\), rebuilt from those fields when <code>matrixAutoUpdate</code> is on
+        (the default); <code>matrixWorld</code> is \(W = W_{\text{parent}}\,L\). Both are refreshed by
+        <code>updateMatrixWorld()</code>, which <code>renderer.render</code> calls for the whole scene before drawing.
+        <code>parent.add(child)</code> makes the link; <code>parent.attach(child)</code> reparents while keeping the
+        world pose. <code>getWorldPosition(v)</code>, <code>localToWorld(v)</code> and <code>worldToLocal(v)</code>
+        read and apply \(W\).
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (local to world, by hand, by three.js and by the library)</span>
+        Parent at \((2, 0, 0)\) turned \(90^\circ\) about \(y\); child at local \((1, 0, 0)\); grandchild at local
+        \((0, 1, 0)\) under the child. The rotation chapter&rsquo;s \(R_y(90^\circ)\) sends \((1, 0, 0)\) to
+        \((0, 0, -1)\), so the child is at \((2, 0, -1)\) and the grandchild at \((2, 1, -1)\), the same chain as
+        <a href="unity-basics.html#transform">the Unity chapter</a>&rsquo;s worked example and with the same answer:
+        <pre>node -e "import('./lib/vendor/three.module.js').then(T=>{const p=new T.Object3D();p.position.set(2,0,0);p.rotation.y=Math.PI/2;const c=new T.Object3D();c.position.set(1,0,0);p.add(c);const g=new T.Object3D();g.position.set(0,1,0);c.add(g);p.updateMatrixWorld(true);console.log(g.getWorldPosition(new T.Vector3()).toArray().map(v=>+v.toFixed(3)))})"
+[ 2, 1, -1 ]</pre>
+        The course library&rsquo;s <code>matMul(matMul(P, C), G)</code> of the three <code>makeTRS</code> matrices puts
+        the grandchild at the same \((2, 1, -1)\) (<code>figures/numbers-webgl.json</code>, key <code>chain</code>).
+        Note the radians: <code>rotation.y = Math.PI / 2</code>, not <code>90</code>.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        <code>rotation.y = 90</code> is a rotation by 90 <em>radians</em>: 5156.62&deg;, which is 116.62&deg; past
+        fourteen whole turns. The object turns, to a strange angle, and no error is raised. three.js angles are radians
+        everywhere (<code>rotation</code>, <code>Euler</code>, <code>Quaternion.setFromAxisAngle</code>);
+        <code>THREE.MathUtils.degToRad(90)</code> converts. The camera&rsquo;s <code>fov</code> is the one exception:
+        it is in degrees.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="conventions">7 &middot; Conventions, against the text&rsquo;s</h2>
+      <p>
+        three.js agrees with the text on more than Unity does: right-handed, \(y\) up, \(+z\) toward the viewer,
+        column vectors, and matrices stored column by column. A picture drawn from the text matches the screen
+        without mirroring. Three conventions still need naming.
+      </p>
+      <table>
+        <tr><th>the text</th><th>three.js</th><th>note</th></tr>
+        <tr><td>\(\mathbf{a}\cdot\mathbf{b}\), \(\mathbf{a}\times\mathbf{b}\), \(|\mathbf{a}|\), \(\hat{\mathbf{a}}\)</td><td><code>a.dot(b)</code>, <code>new Vector3().crossVectors(a, b)</code>, <code>a.length()</code>, <code>a.clone().normalize()</code></td><td>most <code>Vector3</code> methods change the vector they are called on and return it; <code>clone()</code> first when the original must survive</td></tr>
+        <tr><td>a \(4\times4\) matrix, column-major</td><td><code>Matrix4</code>, <code>m.elements[16]</code></td><td>stored down the columns, exactly as the library&rsquo;s arrays: translation at 12, 13, 14. <code>m.multiply(n)</code> is \(m\,n\); <code>v.applyMatrix4(m)</code> is \(m\,v\) with the divide by \(w\)</td></tr>
+        <tr><td>Euler angles</td><td><code>Euler(x, y, z, 'XYZ')</code>, radians</td><td>the default order <code>'XYZ'</code> means \(R = R_x R_y R_z\): the \(z\) turn is applied first. The library&rsquo;s <code>makeTRS</code> uses the same order; Unity&rsquo;s is different (\(R_y R_x R_z\))</td></tr>
+        <tr><td>unit quaternion \((x, y, z, w)\)</td><td><code>Quaternion(x, y, z, w)</code></td><td>same order as the library&rsquo;s <code>quatFromAxisAngle</code>; <code>setFromAxisAngle(axis, rad)</code>; <code>q.multiply(r)</code> is \(q\,r\), \(r\) first</td></tr>
+        <tr><td>\(P\) of <a href="viewing.html#projection">the viewing chapter</a></td><td><code>camera.projectionMatrix</code></td><td>the same sixteen numbers as the library&rsquo;s <code>perspective(fov, aspect, near, far)</code>: the largest difference for <code>(45, 1.5, 0.1, 100)</code> is \(4.4\times10^{-16}\). Call <code>camera.updateProjectionMatrix()</code> after changing <code>fov</code>, <code>aspect</code>, <code>near</code> or <code>far</code></td></tr>
+        <tr><td>\(V\)</td><td><code>camera.matrixWorldInverse</code></td><td>the camera&rsquo;s world matrix inverted; a camera looks down its own \(-z\), which is what the viewing chapter&rsquo;s \(w\) axis says</td></tr>
+      </table>
+      <figure>
+        <img src="figures/webgl-matrix.svg" alt="Two 4 by 4 grids. Left: makeTRS(2, 0.5, minus 1, 0, 30, 0, 2, 2, 2) with each cell's value and its flat index, the index running down the columns and the translation column 2, 0.5, minus 1 at indices 12, 13, 14 highlighted. Right: new Matrix4().set(...elements), the transpose, with the translation now in the bottom row. Below: fromArray keeps the matrix and maps (1, 0, 0) to (3.732, 0.5, minus 2); set transposes it, w becomes 3, and (1, 0, 0) maps to (0.577, 0, 0.333)." />
+        <figcaption>One matrix stored, and the same sixteen numbers passed to <code>set</code>. <code>set</code> is the only <code>Matrix4</code> method that takes its numbers in the order a matrix is printed.</figcaption>
+      </figure>
+      <div class="pitfall">
+        <span class="tag">Pitfall: <code>Matrix4.set</code> reads rows</span>
+        <code>m.set(n11, n12, n13, n14, n21, &hellip;)</code> takes its sixteen arguments row by row, the way a
+        matrix is written on paper, and stores them down the columns. Every other way in (<code>elements</code>,
+        <code>fromArray</code>, <code>toArray</code>, the library&rsquo;s arrays) is column by column. So
+        <code>new Matrix4().set(...elements)</code> builds the <em>transpose</em>. For the TRS matrix of the
+        <a href="unity-basics.html#mathtypes">Unity chapter</a>&rsquo;s worked example (translation \((2, 0.5, -1)\),
+        \(30^\circ\) about \(y\), scale 2):
+        <pre>node -e "Promise.all([import('./lib/vendor/three.module.js'),import('./lib/core/xform.js')]).then(([T,X])=>{const m=X.makeTRS(2,0.5,-1,0,30,0,2,2,2);const good=new T.Matrix4().fromArray(m),bad=new T.Matrix4().set(...m);const p=()=>new T.Vector3(1,0,0);console.log(p().applyMatrix4(good).toArray().map(v=>+v.toFixed(3)));console.log(p().applyMatrix4(bad).toArray().map(v=>+v.toFixed(3)))})"
+[ 3.732, 0.5, -2 ]
+[ 0.577, 0, 0.333 ]</pre>
+        The transpose has the translation in its bottom row, so \(w = 3\) after the multiply and
+        <code>applyMatrix4</code> divides by it: the point lands at \((0.577, 0, 0.333)\) instead of
+        \((3.732, 0.5, -2)\). A check that compares sixteen entries shows the transpose at once; a picture only looks
+        &ldquo;a little off&rdquo;. Use <code>fromArray</code> for a stored matrix and <code>set</code> only when typing
+        one in by rows.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="assets">8 &middot; Geometry, materials, textures, cameras</h2>
+      <p>
+        <strong>Geometry.</strong> A <code>BufferGeometry</code> holds named attributes, each a typed array cut into
+        fixed-size items: <code>position</code> (3 numbers per vertex), <code>normal</code> (3), <code>uv</code> (2),
+        and an optional index (3 per triangle, counter-clockwise seen from the front). It is the vertex and index
+        arrays of <a href="meshes.html#arrays">the meshes chapter</a>, laid out for the graphics card:
+      </p>
+      <pre>const g = new THREE.BufferGeometry();
+g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+g.setAttribute('normal',   new THREE.BufferAttribute(new Float32Array(normals), 3));
+g.setIndex(indices);       // a plain array of integers works
+// after editing an attribute's array in place:
+g.attributes.position.needsUpdate = true;</pre>
+      <p>
+        The array is uploaded to the graphics card once; editing it in place changes nothing on screen until
+        <code>needsUpdate</code> is set. <code>computeVertexNormals()</code> computes the averaged normals the meshes
+        chapter derives by hand, and the homework asks you to compute them yourself (Section 11).
+      </p>
+      <p>
+        <strong>Material.</strong> <code>MeshBasicMaterial</code> draws a flat colour, <code>MeshStandardMaterial</code>
+        lights with three.js&rsquo;s physically based model, and <code>ShaderMaterial</code> runs shaders you write,
+        which is how the homework&rsquo;s lit sphere works; <a href="webgl-shaders.html">the shader chapter</a> covers
+        it. A material&rsquo;s <code>side</code> chooses which faces are drawn (<code>FrontSide</code>, the default, or
+        <code>DoubleSide</code> for a quad seen from both sides).
+      </p>
+      <p>
+        <strong>Texture and colour.</strong> A <code>Texture</code> wraps an image or a canvas; set
+        <code>texture.colorSpace = THREE.SRGBColorSpace</code> for a photograph or painted image so its colours are
+        converted to linear light before shading, and <code>texture.needsUpdate = true</code> after drawing into its
+        canvas. three.js manages colour for you: <code>new THREE.Color(0x808080)</code> stores the linear value 0.2159,
+        not 0.5, and the renderer converts back to sRGB on output (its <code>outputColorSpace</code> is sRGB by
+        default). <a href="color.html">The colour chapter</a> explains why shading must happen in linear light.
+      </p>
+      <p>
+        <strong>Camera.</strong> <code>new THREE.PerspectiveCamera(fovYDeg, aspect, near, far)</code> holds the
+        parameters of <a href="viewing.html#projection">the viewing chapter</a>; position it like any Object3D and
+        aim it with <code>camera.lookAt(x, y, z)</code>, which turns its \(-z\) toward the point. When the canvas
+        changes size, set <code>camera.aspect</code>, call <code>updateProjectionMatrix()</code>, and resize the
+        renderer with <code>renderer.setSize(w, h)</code>.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="library">9 &middot; The course library</h2>
+      <p>
+        The homework does not start from an empty page. It runs inside the course&rsquo;s demo library, the code in
+        <code>lib/</code> behind every demo in this text. Four parts matter for the WebGL track.
+      </p>
+      <table>
+        <tr><th>module</th><th>what it gives you</th></tr>
+        <tr><td><code>lib/core/xform.js</code></td><td>the hand-built math core, no three.js: <code>sub</code>, <code>dot</code>, <code>cross</code>, <code>normalize</code> on 3-arrays; <code>makeTRS(tx, ty, tz, rx, ry, rz, sx, sy, sz)</code> (degrees, order XYZ); <code>axisAngleMatrix</code>, <code>quatFromAxisAngle</code> (returns \([x, y, z, w]\)); <code>matMul(a, b)</code>; <code>invertTRS</code> (for translate-rotate-scale matrices only); <code>applyMat4(m, p)</code> (returns \([x, y, z, w]\), no divide) and <code>perspectiveDivide</code>; <code>lookAtBasis(eye, at, up)</code> (returns \(u, v, w, V\)); <code>perspective</code>; <code>uvMat3</code>. Every matrix is a plain 16-element array in column-major order</td></tr>
+        <tr><td><code>lib/core/scene-shell.js</code></td><td><code>makeScene(container)</code>: a scene, a <code>PerspectiveCamera</code> at \((3, 3, 6)\) looking at the origin, a renderer, a grid and axes, ready to add objects to</td></tr>
+        <tr><td><code>lib/core/demo-shell.js</code>, <code>cockpit.js</code></td><td>the page frame every demo shares: the scene area, a help panel (the ? button), and the control rail with <code>SliderRow</code>, <code>ButtonRow</code> and <code>ValueTable</code> readouts</td></tr>
+        <tr><td><code>lib/core/orbit-camera.js</code></td><td>the navigation of every 3D demo and homework view: drag to turn the scene, wheel to zoom, W, A, S, D to fly, the up and down arrows (or Space and Ctrl) to rise and sink, Q and E to roll, H for the home view, and Esc to give the keys back to a slide deck</td></tr>
+      </table>
+      <div class="ex">
+        <span class="tag">Worked example (the library and three.js agree)</span>
+        <code>makeTRS(2, 0.5, -1, 0, 30, 0, 2, 2, 2)</code> returns the sixteen numbers
+        \((1.732, 0, -1, 0,\; 0, 2, 0, 0,\; 1, 0, 1.732, 0,\; 2, 0.5, -1, 1)\), down the columns; a
+        <code>Matrix4</code> composed from the same position, rotation and scale has the same <code>elements</code>.
+        A library matrix becomes a three.js one with <code>new THREE.Matrix4().fromArray(m)</code>, and back with
+        <code>m4.toArray()</code>, with no reordering in either direction.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="homework">10 &middot; How a homework runs and reports</h2>
+      <p>
+        Each homework has one file to edit, <code>lib/skeletons/hwNN.js</code>, whose functions are stubs marked
+        <code>// TODO</code>, and one page that runs it, <code>homework/run.html?hw=hwNN</code>. The page imports
+        your file, runs the homework&rsquo;s checks on your functions with the published inputs, prints a table under
+        the scene, and draws the scene from your functions, so a wrong function shows twice: as a failed row and as a
+        wrong picture.
+      </p>
+      <ol>
+        <li>Start the server in <code>css551/</code> and open <code>http://localhost:8000/homework/run.html?hw=hw01</code>.</li>
+        <li>Read the checks table: each row is one check, with its points, <em>yours</em> (what your function returned) and <em>expected</em>. An untouched skeleton returns placeholders and scores 0.</li>
+        <li>Implement one function, save, reload (Section 2: your file is never cached), and watch its rows turn green.</li>
+        <li>A row that says <em>threw</em> means your function raised an error; the message is in the row and the line number is in the console.</li>
+      </ol>
+      <p>
+        The table reports the published inputs only. Grading runs the same checks on a second, hidden set of inputs,
+        so a function that returns the expected numbers without computing them scores on the first and not on the
+        second. <a href="../homework/index.html">The homework pages</a> list every check and its tolerance.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (reading a failing check)</span>
+        The first four rows for the untouched HW1 skeleton, as the runner prints them:
+        <table>
+          <tr><th></th><th>check</th><th>pts</th><th>yours</th><th>expected</th></tr>
+          <tr><td>&cross;</td><td>advance: position after 1 s at 60 frames per second</td><td>10</td><td>(0, 0, 0)</td><td>(3, 0, 0)</td></tr>
+          <tr><td>&cross;</td><td>advance: position after 1 s at 20 frames per second</td><td>10</td><td>(0, 0, 0)</td><td>(3, 0, 0)</td></tr>
+          <tr><td>&cross;</td><td>trsMatrix(t, 30, 2): the 16 entries, column-major</td><td>25</td><td>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)</td><td>(1.7321, 0, -1, 0, 0, 2, 0, 0, 1, 0, 1.7321, 0, 2, 0.5, -1, 1)</td></tr>
+          <tr><td>&cross;</td><td>trsMatrix applied to the point (1, 0, 0)</td><td>10</td><td>(1, 0, 0)</td><td>(3.7321, 0.5, -2)</td></tr>
+        </table>
+        Read <em>yours</em> against <em>expected</em> as a diagnosis. All zeros is a stub. A list that matches the
+        expected one with entries 1 and 4, 2 and 8, 3 and 12 (and so on) swapped is a transpose, the
+        <code>Matrix4.set</code> trap of Section 7. A vector of the right direction and the wrong length is a missing
+        normalize or a missing \(dt\). A result that is right at 60 frames per second and wrong at 20 is a step
+        that ignores \(dt\).
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="rule">11 &middot; The course rule: implement and replace</h2>
+      <div class="def">
+        <span class="tag">Definition (implement and replace)</span>
+        Where a homework says so, the library&rsquo;s and three.js&rsquo;s convenience helpers are off limits and
+        the operation is built from primitives, then checked against the helper. The helper is the answer key, not the
+        tool.
+      </div>
+      <p>
+        The helpers each homework forbids, in both tracks, are listed in one table, in
+        <a href="unity-basics.html#rule">the Unity chapter&rsquo;s Section 11</a>, whose third column is the three.js
+        list; this chapter does not repeat it, so there is one authority. For the WebGL track the allowed primitives
+        are the library&rsquo;s <code>sub</code>, <code>dot</code>, <code>cross</code>, <code>normalize</code>
+        (and, where a homework says so, <code>matMul</code> and <code>applyMat4</code>), component access, arithmetic
+        and <code>Math</code>. The head of each skeleton file names its own allowed and off-limits list, and each
+        <a href="../homework/index.html">homework page</a> is the authority for that homework.
+      </p>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        Four tasks, in a terminal in <code>css551/</code> and in the browser.
+        <ol>
+          <li>
+            <strong>The blank page.</strong> Open <code>homework/run.html</code> by double-clicking it, then open the
+            console. Expected: the CORS message of Section 1 naming <code>runner.js</code>, followed by
+            <code>Failed to load resource: net::ERR_FAILED</code>. Start the server and open
+            <code>http://localhost:8000/homework/run.html?hw=hw01</code> instead; the checks table appears with
+            <code>0 / 100 on the published inputs</code>.
+          </li>
+          <li>
+            <strong>The chain, checked.</strong> Run the command of Section 6 and confirm <code>[ 2, 1, -1 ]</code>;
+            then change <code>Math.PI/2</code> to <code>90</code> and run it again. The grandchild is no longer at
+            \((2, 1, -1)\), and nothing complains.
+          </li>
+          <li>
+            <strong>The transpose.</strong> Run the command of Section 7 and confirm the two lines
+            <code>[ 3.732, 0.5, -2 ]</code> and <code>[ 0.577, 0, 0.333 ]</code>. Then print
+            <code>new T.Matrix4().set(...m).transpose().elements</code> and compare it with <code>m</code>: they are
+            equal.
+          </li>
+          <li>
+            <strong>Projection, compared.</strong>
+            <pre>node -e "Promise.all([import('./lib/vendor/three.module.js'),import('./lib/core/xform.js')]).then(([T,X])=>{const c=new T.PerspectiveCamera(45,1.5,0.1,100);const a=c.projectionMatrix.elements,b=X.perspective(45,1.5,0.1,100);console.log(Math.max(...a.map((v,i)=>Math.abs(v-b[i]))))})"
+4.440892098500626e-16</pre>
+            The library&rsquo;s \(P\) and three.js&rsquo;s agree to the last bit of a double: the viewing chapter&rsquo;s
+            matrix is the one the renderer uses.
+          </li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="exercises">12 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (the import path)</span>
+        A file <code>lib/skeletons/hw03.js</code> contains <code>import { matMul } from 'core/xform.js';</code>. What does the browser report, and what is the fix?
+        <details><summary>Solution</summary>
+          A bare specifier with no <code>./</code> or <code>../</code> is not a relative path; the browser refuses it (&ldquo;Failed to resolve module specifier&rdquo;). From <code>lib/skeletons/</code>, <code>..</code> is <code>lib/</code>, so the import is <code>'../core/xform.js'</code>.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (the loop)</span>
+        A loop moves an object 2 units per second with <code>+= 2 * dt</code>. On a 90 Hz display, how far does it move per frame, and what goes wrong if the tab is hidden for 5 seconds and <code>dt</code> is not clamped?
+        <details><summary>Solution</summary>
+          \(2/90 = 0.0222\) per frame. A hidden tab gets no frames, so the first frame back has \(dt \approx 5\) and the object jumps 10 units in one step; clamp <code>dt</code> to, say, 0.1 s.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (local and world)</span>
+        The parent of Section 6 is turned \(180^\circ\) about \(y\) instead. Where are the child and the grandchild?
+        <details><summary>Solution</summary>
+          \(R_y(180^\circ)(1, 0, 0) = (-1, 0, 0)\), so the child is at \((2 - 1, 0, 0) = (1, 0, 0)\) and the grandchild at \((1, 1, 0)\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (storage)</span>
+        For the matrix of Section 7, what are <code>elements[4]</code>, <code>elements[5]</code>, <code>elements[6]</code>, and what are they geometrically?
+        <details><summary>Solution</summary>
+          \((0, 2, 0)\): column 1, where the \(y\) axis went. A rotation about \(y\) leaves it in place, and the scale doubles it.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 5 (the transpose, read from a check)</span>
+        A student&rsquo;s <code>trsMatrix</code> for HW1 returns <code>(1.7321, 0, 1, 2, 0, 2, 0, 0.5, -1, 0, 1.7321, -1, 0, 0, 0, 1)</code>. What did they do?
+        <details><summary>Solution</summary>
+          They wrote the rows in order: the translation \((2, 0.5, -1)\) sits at indices 3, 7, 11, the bottom row of a column-major array. It is the transpose of the expected matrix, the result of the <code>Matrix4.set</code> habit applied to a plain array.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 6 (Euler order)</span>
+        <code>new THREE.Vector3(1, 0, 0).applyEuler(new THREE.Euler(Math.PI / 6, 0, Math.PI / 2))</code>: where does the vector go, and where would it go in the order <code>'ZYX'</code>?
+        <details><summary>Solution</summary>
+          In the default <code>'XYZ'</code> the \(z\) turn comes first: \((1, 0, 0) \to (0, 1, 0)\), then \(30^\circ\) about \(x\) gives \((0, 0.866, 0.5)\). In <code>'ZYX'</code> the \(x\) turn comes first and leaves \((1, 0, 0)\) alone, then the \(z\) turn gives \((0, 1, 0)\) (<code>numbers-webgl.json</code>, key <code>euler</code>).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 7 (mutation)</span>
+        <code>const d = target.position.sub(eye.position);</code> computes a direction. What else just happened?
+        <details><summary>Solution</summary>
+          <code>sub</code> changes the vector it is called on, so the target has moved to the difference. Write <code>target.position.clone().sub(eye.position)</code>, or <code>new THREE.Vector3().subVectors(target.position, eye.position)</code>.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 8 (implement and replace)</span>
+        HW4 forbids <code>Matrix4.lookAt</code> and the library&rsquo;s <code>lookAtBasis</code>. With the allowed primitives, write the three lines that give the camera&rsquo;s \(u\), \(v\), \(w\), and say what to check them against.
+        <details><summary>Solution</summary>
+          <code>const w = normalize(sub(eye, at)); const u = normalize(cross(up, w)); const v = cross(w, u);</code>, the basis of <a href="viewing.html#frame">the viewing chapter</a>. Check against <code>lookAtBasis(eye, at, up)</code> or against a camera placed at <code>eye</code> with <code>camera.lookAt(at)</code>: its world matrix&rsquo;s first three columns are \(u\), \(v\), \(w\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 9 (colour)</span>
+        A material colour is set with <code>new THREE.Color(0x808080)</code>, and a shader you wrote outputs it unchanged without three.js&rsquo;s output conversion. Is the result lighter or darker than the 50% grey the hex code says, and why?
+        <details><summary>Solution</summary>
+          Darker. The colour is stored as linear 0.2159; written straight to the sRGB framebuffer, the pixel gets the code 0.2159 (55 of 255) instead of 0.5 (128). Converting on output (the shader chapter&rsquo;s <code>colorspace_fragment</code>) restores 128.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 10 (the projection, by code)</span>
+        Print <code>camera.projectionMatrix.elements</code> for <code>new THREE.PerspectiveCamera(90, 1, 1, 3)</code> and identify the four nonzero entries of its first three columns by their formulas.
+        <details><summary>Solution</summary>
+          \(f = 1/\tan(45^\circ) = 1\): elements[0] \(= f/\text{aspect} = 1\), elements[5] \(= f = 1\); with near \(N = 1\) and far \(F = 3\), elements[10] \(= -(F + N)/(F - N) = -4/2 = -2\); elements[11] \(= -1\) (the \(w = -z\) of the divide); and elements[14] \(= -2FN/(F - N) = -3\), in the fourth column. Printed: <code>1 0 0 0 0 1 0 0 0 0 -2 -1 0 0 -3 0</code>. The same as the library&rsquo;s <code>perspective(90, 1, 1, 3)</code>.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; WebGL and three.js for This Course v1.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-webgl.mjs</code>; three.js r170, vendored in <code>lib/vendor/</code>. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

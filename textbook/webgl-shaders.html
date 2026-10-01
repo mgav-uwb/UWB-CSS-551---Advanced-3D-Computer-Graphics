@@ -1,0 +1,577 @@
+<!doctype html>
+<!-- CSS 551 course text: Shaders in GLSL (three.js). Topic chapter for the shaders of the WebGL track; the
+     counterpart of unity-shaders.html, independent of any offering's schedule (the hub attaches it). Shared
+     stylesheet: textbook.css. Figures in figures/webgl-*.svg are laid out or computed by
+     tools/gen-textbook-figures-webgl.mjs; the numbers quoted come from figures/numbers-webgl.json and from the
+     vendored three.js (lib/vendor/three.module.js, r170). Every <pre data-glsl> block is compiled in headless
+     Chromium by tools/test-glsl.mjs; every hands-on output below was produced by running what is shown. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shaders in GLSL (three.js) - CSS 551 course text</title>
+    <script>
+      window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <link rel="stylesheet" href="textbook.css" />
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        This chapter links to the course&rsquo;s interactive demos and uses MathJax for its
+        formulas. Read it through the course website (or download the file and open it in a
+        browser); a Canvas inline preview will reach neither the demos nor the math.
+        <a href="index.html">All chapters</a>.
+      </p>
+
+      <h1>Shaders in GLSL (three.js): ShaderMaterial, Uniforms, Varyings, and the Normal Matrix</h1>
+      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
+      <div class="src">
+        Course text &middot; the programmable stages of <a href="rasterization.html#pipeline">the rasterization chapter</a>&rsquo;s pipeline as three.js exposes them: the vertex and fragment shaders of a <code>ShaderMaterial</code>, the attributes, uniforms and varyings that connect them, what three.js declares for you and what a <code>RawShaderMaterial</code> leaves to you, per-pixel lighting with the normal transformed correctly, colour spaces, textures, render state, and how to read a shader error. Read after <a href="webgl-basics.html">the WebGL chapter</a> and before HW5; <a href="unity-shaders.html">the Unity shader chapter</a> covers the same ground in HLSL.
+      </div>
+
+      <p class="lead">
+        A shader is a small program that the graphics card runs once per vertex or once per pixel, in parallel, with
+        no memory of the other vertices or pixels. three.js writes the shaders for its built-in materials; a
+        <code>ShaderMaterial</code> lets you write your own in GLSL, the shading language of OpenGL and WebGL, while
+        three.js still supplies the matrices, the mesh&rsquo;s attributes and the colour conversion. Everything the
+        illumination and texture chapters compute per pixel is written here, which is why the homework&rsquo;s lit
+        sphere (HW5) is a shader. This chapter covers the language as far as the course needs it and the contract
+        between three.js and your code; it leaves out three.js&rsquo;s node-based materials, compute shaders and
+        WebGPU.
+      </p>
+
+      <div class="toc">
+        <strong>Contents</strong>
+        <ol>
+          <li><a href="#pipeline">Where shaders sit in the pipeline</a></li>
+          <li><a href="#anatomy">A ShaderMaterial, end to end</a></li>
+          <li><a href="#glsl">GLSL for this course</a></li>
+          <li><a href="#builtins">What three.js declares for you</a></li>
+          <li><a href="#uniforms">Uniforms from JavaScript</a></li>
+          <li><a href="#lighting">Lighting in the shader, and the normal</a></li>
+          <li><a href="#colour">Linear light and the output colour space</a></li>
+          <li><a href="#textures">Textures and samplers</a></li>
+          <li><a href="#state">Render state: culling, depth, blending</a></li>
+          <li><a href="#debugging">Debugging a shader</a></li>
+          <li><a href="#exercises">Exercises</a></li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="pipeline">1 &middot; Where shaders sit in the pipeline</h2>
+      <p>
+        For each mesh, the graphics card runs the <strong>vertex shader</strong> once per vertex. It reads that
+        vertex&rsquo;s attributes and must write <code>gl_Position</code>, the clip-space position of
+        <a href="viewing.html#projection">the viewing chapter</a> (\(P\,V\,M\,\mathbf{p}\), before the divide by
+        \(w\)). The fixed-function stages then clip, divide, map to the viewport and rasterize each triangle into
+        pixels, interpolating whatever else the vertex shader wrote, perspective-correctly
+        (<a href="rasterization.html#perspective-correct">the rasterization chapter</a>). The <strong>fragment
+        shader</strong> runs once per covered pixel, reads the interpolated values and writes a colour; the depth
+        test and blending decide what reaches the framebuffer.
+      </p>
+      <figure>
+        <img src="figures/webgl-shader-flow.svg" alt="A data-flow diagram: BufferGeometry attributes (position, normal, uv) feed the vertex shader, which runs once per vertex; uniforms you set, and three.js built-ins such as modelMatrix and viewMatrix, feed both shaders; the vertex shader writes gl_Position and varyings to the rasterizer, which interpolates the varyings into the fragment shader, run once per pixel; its gl_FragColor goes to the framebuffer after the depth test and blending." />
+        <figcaption>The three kinds of input. Attributes change per vertex, varyings per pixel, uniforms per draw. A <code>ShaderMaterial</code> gets the built-ins declared for it; a <code>RawShaderMaterial</code> declares everything itself.</figcaption>
+      </figure>
+      <div class="def">
+        <span class="tag">Definition (attribute, uniform, varying)</span>
+        An <strong>attribute</strong> is a per-vertex input read from the geometry&rsquo;s arrays (position, normal,
+        uv); only the vertex shader sees it. A <strong>uniform</strong> is a value set from JavaScript that is the same
+        for every vertex and pixel of one draw (a matrix, a light position, a colour, a texture); both shaders can read
+        it. A <strong>varying</strong> is written by the vertex shader per vertex and read by the fragment shader
+        interpolated across the triangle; the two declarations must match in type and name.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="anatomy">2 &middot; A ShaderMaterial, end to end</h2>
+      <p>
+        A <code>ShaderMaterial</code> is two strings of GLSL and an object of uniforms. The smallest useful one paints
+        a mesh a single colour:
+      </p>
+      <pre>const material = new THREE.ShaderMaterial({
+  uniforms: { uTint: { value: new THREE.Color(0.2, 0.6, 1.0) } },
+  vertexShader: VERTEX,
+  fragmentShader: FRAGMENT,
+});
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 32, 16), material));</pre>
+      <pre data-glsl="vert:tint">// VERTEX: position is the attribute; the three matrices are declared by three.js
+void main() {
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}</pre>
+      <pre data-glsl="frag:tint">// FRAGMENT: the uniform's name and type match the JavaScript key
+uniform vec3 uTint;
+void main() {
+  gl_FragColor = vec4(uTint, 1.0);
+  #include &lt;colorspace_fragment&gt;
+}</pre>
+      <p>
+        <code>vec4(position, 1.0)</code> makes the point homogeneous (\(w = 1\)) and the product is the clip position.
+        The uniform is declared in GLSL and given a value in JavaScript; three.js matches them by name each time it
+        draws. The <code>#include</code> line asks three.js to paste in its output colour conversion (Section 7).
+        Nothing else is needed: the attribute <code>position</code> and the matrices are declared by three.js
+        (Section 4).
+      </p>
+      <p>
+        The strings are usually written in the same JavaScript file as template literals, between backquotes, often
+        tagged with a <code>/* glsl */</code> comment so an editor highlights them. three.js compiles them the first
+        time the mesh is drawn, and recompiles only when the strings or the material&rsquo;s <code>defines</code>
+        change; changing a uniform&rsquo;s value costs nothing.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="glsl">3 &middot; GLSL for this course</h2>
+      <p>
+        GLSL looks like C with vectors. The parts the course uses fit in one table.
+      </p>
+      <table>
+        <tr><th>feature</th><th>GLSL</th><th>note</th></tr>
+        <tr><td>scalars</td><td><code>float</code>, <code>int</code>, <code>bool</code></td><td>no automatic conversion: <code>1</code> is an <code>int</code> and <code>float x = 1;</code> is an error; write <code>1.0</code></td></tr>
+        <tr><td>vectors</td><td><code>vec2</code>, <code>vec3</code>, <code>vec4</code></td><td><code>v.x</code>, <code>v.xyz</code>, <code>v.rgb</code>, <code>v.zyx</code> (a <em>swizzle</em>: any components in any order); <code>vec4(v3, 1.0)</code> extends</td></tr>
+        <tr><td>matrices</td><td><code>mat3</code>, <code>mat4</code></td><td>column-major, like three.js; <code>m * v</code> is \(M\mathbf{v}\); <code>m[2]</code> is a column; <code>mat3(m4)</code> takes the upper-left \(3\times3\)</td></tr>
+        <tr><td>arithmetic</td><td><code>+ - * /</code></td><td>component-wise on vectors (<code>a * b</code> of two <code>vec3</code>s multiplies per component, the way colours combine); a scalar times a vector scales it</td></tr>
+        <tr><td>geometry</td><td><code>dot</code>, <code>cross</code>, <code>length</code>, <code>normalize</code>, <code>reflect(i, n)</code></td><td><code>reflect</code> takes the <em>incoming</em> direction: \(\mathbf{i} - 2(\mathbf{n}\cdot\mathbf{i})\mathbf{n}\), so the mirror of the light direction \(\mathbf{l}\) is <code>reflect(-l, n)</code></td></tr>
+        <tr><td>shaping</td><td><code>max</code>, <code>min</code>, <code>clamp</code>, <code>mix(a, b, t)</code>, <code>step</code>, <code>smoothstep</code>, <code>pow</code></td><td><code>pow(x, y)</code> is undefined for \(x &lt; 0\); clamp first</td></tr>
+        <tr><td>matrix functions</td><td><code>transpose</code>, <code>inverse</code></td><td>available because three.js compiles a <code>ShaderMaterial</code> as GLSL ES 3.00 (WebGL 2); costly per vertex</td></tr>
+      </table>
+      <p>
+        three.js compiles a <code>ShaderMaterial</code> as GLSL ES 3.00 but lets you write in the older GLSL ES 1.00
+        spelling: it adds <code>#define</code> lines so that <code>attribute</code>, <code>varying</code>,
+        <code>texture2D</code> and <code>gl_FragColor</code> mean their 3.00 equivalents (<code>in</code>,
+        <code>out</code>, <code>texture</code>, an output variable). This chapter uses the older spelling throughout,
+        as three.js&rsquo;s own shaders do.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (precision)</span>
+        A fragment shader in GLSL ES must say how precise its floats are: <code>highp</code> (32-bit),
+        <code>mediump</code> or <code>lowp</code>. A <code>ShaderMaterial</code> gets <code>precision highp float;</code>
+        and the same for <code>int</code> and the sampler types prepended for it (or the best the device supports);
+        a <code>RawShaderMaterial</code> gets nothing and fails to compile without the line.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        A type mismatch is a compile error, not a conversion. <code>vec3 c = uTint * 0.5; gl_FragColor = c;</code>
+        fails because <code>gl_FragColor</code> is a <code>vec4</code>; the fix is
+        <code>gl_FragColor = vec4(c, 1.0);</code>. Section 10 shows the error message this produces and how to find
+        the line.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="builtins">4 &middot; What three.js declares for you</h2>
+      <p>
+        Before compiling a <code>ShaderMaterial</code>, three.js prepends a block of declarations to each string. The
+        ones a course shader uses are these:
+      </p>
+      <table>
+        <tr><th>name</th><th>type</th><th>meaning</th><th>in</th></tr>
+        <tr><td><code>position</code>, <code>normal</code>, <code>uv</code></td><td>attribute <code>vec3</code>, <code>vec3</code>, <code>vec2</code></td><td>the geometry&rsquo;s arrays, in object space</td><td>vertex</td></tr>
+        <tr><td><code>modelMatrix</code></td><td><code>mat4</code></td><td>\(M\): the mesh&rsquo;s <code>matrixWorld</code>, object to world</td><td>vertex</td></tr>
+        <tr><td><code>viewMatrix</code></td><td><code>mat4</code></td><td>\(V\): the camera&rsquo;s <code>matrixWorldInverse</code></td><td>both</td></tr>
+        <tr><td><code>modelViewMatrix</code></td><td><code>mat4</code></td><td>\(V M\), object to view</td><td>vertex</td></tr>
+        <tr><td><code>projectionMatrix</code></td><td><code>mat4</code></td><td>\(P\)</td><td>vertex</td></tr>
+        <tr><td><code>normalMatrix</code></td><td><code>mat3</code></td><td>the inverse transpose of the upper \(3\times3\) of \(VM\): for normals in <em>view</em> space</td><td>vertex</td></tr>
+        <tr><td><code>cameraPosition</code></td><td><code>vec3</code></td><td>the camera&rsquo;s position in world space</td><td>both</td></tr>
+      </table>
+      <p>
+        So a world-space lighting shader has \(M\), \(V\), \(P\) and the eye position for free; what it lacks is a
+        normal matrix for <em>world</em> space, since three.js&rsquo;s <code>normalMatrix</code> is built from
+        \(VM\). Section 6 supplies one.
+      </p>
+      <table>
+        <tr><th></th><th><code>ShaderMaterial</code></th><th><code>RawShaderMaterial</code></th></tr>
+        <tr><td>declarations above</td><td>prepended</td><td>none: declare every attribute and uniform yourself</td></tr>
+        <tr><td>precision line</td><td>prepended</td><td>write it</td></tr>
+        <tr><td>GLSL version</td><td>ES 3.00, with the 1.00 spellings defined</td><td>ES 1.00 unless <code>glslVersion: THREE.GLSL3</code> is set</td></tr>
+        <tr><td><code>#include &lt;&hellip;&gt;</code> of three.js chunks</td><td>available</td><td>available, but the functions the chunks call are not declared</td></tr>
+        <tr><td>values of the built-in matrices</td><td>set every draw</td><td>set every draw, if you declare them by the same names</td></tr>
+      </table>
+      <p>
+        The raw form is what a WebGL program without three.js would contain, and nothing is hidden in it:
+      </p>
+      <pre data-glsl="rawvert:raw">attribute vec3 position;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+void main() {
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}</pre>
+      <pre data-glsl="rawfrag:raw">precision highp float;
+uniform vec3 uTint;
+void main() {
+  gl_FragColor = vec4(uTint, 1.0);
+}</pre>
+
+<!-- ============================================================ -->
+      <h2 id="uniforms">5 &middot; Uniforms from JavaScript</h2>
+      <p>
+        Each entry of <code>uniforms</code> is an object with a <code>value</code>; three.js uploads the value to the
+        GLSL uniform of the same name at every draw. The JavaScript type decides the GLSL type it can fill:
+      </p>
+      <table>
+        <tr><th>JavaScript value</th><th>GLSL uniform</th></tr>
+        <tr><td>a number</td><td><code>float</code> (or <code>int</code>)</td></tr>
+        <tr><td><code>THREE.Vector2</code>, <code>Vector3</code>, <code>Vector4</code></td><td><code>vec2</code>, <code>vec3</code>, <code>vec4</code></td></tr>
+        <tr><td><code>THREE.Color</code></td><td><code>vec3</code>, its linear \(r, g, b\)</td></tr>
+        <tr><td><code>THREE.Matrix3</code>, <code>Matrix4</code></td><td><code>mat3</code>, <code>mat4</code>, column-major as stored</td></tr>
+        <tr><td><code>THREE.Texture</code></td><td><code>sampler2D</code></td></tr>
+        <tr><td>a boolean</td><td><code>bool</code></td></tr>
+      </table>
+      <pre>// once per frame, or whenever the value changes; no needsUpdate, no recompile
+material.uniforms.uLightWorld.value.copy(lamp.position);
+material.uniforms.uTime.value = t / 1000;</pre>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        Replacing the <code>uniforms</code> object or a uniform&rsquo;s wrapper (<code>material.uniforms.uLightWorld =
+        lamp.position</code>) breaks the link three.js keeps to it; change <code>.value</code>, or the contents of
+        <code>.value</code>, instead. A uniform declared in GLSL but missing from <code>uniforms</code> is not an
+        error: it keeps the value 0 (a black colour, a zero matrix that collapses every vertex to one point), and no
+        message appears. And a uniform declared but never used is removed by the compiler, so setting it has no
+        effect and also raises no error.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="lighting">6 &middot; Lighting in the shader, and the normal</h2>
+      <p>
+        Per-pixel lighting needs, at each pixel, the surface point, the surface normal and the light&rsquo;s
+        position in one space. World space is the natural choice: the light&rsquo;s position comes from the scene,
+        and <code>cameraPosition</code> is the eye. The vertex shader carries the world position and the world normal
+        as varyings; the fragment shader builds \(\mathbf{L}\), clamps \(\mathbf{N}\cdot\mathbf{L}\) and multiplies.
+        It is <a href="illumination.html#lambert">the illumination chapter</a>&rsquo;s diffuse term:
+      </p>
+      <pre data-glsl="vert:diffuse">uniform mat3 uNormalWorld;      // inverse transpose of mat3(modelMatrix), set from JavaScript
+varying vec3 vWorldPos;
+varying vec3 vWorldNormal;
+void main() {
+  vec4 world   = modelMatrix * vec4(position, 1.0);   // the point, in world space
+  vWorldPos    = world.xyz;
+  vWorldNormal = uNormalWorld * normal;               // the normal, in world space
+  gl_Position  = projectionMatrix * viewMatrix * world;
+}</pre>
+      <pre data-glsl="frag:diffuse">uniform vec3 uLightWorld;       // the light's position, world space
+uniform vec3 uAlbedo;           // diffuse reflectance, linear
+varying vec3 vWorldPos;
+varying vec3 vWorldNormal;
+void main() {
+  vec3 n = normalize(vWorldNormal);                // interpolation shortens it
+  vec3 l = normalize(uLightWorld - vWorldPos);     // direction to the light, per pixel
+  vec3 c = uAlbedo * max(dot(n, l), 0.0);          // max(0, N·L)
+  gl_FragColor = vec4(c, 1.0);
+  #include &lt;colorspace_fragment&gt;
+}</pre>
+      <pre>// JavaScript: the world normal matrix, refreshed before each draw
+uniforms.uNormalWorld = { value: new THREE.Matrix3() };
+mesh.onBeforeRender = () =&gt; material.uniforms.uNormalWorld.value.getNormalMatrix(mesh.matrixWorld);</pre>
+      <p>
+        <code>getNormalMatrix(m)</code> computes \(\big((M_{3\times3})^{-1}\big)^{\top}\) on the CPU, once per draw. The
+        alternative, <code>transpose(inverse(mat3(modelMatrix))) * normal</code> in the vertex shader, gives the same
+        vector and inverts the same matrix once per vertex. The normal is renormalized in the fragment shader because
+        interpolating two unit vectors gives a shorter one in between.
+      </p>
+      <figure>
+        <img src="figures/webgl-normal.svg" alt="A unit circle scaled 2 times in x into an ellipse. At the point (1.414, 0.707) two arrows: mat3(modelMatrix) times n gives (0.894, 0.447), leaning away from the perpendicular; normalMatrix times n gives (0.447, 0.894), perpendicular to the dashed tangent." />
+        <figcaption>One normal, two transforms, after a scale of 2 in \(x\). Only the inverse transpose stays perpendicular to the surface.</figcaption>
+      </figure>
+      <div class="pitfall">
+        <span class="tag">Pitfall: <code>mat3(modelMatrix) * normal</code></span>
+        Multiplying the normal by the model matrix itself is exact for rotations and translations and wrong under a
+        non-uniform scale, the trap of <a href="illumination.html#normals">the illumination chapter</a>. Take the point
+        \((0.707, 0.707, 0)\) on a unit circle with normal \((0.707, 0.707, 0)\), and scale the object \(2\times\) in
+        \(x\). The point moves to \((1.414, 0.707, 0)\). <code>mat3(modelMatrix) * normal</code>, normalized, is
+        \((0.894, 0.447, 0)\); the inverse transpose gives \((0.447, 0.894, 0)\). The two are \(36.9^\circ\) apart, and
+        the first has a dot of \(-0.6\) with the surface&rsquo;s tangent where the second has 0. These are the numbers
+        of <a href="unity-shaders.html#lighting">the Unity shader chapter</a>&rsquo;s finite-difference normal, which
+        is the same mistake in another form. A sphere scaled \((2, 1, 1)\) shows it: its highlights and terminator
+        sit where a sphere&rsquo;s would, not where the ellipsoid&rsquo;s should. For a uniform scale the two agree
+        after normalizing, which is why the shortcut often goes unnoticed.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall: mixing spaces</span>
+        three.js&rsquo;s <code>normalMatrix</code> takes normals to <em>view</em> space. Combined with a world-space
+        light position, it gives lighting that turns with the camera: correct when the camera is at its starting pose,
+        wrong after an orbit. Either light in view space throughout (transform the light by <code>viewMatrix</code>,
+        take the eye at the origin) or in world space throughout, as above.
+      </div>
+      <p>
+        The specular term of the illumination chapter is a few more lines in the fragment shader: the direction to
+        the eye from <code>cameraPosition</code> and the world position, the mirror direction with
+        <code>reflect</code>, and the clamped cosine raised to the shininess with <code>pow</code>. An ambient term is
+        a constant added before the output. Every one of them is computed per pixel from interpolated vectors, which
+        is Phong shading in the sense of <a href="meshes.html#shading">the meshes chapter</a>; computing the colour in
+        the vertex shader and interpolating it would be Gouraud shading.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="colour">7 &middot; Linear light and the output colour space</h2>
+      <p>
+        Lighting adds and multiplies light, so it must run on linear values (<a href="color.html#linear">the colour
+        chapter</a>); screens expect sRGB-encoded values (<a href="color.html#transfer">the transfer function</a>).
+        three.js keeps the two apart for you on the way in and asks you to opt in on the way out:
+      </p>
+      <ul>
+        <li><strong>In.</strong> A <code>THREE.Color</code> stores linear components (<code>new THREE.Color(0x808080)</code> holds 0.2159), and a texture marked <code>colorSpace = THREE.SRGBColorSpace</code> is decoded to linear by the graphics card when it is sampled. A plain <code>Vector3</code> uniform is passed as it is.</li>
+        <li><strong>Out.</strong> <code>#include &lt;colorspace_fragment&gt;</code>, as the last line of <code>main</code>, expands to <code>gl_FragColor = linearToOutputTexel( gl_FragColor );</code>, which encodes to the renderer&rsquo;s <code>outputColorSpace</code> (sRGB by default). Without the line, the shader&rsquo;s number is written to the screen as the code value.</li>
+      </ul>
+      <p>
+        Either convention is consistent if its inputs are chosen for it: linear inputs with the output conversion, or
+        values meant as screen codes with none. The error is the mix, linear inputs without the conversion, which
+        makes every mid-tone too dark, or screen codes with the conversion, which makes them too light.
+      </p>
+      <div class="hands">
+        <span class="tag">Hands-on: one pixel, with and without the conversion</span>
+        Save this as <code>css551/try-shader.html</code>, serve the folder, open
+        <code>http://localhost:8000/try-shader.html</code> and read the console. It draws a plane facing the camera,
+        lit by a light at \((0, 1.732, 1)\), so \(\mathbf{N}\cdot\mathbf{L} = 0.5\) at the origin, and reads back the
+        centre pixel.
+        <pre>&lt;!doctype html&gt;
+&lt;script type="module"&gt;
+import * as THREE from './lib/vendor/three.module.js';
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(64, 64);
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 10);
+camera.position.z = 3;
+const mat = new THREE.ShaderMaterial({
+  uniforms: {
+    uLightWorld: { value: new THREE.Vector3(0, 1.732, 1) },
+    uAlbedo: { value: new THREE.Vector3(1, 1, 1) },
+  },
+  vertexShader: `
+    varying vec3 vWorldPos;
+    void main() {
+      vec4 world = modelMatrix * vec4(position, 1.0);
+      vWorldPos = world.xyz;
+      gl_Position = projectionMatrix * viewMatrix * world;
+    }`,
+  fragmentShader: `
+    uniform vec3 uLightWorld;
+    uniform vec3 uAlbedo;
+    varying vec3 vWorldPos;
+    void main() {
+      vec3 n = vec3(0.0, 0.0, 1.0);
+      vec3 l = normalize(uLightWorld - vWorldPos);
+      gl_FragColor = vec4(uAlbedo * max(dot(n, l), 0.0), 1.0);
+      #include &lt;colorspace_fragment&gt;
+    }`,
+});
+scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat));
+renderer.render(scene, camera);
+const gl = renderer.getContext();
+const px = new Uint8Array(4);
+gl.readPixels(32, 32, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+console.log('centre pixel', px.join(', '));
+&lt;/script&gt;</pre>
+        The console prints <code>centre pixel 188, 188, 188, 255</code>. Delete the <code>#include</code> line and
+        reload: <code>centre pixel 129, 129, 129, 255</code>. The pixel&rsquo;s centre is half a pixel off the axis,
+        where \(\mathbf{N}\cdot\mathbf{L} = 0.5042\): without the conversion that is written as \(0.5042 \times 255 =
+        128.6\), and with it the sRGB encoding of 0.5042, \(188.2\). A surface lit at \(60^\circ\) reflects half the
+        light of one lit head-on; on the screen, half the light is code 188, not 128.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="textures">8 &middot; Textures and samplers</h2>
+      <p>
+        A texture reaches a shader as a <code>sampler2D</code> uniform, and <code>texture2D(sampler, uv)</code> returns
+        the filtered colour at a texture coordinate, \((0, 0)\) at the bottom-left of the image and \((1, 1)\) at the
+        top-right. The geometry&rsquo;s <code>uv</code> attribute is passed through as a varying:
+      </p>
+      <pre data-glsl="vert:tex">varying vec2 vUv;
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}</pre>
+      <pre data-glsl="frag:tex">uniform sampler2D uMap;
+uniform mat3 uPlace;            // a 2D placement: scale, rotate, offset, as in the texture chapter
+varying vec2 vUv;
+void main() {
+  vec2 st = (uPlace * vec3(vUv, 1.0)).xy;         // homogeneous 2D: the third component is 1
+  gl_FragColor = texture2D(uMap, st);
+  #include &lt;colorspace_fragment&gt;
+}</pre>
+      <pre>const tex = new THREE.TextureLoader().load('checker.png');
+tex.colorSpace = THREE.SRGBColorSpace;            // an image of colours: decode to linear when sampled
+tex.wrapS = tex.wrapT = THREE.RepeatWrapping;     // the default is ClampToEdgeWrapping
+material.uniforms.uMap = { value: tex };</pre>
+      <p>
+        The placement matrix is <a href="texture-mapping.html#placement">the texture chapter</a>&rsquo;s \(3\times3\)
+        homogeneous transform of the plane, applied to the coordinate before the lookup; the library&rsquo;s
+        <code>uvMat3</code> builds one, and <code>Matrix3.fromArray</code> carries it to the uniform. The sampling
+        options are properties of the texture, not of the shader: <code>wrapS</code> and <code>wrapT</code>
+        (<code>ClampToEdgeWrapping</code> by default, <code>RepeatWrapping</code>, <code>MirroredRepeatWrapping</code>),
+        <code>magFilter</code> (<code>LinearFilter</code> by default, or <code>NearestFilter</code>) and
+        <code>minFilter</code> (<code>LinearMipmapLinearFilter</code> by default, trilinear filtering over the mipmaps
+        of <a href="texture-mapping.html#minification">the minification section</a>). <code>anisotropy</code> is 1 by
+        default; raise it for a floor seen at a grazing angle. Data textures (normal maps, heights) keep the default
+        colour space, since their numbers are not colours.
+      </p>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        Images load asynchronously: the texture is black until the image arrives, and a page that renders only on
+        demand must render again when it does (<code>new THREE.TextureLoader().load(url, () =&gt; draw())</code>).
+        And <code>flipY</code> is <code>true</code> by default, which is what makes the image&rsquo;s top row land at
+        \(v = 1\); a texture drawn from a typed array or a render target is not flipped, so the same uv shows it
+        upside down relative to the loaded image.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="state">9 &middot; Render state: culling, depth, blending</h2>
+      <p>
+        What happens to a fragment after the shader is set on the material, not in GLSL. The defaults of a
+        <code>ShaderMaterial</code> draw opaque front faces with the depth test and depth writes on.
+      </p>
+      <table>
+        <tr><th>property</th><th>default</th><th>meaning</th></tr>
+        <tr><td><code>side</code></td><td><code>FrontSide</code></td><td>back faces (clockwise on screen) are culled; <code>BackSide</code> draws only them, <code>DoubleSide</code> both. A double-sided surface lit from behind needs <code>gl_FrontFacing</code> to flip its normal</td></tr>
+        <tr><td><code>depthTest</code></td><td><code>true</code></td><td>the z-buffer test of <a href="rasterization.html#zbuffer">the rasterization chapter</a>: a fragment farther than what is stored is discarded</td></tr>
+        <tr><td><code>depthWrite</code></td><td><code>true</code></td><td>a surviving fragment writes its depth; turned off for transparent surfaces so they do not hide what is drawn after them</td></tr>
+        <tr><td><code>transparent</code></td><td><code>false</code></td><td>when <code>true</code>, blending is on and three.js draws the mesh after the opaque ones, sorted back to front by object</td></tr>
+        <tr><td><code>blending</code></td><td><code>NormalBlending</code></td><td>with <code>transparent</code>, \(c = \alpha\,c_{\text{src}} + (1 - \alpha)\,c_{\text{dst}}\) (<a href="rasterization.html#blending">blending</a>); <code>AdditiveBlending</code> adds, for glows and particles. Ignored while <code>transparent</code> is <code>false</code></td></tr>
+        <tr><td><code>wireframe</code></td><td><code>false</code></td><td>draws the triangles&rsquo; edges as lines</td></tr>
+      </table>
+      <p>
+        A fragment shader can also refuse a pixel with <code>discard;</code>, which writes neither colour nor depth: a
+        cut-out leaf from an alpha texture, or a clipping plane. Sorting is per object, not per triangle, so two
+        interpenetrating transparent meshes, or one concave transparent mesh, can still blend in the wrong order.
+      </p>
+
+<!-- ============================================================ -->
+      <h2 id="debugging">10 &middot; Debugging a shader</h2>
+      <p>
+        A shader cannot print. Two techniques replace <code>console.log</code>: read the compiler&rsquo;s message when it
+        fails, and paint the value you doubt as a colour when it runs.
+      </p>
+      <div class="hands">
+        <span class="tag">Hands-on: reading a compile error</span>
+        Give the material of Section 2 this fragment shader, the mistake of Section 3:
+        <pre data-glsl="frag:broken" data-glsl-expect="error">uniform vec3 uTint;
+void main() {
+  vec3 c = uTint * 0.5;
+  gl_FragColor = c;
+}</pre>
+        Nothing is drawn, and the console shows (in headless Chromium, three.js r170):
+        <pre>THREE.WebGLProgram: Shader Error 0 - VALIDATE_STATUS false
+
+Material Name:
+Material Type: ShaderMaterial
+
+Program Info Log: Fragment shader is not compiled.
+
+FRAGMENT
+
+ERROR: 0:60: '=' : dimension mismatch
+ERROR: 0:60: 'assign' : cannot convert from 'highp 3-component vector of float' to 'out highp 4-component vector of float'
+
+  55: }
+  56:
+  57: uniform vec3 uTint;
+  58: void main() {
+  59:   vec3 c = uTint * 0.5;
+&gt; 60:   gl_FragColor = c;
+  61: }</pre>
+        followed by <code>WebGL: INVALID_OPERATION: useProgram: program not valid</code>. The line number counts the
+        56 lines three.js prepended, so line 60 is line 4 of your string; the listing under the message marks it with
+        <code>&gt;</code>. The <code>out highp 4-component vector</code> is <code>gl_FragColor</code> after the
+        GLSL 3.00 <code>#define</code> of Section 3. Read the first error; the rest usually follow from it.
+      </div>
+      <p>
+        When the shader compiles but the picture is wrong, replace the output with the quantity in doubt, mapped into
+        \([0, 1]\):
+      </p>
+      <pre data-glsl="frag:debug" data-glsl-with="diffuse">varying vec3 vWorldPos;
+varying vec3 vWorldNormal;
+void main() {
+  vec3 n = normalize(vWorldNormal);
+  gl_FragColor = vec4(0.5 * n + 0.5, 1.0);        // a unit vector, components -1..1, as a colour
+}</pre>
+      <ul>
+        <li><strong>Normals as colour.</strong> On a sphere in world space, the side facing \(+x\) is pink-red \((1, 0.5, 0.5)\), the top light green, the side facing the viewer at \(+z\) lavender. A face that shows the wrong hue has the wrong normal; a hue that changes as the camera orbits is a normal in view space.</li>
+        <li><strong>A scalar as grey.</strong> <code>gl_FragColor = vec4(vec3(max(dot(n, l), 0.0)), 1.0);</code> shows \(\mathbf{N}\cdot\mathbf{L}\) alone. Black where you expect light is a light in the wrong place or a normal pointing in.</li>
+        <li><strong>A position as colour.</strong> <code>fract(vWorldPos)</code> draws a grid that should stay fixed to the world as the camera moves.</li>
+        <li><strong>A solid colour.</strong> <code>gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);</code>: if the mesh is not magenta, the problem is upstream of the fragment shader (the mesh is not in the scene, is culled, or is outside the frustum).</li>
+      </ul>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        Remove the <code>colorspace_fragment</code> line while painting debug values; otherwise a normal component of
+        0.5 is shown as code 188 rather than 128, and the colours do not read as the numbers they stand for. The
+        homework runner&rsquo;s HW5 skeleton paints normals this way until the lighting is written.
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="exercises">11 &middot; Exercises</h2>
+      <div class="ex">
+        <span class="tag">Exercise 1 (which input)</span>
+        For each value, say whether it is an attribute, a uniform or a varying: the light&rsquo;s position; a vertex&rsquo;s texture coordinate in the vertex shader; the same coordinate in the fragment shader; the time in seconds; the world normal at a pixel.
+        <details><summary>Solution</summary>
+          Uniform; attribute; varying; uniform; varying (computed per vertex, interpolated per pixel).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 2 (the clip position)</span>
+        Write <code>gl_Position</code> with <code>modelMatrix</code>, <code>viewMatrix</code> and <code>projectionMatrix</code>, and say why the order cannot be changed.
+        <details><summary>Solution</summary>
+          <code>projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0)</code>: \(P V M \mathbf{p}\) with column vectors applies \(M\) first. Matrix products do not commute, so another order applies the transforms in another sequence.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 3 (compile errors)</span>
+        Which of these lines fail to compile, and why? (a) <code>float k = 2;</code> (b) <code>vec3 a = vec3(1.0);</code> (c) <code>vec4 c = vec4(n, 1);</code> with <code>n</code> a <code>vec3</code> (d) <code>vec2 t = v.xz;</code> with <code>v</code> a <code>vec3</code>.
+        <details><summary>Solution</summary>
+          Only (a): an <code>int</code> is not converted to a <code>float</code>. (b) fills all three components; (c) is allowed because a constructor converts its arguments; (d) is a swizzle.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 4 (a raw material)</span>
+        A <code>RawShaderMaterial</code> uses the <code>ShaderMaterial</code> vertex shader of Section 2 unchanged. What does the compiler report?
+        <details><summary>Solution</summary>
+          That <code>projectionMatrix</code>, <code>modelViewMatrix</code> and <code>position</code> are undeclared: a raw material gets none of the declarations of Section 4. Add the three declarations, as in the raw example.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 5 (the normal, by numbers)</span>
+        An object is scaled \((1, 3, 1)\). For the surface normal \((0.6, 0.8, 0)\) in object space, compute the normalized result of <code>mat3(modelMatrix) * normal</code> and of the inverse transpose, and the angle between them.
+        <details><summary>Solution</summary>
+          \(M_{3\times3} = \mathrm{diag}(1, 3, 1)\): \((0.6, 2.4, 0)\), normalized \((0.243, 0.970, 0)\). The inverse transpose is \(\mathrm{diag}(1, 1/3, 1)\): \((0.6, 0.267, 0)\), normalized \((0.914, 0.406, 0)\). The angle is \(\arccos(0.243 \cdot 0.914 + 0.970 \cdot 0.406) = \arccos(0.616) = 52.0^\circ\).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 6 (world or view)</span>
+        A student lights with <code>normalize(normalMatrix * normal)</code> and a world-space <code>uLightWorld</code>. The sphere looks right at first and the lit side drifts as the camera orbits. Explain, and give two fixes.
+        <details><summary>Solution</summary>
+          <code>normalMatrix</code> is built from \(VM\), so the normal is in view space and the light in world space; the mismatch changes with \(V\). Either use a world normal matrix (Section 6) or move the light into view space with <code>(viewMatrix * vec4(uLightWorld, 1.0)).xyz</code> and use the view-space position of the point.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 7 (the output conversion)</span>
+        A shader outputs the linear value 0.25 with the <code>colorspace_fragment</code> line. What code value reaches the screen (sRGB: \(1.055\,x^{1/2.4} - 0.055\) for \(x &gt; 0.0031308\))? Without the line?
+        <details><summary>Solution</summary>
+          \(1.055 \times 0.25^{1/2.4} - 0.055 = 0.5371\), code \(0.5371 \times 255 = 137\). Without it, \(0.25 \times 255 = 64\) (63.75 rounded).
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 8 (texture placement)</span>
+        <code>uPlace</code> is a scale by 4 in both directions with <code>RepeatWrapping</code>. How many copies of the image cover the quad, and what changes with <code>ClampToEdgeWrapping</code>?
+        <details><summary>Solution</summary>
+          \(4 \times 4 = 16\) copies: \(st\) runs from 0 to 4 and the repeat keeps the fractional part. With clamping, the image fills the lower-left quarter of each axis, \(st \in [0, 1]\), and the rest of the quad repeats the image&rsquo;s edge texels as streaks.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 9 (render state)</span>
+        A glass sphere with <code>transparent: true</code> and <code>opacity</code> 0.4 is drawn and its back half is missing, while an opaque cube behind it shows through correctly. Which property explains the missing back half, and what are the costs of changing it?
+        <details><summary>Solution</summary>
+          <code>side</code> is <code>FrontSide</code>, so the inner back faces are culled. <code>DoubleSide</code> draws them, but in one draw call, in triangle order, so some back faces blend over front faces already drawn and the result depends on the mesh&rsquo;s triangle order. Drawing the sphere twice, <code>BackSide</code> first and <code>FrontSide</code> second, gives the right order for a convex shape.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 10 (a debug view)</span>
+        In the normals-as-colour view of Section 10, a sphere&rsquo;s top is light green and its left side, facing \(-x\), is what colour? A flat floor with normal \((0, 1, 0)\)?
+        <details><summary>Solution</summary>
+          \(0.5\,(-1, 0, 0) + 0.5 = (0, 0.5, 0.5)\), a teal. The floor is \((0.5, 1, 0.5)\), the same light green as the sphere&rsquo;s top, everywhere.
+        </details>
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Shaders in GLSL (three.js) v1.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-webgl.mjs</code>; every marked GLSL block compiled by <code>tools/test-glsl.mjs</code> against three.js r170. <a href="index.html">All chapters</a>.
+      </footer>
+    </div>
+  </body>
+</html>

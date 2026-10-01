@@ -406,10 +406,10 @@ public class Bounce : MonoBehaviour {
         <tr><td><code>Quaternion.AngleAxis</code>, quaternion products</td><td><code>Quaternion.Slerp</code>, <code>RotateTowards</code> when named</td><td><code>Quaternion.slerp</code>, <code>Quaternion.slerpQuaternions</code> when named</td><td>slerp from the rotation chapter&rsquo;s formula</td></tr>
         <tr><td>filling <code>Mesh.vertices</code>, <code>triangles</code>, <code>uv</code></td><td><code>Mesh.RecalculateNormals</code>, primitive geometries when named</td><td><code>BufferGeometry.computeVertexNormals</code>, the built-in geometries when named</td><td>face and vertex normals from cross products (<a href="meshes.html#normals">the meshes chapter</a>)</td></tr>
         <tr><td>a 3&times;3 matrix filled entry by entry</td><td><code>Material.mainTextureOffset</code>, <code>mainTextureScale</code> when the placement matrix is the task</td><td><code>Texture.offset</code>, <code>repeat</code>, <code>rotation</code> with <code>matrixAutoUpdate</code> left on, <code>Texture.matrix.setUvTransform</code>, the library&rsquo;s <code>uvMat3</code>, when the placement matrix is the task</td><td>the placement matrix of <a href="texture-mapping.html#placement">the texture-mapping chapter</a></td></tr>
-        <tr><td><code>Shader.SetGlobalMatrix</code>, <code>Material.SetMatrix</code></td><td>the engine&rsquo;s automatic transform when named</td><td>the <code>modelViewMatrix</code> and <code>projectionMatrix</code> uniforms a <code>ShaderMaterial</code> receives automatically, when named (a <code>RawShaderMaterial</code> receives only what you upload)</td><td>your own matrix uploaded to your own shader (<a href="unity-shaders.html">the shader chapter</a>)</td></tr>
+        <tr><td><code>Shader.SetGlobalMatrix</code>, <code>Material.SetMatrix</code></td><td>the engine&rsquo;s automatic transform when named</td><td>the <code>modelViewMatrix</code> and <code>projectionMatrix</code> uniforms a <code>ShaderMaterial</code> receives automatically, when named (a <code>RawShaderMaterial</code> is not given their declarations, but three.js still fills them if the shader declares them by those names; use your own names to be sure they are yours)</td><td>your own matrix uploaded to your own shader (<a href="unity-shaders.html">the shader chapter</a>)</td></tr>
       </table>
       <p>
-        Each homework page (one per assignment, <code>homework/hwNN/index.html</code> on the course site) names its own list for both tracks and is the authority on which helpers it forbids. The habit
+        Each homework page (one per assignment, <code>homework/hwNN/index.html</code> on the course site) names its own list for both tracks and is the authority on which helpers it forbids. This table is also the WebGL track&rsquo;s (its third column); <a href="webgl-basics.html#rule">WebGL and three.js for This Course</a> refers to it rather than repeating it. The habit
         the rule builds is the one the text is written for: to know what the helper does, and to be able
         to say, with a number, whether it did it.
       </p>
@@ -528,7 +528,7 @@ public class Bounce : MonoBehaviour {
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Unity for This Course v1.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; class-example code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Unity for This Course v1.3 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-unity.mjs</code>; class-example code after Kelvin Sung&rsquo;s CSS 451 class examples. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>
