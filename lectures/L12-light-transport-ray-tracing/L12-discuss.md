@@ -15,9 +15,9 @@
 
 - **Thursday November 12**, the first **75 minutes** of class, in person; lecture follows
 - **weeks 1–6**: the big picture, the interactive loop, vectors, rotation, affine transformations, scene graphs, viewing, rasterization and antialiasing, meshes, texture mapping, illumination
-- about **30 multiple-choice items**, on paper, closed book; bring a **pencil**; no devices
+- **25 multiple-choice questions**, 8 points each (200 points), on paper; bring a **pencil**; no devices
+- one **handwritten** cheat sheet allowed (one page, both sides), **handed in with the exam**; not handwritten or not handed in: **50 %** off
 - items are **computational**: which entry of the matrix, which pixel is inside, what N·L is after the light moves; the wrong options are the pitfalls from the text
-- the worked examples and exercises in the chapters are the best preparation
 
 
 ---

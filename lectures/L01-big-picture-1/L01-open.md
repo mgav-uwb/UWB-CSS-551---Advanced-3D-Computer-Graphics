@@ -16,9 +16,9 @@
   questions on the course logistics before the discussion.
 
   Facts on these slides come from the syllabus and Plan C
-  (planning/css551-au26-plan-c-2026-09-29.md): grading 20/30/20/30, quizzes best
-  6 of 8 from week 2, midterm Thu Nov 12, final Thu Dec 17, homework out Thursday
-  due Wednesday 11:59 PM, two late tokens. Canvas governs every date.
+  (planning/css551-au26-plan-c-2026-09-29.md): 1000 points (homework 200, quizzes best 6 of 8 at 40 = 240, midterm 200,
+  final 360; decided 2026-09-30), quizzes from week 2, midterm Thu Nov 12, final Thu Dec 17, homework out Thursday
+  due Wednesday 11:59 PM, two 48-hour late tokens. The site syllabus governs.
 
   reveal.js: FLAT; notes follow "Note:"; no math; never two "_" on one line
   outside a code fence.
@@ -63,14 +63,16 @@ How a computer turns a description of a 3D world into a picture, and, increasing
 
 ## Grading
 
-| Component | Weight | Detail |
-| --- | --- | --- |
-| Homework, 8 | 20 % | 2.5 % each; run and compared against the numbers the assignment names |
-| Weekly quizzes, 8 | 30 % | **best 6 count**; 8 to 10 multiple-choice items; no make-ups |
-| Midterm | 20 % | Thursday November 12, first 75 minutes, weeks 1 to 6 |
-| Final | 30 % | Thursday December 17, two hours, cumulative, weeks 7 to 11 weighted |
+**1000 points**: your points divided by 10 is your percentage.
 
-Quiz and exam items are **computational**: which matrix entry, which pixel wins, what the diffuse term is after the light moves. Pencil, paper, no devices.
+| Component | Points | Detail |
+| --- | --- | --- |
+| Final | 360 | Thursday December 17, two hours, 45 questions × 8 points, weeks 7 to 11 weighted |
+| Weekly quizzes, 8 | 240 | 8 questions × 5 points = 40 each; **best 6 count**; no make-ups |
+| Midterm | 200 | Thursday November 12, first 75 minutes, 25 questions × 8 points, weeks 1 to 6 |
+| Homework, 8 | 200 | 25 points each; run and compared against the numbers the assignment names |
+
+**Exams**: one **handwritten** cheat sheet, both sides, handed in with the exam; otherwise **50 %** off.
 
 
 ---
@@ -80,7 +82,7 @@ Quiz and exam items are **computational**: which matrix entry, which pixel wins,
 - each assignment: one specification, a **skeleton in each of two tracks**, and the numbers a correct build reproduces
 - **Unity** (C#, the pinned version 6000.3.11f1) or **WebGL** (JavaScript on the course's demo library); for the two neural homeworks, **Python** or JavaScript
 - **implement and replace**: where an assignment says so, the engine's helper is off limits; build it from primitives and check it against the helper
-- **two late tokens** each: 24 hours, no penalty, one homework per token, declared at submission; beyond that 10 % per day for three days
+- **two late tokens** each: 48 hours, no penalty, one homework per token, declared at submission; without a token, late work is not accepted
 
 
 ---
@@ -89,7 +91,7 @@ Quiz and exam items are **computational**: which matrix entry, which pixel wins,
 
 - the **course site**: the <a href="../../syllabus/index.html">syllabus</a>, the <a href="../../schedule/index.html">schedule</a>, every lecture deck, every demo
 - the **course text**: <a href="../../textbook/index.html">24 chapters</a>, free, the primary reading; every lecture, homework and quiz draws its numbers from it
-- **Canvas**: submissions, grades, announcements, and **every due date** (Canvas governs if anything disagrees)
+- **Canvas**: submissions, grades, announcements and the Tuesday Zoom link; everything else is on this site, and the **syllabus** governs if anything disagrees
 
 
 ---
