@@ -68,11 +68,27 @@ A **512 × 512** depth buffer at **16 bits per pixel**, with memory at about **o
 
 ---
 
+## Before next Thursday (October 8)
+
+HW1 goes out on October 8. Get your tools working this week, not that night.
+
+| | Unity track | WebGL track |
+| --- | --- | --- |
+| **Install** | Unity Hub and the editor **6000.3.11f1** (several GB) | nothing: a browser and Python 3 |
+| **Read** | <a href="../../textbook/unity-basics.html#install">Unity for This Course</a>, Sections 1 to 4 | <a href="../../textbook/webgl-basics.html#serve">WebGL and three.js for This Course</a>, Sections 1 to 3 |
+| **Check** | open one class-example project from Canvas and press Play | run the course locally and open <code>homework/run.html?hw=hw01</code> |
+
+- **Pick a track** for HW1 (you may switch per assignment)
+- bring setup problems to Thursday's discussion, or post them on Canvas before then
+
+
+---
+
 ## Wrap
 
 A scene is data (meshes, transforms, materials, a camera, lights), and rendering is the pipeline that turns it into a grid of pixels: project, rasterize, test depth, shade. Local lighting and one sample per pixel are the pipeline's two cheap lies; chasing the photograph and antialiasing are what the field did about them.
 
 - **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 1 to 4, and the <a href="../../syllabus/index.html">syllabus</a>
-- **Before the first homework**: if you plan the Unity track, install **Unity Hub** and the editor **6000.3.11f1** (several gigabytes); for the WebGL track, a browser and Python 3 are enough
+- **Before next Thursday**: pick a track, install and read as on the previous slide
 - **Due**: nothing yet
 
