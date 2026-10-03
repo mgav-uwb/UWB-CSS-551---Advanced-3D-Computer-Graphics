@@ -52,9 +52,9 @@
   {
    "idea": "path tracing",
    "from": 1986,
-   "to": 2013,
-   "arrival": "a feature film lit entirely by path tracing (Monsters University)",
-   "years": 27
+   "to": 2016,
+   "arrival": "a Pixar feature path-traced throughout (Finding Dory; Christensen and Jarosz 2016)",
+   "years": 30
   },
   {
    "idea": "programmable shading (REYES)",
@@ -72,7 +72,7 @@
   }
  ],
  "lagStats": {
-  "mean": 23.2,
+  "mean": 23.5,
   "min": 3,
   "max": 48,
   "median": 22
