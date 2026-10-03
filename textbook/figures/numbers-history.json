@@ -52,16 +52,16 @@
   {
    "idea": "path tracing",
    "from": 1986,
-   "to": 2016,
-   "arrival": "a Pixar feature path-traced throughout (Finding Dory; Christensen and Jarosz 2016)",
-   "years": 30
+   "to": 2006,
+   "arrival": "a feature film rendered by path tracing (Monster House, Arnold)",
+   "years": 20
   },
   {
-   "idea": "programmable shading (REYES)",
-   "from": 1987,
+   "idea": "programmable shading (shade trees)",
+   "from": 1984,
    "to": 2001,
    "arrival": "GeForce 3, the first consumer shader hardware",
-   "years": 14
+   "years": 17
   },
   {
    "idea": "radiance fields (NeRF)",
@@ -72,10 +72,10 @@
   }
  ],
  "lagStats": {
-  "mean": 23.5,
+  "mean": 22.8,
   "min": 3,
   "max": 48,
-  "median": 22
+  "median": 21
  },
  "budgets": [
   {

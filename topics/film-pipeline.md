@@ -68,8 +68,8 @@
 
 | | a game frame | a feature-film frame |
 | --- | --- | --- |
-| time to make it | 16.7 ms | about 29 hours (Monsters University, 2013) |
-| ratio | 1 | 6,264,000 (6.8 orders of magnitude) |
+| time to make it | 16.7 ms | about 29 hours, as reported (Monsters University, 2013) |
+| ratio | 1 | about 6 million (6.8 orders of magnitude) |
 | who waits | the player, every frame | nobody: frames are computed, then played |
 | light transport | rasterize, a few rays, denoise | path trace, many samples per pixel, denoise |
 
@@ -200,7 +200,7 @@ All three follow the rendering equation of week 7 by Monte Carlo: many random li
 | film | machines | the figure | per frame |
 | --- | --- | --- | --- |
 | *Toy Story* (1995) | 117 Sun SPARCstation 20s | 800,000 machine-hours for 114,240 frames | **7.0 h** on average; 45 min to 30 h |
-| *Monsters University* (2013) | 24,000 cores | 100 million CPU hours | about **29 h** |
+| *Monsters University* (2013) | 24,000 cores | 100 million CPU hours | about **29 h** (reported; about 670 core-hours) |
 | *Big Hero 6* (2014) | 55,000 cores, about 4,600 computers, 1.5 MW | Hyperion, global illumination throughout | |
 
 100 million CPU hours ÷ 24,000 cores = **4,167 hours per core**: 174 days of every core busy.
@@ -213,7 +213,7 @@ All three follow the rendering equation of week 7 by Monte Carlo: many random li
 > As technology advances, rendering time remains constant.
 
 - attributed to **Jim Blinn**: artists spend every gain on richer frames, not faster ones
-- Toy Story's average **7 h** a frame; Monsters University's **29 h**, on hardware thousands of times faster
+- Toy Story's average **7 h** a frame; Monsters University's reported **29 h**, on hardware thousands of times faster
 - the game budget is fixed by the display (16.7 ms), so games spend gains the same way: on more per frame
 
 
@@ -248,7 +248,7 @@ All three follow the rendering equation of week 7 by Monte Carlo: many random li
 ## Four channels: color and coverage
 
 - **alpha** is the fraction of the pixel the element **covers**: 1 opaque, 0 empty, 0.5 half
-- the integral alpha channel: Ed Catmull and Alvy Ray Smith, New York Institute of Technology, 1977
+- the integral alpha channel: Ed Catmull and Alvy Ray Smith, New York Institute of Technology, 1970s
 - **Porter and Duff** (Lucasfilm, SIGGRAPH 1984): an algebra of compositing operators on RGBA images, with color stored **premultiplied** by alpha
 
 

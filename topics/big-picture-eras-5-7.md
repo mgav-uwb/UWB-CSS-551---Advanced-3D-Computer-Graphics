@@ -44,7 +44,7 @@
 
 A **shader** is a small program the GPU runs *per vertex* and *per pixel*: you write the shading stage yourself.
 
-- first written in raw GPU assembly; by ~2003 the C-like languages **HLSL** and **GLSL** arrive
+- first written in raw GPU assembly; by 2004 the C-like languages **Cg**, **HLSL** and **GLSL** arrive
 - shading becomes ordinary programming: any look, not a fixed menu
 - the shaders written in this course, Unity's and WebGL's, are exactly these
 
@@ -156,7 +156,7 @@ Utah's texture and bump tricks, now written as **shaders**, so *every* surface c
 <img src="../../media/overview/stanford-bunny.jpg" class="media-shot" style="max-height: 190px;" alt="photograph of a physical 3D-printed Stanford bunny, the field's famous scanned rabbit model, printed back into the real world">
 <small class="credit">funnypolynomial · CC BY 2.0 · via Wikimedia Commons</small>
 
-- 1994: a ceramic rabbit, laser-scanned → **69,451 triangles**, the field's favorite test object
+- 1994: a clay rabbit, laser-scanned → **69,451 triangles**, the field's favorite test object
 - this photo: the scan, **3D-printed back into the world**
 - and you've met it: our scene's rabbit *is* the Stanford bunny
 
@@ -176,7 +176,7 @@ Utah's texture and bump tricks, now written as **shaders**, so *every* surface c
 
 - **subdivision**: model blocky → the computer *rounds it*, step after step
 - each pass splits and smooths every face; two or three passes: sculpture
-- how film characters are actually modeled (an Oscar was won for it)
+- how film characters are actually modeled (a technical Academy Award was won for it)
 
 
 ---

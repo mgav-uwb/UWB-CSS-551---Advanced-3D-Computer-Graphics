@@ -93,7 +93,7 @@ A render layer's pixel, **premultiplied**, is F = (0.30, 0.30, 0.00) with α = *
 
 ## Wrap
 
-Each era changed what a scene **is** (triangles, shader programs, scans, Gaussians, network weights) while the machinery underneath (cameras, rasterization, sampling, integrals, compositing) carried over unchanged. Ideas wait a median of **22 years** for the hardware budget to reach them, which makes today's research the roadmap.
+Each era changed what a scene **is** (triangles, shader programs, scans, Gaussians, network weights) while the machinery underneath (cameras, rasterization, sampling, integrals, compositing) carried over unchanged. Ideas wait a median of **21 years** for the hardware budget to reach them, which makes today's research the roadmap.
 
 - **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 5 to 10; <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11; <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3
 - **Quiz 1**: Thursday, the last 20 minutes, on this lecture and Thursday's

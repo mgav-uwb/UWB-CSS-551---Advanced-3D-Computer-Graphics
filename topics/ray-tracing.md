@@ -53,7 +53,7 @@ Appel cast rays for visibility and shadows in 1968; Whitted made the hit point a
 | year | who | what |
 | ---- | --- | ---- |
 | 1968 | Appel (IBM) | rays from the eye to find visible surfaces and shadows |
-| 1980 | Whitted | recursive rays: reflection, refraction, shadows (74 minutes per image on a VAX-11/780) |
+| 1980 | Whitted | recursive rays: reflection, refraction, shadows (74 minutes for the famous image, VAX-11/780) |
 | 1984 | Cook, Porter, Carpenter | distributed rays: soft shadows, glossy reflection, depth of field, motion blur |
 | 1986 | Kajiya | the rendering equation; path tracing solves it by Monte Carlo |
 | 2018 | NVIDIA Turing | ray tracing hardware in consumer GPUs |

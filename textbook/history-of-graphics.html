@@ -93,9 +93,12 @@
       <p>
         Computer graphics is older than you might guess: older than
         time-sharing, older than the mouse, nearly as old as stored-program
-        computing itself. MIT&rsquo;s <strong>Whirlwind</strong>, operational in
-        1951, was the first computer fast enough to compute in real time, and it
-        talked to its operators through a cathode-ray tube: a
+        computing itself. MIT&rsquo;s <strong>Whirlwind</strong>, begun in 1945 as a Navy flight
+        simulator and first demonstrated in 1951, was the first computer to display text and
+        graphics in real time
+        (<a href="https://archive.org/details/ETC3236" target="_blank" rel="noopener">Carlson,
+        &ldquo;Computer Graphics and Computer Animation: A Retrospective Overview,&rdquo; sec. 2.1</a>),
+        and it talked to its operators through a cathode-ray tube: a
         <strong>vector display</strong>, meaning the electron beam was steered
         directly from point to point to draw glowing line segments, like a very
         fast plotter made of light. There were no pixels; there was no
@@ -147,8 +150,10 @@
         </figcaption>
       </figure>
       <p>
-        The same years produced the first commercial computer-aided design system, General
-        Motors and IBM&rsquo;s DAC-1 (1964), and the algorithm that every raster line still
+        The same years produced General Motors and IBM&rsquo;s DAC-1, often called the first
+        computer-aided design system (in use at GM from 1963, shown publicly in 1964;
+        <a href="https://archive.org/details/ETC3236" target="_blank" rel="noopener">Carlson,
+        sec. 3.3</a>), and the algorithm that every raster line still
         descends from: Jack Bresenham&rsquo;s 1965 method for choosing, with integer
         arithmetic only, which grid points a line should light
         (<a href="https://doi.org/10.1147/sj.41.0025" target="_blank" rel="noopener">Bresenham,
@@ -169,7 +174,10 @@
         product roadmap the industry has been executing for sixty years: virtual
         reality, physical simulation, direct manipulation. Sutherland then went
         and built the first piece of it himself: in 1968 he and his students
-        demonstrated the first head-mounted display, a contraption so heavy it
+        demonstrated the first head-mounted display driven by a computer&rsquo;s own graphics
+        (Philco&rsquo;s 1961 Headsight had carried a remote camera&rsquo;s picture;
+        <a href="https://archive.org/details/ETC3236" target="_blank" rel="noopener">Carlson,
+        sec. 17.1</a>), a contraption so heavy it
         hung from the ceiling and was nicknamed the Sword of Damocles. It drew
         wireframe rooms that stayed put as you turned your head. Keep that date
         in mind when you reach Section 7: consumer virtual reality is this
@@ -208,7 +216,7 @@
         are blocked, the difference between a wireframe ghost and a solid
         object. The candidates multiplied: John Warnock&rsquo;s 1969 thesis subdivided the
         screen until each region was simple; Gary Watkins (1970) walked the picture one scan
-        line at a time; Martin Newell and colleagues (1972) sorted the polygons back to front
+        line at a time; Martin Newell and colleagues at Cambridge (1972) sorted the polygons back to front
         and painted them over each other, the <em>painter&rsquo;s algorithm</em>
         (<a href="https://doi.org/10.1145/800193.569954" target="_blank" rel="noopener">Newell,
         Newell &amp; Sancha, &ldquo;A Solution to the Hidden Surface Problem,&rdquo; 1972</a>).
@@ -275,25 +283,30 @@
       </p>
       <figure>
         <img src="../media/overview/utah-teapot.jpg"
-             alt="The original white Melitta teapot that Martin Newell digitized in 1975, displayed at the Computer History Museum." />
+             alt="The original white Melitta teapot that Martin Newell digitized in the mid-1970s, displayed at the Computer History Museum." />
         <figcaption>
           The actual teapot: the Melitta pot Martin Newell digitized in
-          1975, now at the Computer History Museum in Mountain View. &middot;
+          1974 or 1975 (sources differ), now at the Computer History Museum in Mountain View. &middot;
           Michael Hicks &middot; CC BY 2.0 &middot; via Wikimedia Commons
         </figcaption>
       </figure>
       <div class="aside">
         <span class="tag">Why a teapot?</span>
-        Researchers needed a standard object to test shading on, and in 1975 Utah
+        Researchers needed a standard object to test shading on, and in 1974 or 1975
+        (the museum&rsquo;s record says 1974, other accounts 1975) Utah
         student <strong>Martin Newell</strong> needed a model with particular
-        properties. Over tea, his wife Sandra suggested the tea set on the table.
+        properties. The teapot was the Newells&rsquo; own Melitta pot; the often-told
+        version has his wife Sandra suggesting it over tea.
         The teapot turned out to be nearly perfect: it is curved everywhere, so
         it exercises smooth shading; its silhouette is complex (spout, handle,
         lid); it is partly concave, so it casts shadows <em>onto itself</em>; and
         it looks recognizable without any texture at all. Newell plotted its
-        profile on graph paper and entered the control points by hand: 32 bicubic
+        profile on graph paper and entered the control points by hand: 28 bicubic
         B&eacute;zier patches, the surface type of <a href="curves-surfaces.html#patch">the curves
-        chapter</a>. The dataset escaped into the community and never left; the teapot has
+        chapter</a>, with no bottom; Frank Crow added four bottom patches in 1987, which made the
+        32-patch teapot most libraries ship
+        (<a href="https://graphics.cs.utah.edu/history/utah_teapot.php" target="_blank"
+           rel="noopener">University of Utah, &ldquo;The Utah Teapot&rdquo;</a>). The dataset escaped into the community and never left; the teapot has
         appeared in decades of papers, in film cameos, and (once) as a built-in
         primitive in graphics libraries. The physical pot survives at the
         <a href="https://www.computerhistory.org/collections/catalog/X398.84/"
@@ -308,8 +321,8 @@
         is worth reciting because it explains where the industry came from.
         <strong>Ed Catmull</strong> co-founded Pixar and ran it (and later Disney
         Animation) for decades. <strong>John Warnock</strong> (hidden-surface
-        thesis, 1969) co-founded Adobe. <strong>Jim Clark</strong> (PhD under
-        Sutherland) founded Silicon Graphics in 1982 and later co-founded
+        thesis, 1969) co-founded Adobe. <strong>Jim Clark</strong> (Utah PhD)
+        founded Silicon Graphics (in 1981 or 1982; sources differ) and later co-founded
         Netscape. <strong>Alan Kay</strong> went to Xerox PARC, where his
         Smalltalk work shaped object-oriented programming and the graphical user
         interface. <strong>Jim Blinn</strong> went to NASA&rsquo;s Jet Propulsion
@@ -377,8 +390,9 @@
         <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)"
            target="_blank" rel="noopener">ray tracing</a>). His famous
         demonstration image, a glass sphere and a mirrored sphere over a
-        checkered floor, took 74 minutes per frame on the era&rsquo;s
-        minicomputer, a VAX-11/780. Hold that thought until Section 7, because the algorithm
+        checkered floor, took 74 minutes per frame at 480 by 640 pixels on the era&rsquo;s
+        minicomputer, a VAX-11/780 (the paper&rsquo;s Section 4 gives the times: 44, 74 and 122
+        minutes for its three pictures). Hold that thought until Section 7, because the algorithm
         never changed; the hardware caught up. Four years later Cook, Porter and Carpenter
         showed that spreading the rays out at random, over the lens, the light, the time the
         shutter is open, and the glossy lobe of a surface, turns Whitted&rsquo;s hard-edged
@@ -388,10 +402,10 @@
         Ray Tracing,&rdquo; 1984</a>).
       </p>
       <p>
-        Materials got the same treatment. In 1982 <strong>Robert Cook</strong>
+        Materials got the same treatment. In 1981 and 1982 <strong>Robert Cook</strong>
         and <strong>Kenneth Torrance</strong> published the
-        <strong>Cook&ndash;Torrance</strong> reflectance model, importing
-        <em>microfacet theory</em> from applied physics: a surface&rsquo;s gloss
+        <strong>Cook&ndash;Torrance</strong> reflectance model, completing the import of
+        <em>microfacet theory</em> from applied physics that Blinn had begun in 1977: a surface&rsquo;s gloss
         is modeled as a statistical distribution of microscopic mirrors
         (<a href="https://doi.org/10.1145/357290.357293" target="_blank" rel="noopener">&ldquo;A
         Reflectance Model for Computer Graphics,&rdquo; 1982</a>). It
@@ -444,14 +458,18 @@
       <div class="aside">
         <span class="tag">The Cornell box is a physical object</span>
         The most famous scene in computer graphics is not a file. It is a
-        box. Cornell researchers built a real one: painted panels, a measured
+        box. Cornell researchers built a real one (Goral and colleagues introduced the scene in
+        1984; the measured comparison below was published in 1986): painted panels, a measured
         light in the ceiling, a camera in the front wall. They measured the
         paints&rsquo; reflectances and the lamp&rsquo;s emission with laboratory
         instruments, <em>photographed</em> the box, then rendered the same
         geometry with their algorithms and compared, pixel by pixel. That is the
         scientific method applied to rendering: the photograph is the
         experiment, the renderer is the theory, and the difference image is the
-        error bar. Every &ldquo;Cornell box&rdquo; image you will ever see
+        error bar
+        (<a href="https://doi.org/10.1145/7529.7920" target="_blank" rel="noopener">Meyer,
+        Rushmeier, Cohen, Greenberg &amp; Torrance, &ldquo;An Experimental Evaluation of Computer
+        Graphics Imagery,&rdquo; 1986</a>). Every &ldquo;Cornell box&rdquo; image you will ever see
         (including the one above, and the one in the Big Picture lecture) descends from
         that physical box, and its geometry is still passed around as a
         standard test file
@@ -543,13 +561,14 @@
         <strong>framebuffer</strong>, a block of memory holding a color for
         every pixel, with the monitor repainting itself from that memory
         continuously. In the early 1970s, memory for even one modest color image
-        cost as much as a house, which is why the first real framebuffer system
-        was built at the one lab that would pay:
+        was a major capital purchase (as late as 1975 a 512 by 512 color frame buffer cost
+        $80,000, about $480,000 today; Smith&rsquo;s annotations, cited in Section 2), which is why one of the first frame buffer systems, and
+        the first with a paint program, was built at a lab that would pay:
         <strong>Richard Shoup</strong>&rsquo;s <strong>SuperPaint</strong> at
         Xerox PARC (1972&ndash;73), a shift-register frame store with a paint
         program on top, the ancestor of every paint tool and, in a real
         sense, of the modern screen itself
-        (<a href="https://doi.org/10.1109/85.929908" target="_blank"
+        (<a href="https://doi.org/10.1109/85.929909" target="_blank"
            rel="noopener">Shoup&rsquo;s retrospective in the IEEE Annals</a>).
         As memory prices collapsed, the framebuffer went from exotic instrument
         to the assumed substrate of all computing, and the question became
@@ -598,10 +617,12 @@
         &ldquo;A Parallel Algorithm for Polygon Rasterization,&rdquo; 1988</a>). This design,
         the <strong>fixed-function pipeline</strong>, is why graphics hardware
         exists as a separate thing at all. <strong>SGI</strong> built it into
-        refrigerator-priced workstations (descendants of Clark&rsquo;s Geometry
+        refrigerator-sized workstations costing $100,000 and more
+        (<a href="https://archive.org/details/vasulka11606" target="_blank" rel="noopener">Gorey,
+        &ldquo;Periodic Table of the IRISes,&rdquo; SGI price list, 1993</a>; descendants of Clark&rsquo;s Geometry
         Engine) that ran the film, CAD, and science markets through the 1990s;
         Kurt Akeley&rsquo;s 1993 paper on the RealityEngine is the fullest public account of
-        one, including the first hardware multisampling
+        one, including its hardware multisampling
         (<a href="https://doi.org/10.1145/166117.166131" target="_blank" rel="noopener">Akeley,
         &ldquo;RealityEngine Graphics,&rdquo; 1993</a>), and the machine in the photo below is
         what &ldquo;serious graphics&rdquo; looked like in 1995.
@@ -611,7 +632,7 @@
              alt="An SGI Onyx deskside graphics workstation, a large teal tower from the mid-1990s." />
         <figcaption>
           An SGI Onyx deskside workstation: mid-1990s high-end graphics,
-          at roughly the price of a Ferrari. &middot; Dave Fischer &middot;
+          an Onyx RealityEngine2 listed at about $160,000 in 1993. &middot; Dave Fischer &middot;
           CC BY-SA 4.0 &middot; via Wikimedia Commons
         </figcaption>
       </figure>
@@ -630,7 +651,7 @@
         price collapsed. In 1996 the <strong>3dfx Voodoo</strong> put the back
         half of the pipeline, rasterize, z-test, texture, on a
         consumer add-in card for a few hundred dollars, and PC games
-        (<em>Quake</em>, above all) made it a mass market. In October 1999 NVIDIA&rsquo;s
+        (<em>Quake</em>, above all) made it a mass market. In 1999 (announced in August, on sale in October) NVIDIA&rsquo;s
         <strong>GeForce 256</strong> pulled the <em>front</em> half,
         transform and lighting, onto the same consumer chip, completing
         the strip in silicon, and its marketing coined the word that stuck:
@@ -732,14 +753,19 @@
         game looked the same. The hardware implemented Gouraud interpolation and
         a couple of texture-combine modes, so that was what everyone shipped;
         the plasticky mid-90s look was baked into the chips themselves.
-        Film had escaped that trap a decade earlier: REYES let artists write
+        Film had escaped that trap more than a decade earlier: Cook&rsquo;s shade trees
+        (<a href="https://doi.org/10.1145/800031.808602" target="_blank" rel="noopener">Cook,
+        &ldquo;Shade Trees,&rdquo; 1984</a>) and then REYES let artists write
         arbitrary <em>shading procedures</em>. The obvious question, could
         consumer hardware do the same, was answered in 2001 by the
-        <strong>GeForce 3</strong>, the first consumer GPU whose transform and
-        shading stages executed small user-written programs called
-        <strong>shaders</strong>
+        <strong>GeForce 3</strong>, the first consumer GPU whose transform stage executed small
+        user-written programs called <strong>shaders</strong>
         (<a href="https://doi.org/10.1145/383259.383274" target="_blank" rel="noopener">Lindholm,
-        Kilgard &amp; Moreton, &ldquo;A User-Programmable Vertex Engine,&rdquo; 2001</a>). The
+        Kilgard &amp; Moreton, &ldquo;A User-Programmable Vertex Engine,&rdquo; 2001</a>); its
+        pixel stage was configurable rather than fully programmable, and fully programmable
+        floating-point pixel shading followed in 2002 with ATI&rsquo;s Radeon 9700
+        (<a href="https://doi.org/10.1109/MM.2008.31" target="_blank" rel="noopener">Lindholm and
+        colleagues, &ldquo;NVIDIA Tesla,&rdquo; 2008</a>). The
         pipeline&rsquo;s shape survived, but its two computational hearts became programmable:
       </p>
       <div class="pipe" aria-label="programmable pipeline">
@@ -754,11 +780,14 @@
         <div class="st"><strong>framebuffer</strong><small>write the pixel</small></div>
       </div>
       <p>
-        The first shaders were written in raw GPU assembly; within three years
-        the C-like shading languages arrived, Microsoft&rsquo;s HLSL and
-        OpenGL&rsquo;s
+        The first shaders were written in raw GPU assembly; by 2004
+        the C-like shading languages had arrived: NVIDIA&rsquo;s Cg
+        (<a href="https://doi.org/10.1145/1201775.882362" target="_blank" rel="noopener">Mark
+        and colleagues, 2003</a>), Microsoft&rsquo;s HLSL, and OpenGL&rsquo;s
         <a href="https://registry.khronos.org/OpenGL/specs/gl/GLSLangSpec.4.60.pdf"
-           target="_blank" rel="noopener">GLSL</a>, and shader writing
+           target="_blank" rel="noopener">GLSL</a>, part of
+        <a href="https://registry.khronos.org/OpenGL/specs/gl/glspec20.pdf" target="_blank"
+           rel="noopener">OpenGL 2.0 (2004)</a>, and shader writing
         became ordinary programming. (It is how you will write the illumination
         code in this course: Unity&rsquo;s shaders compile to exactly this
         machinery.) Hardware then took a second step with deep consequences.
@@ -779,7 +808,10 @@
         cards because graphics had already spent thirty years building the
         cheap, massively parallel arithmetic machines that neural networks
         needed (the 2012 AlexNet breakthrough was trained on two consumer
-        gaming GPUs).
+        gaming GPUs, NVIDIA GTX 580s;
+        <a href="https://doi.org/10.1145/3065386" target="_blank" rel="noopener">Krizhevsky,
+        Sutskever &amp; Hinton, &ldquo;ImageNet Classification with Deep Convolutional Neural
+        Networks,&rdquo; NeurIPS 2012</a>).
       </p>
       <p>
         The first thing programmers did with the open shading stage was make
@@ -825,6 +857,8 @@
         normal and material instead of its color, and a second pass can light the whole screen
         once from those buffers, whatever the number of triangles: <strong>deferred
         shading</strong>, proposed by Saito and Takahashi in 1990 as the &ldquo;G-buffer&rdquo;
+        (<a href="https://doi.org/10.1145/97880.97901" target="_blank" rel="noopener">Saito
+        &amp; Takahashi, &ldquo;Comprehensible Rendering of 3-D Shapes,&rdquo; 1990</a>)
         and adopted by engines in the mid-2000s once render targets were cheap. It decouples the
         cost of lighting from the cost of geometry, which is what let scenes carry hundreds of
         lights, and it is the reason a modern frame is a sequence of a dozen full-screen passes
@@ -868,15 +902,16 @@
       </div>
       <p>
         The same fifteen years industrialized the software above the pipeline.
-        id Software&rsquo;s <em>Quake</em> (1996) lineage established the
+        id Software&rsquo;s <em>Quake</em> (1996;
+        <a href="https://archive.org/details/ETC3236" target="_blank" rel="noopener">Carlson,
+        sec. 14.2</a>) lineage established the
         licensed <strong>game engine</strong> as a business; Epic&rsquo;s
         <strong>Unreal</strong> (1998) and then <strong>Unity</strong> (2005)
         turned the accumulated engineering of Sections 2&ndash;4 into a product
         anyone could download, which is precisely why this course teaches
         through an engine while making you rebuild its core math yourself. And
         when the iPhone arrived in 2007 with a real GPU driving it, the
-        programmable pipeline went into everyone&rsquo;s pocket; by the end of
-        this era, the number of GPUs on Earth exceeded the number of people.
+        programmable pipeline went into everyone&rsquo;s pocket.
       </p>
       <p class="note">
         In this text: shaders and the programmable stages are the last sections of
@@ -894,13 +929,15 @@
         <strong>Laser range scanning</strong> sweeps a stripe of light across an
         object and triangulates millions of surface points; software then
         stitches the overlapping scans into one triangle mesh. The emblem of the
-        era is a garden-store ceramic rabbit that Stanford&rsquo;s Greg Turk and
+        era is a garden-store terra-cotta (clay) rabbit that Stanford&rsquo;s Greg Turk and
         Marc Levoy scanned in 1994: the <strong>Stanford bunny</strong>, 69,451
         triangles, released freely and adopted as the field&rsquo;s shared test
         model; for thirty years, new mesh algorithms have demonstrated
         themselves on the bunny first
         (<a href="https://doi.org/10.1145/192161.192241" target="_blank" rel="noopener">Turk &amp;
-        Levoy, &ldquo;Zippered Polygon Meshes from Range Images,&rdquo; 1994</a>). It lives,
+        Levoy, &ldquo;Zippered Polygon Meshes from Range Images,&rdquo; 1994</a>; the rabbit
+        itself: <a href="https://faculty.cc.gatech.edu/~turk/bunny/bunny.html" target="_blank"
+           rel="noopener">Turk, &ldquo;The Stanford Bunny&rdquo;</a>). It lives,
         with its scanner siblings, in the
         <a href="https://graphics.stanford.edu/data/3Dscanrep/" target="_blank"
            rel="noopener">Stanford 3D Scanning Repository</a>, and in this course&rsquo;s
@@ -918,11 +955,11 @@
       </figure>
       <p>
         Capture then went monumental. In 1998&ndash;99 Levoy&rsquo;s team hauled
-        scanners to Florence and digitized Michelangelo&rsquo;s David at
-        quarter-millimeter resolution, the
+        scanners to Florence and scanned Michelangelo&rsquo;s David at
+        quarter-millimeter spacing, the
         <a href="https://accademia.stanford.edu/mich/" target="_blank"
-           rel="noopener">Digital Michelangelo Project</a>, roughly two billion
-        polygons of marble, and the moment cultural heritage became a graphics
+           rel="noopener">Digital Michelangelo Project</a>, into some two billion
+        polygons of raw data, and the moment cultural heritage became a graphics
         application
         (<a href="https://doi.org/10.1145/344779.344849" target="_blank" rel="noopener">Levoy et
         al., 2000</a>). The same years developed <strong>photogrammetry</strong>,
@@ -952,7 +989,7 @@
         up the triangles that separate them
         (<a href="https://doi.org/10.1145/37401.37422" target="_blank" rel="noopener">&ldquo;Marching
         Cubes: A High Resolution 3D Surface Construction Algorithm,&rdquo; 1987</a>); it is
-        among the most cited papers in the field&rsquo;s history, and it is still how a scanned
+        one of the most widely used algorithms in the field, and it is still how a scanned
         volume, a signed-distance field, or a neural field becomes a mesh.
       </p>
       <figure>
@@ -1090,8 +1127,12 @@
         lighting, and <em>Finding Dory</em> (2016) was its first feature path-traced throughout,
         Kajiya&rsquo;s 1986 estimator finally affordable at film resolution
         (<a href="https://doi.org/10.1561/0600000073" target="_blank" rel="noopener">Christensen
-        and Jarosz, &ldquo;The Path to Path-Traced Movies,&rdquo; 2016</a>); by then every major
-        studio renderer had followed.
+        and Jarosz, &ldquo;The Path to Path-Traced Movies,&rdquo; 2016</a>). The first feature
+        rendered by path tracing at all had come a decade earlier: Sony&rsquo;s <em>Monster
+        House</em> (2006), rendered in Arnold
+        (<a href="https://doi.org/10.1145/3182160" target="_blank" rel="noopener">Georgiev and
+        colleagues, &ldquo;Arnold: A Brute-Force Production Path Tracer,&rdquo; 2018</a>); by
+        2016 every major studio renderer had followed.
       </p>
       <p>
         The second movement closed a forty-year loop. In 2018 NVIDIA&rsquo;s
@@ -1109,7 +1150,7 @@
         factory) draws the scene, rays are budgeted where they buy the most,
         honest reflections, shadows, and one bounce of global illumination, and a
         denoiser cleans up the few samples per pixel the budget allows. The
-        rasterizer itself came full circle at the end of the era: Epic&rsquo;s Nanite (2021)
+        rasterizer itself came full circle just after the era: Epic&rsquo;s Nanite (2021)
         renders film-scale scans by dicing them to pixel-sized triangles on the GPU, which is
         REYES&rsquo;s 1987 micropolygon idea running in 16 milliseconds.
       </p>
@@ -1124,12 +1165,14 @@
       </figure>
       <p>
         The era&rsquo;s third movement was the return of Sutherland&rsquo;s
-        head-mounted display as a product. A 2012 Kickstarter for the Oculus
-        Rift relaunched <strong>virtual reality</strong>; consumer headsets
+        head-mounted display as a product. A Kickstarter campaign for the Oculus
+        Rift relaunched <strong>virtual reality</strong> in the early 2010s; consumer headsets
         shipped in 2016. VR is this course&rsquo;s subject matter under maximum
         pressure: two images per frame (one per eye), at 90 or more frames per
         second, with total motion-to-photon <strong>latency</strong> of about
-        twenty milliseconds; miss the budget and the user is not annoyed
+        twenty milliseconds
+        (<a href="https://danluu.com/latency-mitigation/" target="_blank" rel="noopener">Carmack,
+        &ldquo;Latency Mitigation Strategies,&rdquo; 2013</a>); miss the budget and the user is not annoyed
         but physically ill. What VR buys with that rigor is
         <strong>presence</strong>, the body&rsquo;s conviction that it is
         <em>in</em> the scene: the &ldquo;looking glass into a
@@ -1165,7 +1208,7 @@
         optimization. In 2020,
         <a href="https://arxiv.org/abs/2003.08934" target="_blank"
            rel="noopener">NeRF, neural radiance fields</a> (Mildenhall and colleagues, at
-        Berkeley and Google), showed
+        Berkeley, Google and UC San Diego), showed
         that a modest neural network can be trained, from a few dozen ordinary
         photographs of a place, to answer the question &ldquo;what color and
         density is space at this point, seen from this direction?&rdquo; Render
@@ -1184,7 +1227,8 @@
         In 2023,
         <a href="https://doi.org/10.1145/3592433" target="_blank"
            rel="noopener">3D Gaussian splatting</a> (Kerbl,
-        Kopanas, Leimk&uuml;hler, and Drettakis at Inria) removed the catch entirely by
+        Kopanas, Leimk&uuml;hler, and Drettakis, at Inria, Universit&eacute; C&ocirc;te d&rsquo;Azur
+        and the Max Planck Institute for Informatics) removed the catch entirely by
         changing the representation: not a network but millions of small
         translucent 3D blobs, Gaussians, each with position,
         shape, color, and opacity, optimized until, splatted onto the screen
@@ -1308,7 +1352,7 @@
         with a time axis, a block of latents attended across frames
         (<a href="https://arxiv.org/abs/2204.03458" target="_blank"
            rel="noopener">Ho et al., &ldquo;Video Diffusion Models,&rdquo;
-        2022</a>), scaled by 2024 to minute-long clips. What still breaks is
+        2022</a>), and scaled since to far longer clips. What still breaks is
         exactly what a scene would enforce: object permanence, physics,
         counting, legible text, a camera you can move. The field is merging the
         two from both sides, and the chapters on <a href="diffusion-models.html">diffusion models</a> and
@@ -1354,11 +1398,11 @@
         The chapter has repeated one observation in eight forms: an idea is published, and
         then, years later, it ships. The figure below puts dates on ten of the cases named
         above; the gap runs from three years (radiance fields to real-time splats) to forty-eight
-        (the head-mounted display), with a median of 22 years.
+        (the head-mounted display), with a median of 21 years.
       </p>
       <figure>
         <img src="figures/hist-lag.svg"
-             alt="Ten horizontal bars from a black dot at the publication year to a green dot at the year of mainstream arrival: head-mounted display 1968 to 2016, z-buffer and texture mapping 1974 to 1996, bump mapping 1978 to 2004, Catmull-Clark 1978 to 1997, ray tracing 1980 to 2018, mipmaps 1983 to 1996, path tracing 1986 to 2016, programmable shading 1987 to 2001, NeRF 2020 to 2023, each labeled with its length in years." />
+             alt="Ten horizontal bars from a black dot at the publication year to a green dot at the year of mainstream arrival: head-mounted display 1968 to 2016, z-buffer and texture mapping 1974 to 1996, bump mapping 1978 to 2004, Catmull-Clark 1978 to 1997, ray tracing 1980 to 2018, mipmaps 1983 to 1996, path tracing 1986 to 2006, programmable shading (shade trees) 1984 to 2001, NeRF 2020 to 2023, each labeled with its length in years." />
         <figcaption>
           From the paper to the product, for ten ideas in this chapter. The arrival events are
           the ones named in the text (a consumer card, a shipped film, a consumer headset); a
@@ -1371,7 +1415,7 @@
         which the budget figure of Section 3 shows is a matter of five or six orders of
         magnitude; the transistor count of graphics hardware doubled roughly every two years
         through this period, so six orders of magnitude is about forty years, and the median
-        lag is what a factor of a few thousand looks like on that clock. The consequence for
+        lag is what a factor of a thousand or two looks like on that clock. The consequence for
         a student is that the research literature of today is the product roadmap of the
         2040s, and that the mathematics underneath (the same vectors, matrices, integrals and
         sampling in every era) does not go out of date.
@@ -1381,11 +1425,11 @@
         Histories like this one name a person and a year for each idea, and the naming is
         convenient but the picture it suggests is wrong in two ways. First, most of these
         ideas were found more than once: the z-buffer by Catmull and Stra&szlig;er in the same
-        year, the diffusion model by three groups from different directions, radiosity in
+        year, the diffusion model from thermodynamics and from score matching, radiosity in
         graphics and in heat transfer decades apart. An idea whose time has come is found by
         whoever is looking. Second, the year of the paper is rarely the year the idea mattered:
         by the ten cases above, a technique&rsquo;s publication year and its impact year differ by
-        a median of 22 years, so a chronology ordered by publication and one ordered by
+        a median of 21 years, so a chronology ordered by publication and one ordered by
         influence are different chronologies. The dates in this chapter are publication dates,
         because those are the ones that can be checked; read the influence off the figure.
       </div>
@@ -1510,7 +1554,10 @@
             (<code>10.1145/3592433</code>) and find, in its related-work section, the citations
             to NeRF (2020) and to point-based rendering. Follow the point-based one: it leads back
             to work from around 2000, and from there to Levoy and Whitted&rsquo;s 1985 report on
-            points as a display primitive. The newest idea in the chapter has a forty-year root.
+            points as a display primitive
+            (<a href="https://graphics.stanford.edu/papers/points/" target="_blank"
+               rel="noopener">&ldquo;The Use of Points as a Display Primitive,&rdquo; UNC
+            technical report 85-022</a>). The newest idea in the chapter has a forty-year root.
           </li>
           <li>
             <strong>Date an idea yourself.</strong> Pick one technique in this chapter that is
@@ -1580,8 +1627,8 @@
         What do the three have in common about their timing?
         <details><summary>Solution</summary>
           The z-buffer (Catmull, Stra&szlig;er, both 1974); the diffusion model (Sohl-Dickstein et
-          al. 2015, Song and Ermon 2019, Ho et al. 2020, from thermodynamics, score matching and
-          variational inference respectively); radiosity (radiative heat transfer in engineering,
+          al. 2015 from thermodynamics, Song and Ermon 2019 from score matching, made practical
+          by Ho et al. 2020); radiosity (radiative heat transfer in engineering,
           then Goral et al. 1984). In each case the enabling condition had just arrived: cheap
           memory, large GPUs and datasets, and a lab equipped to measure light. The idea was
           found by whoever was looking when it became possible.
@@ -1591,10 +1638,11 @@
         <span class="tag">Exercise 6 (the lag, extended)</span>
         Shadow maps were published in 1978. Take their arrival as their use on every light in
         a shipped game engine, which the id Tech 4 engine of Doom 3 (2004) did with a related
-        technique and Unreal Engine 3 (2006) did with shadow maps proper. Compute the lag and
-        place it against the figure&rsquo;s median.
+        technique and Unreal Engine 3 (about 2006) did with shadow maps proper; treat both
+        engine dates as approximate milestones. Compute the lag and place it against the
+        figure&rsquo;s median.
         <details><summary>Solution</summary>
-          \(2006 - 1978 = 28\) years (or 26 with the 2004 milestone), above the median of 22 and
+          \(2006 - 1978 = 28\) years (or 26 with the 2004 milestone), above the median of 21 and
           in the same range as bump mapping&rsquo;s 26. Shadow maps needed two things the raster
           machine lacked until the programmable era: a rendering pass to an offscreen depth
           texture, and a per-pixel comparison against it.

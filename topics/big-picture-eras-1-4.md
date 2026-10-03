@@ -112,7 +112,7 @@ The course walks this bar left to right; the bands **overlap on purpose**: resea
 
 ## The name itself
 
-- **1960**, Boeing: **William Fetter**, in Verne Hudson's design group, used the phrase **"computer graphics"** for drawings made by computer to lay out a cockpit
+- **About 1960**, Boeing: **William Fetter**, in Verne Hudson's design group, used the phrase **"computer graphics"** for drawings made by computer to lay out a cockpit
 - his most famous image is a **wireframe pilot**, a human figure for checking reach and visibility
 - sources credit both Fetter and Hudson with the phrase; the field named itself in an aircraft factory
 
@@ -124,7 +124,7 @@ The course walks this bar left to right; the bands **overlap on purpose**: resea
 **1965**, Sutherland's manifesto: the display is *"a looking glass into a mathematical wonderland."*
 
 - not a window onto data: a *world* the computer controls
-- **1968**: he builds the first head-mounted display, the **"Sword of Damocles,"** hung from the ceiling
+- **1968**: he builds the first head-mounted display driven by computer graphics, the **"Sword of Damocles,"** hung from the ceiling
 - that idea comes back, as a product, fifty years from now on this timeline
 
 
@@ -171,8 +171,8 @@ Every model, hand-built cube or scanned rabbit, is *the same data*: vertices plu
 
 ## A mesh, drawn by hand: the 1972 hand
 
-- **Ed Catmull and Fred Parke**, University of Utah, 1972: *A Computer Animated Hand*, a class project
-- Catmull made a plaster model of his left hand and drew **about 350 triangles and polygons** on it in ink; each corner was measured and typed in
+- **Ed Catmull and Fred Parke**, University of Utah, 1972: *A Computer Animated Hand*
+- Catmull made a plaster model of his left hand and drew a net of **polygons** on it; each corner was measured and typed in
 - the hand opens, closes and turns, rendered with the shading of the day
 - added to the U.S. **National Film Registry** in **2011**
 
@@ -242,7 +242,7 @@ Each object also carries a **material**: its *surface recipe*:
 <img src="../../media/overview/utah-teapot.jpg" alt="the original physical Utah teapot, a Melitta pot, on display at the Computer History Museum" style="max-height: 240px; width: auto;">
 <small class="credit">Michael Hicks · CC BY 2.0 · via Wikimedia Commons</small>
 
-**1975**: Martin Newell digitizes his own teapot into a mesh, the field's mascot ever since.
+**Mid-1970s**: Martin Newell digitizes a Melitta teapot by hand, the field's mascot ever since.
 
 
 ---
@@ -471,7 +471,7 @@ Watch for: the readout's triangle count; it never leaves 2.
 | --- | --- | --- |
 | **Ed Catmull** | the z-buffer, texture mapping (1974) | Pixar; Walt Disney Animation Studios |
 | **John Warnock** | hidden-surface work at Utah | Adobe (PostScript, PDF) |
-| **Jim Clark** | head-mounted display and geometry hardware | Silicon Graphics; Netscape |
+| **Jim Clark** | geometry hardware | Silicon Graphics; Netscape |
 | **Alan Kay** | the Dynabook idea, object-oriented Smalltalk | Xerox PARC |
 
 One graduate program, late 1960s and 1970s, under **David Evans and Ivan Sutherland**.
@@ -502,7 +502,7 @@ Utah's lighting is **local**: each point is lit *alone*, as if nothing else exis
 <img src="../../media/overview/cornell-box.jpg" class="media-shot" style="max-height: 300px;" alt="the Cornell box: a cube room with one red wall, one green wall, and two boxes, lit from a ceiling light, soft shadows and color bleeding visible">
 <small class="credit">SeeSchloss · Public domain · via Wikimedia Commons</small>
 
-The field's standard test scene, the **Cornell box**: a *real* box, built and photographed in 1984. **Global illumination (GI)**: let light *bounce*.
+The field's standard test scene, the **Cornell box**: a *real* box, built at Cornell in the mid-1980s and photographed to test renderers. **Global illumination (GI)**: let light *bounce*.
 
 
 ---
@@ -606,7 +606,7 @@ Utah worked out these stations; this era **cast them into hardware**. A **GPU** 
 <img src="../../media/overview/sgi-workstation.jpg" class="media-shot" style="max-height: 150px;" alt="an SGI Onyx deskside graphics workstation from the mid-1990s, a large deskside cabinet">
 <small class="credit">Dave Fischer · CC BY-SA 4.0 · via Wikimedia Commons</small>
 
-- **SGI** built the pipeline as hardware: mid-90s high end, at Ferrari prices
+- **SGI** built the pipeline as hardware: mid-90s high end, about **$160,000** (1993)
 - **1992**: SGI opens its control interface as a standard; **OpenGL**, whose calls name the pipeline's stages one for one
 
 
