@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>More on the Problems - CSS 551 course text supplement</title>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        svg: { fontCache: "global" },
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+    ></script>
+    <link rel="stylesheet" href="../textbook.css" />
+    <style>
+      .cost {
+        border: 1px solid #c9c2a8;
+        background: #fbf8ee;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .cost .tag {
+        color: #8a6d1f;
+      }
+      .cost .grade {
+        font-weight: 600;
+      }
+      .lag {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .who {
+        font-family: system-ui, sans-serif;
+        font-size: 13.5px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .placeholder-note {
+        font-family: system-ui, sans-serif;
+        font-size: 12.5px;
+        color: #8a6d1f;
+      }
+    </style>
+    <style>
+      .pending {
+        border: 2px dashed #b9c0d0;
+        border-radius: 8px;
+        padding: 28px 16px;
+        text-align: center;
+        color: #5c6270;
+        font-style: italic;
+        background: #f6f8fb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        <a href="../history-of-graphics.html">A History of Computer Graphics</a>
+        &middot; <a href="../index.html">All chapters</a>.
+      </p>
+
+      <h1>More on the Problems</h1>
+
+      <p class="lead">
+        Further contributors, side notes and secondary sources for the problems
+        of Sections 4 and 6 of
+        <a href="../history-of-graphics.html#problems-1"
+          >A History of Computer Graphics</a
+        >, under the same problem headings.
+      </p>
+
+      <h2 id="problems-1">Problems and solutions, 1959 to 1980</h2>
+
+      <h3 id="p-drawing">
+        Interactive drawing and line rasterization (1963 to 1965)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-drawing">interactive drawing</a>.
+      </p>
+      <p>
+        Bresenham&rsquo;s line algorithm, published by Jack Bresenham of
+        International Business Machines (IBM) in the
+        <em>IBM Systems Journal</em> in 1965, was written for a pen plotter,
+        since there were no raster screens to draw on.
+      </p>
+
+      <h3 id="p-curves">Free-form curves and surfaces (1959 to 1975)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-curves">free-form curves</a>.
+      </p>
+      <p>
+        Main source: Farin, &ldquo;A History of Curves and Surfaces in
+        CAGD&rdquo; (computer-aided geometric design), 2002 (<a
+          href="https://www.farinhansford.com/gerald/papers/history.pdf"
+          target="_blank"
+          rel="noopener"
+          >author copy</a
+        >). <strong>Ferguson curves and bicubic patches</strong> (1964, James
+        Ferguson, Boeing) interpolated parametric cubics through data points (<a
+          href="https://doi.org/10.1145/321217.321225"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Multivariable curve interpolation,&rdquo;
+          <em>Journal of the ACM</em> 11(2), 1964</a
+        >; ACM is the Association for Computing Machinery). The
+        <strong>Coons patch</strong> (1967, Steven Coons, Massachusetts
+        Institute of Technology (MIT) Project MAC) filled a surface between four
+        boundary curves (<a
+          href="https://doi.org/10.21236/AD0663504"
+          target="_blank"
+          rel="noopener"
+          >MAC-TR-41, &ldquo;Surfaces for computer-aided design of space
+          forms&rdquo;</a
+        >). A. Robin Forrest brought Bézier&rsquo;s curves to the research
+        community (<a
+          href="https://doi.org/10.1093/comjnl/15.1.71"
+          target="_blank"
+          rel="noopener"
+          ><em>Computer Journal</em> 15(1), 1972</a
+        >). On B-splines, Riesenfeld&rsquo;s 1973 Syracuse thesis and Gordon and
+        Riesenfeld&rsquo;s chapter of 1974 followed de Boor, Gordon at General
+        Motors Research (<a
+          href="https://doi.org/10.1016/B978-0-12-079050-0.50011-4"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;B-spline curves and surfaces&rdquo;</a
+        >). By Farin&rsquo;s account Boeing adopted rational B-splines to unify
+        its conic and spline software, and Boeing, the Structural Dynamics
+        Research Corporation (SDRC) and Unigraphics pushed NURBS (non-uniform
+        rational B-splines) into the Initial Graphics Exchange Specification
+        (IGES) standard.
+        <!-- to source: the year NURBS entered IGES (not found; PT 2) -->
+      </p>
+      <div class="who">
+        Boeing &middot; MIT Project MAC &middot; General Motors Research
+        &middot;
+        <em>Journal of the ACM</em>, <em>Computer Journal</em>
+      </div>
+
+      <h3 id="p-hidden">
+        Visibility: hidden lines and hidden surfaces (1963 to 1974)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-hidden">visibility</a>.
+      </p>
+      <p>
+        <strong>Quantitative invisibility</strong> (1967, Arthur Appel, IBM)
+        counted how many surfaces hide each stretch of a line (<a
+          href="https://doi.org/10.1145/800196.806007"
+          target="_blank"
+          rel="noopener"
+          >Appel, 1967</a
+        >). <strong>Area subdivision</strong> (1969, John Warnock, University of
+        Utah) subdivided the screen until each region was simple (<a
+          href="https://apps.dtic.mil/sti/tr/pdf/AD0753671.pdf"
+          target="_blank"
+          rel="noopener"
+          >Utah TR 4-15</a
+        >). The <strong>scan-line visible-surface algorithm</strong> (1970, Gary
+        Watkins, Utah) worked one scan line at a time, designed for hardware
+        (Utah report UTEC-CSc-70-101). In 1974 Sutherland, Robert Sproull and
+        Robert Schumacker compared ten such algorithms in the journal
+        <em>ACM Computing Surveys</em> and showed that they &ldquo;differ mainly
+        in how they sort&rdquo; (<a
+          href="https://doi.org/10.1145/356625.356626"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;A characterization of ten hidden-surface algorithms&rdquo;</a
+        >).
+      </p>
+      <p>
+        Wolfgang Straßer reached the z-buffer idea independently in his 1974
+        thesis at the Technische Universität (TU) Berlin, under Wolfgang Giloi
+        (Eurographics obituary).
+      </p>
+      <!-- to source: E&S hardware after Watkins&rsquo;s algorithm ("Shaded Picture System", 1973) is grade C in PT 3; kept out -->
+      <div class="who">
+        IBM &middot; University of Utah &middot; TU Berlin &middot;
+        <em>ACM Computing Surveys</em>
+      </div>
+
+      <h3 id="p-clipping">Clipping (1967 to 1974)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-clipping">clipping</a>.
+      </p>
+      <p>
+        Cohen-Sutherland line clipping is documented only in later textbooks
+        (for instance Newman and Sproull, 1973); no paper by its inventors is
+        known.
+      </p>
+
+      <h3 id="p-detail">
+        Surface detail without geometry: texture and reflection mapping (1974 to
+        1986)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-detail">surface detail</a>.
+      </p>
+      <p>
+        <strong>Environment mapping</strong> (1976, Jim Blinn and Martin Newell,
+        Utah) took mirror reflections from a stored picture of the surroundings
+        (<a
+          href="https://doi.org/10.1145/360349.360353"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Texture and reflection in computer generated images,&rdquo;
+          <em>Communications of the ACM</em> (CACM) 19(10), 1976</a
+        >). SIGGRAPH, the ACM Special Interest Group on Computer Graphics and
+        Interactive Techniques, is also the group&rsquo;s annual conference,
+        held since 1974. <strong>Cube environment maps</strong> (1986, Ned
+        Greene) gave environment maps the form hardware uses (<a
+          href="https://doi.org/10.1109/MCG.1986.276658"
+          target="_blank"
+          rel="noopener"
+          ><em>IEEE Computer Graphics and Applications</em> (CG&amp;A) 6(11),
+          1986</a
+        >), and Heckbert surveyed the whole thread in the same issue (<a
+          href="https://doi.org/10.1109/MCG.1986.276672"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Survey of texture mapping&rdquo;</a
+        >).
+      </p>
+      <div class="aside">
+        <span class="tag">The test object: the Utah teapot</span>
+        Martin Newell, a Utah student, digitized a standard test object: the
+        Newells&rsquo; own Melitta teapot, in 1974 or 1975 (the Computer History
+        Museum (CHM) object record says about 1974; other accounts say 1975). He
+        entered 28 bicubic Bézier patches by hand, with no bottom; Frank Crow
+        added four bottom patches in 1987, which made the 32-patch teapot most
+        libraries ship (<a
+          href="https://graphics.cs.utah.edu/history/utah_teapot.php"
+          target="_blank"
+          rel="noopener"
+          >University of Utah, &ldquo;The Utah Teapot&rdquo;</a
+        >). The often-told version has Sandra Newell suggesting the teapot over
+        tea. The physical pot is at the
+        <a
+          href="https://www.computerhistory.org/collections/catalog/X398.84/"
+          target="_blank"
+          rel="noopener"
+          >Computer History Museum</a
+        >; the patches are the surface type of
+        <a href="../curves-surfaces.html#patch">the curves chapter</a>.
+        <!-- to source: "the rendered teapot is squatter than the real one (non-square pixels)"; not in research or audit -->
+      </div>
+      <figure>
+        <img
+          src="../../media/history/site-utah-teapot-photo.jpg"
+          data-cat="site-utah-teapot-photo"
+          style="max-width: min(420px, 100%)"
+          alt="The original white Melitta teapot that Martin Newell digitized, displayed at the Computer History Museum."
+        />
+        <figcaption>
+          The original Utah teapot (CHM), digitized 1974 or 1975 &middot;
+          Michael Hicks &middot; CC BY 2.0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="who">University of Utah &middot; CACM, IEEE CG&amp;A</div>
+
+      <h3 id="p-geometry">
+        Computational geometry: search structures, partitions and solids (1975
+        to 1996)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-geometry">computational geometry</a>.
+      </p>
+      <p>
+        Preparata and Shamos date the name of the discipline to Shamos&rsquo;s
+        paper at the 1975 ACM Symposium on Theory of Computing (STOC) (<a
+          href="https://doi.org/10.1145/800116.803772"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Geometric complexity&rdquo;</a
+        >; see Section 1 of the chapter for the older, spline meaning of the
+        phrase). Voronoi diagrams later served surface reconstruction: the
+        <strong>crust</strong> algorithm (1998, Nina Amenta, Marshall Bern and
+        Manolis Kamvysselis, Xerox Palo Alto Research Center (PARC)) reconstructed a surface from sample
+        points with guarantees (<a
+          href="https://doi.org/10.1145/280814.280947"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1998</a
+        >). The design of CGAL, with exact geometric predicates and a kernel of
+        primitives shared by its algorithms, is described in
+        <a
+          href="https://doi.org/10.1002/1097-024X(200009)30:11%3C1167::AID-SPE337%3E3.0.CO;2-B"
+          target="_blank"
+          rel="noopener"
+          >Fabri et al., &ldquo;On the design of CGAL,&rdquo; <em>Software:
+          Practice and Experience</em> 30(11), 2000</a
+        >; the project site gives its copyright from 1995 (<a
+          href="https://www.cgal.org/"
+          target="_blank"
+          rel="noopener"
+          >cgal.org</a
+        >).
+      </p>
+      <div class="who">
+        Yale &middot; Xerox PARC &middot; CGAL Project &middot; STOC, SIGGRAPH,
+        <em>Software: Practice and Experience</em>
+      </div>
+
+      <h3 id="p-characters">
+        Character animation: skeletons and skinning (1976 to 2000)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-characters"
+          >character animation</a
+        >.
+      </p>
+      <p>
+        <strong>The principles of traditional animation applied to 3D</strong>
+        (1987, John Lasseter, Pixar;
+        <a
+          href="https://doi.org/10.1145/37402.37407"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1987</a
+        >); and <strong>pose space deformation</strong> (2000, J. P. Lewis, Matt
+        Cordner and Nickson Fong), which named and fixed the artifacts of linear
+        blend skinning (<a
+          href="https://doi.org/10.1145/344779.344862"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 2000</a
+        >).
+      </p>
+      <div class="who">Pixar &middot; SIGGRAPH</div>
+
+      <h3 id="p-mocap">
+        Motion capture (1878 to 2002)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-mocap">motion capture</a>.
+      </p>
+      <p>
+        Leland Stanford hired Muybridge in 1872 to settle whether all four
+        hooves of a trotting horse leave the ground at once (description of the
+        Library of Congress print on Wikimedia Commons). A survey of
+        <strong>digital representations of human movement</strong> (1979, Norman
+        Badler and Stephen Smoliar;
+        <a
+          href="https://doi.org/10.1145/356757.356760"
+          target="_blank"
+          rel="noopener"
+          ><em>ACM Computing Surveys</em> 11(1)</a
+        >) preceded the first capture systems; Sturman&rsquo;s history (SIGGRAPH
+        1994 course) covers <strong>optical capture and performance
+        animation</strong> from 1983 to 1993. Vicon lists the University of
+        Strathclyde, the University of Western Australia and the Saitama
+        Rehabilitation Center among the early adopters of the 1980s, mostly for
+        gait analysis (<a
+          href="https://www.vicon.com/about-us/"
+          target="_blank"
+          rel="noopener"
+          >Vicon</a
+        >). Captured motion was also searched and recombined for interactive
+        avatars (2002, Jehee Lee, Jinxiang Chai, Paul Reitsma, Jessica Hodgins
+        and Nancy Pollard, Carnegie Mellon University (CMU);
+        <a
+          href="https://doi.org/10.1145/566654.566607"
+          target="_blank"
+          rel="noopener"
+          ><em>ACM Transactions on Graphics</em> (TOG) 21(3)</a
+        >).
+        <!-- to source: performance capture in film (Gollum, The Two Towers, 2002; The Polar Express, 2004; Avatar, 2009); "gait analysis" use is Vicon's own framing of its clinical customers (B) -->
+      </p>
+      <div class="who">
+        Simon Fraser University &middot; Oxford Metrics (Vicon) &middot; CMU
+        &middot; <em>ACM Computing Surveys</em>, SIGGRAPH, ACM TOG
+      </div>
+
+      <h3 id="p-highlights">
+        Physically based reflection models (1967 to 1982)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-highlights">reflection models</a
+        >.
+      </p>
+      <p>
+        The <strong>Trowbridge-Reitz distribution</strong> (1975), later renamed
+        GGX, is the one most current engines use (<a
+          href="https://doi.org/10.1364/JOSA.65.000531"
+          target="_blank"
+          rel="noopener"
+          ><em>Journal of the Optical Society of America</em> (JOSA) 65(5),
+          1975</a
+        >). The Cook-Torrance model appeared first at SIGGRAPH 1981 (<a
+          href="https://doi.org/10.1145/965161.806819"
+          target="_blank"
+          rel="noopener"
+          >doi</a
+        >), before its journal version of 1982.
+      </p>
+
+      <h3 id="p-brdf">
+        Measuring reflectance: BRDF acquisition (1977 to 2003)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-brdf">measuring reflectance</a>.
+      </p>
+      <p>
+        Nicodemus had proposed the nomenclature of the bidirectional reflectance
+        distribution function (BRDF) in 1970 (<a
+          href="https://doi.org/10.1364/AO.9.001474"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Reflectance nomenclature and directional reflectance and
+          emissivity,&rdquo; <em>Applied Optics</em> 9(6)</a
+        >); the 1977 monograph, with J. C. Richmond, J. J. Hsia, I. W. Ginsberg
+        and T. Limperis, fixed the definitions that graphics later adopted.
+        Ward&rsquo;s imaging gonioreflectometer recorded the reflected
+        hemisphere in one camera image instead of moving a detector, and his
+        anisotropic Gaussian model was fit to its data. The Cornell method was
+        published in fuller form in
+        <a
+          href="https://doi.org/10.1364/AO.39.002592"
+          target="_blank"
+          rel="noopener"
+          ><em>Applied Optics</em> 39(16), 2000</a
+        >. The light-stage team was Paul Debevec, Tim Hawkins, Chris Tchou,
+        Haarm-Pieter Duiker, Westley Sarokin and Mark Sagar; the later light
+        stages were built at the University of Southern California&rsquo;s
+        Institute for Creative Technologies (USC ICT). The Mitsubishi Electric
+        Research Laboratories (MERL) data are now
+        distributed through Zenodo (<a
+          href="https://doi.org/10.5281/zenodo.8101680"
+          target="_blank"
+          rel="noopener"
+          >doi:10.5281/zenodo.8101680</a
+        >).
+      </p>
+      <div class="who">
+        National Bureau of Standards &middot; Lawrence Berkeley Laboratory
+        &middot; Cornell &middot; USC ICT &middot; MERL &middot; <em>Applied Optics</em>
+      </div>
+
+      <h3 id="p-shadows">Cast shadows (1977 to 1987)</h3>
+      <p class="note">
+        Main text: <a href="../history-of-graphics.html#p-shadows">shadows</a>.
+      </p>
+      <p>Shadow maps were in Pixar&rsquo;s production rendering by 1987.</p>
+      <!-- to source: first shipped game with shadow volumes or shadow maps (Doom 3 2004, Unreal Engine 3 about 2006 are unsourced; PT 13) -->
+
+      <h3 id="p-aliasing">Aliasing (1977 to 1986)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-aliasing">aliasing</a>.
+      </p>
+      <p>
+        <strong>Motion blur</strong> (1983, Michael Potmesil and Indranil
+        Chakravarty) applied the idea of filtering in time (<a
+          href="https://doi.org/10.1145/964967.801169"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1983</a
+        >). Hardware multisample antialiasing is described in Akeley&rsquo;s
+        1993 paper on the RealityEngine (main text,
+        <a href="../history-of-graphics.html#p-hardware">Section 6</a>).
+      </p>
+
+      <h3 id="p-nature">Natural shapes: fractal terrain (1967 to 1982)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-nature">natural shapes</a>.
+      </p>
+      <p>
+        Loren Carpenter, then at Boeing, showed a fractal-landscape flyover
+        film,
+        <em>Vol Libre</em>, at SIGGRAPH 1980; its frames are reported to have
+        taken 20 to 40 minutes each on a VAX-11/780.
+      </p>
+      <div class="who">Boeing &middot; SIGGRAPH</div>
+
+      <h3 id="p-procmodel">
+        Procedural modeling: grammars for plants and buildings (1968 to 2006)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-procmodel">procedural modeling</a>.
+      </p>
+      <p>
+        Before Prusinkiewicz&rsquo;s work, Alvy Ray Smith (Lucasfilm) used
+        formal languages and &ldquo;graftals&rdquo; for plants (<a
+          href="https://doi.org/10.1145/800031.808571"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Plants, fractals, and formal languages,&rdquo; SIGGRAPH
+          1984</a
+        >), and Jules Bloomenthal (NYIT) modeled a maple tree with
+        generalized cylinders (<a
+          href="https://doi.org/10.1145/325334.325249"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Modeling the mighty maple,&rdquo; SIGGRAPH 1985</a
+        >). SideFX reports Academy recognition for Houdini in 1998, 2003, 2012,
+        2019 and 2023, and the Academy Award of Merit in 2018 (<a
+          href="https://www.sidefx.com/company/about-sidefx/"
+          target="_blank"
+          rel="noopener"
+          >SideFX</a
+        >).
+        <!-- to source: Stiny and Gips, "Shape grammars and the generative specification of painting and sculpture," in Information Processing 71 (IFIP Congress 1971), North-Holland, 1972 (no DOI; shapegrammar.org unreachable); Houdini 1.0 release year (1996 per the brief) -->
+      </p>
+      <div class="who">
+        Lucasfilm &middot; NYIT &middot; SideFX &middot; SIGGRAPH
+      </div>
+
+      <h3 id="p-subdivision">
+        Smooth surfaces of arbitrary topology: subdivision (1974 to 1998)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-subdivision">subdivision</a>.
+      </p>
+      <p>
+        <strong>Corner cutting</strong> (1974, George Chaikin) made smooth
+        curves by repeatedly cutting corners (<a
+          href="https://doi.org/10.1016/0146-664X(74)90028-8"
+          target="_blank"
+          rel="noopener"
+          ><em>Computer Graphics and Image Processing</em> 3(4), 1974</a
+        >). <strong>Doo-Sabin subdivision</strong> (1978, Daniel Doo and Malcolm
+        Sabin) appeared in the same issue of <em>Computer-Aided Design</em> as
+        Catmull-Clark, with an analysis at irregular points (<a
+          href="https://doi.org/10.1016/0010-4485(78)90111-2"
+          target="_blank"
+          rel="noopener"
+          >doi</a
+        >). The Academy of Motion Picture Arts and Sciences gave Catmull, DeRose
+        and Jos Stam a Technical Achievement Award for subdivision surfaces in
+        2006.
+      </p>
+      <div class="who">
+        <em>Computer Graphics and Image Processing</em>,
+        <em>Computer-Aided Design</em>
+      </div>
+
+      <h3 id="p-rays">
+        Shadows, reflection and refraction: ray tracing (1968 to 1984)
+      </h3>
+      <p class="note">
+        Main text: <a href="../history-of-graphics.html#p-rays">ray tracing</a>.
+      </p>
+      <p>
+        <strong>Refraction</strong> (1979, Douglas Kay and Donald Greenberg,
+        Cornell) rendered transparent objects that bend light (<a
+          href="https://doi.org/10.1145/965103.807438"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1979</a
+        >). <strong>Bounding-volume hierarchies for rays</strong> (1980, Steven
+        Rubin and Turner Whitted, Bell Labs) let rays skip most of a scene (<a
+          href="https://doi.org/10.1145/965105.807479"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1980</a
+        >).
+      </p>
+      <div class="who">Cornell &middot; Bell Labs &middot; SIGGRAPH</div>
+
+      <h3 id="who-1">Who, 1959 to 1980</h3>
+      <p>
+        <strong>University departments and laboratories</strong>: MIT (Lincoln
+        Laboratory and Project MAC), Harvard, Utah, Cambridge, Cornell,
+        Syracuse, Simon Fraser, TU Berlin.
+        <strong>Corporate research laboratories and companies</strong>: IBM,
+        Bell Labs, Evans &amp; Sutherland, Boeing, General Motors Research,
+        Citroën and Renault, and by the end of the period Lucasfilm.
+        <strong>Funders</strong>: the Information Processing Techniques Office of
+        the Advanced Research Projects Agency (ARPA) and the Office of Naval
+        Research (ONR) above all. The
+        <strong>venues</strong> moved from the Joint Computer Conferences of the
+        American Federation of Information Processing Societies (AFIPS) and CACM
+        to <em>ACM Computing Surveys</em>, and from 1974 to SIGGRAPH, which has
+        carried most of the field&rsquo;s papers since.
+      </p>
+
+      <h2 id="problems-2">Problems and solutions, 1980 to 2023</h2>
+
+      <h3 id="p-hardware">
+        Hardware pipelines for interactive 3D (1982 to 1993)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-hardware">hardware pipelines</a>.
+      </p>
+      <p>
+        <strong>Pixel-Planes</strong> (1985, Henry Fuchs, John Poulton, John
+        Eyles and others, University of North Carolina (UNC) at Chapel Hill) put
+        a processor behind every pixel (<a
+          href="https://doi.org/10.1145/325165.325205"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1985</a
+        >). <strong>High-performance polygon rendering</strong> (1988, Kurt
+        Akeley and Tom Jermoluk, Silicon Graphics (SGI)) described the
+        architecture of SGI&rsquo;s GT series (<a
+          href="https://doi.org/10.1145/378456.378516"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1988</a
+        >).
+      </p>
+      <div class="who">
+        UNC Chapel Hill &middot; Silicon Graphics &middot; SIGGRAPH
+      </div>
+
+      <h3 id="p-implicit">
+        Implicit surfaces, level sets and sparse volumes (1982 to 2013)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-implicit">implicit surfaces</a>.
+      </p>
+      <p>
+        <strong>Polygonization of implicit surfaces</strong> (1988, Jules
+        Bloomenthal, Xerox PARC;
+        <a
+          href="https://doi.org/10.1016/0167-8396(88)90013-1"
+          target="_blank"
+          rel="noopener"
+          ><em>Computer Aided Geometric Design</em> 5(4)</a
+        >); <strong>particles that sample and control implicit surfaces</strong>
+        (1994, Andrew Witkin and Paul Heckbert, CMU;
+        <a
+          href="https://doi.org/10.1145/192161.192227"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1994</a
+        >); and <strong>smoke</strong> on a grid with vorticity confinement
+        (2001, Ronald Fedkiw, Jos Stam and Henrik Wann Jensen;
+        <a
+          href="https://doi.org/10.1145/383259.383260"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 2001</a
+        >), the kind of density field VDB stores. Museth presented the data
+        structure first as DB+Grid (<a
+          href="https://doi.org/10.1145/2037826.2037894"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 2011 talk</a
+        >); OpenVDB is now maintained by the Academy Software Foundation under
+        the Apache-2.0 license.
+        <!-- to source: origin of the term "metaballs" (Nishimura et al., Osaka, 1985, in Japanese; not found on Crossref) -->
+      </p>
+      <div class="who">
+        Xerox PARC &middot; CMU &middot; Stanford &middot; DreamWorks Animation
+        &middot; <em>Computer Aided Geometric Design</em>, SIGGRAPH
+      </div>
+
+      <h3 id="p-compositing">Digital compositing (1984)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-compositing">compositing</a>.
+      </p>
+      <p>
+        The alpha channel itself, a coverage value stored with each pixel, is
+        credited by Smith to Catmull and himself at the New York Institute of
+        Technology (NYIT) in the 1970s (Smith 1995 as cited by Carlson).
+      </p>
+      <div class="who">NYIT</div>
+
+      <h3 id="p-radiosity">Indirect illumination: radiosity (1984 to 1988)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-radiosity">radiosity</a>.
+      </p>
+      <p>
+        <strong>Non-diffuse radiosity</strong> (1986, David Immel, Michael Cohen
+        and Donald Greenberg) extended radiosity to glossy surfaces (<a
+          href="https://doi.org/10.1145/15886.15901"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1986</a
+        >).
+      </p>
+      <div class="aside">
+        <span class="tag">The Cornell box</span>
+        Goral and colleagues introduced the scene in 1984: a box with painted
+        panels and a light in its ceiling. The Cornell group then built a real
+        one, measured the paints&rsquo; reflectances and the lamp&rsquo;s
+        emission, photographed it, rendered the same geometry, and compared the
+        two pixel by pixel (<a
+          href="https://doi.org/10.1145/7529.7920"
+          target="_blank"
+          rel="noopener"
+          >Meyer, Rushmeier, Cohen, Greenberg and Torrance, &ldquo;An
+          experimental evaluation of computer graphics imagery,&rdquo;
+          <em>ACM Transactions on Graphics</em>, 1986</a
+        >).
+      </div>
+      <figure>
+        <img
+          src="../../media/history/site-cornell-box.png"
+          data-cat="site-cornell-box"
+          style="max-width: min(400px, 100%)"
+          alt="A rendered Cornell box: red left wall, green right wall, white floor and ceiling, a sphere and a box inside, lit from the ceiling."
+        />
+        <figcaption>
+          Cornell box (POV-Ray render), 2005 &middot; SeeSchloss &middot; public
+          domain &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="who">
+        Cornell Program of Computer Graphics &middot; ACM TOG
+      </div>
+
+      <h3 id="p-procedural">
+        Procedural, solid and example-based texture (1985 to 2001)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-procedural">texture</a>.
+      </p>
+      <p>
+        In 1997 Ken Perlin of New York University (NYU) received an Academy Technical Achievement Award for
+        his noise (Perlin&rsquo;s page), and in 2002 he revised it with a
+        better interpolant and gradient set (<a
+          href="https://doi.org/10.1145/566654.566636"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;Improving noise,&rdquo; ACM TOG 21(3)</a
+        >). Turk&rsquo;s and Witkin and Kass&rsquo;s reaction-diffusion papers
+        appeared at the same conference (SIGGRAPH 1991). Heeger and Bergen also
+        presented their method at the IEEE International Conference on Image
+        Processing (<a
+          href="https://doi.org/10.1109/ICIP.1995.537718"
+          target="_blank"
+          rel="noopener"
+          >ICIP 1995</a
+        >).
+      </p>
+      <div class="who">NYU &middot; SIGGRAPH, ACM TOG, ICIP</div>
+
+      <h3 id="p-points">
+        Points as a rendering primitive (1985 to 2001)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-points">points</a>.
+      </p>
+      <p>
+        <strong>Point sample rendering</strong> (1998, J. P. Grossman and
+        William Dally;
+        <a
+          href="https://doi.org/10.1007/978-3-7091-6453-2_17"
+          target="_blank"
+          rel="noopener"
+          >Eurographics Rendering Workshop 1998</a
+        >) and <strong>surfels</strong> (2000, Hanspeter Pfister, Matthias
+        Zwicker, Jeroen van Baar and Markus Gross;
+        <a
+          href="https://doi.org/10.1145/344779.344936"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 2000</a
+        >) came between the Levoy-Whitted report and surface splatting. The
+        same group extended the elliptical weighted average (EWA) filter to
+        volumes (<a
+          href="https://doi.org/10.1109/VISUAL.2001.964490"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;EWA volume splatting,&rdquo; IEEE Visualization 2001</a
+        >).
+      </p>
+      <div class="who">
+        ETH Zurich &middot; MERL &middot; SIGGRAPH, IEEE Visualization
+      </div>
+
+      <h3 id="p-rendering-equation">
+        The rendering equation and Monte Carlo light transport (1986 to 1997)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-rendering-equation"
+          >the rendering equation</a
+        >.
+      </p>
+      <p>
+        Immel, Cohen and Greenberg gave an independent general formulation, in
+        radiosity form, at the same conference as Kajiya (SIGGRAPH 1986).
+        <strong>Bidirectional path tracing</strong> (Eric Veach and Leonidas
+        Guibas, Stanford, Eurographics Rendering Workshop 1994, published 1995;
+        <a
+          href="https://doi.org/10.1007/978-3-642-87825-1_11"
+          target="_blank"
+          rel="noopener"
+          >doi</a
+        >) and <strong>Metropolis light transport</strong> (1997, Veach and
+        Guibas, Stanford;
+        <a
+          href="https://doi.org/10.1145/258734.258775"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1997</a
+        >) completed the set of estimators.
+      </p>
+      <div class="who">Cornell &middot; Stanford &middot; SIGGRAPH</div>
+
+      <h3 id="p-physics">Physically based animation (1987 to 1999)</h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-physics"
+          >physically based animation</a
+        >.
+      </p>
+      <p>
+        <strong>Rigid bodies with friction</strong> (1988, James Hahn;
+        <a
+          href="https://doi.org/10.1145/378456.378530"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1988</a
+        >); <strong>spacetime constraints</strong> (1988, Andrew Witkin and
+        Michael Kass;
+        <a
+          href="https://doi.org/10.1145/378456.378507"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1988</a
+        >); <strong>resting contact</strong> solved analytically (1989, David
+        Baraff;
+        <a
+          href="https://doi.org/10.1145/74334.74356"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1989</a
+        >); and <strong>liquids</strong> from the Navier-Stokes equations (1996,
+        Nick Foster and Dimitri Metaxas;
+        <a
+          href="https://doi.org/10.1006/gmip.1996.0039"
+          target="_blank"
+          rel="noopener"
+          ><em>Graphical Models and Image Processing</em> 58(5)</a
+        >). The Academy gave Technical Achievement Awards to Platt and
+        Terzopoulos for cloth in 2006 and to Stam and colleagues for Maya Fluids
+        in 2008.
+      </p>
+      <div class="who">
+        SIGGRAPH &middot; <em>Graphical Models and Image Processing</em>
+      </div>
+
+      <h3 id="p-scanning">
+        3D scanning and reconstruction from range images and photographs (1982
+        to 2010)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-scanning">3D scanning</a>.
+      </p>
+      <p>
+        Earlier coded-light work by Martin Altschuler and colleagues projected a
+        laser dot matrix (<a
+          href="https://doi.org/10.1117/12.957387"
+          target="_blank"
+          rel="noopener"
+          >Society of Photo-Optical Instrumentation Engineers (SPIE) 1979</a
+        >). <strong>Surface reconstruction from unorganized points</strong>
+        (1992, Hugues Hoppe, Tony DeRose, Tom Duchamp, John McDonald and Werner
+        Stuetzle;
+        <a
+          href="https://doi.org/10.1145/142920.134011"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1992</a
+        >) fit a signed distance to scattered points.
+        <strong>Volumetric range merging</strong> (1996, Brian Curless and
+        Marc Levoy, Stanford;
+        <a
+          href="https://doi.org/10.1145/237170.237269"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1996</a
+        >) is the method the Stanford repository calls vrip; its Happy Buddha
+        and Dragon were acquired with Curless&rsquo;s spacetime analysis and
+        Lucy with the Stanford Large Statue Scanner built for the Digital
+        Michelangelo Project (<a
+          href="https://graphics.stanford.edu/data/3Dscanrep/"
+          target="_blank"
+          rel="noopener"
+          >repository</a
+        >). The project scanned 10 statues, 2 building interiors and 1,163
+        fragments of the Forma Urbis Romae; the David alone gave about 2
+        billion polygons and 7,000 color images, with 30 people from Stanford
+        and the University of Washington, in production from September 1998 to
+        June 1999 (Levoy et al.; project page). Its images are all rights
+        reserved. <strong>Screened Poisson reconstruction</strong> (2013,
+        Kazhdan and Hoppe;
+        <a
+          href="https://doi.org/10.1145/2487228.2487237"
+          target="_blank"
+          rel="noopener"
+          >ACM TOG 32(3)</a
+        >) added point constraints to the Poisson equation (<a
+          href="https://www.cs.jhu.edu/~misha/MyPapers/SGP06.pdf"
+          target="_blank"
+          rel="noopener"
+          >the 2006 paper, author copy</a
+        >).
+        <!-- to source: Cyberware founding year (1982 per the brief) -->
+      </p>
+      <div class="who">
+        Stanford &middot; University of Washington &middot; Microsoft Research
+        &middot; Johns Hopkins &middot; SPIE, SIGGRAPH, ACM TOG
+      </div>
+
+      <h3 id="p-hair">
+        Hair and fur (1989 to 2003)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-hair">hair and fur</a>.
+      </p>
+      <p>
+        Kajiya and Kay called their volume elements <strong>texels</strong>,
+        three-dimensional texture cells holding density, a frame and a lighting
+        model. The Marschner model separates three paths through the fiber:
+        reflection at the surface (R), transmission through it (TT) and one
+        internal reflection (TRT), which gives the colored secondary highlight.
+      </p>
+      <div class="who">Caltech &middot; Stanford &middot; SIGGRAPH</div>
+
+      <h3 id="p-npr">
+        Non-photorealistic rendering (1990 to 1998)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-npr">non-photorealistic rendering</a>.
+      </p>
+      <p>
+        <strong>Painterly rendering</strong> with curved strokes of several
+        sizes (1998, Aaron Hertzmann, NYU;
+        <a
+          href="https://doi.org/10.1145/280814.280951"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1998</a
+        >); <strong>interactive technical illustration</strong> (1999, Bruce
+        Gooch, Peter-Pike Sloan, Amy Gooch, Peter Shirley and Richard
+        Riesenfeld, Utah;
+        <a
+          href="https://doi.org/10.1145/300523.300526"
+          target="_blank"
+          rel="noopener"
+          >Symposium on Interactive 3D Graphics (I3D) 1999</a
+        >); and the Gooches&rsquo; textbook
+        <em>Non-Photorealistic Rendering</em> (<a
+          href="https://doi.org/10.1201/9781439864173"
+          target="_blank"
+          rel="noopener"
+          >A K Peters, 2001</a
+        >).
+      </p>
+      <div class="who">NYU &middot; University of Utah &middot; SIGGRAPH, I3D</div>
+
+      <h3 id="p-capture">
+        Image-based rendering and captured light (1996 to 1998)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-capture">captured light</a>.
+      </p>
+      <p>
+        The <strong>Lumigraph</strong> (1996, Steven Gortler, Radek
+        Grzeszczuk, Richard Szeliski and Michael Cohen, Microsoft Research) did
+        what light field rendering did, with approximate geometry (<a
+          href="https://doi.org/10.1145/237170.237200"
+          target="_blank"
+          rel="noopener"
+          >SIGGRAPH 1996</a
+        >). Range scanning, volumetric merging, surface reconstruction and
+        Facade are under
+        <a href="#p-scanning">3D scanning and reconstruction</a>.
+      </p>
+      <div class="who">Stanford &middot; Microsoft Research &middot; SIGGRAPH</div>
+
+      <h3 id="p-consumer">
+        Consumer 3D hardware and programmable shading (1996 to 2004)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-consumer">consumer hardware</a>.
+      </p>
+      <p>
+        Microsoft shipped <strong>Direct3D</strong> on 13 June 1996, listing the
+        3dfx Voodoo Graphics among the first accelerators. The GeForce 256 had
+        nearly 23 million transistors; cards went on sale in October 1999 (press
+        releases). DirectX 7, with hardware transform and lighting, shipped on
+        22 September 1999, and DirectX 8, with vertex and pixel shaders, on 9
+        November 2000. The GeForce3&rsquo;s pixel stage was marketed as a
+        &ldquo;pixel shader,&rdquo; while NVIDIA&rsquo;s own 2008 retrospective
+        calls it configurable and credits ATI&rsquo;s
+        <strong>Radeon 9700</strong> (2002) with the first programmable
+        floating-point pixel processor (<a
+          href="https://doi.org/10.1109/MM.2008.31"
+          target="_blank"
+          rel="noopener"
+          >Lindholm, Nickolls, Oberman and Montrym, &ldquo;NVIDIA Tesla,&rdquo;
+          <em>IEEE Micro</em>, 2008</a
+        >). High-level shading languages followed: NVIDIA&rsquo;s
+        <strong>Cg</strong> (<a
+          href="https://doi.org/10.1145/1201775.882362"
+          target="_blank"
+          rel="noopener"
+          >Mark, Glanville, Akeley and Kilgard, SIGGRAPH 2003</a
+        >) and the OpenGL Shading Language (GLSL), part of the
+        <a
+          href="https://registry.khronos.org/OpenGL/specs/gl/glspec20.pdf"
+          target="_blank"
+          rel="noopener"
+          >OpenGL 2.0 specification of 22 October 2004</a
+        >.
+      </p>
+      <div class="who">
+        Microsoft &middot; Khronos Group &middot; <em>IEEE Micro</em>, SIGGRAPH
+      </div>
+
+      <h3 id="p-film-pt">
+        Path tracing in feature-film production (2006 to 2018)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-film-pt">path-traced films</a>.
+      </p>
+      <p>
+        The Academy gave Arnold a Scientific and Engineering Award in 2017.
+        <em>Monsters University</em> (2013) was the first Pixar feature with
+        ray-traced global illumination. <strong>Manuka</strong> (Weta Digital)
+        did spectral path tracing at film scale (<a
+          href="https://doi.org/10.1145/3182161"
+          target="_blank"
+          rel="noopener"
+          >TOG 2018</a
+        >). The participants&rsquo; overview is Christensen and Jarosz,
+        <a
+          href="https://doi.org/10.1561/0600000073"
+          target="_blank"
+          rel="noopener"
+          >&ldquo;The path to path-traced movies,&rdquo; 2016</a
+        >.
+        <!-- to source: render-farm figures for Toy Story, Monsters University and Big Hero 6 (secondary only; "reported" if used) -->
+      </p>
+      <div class="who">
+        Weta Digital &middot;
+        <em>Foundations and Trends in Computer Graphics and Vision</em>
+      </div>
+
+      <h3 id="p-rt-realtime">
+        Real-time ray tracing and denoising (2017 to 2018)
+      </h3>
+      <p class="note">
+        Main text:
+        <a href="../history-of-graphics.html#p-rt-realtime"
+          >real-time ray tracing</a
+        >.
+      </p>
+      <p>
+        Two other denoisers of 2017: <strong>kernel-predicting networks</strong>
+        for film frames (Steve Bako, Thijs Vogels and colleagues;
+        <a
+          href="https://doi.org/10.1145/3072959.3073708"
+          target="_blank"
+          rel="noopener"
+          >TOG 36(4)</a
+        >) and a <strong>recurrent denoising autoencoder</strong> for
+        interactive sequences (Chakravarty Alla Chaitanya and colleagues;
+        <a
+          href="https://doi.org/10.1145/3072959.3073601"
+          target="_blank"
+          rel="noopener"
+          >TOG 36(4)</a
+        >).
+      </p>
+
+      <h3 id="who-2">Who, 1980 to 2023</h3>
+      <p>
+        <strong>Studios</strong>: Lucasfilm and Pixar, Walt Disney Animation
+        Studios, Sony Pictures Imageworks, Weta Digital.
+        <strong>Hardware companies</strong>: Silicon Graphics, 3dfx, ATI,
+        NVIDIA. <strong>Software companies</strong>: Alias|Wavefront, Microsoft,
+        Epic Games. <strong>Corporate and national research institutes</strong>:
+        Xerox PARC, Bell Labs, Microsoft Research, NVIDIA Research, Disney
+        Research, Inria in France and the Max Planck Institute for Informatics
+        (MPI-Inf) in Germany. The <strong>university laboratories</strong> are Cornell, Stanford, UNC,
+        Caltech, Berkeley and CMU. The <strong>venues</strong> are SIGGRAPH and ACM TOG,
+        Eurographics and its journal <em>Computer Graphics Forum</em>, the
+        Eurographics Symposium on Rendering (EGSR) and High Performance Graphics
+        (HPG), and, for learned graphics, the computer-vision conferences Computer Vision and Pattern Recognition
+        (CVPR) and the European Conference on Computer Vision (ECCV) and the
+        machine-learning conferences Neural Information Processing Systems
+        (NeurIPS), the International Conference on Machine Learning (ICML) and
+        the International Conference on Learning Representations (ICLR).
+      </p>
+
+      <h2 id="organizations">Organizations</h2>
+      <p class="lead">
+        Profiles of two organizations from the table in
+        <a href="../history-of-graphics.html#organizations">Section 13</a> of
+        the chapter.
+      </p>
+
+      <h3 id="p-utah">The University of Utah computer science department</h3>
+      <p class="note">
+        Main text: <a href="../history-of-graphics.html#org-utah">Utah</a>.
+      </p>
+      <p>
+        David Evans was recruited to the University of Utah in 1965 to build a
+        computer science department and concentrated it on graphics, with funding from ARPA&rsquo;s Information Processing Techniques Office; Sutherland joined in 1968, and
+        the two founded Evans &amp; Sutherland the same year (Carlson). The
+        program reported its work to ARPA in reports such as Evans&rsquo;s
+        <em>Graphical Man/Machine Communications</em> (<a
+          href="https://doi.org/10.21236/ad0726623"
+          target="_blank"
+          rel="noopener"
+          >1971</a
+        >). Utah work in the chapter includes Warnock&rsquo;s and
+        Watkins&rsquo;s visible-surface algorithms, Gouraud and Phong shading,
+        Catmull&rsquo;s z-buffer and texture mapping, Blinn&rsquo;s reflection
+        models and bump mapping, Newell&rsquo;s teapot and Loop subdivision. Its
+        alumni founded or led companies: Catmull at Pixar, Warnock at Adobe, Jim
+        Clark at Silicon Graphics (founded in 1981 or 1982; sources differ) and
+        later Netscape, and Alan Kay at Xerox PARC; Jim Blinn went to the Jet Propulsion Laboratory of the National
+        Aeronautics and Space Administration (NASA), and
+        Nolan Bushnell, a Utah undergraduate of the period, founded Atari.
+      </p>
+
+      <h3 id="p-pixar">Lucasfilm and Pixar</h3>
+      <p class="note">
+        Main text: <a href="../history-of-graphics.html#org-pixar">Pixar</a>.
+      </p>
+      <p>
+        Lucasfilm&rsquo;s computer division was formed in 1979 and spun off as
+        Pixar in 1986, when Steve Jobs bought it (CHM, Carlson). Before it made
+        films Pixar sold hardware: the <strong>Pixar Image Computer</strong>,
+        announced as shipping on 11 May 1986, with 24 MB of &ldquo;picture
+        memory&rdquo; for a 2,000 by 2,000 image in four 12-bit channels and a
+        four-way parallel processor (Pixar press release). With Disney, Pixar
+        built software on it to color hand-drawn animation digitally (the Computer Animation Production
+        System, CAPS).
+      </p>
+      <figure>
+        <img
+          src="../../media/history/photo-pixar-image-computer.jpg"
+          data-cat="photo-pixar-image-computer"
+          style="max-width: min(420px, 100%)"
+          alt="The Pixar Image Computer, a large grey cabinet."
+        />
+        <figcaption>
+          Pixar Image Computer, 1986 &middot; Adam Schuster &middot; CC BY 2.0
+          &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="cost">
+        <span class="tag">Cost &middot; Pixar Image Computer</span>
+        $122,000 (1986) = <strong>$358,000</strong> in 2026 $ (&times;2.937),
+        about $14,900 per MB of picture memory with its processor (press
+        release; a development system with host workstation was $180,000). The
+        1988 P-II: $29,500 (Price, <em>The Pixar Touch</em>).
+      </div>
+      <p>
+        The people of Lucasfilm&rsquo;s computer division and Pixar included
+        Catmull, Smith, Cook, Carpenter, Porter, Duff, Reeves, and later
+        Hanrahan.
+      </p>
+
+      <h3 id="org-others">Other organizations</h3>
+      <p>
+        The People and Organizations data also list organizations that have no row in the table of Section 13: the software companies Adobe,
+        Autodesk, Softimage and Unity Technologies; the studios Information
+        International Inc. (III), MAGI (Mathematical Applications Group Inc.),
+        Digital Productions and Weta Digital; Disney Research, NVIDIA Research
+        and the Fraunhofer Institute for Computer Graphics Research (IGD); and
+        the IEEE VIS conference with the <em>IEEE Transactions on Visualization
+        and Computer Graphics</em> (TVCG, from 1995).
+      </p>
+
+      <footer>
+        CSS 551 &middot; course text &middot; More on the Problems, supplement to A History of
+        Computer Graphics v4.0 &middot; prepared by Dr. Marcel Gavriliu. Image
+        credits appear in each caption.
+        <a href="../history-of-graphics.html">Back to the chapter</a>.
+      </footer>
+    </div>
+  </body>
+</html>

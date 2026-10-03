@@ -33,7 +33,7 @@
 
 <img src="../../textbook/figures/hist-map.svg" class="media-shot" style="max-height: 470px;" alt="eight eras of computer graphics on the left, linked to the course text's chapters on the right: 28 links from the eras to 20 chapters">
 
-<small>From <a href="../../textbook/history-of-graphics.html#era-map">A History of Computer Graphics, Section 10</a>: eight eras, 28 links into 20 chapters.</small>
+<small>The field's history mapped into the course's 20 chapters; the history itself is in <a href="../../textbook/history-of-graphics.html#map">A History of Computer Graphics</a>.</small>
 
 
 ---

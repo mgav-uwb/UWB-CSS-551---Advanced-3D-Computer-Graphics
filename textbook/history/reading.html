@@ -1,0 +1,2090 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reading and Software - CSS 551 course text supplement</title>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        svg: { fontCache: "global" },
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+    ></script>
+    <link rel="stylesheet" href="../textbook.css" />
+    <style>
+      .cost {
+        border: 1px solid #c9c2a8;
+        background: #fbf8ee;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .cost .tag {
+        color: #8a6d1f;
+      }
+      .cost .grade {
+        font-weight: 600;
+      }
+      .lag {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .who {
+        font-family: system-ui, sans-serif;
+        font-size: 13.5px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .placeholder-note {
+        font-family: system-ui, sans-serif;
+        font-size: 12.5px;
+        color: #8a6d1f;
+      }
+    </style>
+    <style>
+      .pending {
+        border: 2px dashed #b9c0d0;
+        border-radius: 8px;
+        padding: 28px 16px;
+        text-align: center;
+        color: #5c6270;
+        font-style: italic;
+        background: #f6f8fb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        <a href="../history-of-graphics.html">A History of Computer Graphics</a>
+        &middot; <a href="../index.html">All chapters</a>.
+      </p>
+
+      <h1>Reading and Software</h1>
+
+      <p class="lead">
+        Sixty influential papers by theme, and free software, extending the
+        <a href="../history-of-graphics.html#reading">reading section</a> of A
+        History of Computer Graphics.
+      </p>
+
+      <h2 id="papers-all">Papers: sixty, by theme</h2>
+      <p>
+        Influence signal: reprinted in the Association for Computing
+        Machinery (ACM) collections
+        <em>Seminal Graphics: Pioneering Efforts That Shaped the Field</em>
+        (1998) or
+        <em>Seminal Graphics Papers: Pushing the Boundaries, Volume 2</em>
+        (2023, papers to 2015).
+        <!-- to source: SIGGRAPH Test-of-Time awards (siggraph.org not readable by script) and citation counts with read dates (papers.md open items 1 and 2) -->
+      </p>
+      <details>
+        <summary>Interaction and displays (3)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1963</td>
+            <td>
+              I. E. Sutherland, "Sketchpad: A man-machine graphical
+              communication system,"
+              <em>Proc. AFIPS Spring Joint Computer Conf.</em> 23, pp. 329 ff.,
+              1963;
+              <a
+                href="https://doi.org/10.1145/1461551.1461591"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/1461551.1461591</a
+              >;
+              <a
+                href="https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-574.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Drawing and editing structured pictures directly on a display with
+              a light pen
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              this chapter, <a href="../interaction.html">interaction</a>,
+              <a href="../scene-graphs.html">scene graphs</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1968</td>
+            <td>
+              I. E. Sutherland, "A head-mounted three dimensional display,"
+              <em>Proc. AFIPS Fall Joint Computer Conf.</em> 33, pp. 757 ff.,
+              1968;
+              <a
+                href="https://doi.org/10.1145/1476589.1476686"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/1476589.1476686</a
+              >
+            </td>
+            <td>
+              Presenting perspective images that follow the viewer&rsquo;s head
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              this chapter, <a href="../viewing.html">viewing</a>,
+              <a href="../interaction.html">interaction</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1993</td>
+            <td>
+              C. Cruz-Neira, D. J. Sandin, T. A. DeFanti, "Surround-screen
+              projection-based virtual reality: the design and implementation of
+              the CAVE," <em>Proc. SIGGRAPH 93</em>, pp. 135-142;
+              <a
+                href="https://doi.org/10.1145/166117.166134"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/166117.166134</a
+              >
+            </td>
+            <td>
+              Immersive virtual reality (VR) without a head-mounted display, using projected walls
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../interaction.html">interaction</a>,
+              <a href="../viewing.html">viewing</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Rasterization and visibility (6)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1965</td>
+            <td>
+              J. E. Bresenham, "Algorithm for computer control of a digital
+              plotter," <em>IBM Systems Journal</em> 4(1):25-30, 1965;
+              <a
+                href="https://doi.org/10.1147/sj.41.0025"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1147/sj.41.0025</a
+              >
+            </td>
+            <td>
+              Drawing straight lines on a discrete grid with integer arithmetic
+              only
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../rasterization.html">rasterization</a></td>
+          </tr>
+          <tr>
+            <td>1974</td>
+            <td>
+              I. E. Sutherland, R. F. Sproull, R. A. Schumacker, "A
+              characterization of ten hidden-surface algorithms,"
+              <em>ACM Computing Surveys</em> 6(1):1-55, 1974;
+              <a
+                href="https://doi.org/10.1145/356625.356626"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/356625.356626</a
+              >
+            </td>
+            <td>
+              Unifying hidden-surface removal as a family of sorting strategies
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../rasterization.html">rasterization</a>, this chapter
+            </td>
+          </tr>
+          <tr>
+            <td>1974/75</td>
+            <td>
+              E. Catmull, "Computer display of curved surfaces," 1975 (reprinted
+              in Seminal Graphics, 1998); based on his Univ. of Utah PhD thesis,
+              "A subdivision algorithm for computer display of curved surfaces,"
+              1974;
+              <a
+                href="https://doi.org/10.1145/280811.280920"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/280811.280920</a
+              >
+            </td>
+            <td>
+              Rendering curved patches by subdivision to pixels; introduces the
+              z-buffer and texture mapping
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../rasterization.html">rasterization</a>,
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../curves-surfaces.html">curves and surfaces</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1976</td>
+            <td>
+              J. H. Clark, "Hierarchical geometric models for visible surface
+              algorithms," <em>CACM</em> 19(10):547-554, 1976;
+              <a
+                href="https://doi.org/10.1145/360349.360354"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/360349.360354</a
+              >
+            </td>
+            <td>
+              Bounding-volume hierarchies and level of detail for scenes too
+              large to draw whole
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../scene-graphs.html">scene graphs</a>,
+              <a href="../viewing.html">viewing</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1977</td>
+            <td>
+              F. C. Crow, "The aliasing problem in computer-generated shaded
+              images," <em>CACM</em> 20(11):799-805, 1977;
+              <a
+                href="https://doi.org/10.1145/359863.359869"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/359863.359869</a
+              >
+            </td>
+            <td>
+              Jagged edges and moire explained as undersampling, with filtering
+              remedies
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../antialiasing.html">antialiasing</a></td>
+          </tr>
+          <tr>
+            <td>1978</td>
+            <td>
+              L. Williams, "Casting curved shadows on curved surfaces,"
+              <em>Computer Graphics</em> (SIGGRAPH 78) 12(3):270-274;
+              <a
+                href="https://doi.org/10.1145/965139.807402"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/965139.807402</a
+              >
+            </td>
+            <td>Shadows by rendering depth from the light: the shadow map</td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../rasterization.html">rasterization</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Shading and texture (10)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1971</td>
+            <td>
+              H. Gouraud, "Continuous shading of curved surfaces,"
+              <em>IEEE Trans. Computers</em> C-20(6):623-629, 1971;
+              <a
+                href="https://doi.org/10.1109/t-c.1971.223313"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1109/t-c.1971.223313</a
+              >
+            </td>
+            <td>
+              Visible facets of polygon meshes: interpolated vertex intensities
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../meshes.html">meshes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1975</td>
+            <td>
+              B. T. Phong, "Illumination for computer generated pictures,"
+              <em>CACM</em> 18(6):311-317, 1975;
+              <a
+                href="https://doi.org/10.1145/360825.360839"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/360825.360839</a
+              >
+            </td>
+            <td>
+              Specular highlights and smooth shading via interpolated normals
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../illumination.html">illumination</a></td>
+          </tr>
+          <tr>
+            <td>1976</td>
+            <td>
+              J. F. Blinn, M. E. Newell, "Texture and reflection in computer
+              generated images," <em>CACM</em> 19(10):542-547, 1976;
+              <a
+                href="https://doi.org/10.1145/360349.360353"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/360349.360353</a
+              >
+            </td>
+            <td>
+              Texture detail and mirror reflection without ray tracing
+              (environment mapping)
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../illumination.html">illumination</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1977</td>
+            <td>
+              J. F. Blinn, "Models of light reflection for computer synthesized
+              pictures," <em>Computer Graphics</em> (SIGGRAPH 77) 11(2):192-198;
+              <a
+                href="https://doi.org/10.1145/965141.563893"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/965141.563893</a
+              >
+            </td>
+            <td>
+              Physically motivated highlights (microfacet ideas; the Blinn
+              half-vector)
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../light-transport-pbr.html">light transport</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1978</td>
+            <td>
+              J. F. Blinn, "Simulation of wrinkled surfaces,"
+              <em>Computer Graphics</em> (SIGGRAPH 78) 12(3):286-292;
+              <a
+                href="https://doi.org/10.1145/965139.507101"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/965139.507101</a
+              >
+            </td>
+            <td>Surface roughness without extra geometry: bump mapping</td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../illumination.html">illumination</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1982</td>
+            <td>
+              R. L. Cook, K. E. Torrance, "A reflectance model for computer
+              graphics," <em>ACM TOG</em> 1(1):7-24, 1982 (SIGGRAPH 81 version:
+              <em>Computer Graphics</em> 15(3):307-316);
+              <a
+                href="https://doi.org/10.1145/357290.357293"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/357290.357293</a
+              >
+            </td>
+            <td>
+              Material-dependent specular reflection: microfacet bidirectional reflectance distribution function (BRDF) with
+              Fresnel term
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../light-transport-pbr.html">light transport</a>,
+              <a href="../color.html">color</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1983</td>
+            <td>
+              L. Williams, "Pyramidal parametrics,"
+              <em>Computer Graphics</em> (SIGGRAPH 83) 17(3):1-11;
+              <a
+                href="https://doi.org/10.1145/964967.801126"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/964967.801126</a
+              >
+            </td>
+            <td>
+              Aliasing in minified textures: prefiltered image pyramid (mipmap)
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../antialiasing.html">antialiasing</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>
+              R. L. Cook, "Shade trees," <em>Computer Graphics</em> (SIGGRAPH
+              84) 18(3):223-231;
+              <a
+                href="https://doi.org/10.1145/964965.808602"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/964965.808602</a
+              >;
+              <a
+                href="https://graphics.pixar.com/library/ShadeTrees/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Fixed shading models too rigid; shading as composable expression
+              trees
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../texture-mapping.html">texture mapping</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1985</td>
+            <td>
+              K. Perlin, "An image synthesizer,"
+              <em>Computer Graphics</em> (SIGGRAPH 85) 19(3):287-296;
+              <a
+                href="https://doi.org/10.1145/325165.325247"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/325165.325247</a
+              >
+            </td>
+            <td>
+              Natural-looking texture without images: noise and procedural
+              shading
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../texture-mapping.html">texture mapping</a></td>
+          </tr>
+          <tr>
+            <td>1990</td>
+            <td>
+              P. Hanrahan, J. Lawson, "A language for shading and lighting
+              calculations," <em>Computer Graphics</em> (SIGGRAPH 90)
+              24(4):289-298;
+              <a
+                href="https://doi.org/10.1145/97880.97911"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/97880.97911</a
+              >
+            </td>
+            <td>
+              A programmable shading language (RenderMan Shading Language)
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../texture-mapping.html">texture mapping</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Light transport and ray tracing (9)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1980</td>
+            <td>
+              T. Whitted, "An improved illumination model for shaded display,"
+              <em>CACM</em> 23(6):343-349, 1980;
+              <a
+                href="https://doi.org/10.1145/358876.358882"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/358876.358882</a
+              >
+            </td>
+            <td>Reflection, refraction and shadows by recursive rays</td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../ray-tracing.html">ray tracing</a></td>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>
+              R. L. Cook, T. Porter, L. Carpenter, "Distributed ray tracing,"
+              <em>Computer Graphics</em> (SIGGRAPH 84) 18(3):137-145;
+              <a
+                href="https://doi.org/10.1145/964965.808590"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/964965.808590</a
+              >;
+              <a
+                href="https://graphics.pixar.com/library/DistributedRayTracing/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Soft shadows, gloss, motion blur, depth of field by stochastic
+              sampling
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../ray-tracing.html">ray tracing</a>,
+              <a href="../antialiasing.html">antialiasing</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>
+              C. M. Goral, K. E. Torrance, D. P. Greenberg, B. Battaile,
+              "Modeling the interaction of light between diffuse surfaces,"
+              <em>Computer Graphics</em> (SIGGRAPH 84) 18(3):213-222;
+              <a
+                href="https://doi.org/10.1145/964965.808601"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/964965.808601</a
+              >
+            </td>
+            <td>Diffuse interreflection (color bleeding) via radiosity</td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../light-transport-pbr.html">light transport</a></td>
+          </tr>
+          <tr>
+            <td>1986</td>
+            <td>
+              J. T. Kajiya, "The rendering equation,"
+              <em>Computer Graphics</em> (SIGGRAPH 86) 20(4):143-150;
+              <a
+                href="https://doi.org/10.1145/15886.15902"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/15886.15902</a
+              >
+            </td>
+            <td>One integral equation for all light transport; path tracing</td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../light-transport-pbr.html">light transport</a>,
+              <a href="../ray-tracing.html">ray tracing</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1988</td>
+            <td>
+              M. F. Cohen, S. E. Chen, J. R. Wallace, D. P. Greenberg, "A
+              progressive refinement approach to fast radiosity image
+              generation," <em>Computer Graphics</em> (SIGGRAPH 88) 22(4):75-84;
+              <a
+                href="https://doi.org/10.1145/378456.378487"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/378456.378487</a
+              >
+            </td>
+            <td>Radiosity too slow to view; shoot light progressively</td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../light-transport-pbr.html">light transport</a></td>
+          </tr>
+          <tr>
+            <td>1995</td>
+            <td>
+              E. Veach, L. J. Guibas, "Optimally combining sampling techniques
+              for Monte Carlo rendering," <em>Proc. SIGGRAPH 95</em>, pp.
+              419-428;
+              <a
+                href="https://doi.org/10.1145/218380.218498"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/218380.218498</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/combine/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/veach_thesis/"
+                target="_blank"
+                rel="noopener"
+                >Veach&rsquo;s thesis</a
+              >
+            </td>
+            <td>
+              Noise from a single sampling strategy: multiple importance
+              sampling
+            </td>
+            <td>none recorded</td>
+            <td><a href="../light-transport-pbr.html">light transport</a></td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              H. W. Jensen, "Global illumination using photon maps,"
+              <em>Rendering Techniques '96</em> (Eurographics Workshop on
+              Rendering), Springer, pp. 21-30;
+              <a
+                href="https://doi.org/10.1007/978-3-7091-7484-5_3"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1007/978-3-7091-7484-5_3</a
+              >;
+              <a
+                href="http://graphics.ucsd.edu/~henrik/papers/photon_map/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Caustics and indirect light that path tracing samples poorly
+            </td>
+            <td>none recorded</td>
+            <td><a href="../light-transport-pbr.html">light transport</a></td>
+          </tr>
+          <tr>
+            <td>1997</td>
+            <td>
+              E. Veach, L. J. Guibas, "Metropolis light transport,"
+              <em>Proc. SIGGRAPH 97</em>, pp. 65-76;
+              <a
+                href="https://doi.org/10.1145/258734.258775"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/258734.258775</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/metro/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Light paths that are hard to sample: Markov chain path mutation
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../light-transport-pbr.html">light transport</a></td>
+          </tr>
+          <tr>
+            <td>2001</td>
+            <td>
+              H. W. Jensen, S. R. Marschner, M. Levoy, P. Hanrahan, "A practical
+              model for subsurface light transport,"
+              <em>Proc. SIGGRAPH 2001</em>, pp. 511-518;
+              <a
+                href="https://doi.org/10.1145/383259.383319"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/383259.383319</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/bssrdf/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Subsurface scattering in translucent materials (skin, marble,
+              milk)
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../light-transport-pbr.html">light transport</a>,
+              <a href="../illumination.html">illumination</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Image-based rendering, compositing and capture (7)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1984</td>
+            <td>
+              T. Porter, T. Duff, "Compositing digital images,"
+              <em>Computer Graphics</em> (SIGGRAPH 84) 18(3):253-259;
+              <a
+                href="https://doi.org/10.1145/964965.808606"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/964965.808606</a
+              >;
+              <a
+                href="https://graphics.pixar.com/library/Compositing/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Combining separately rendered elements: alpha channel and the over
+              operator
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../image-space.html">image space</a>,
+              <a href="../color.html">color</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1993</td>
+            <td>
+              S. E. Chen, L. Williams, "View interpolation for image synthesis,"
+              <em>Proc. SIGGRAPH 93</em>, pp. 279-288;
+              <a
+                href="https://doi.org/10.1145/166117.166153"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/166117.166153</a
+              >
+            </td>
+            <td>
+              New views from stored images plus depth instead of re-rendering
+            </td>
+            <td>both Seminal Graphics volumes</td>
+            <td>
+              <a href="../image-space.html">image space</a>,
+              <a href="../learned-scenes.html">learned scenes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              M. Levoy, P. Hanrahan, "Light field rendering,"
+              <em>Proc. SIGGRAPH 96</em>, pp. 31-42;
+              <a
+                href="https://doi.org/10.1145/237170.237199"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/237170.237199</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/light/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Rendering new views with no geometry, from a 4D array of rays
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../learned-scenes.html">learned scenes</a>,
+              <a href="../image-space.html">image space</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              S. J. Gortler, R. Grzeszczuk, R. Szeliski, M. F. Cohen, "The
+              lumigraph," <em>Proc. SIGGRAPH 96</em>, pp. 43-54;
+              <a
+                href="https://doi.org/10.1145/237170.237200"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/237170.237200</a
+              >
+            </td>
+            <td>
+              Same 4D ray function, captured with a hand-held camera and coarse
+              geometry
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../learned-scenes.html">learned scenes</a>,
+              <a href="../image-space.html">image space</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              P. E. Debevec, C. J. Taylor, J. Malik, "Modeling and rendering
+              architecture from photographs," <em>Proc. SIGGRAPH 96</em>, pp.
+              11-20;
+              <a
+                href="https://doi.org/10.1145/237170.237191"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/237170.237191</a
+              >;
+              <a
+                href="https://www.pauldebevec.com/Research/debevec-siggraph96-paper.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Photoreal models of buildings from a few photos (Facade,
+              view-dependent texture)
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../learned-scenes.html">learned scenes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1997</td>
+            <td>
+              P. E. Debevec, J. Malik, "Recovering high dynamic range radiance
+              maps from photographs," <em>Proc. SIGGRAPH 97</em>, pp. 369-378;
+              <a
+                href="https://doi.org/10.1145/258734.258884"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/258734.258884</a
+              >;
+              <a
+                href="https://www.pauldebevec.com/Research/HDR/debevec-siggraph97.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>Cameras clip real-world radiance; merge exposures into high dynamic range (HDR)</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../color.html">color</a>,
+              <a href="../image-space.html">image space</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1998</td>
+            <td>
+              P. Debevec, "Rendering synthetic objects into real scenes,"
+              <em>Proc. SIGGRAPH 98</em>, pp. 189-198;
+              <a
+                href="https://doi.org/10.1145/280814.280864"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/280814.280864</a
+              >;
+              <a
+                href="https://www.pauldebevec.com/Research/IBL/debevec-siggraph98.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Lighting computer-generated (CG) objects with measured real light (image-based
+              lighting)
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../illumination.html">illumination</a>,
+              <a href="../light-transport-pbr.html">light transport</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Animation and simulation (8)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1983</td>
+            <td>
+              W. T. Reeves, "Particle systems: a technique for modeling a class
+              of fuzzy objects," <em>ACM TOG</em> 2(2):91-108, 1983;
+              <a
+                href="https://doi.org/10.1145/357318.357320"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/357318.357320</a
+              >
+            </td>
+            <td>
+              Phenomena without surfaces (fire, smoke, explosions): particle
+              systems
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1987</td>
+            <td>
+              C. W. Reynolds, "Flocks, herds and schools: a distributed
+              behavioral model," <em>Computer Graphics</em> (SIGGRAPH 87)
+              21(4):25-34;
+              <a
+                href="https://doi.org/10.1145/37402.37406"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/37402.37406</a
+              >;
+              <a
+                href="https://www.red3d.com/cwr/papers/1987/boids.html"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>Group motion from three local rules (boids)</td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1987</td>
+            <td>
+              J. Lasseter, "Principles of traditional animation applied to 3D
+              computer animation," <em>Computer Graphics</em> (SIGGRAPH 87)
+              21(4):35-44;
+              <a
+                href="https://doi.org/10.1145/37402.37407"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/37402.37407</a
+              >
+            </td>
+            <td>
+              Principles of traditional animation (squash and stretch, timing,
+              anticipation) applied to 3D keyframing
+            </td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1987</td>
+            <td>
+              D. Terzopoulos, J. Platt, A. Barr, K. Fleischer, "Elastically
+              deformable models," <em>Computer Graphics</em> (SIGGRAPH 87)
+              21(4):205-214;
+              <a
+                href="https://doi.org/10.1145/37402.37427"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/37402.37427</a
+              >
+            </td>
+            <td>Cloth, rubber and soft bodies from elasticity theory</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1988</td>
+            <td>
+              A. Witkin, M. Kass, "Spacetime constraints,"
+              <em>Computer Graphics</em> (SIGGRAPH 88) 22(4):159-168;
+              <a
+                href="https://doi.org/10.1145/378456.378507"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/378456.378507</a
+              >;
+              <a
+                href="https://www.cs.cmu.edu/~aw/pdf/spacetime.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Physically plausible motion from goals, solved as optimization
+              over time
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1998</td>
+            <td>
+              D. Baraff, A. Witkin, "Large steps in cloth simulation,"
+              <em>Proc. SIGGRAPH 98</em>, pp. 43-54;
+              <a
+                href="https://doi.org/10.1145/280814.280821"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/280814.280821</a
+              >;
+              <a
+                href="https://www.cs.cmu.edu/~baraff/papers/sig98.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>Stiff cloth forced tiny time steps; implicit integration</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1999</td>
+            <td>
+              J. Stam, "Stable fluids," <em>Proc. SIGGRAPH 99</em>, pp. 121-128;
+              <a
+                href="https://doi.org/10.1145/311535.311548"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/311535.311548</a
+              >;
+              <a
+                href="https://www.dgp.toronto.edu/public_user/stam/reality/Research/pdf/ns.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Fluid solvers blew up at large time steps; semi-Lagrangian
+              advection
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../animation.html">animation</a></td>
+          </tr>
+          <tr>
+            <td>1999</td>
+            <td>
+              V. Blanz, T. Vetter, "A morphable model for the synthesis of 3D
+              faces," <em>Proc. SIGGRAPH 99</em>, pp. 187-194;
+              <a
+                href="https://doi.org/10.1145/311535.311556"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/311535.311556</a
+              >
+            </td>
+            <td>3D faces from one photo via a statistical shape space</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../meshes.html">meshes</a>,
+              <a href="../neural-nets-embeddings.html">neural networks</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Curves, surfaces and geometry processing (6)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1978</td>
+            <td>
+              E. Catmull, J. Clark, "Recursively generated B-spline surfaces on
+              arbitrary topological meshes,"
+              <em>Computer-Aided Design</em> 10(6):350-355, 1978;
+              <a
+                href="https://doi.org/10.1016/0010-4485(78)90110-0"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1016/0010-4485(78)90110-0</a
+              >
+            </td>
+            <td>Smooth surfaces on meshes of any topology: subdivision</td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../curves-surfaces.html">curves and surfaces</a>,
+              <a href="../meshes.html">meshes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1987</td>
+            <td>
+              W. E. Lorensen, H. E. Cline, "Marching cubes: a high resolution 3D
+              surface construction algorithm,"
+              <em>Computer Graphics</em> (SIGGRAPH 87) 21(4):163-169;
+              <a
+                href="https://doi.org/10.1145/37402.37422"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/37402.37422</a
+              >
+            </td>
+            <td>Extracting a triangle surface from volume data (computed tomography, CT; magnetic resonance
+              imaging, MRI)</td>
+            <td>Seminal Graphics (1998)</td>
+            <td><a href="../meshes.html">meshes</a></td>
+          </tr>
+          <tr>
+            <td>1992</td>
+            <td>
+              H. Hoppe, T. DeRose, T. Duchamp, J. McDonald, W. Stuetzle,
+              "Surface reconstruction from unorganized points,"
+              <em>Computer Graphics</em> (SIGGRAPH 92) 26(2):71-78;
+              <a
+                href="https://doi.org/10.1145/142920.134011"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/142920.134011</a
+              >;
+              <a
+                href="https://hhoppe.com/recon.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>A mesh from a raw point cloud with no connectivity</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../meshes.html">meshes</a></td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              H. Hoppe, "Progressive meshes," <em>Proc. SIGGRAPH 96</em>, pp.
+              99-108;
+              <a
+                href="https://doi.org/10.1145/237170.237216"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/237170.237216</a
+              >;
+              <a href="https://hhoppe.com/pm.pdf" target="_blank" rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>Continuous level of detail and streaming for meshes</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../meshes.html">meshes</a></td>
+          </tr>
+          <tr>
+            <td>1996</td>
+            <td>
+              B. Curless, M. Levoy, "A volumetric method for building complex
+              models from range images," <em>Proc. SIGGRAPH 96</em>, pp.
+              303-312;
+              <a
+                href="https://doi.org/10.1145/237170.237269"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/237170.237269</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/volrange/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Merging many range scans into one watertight model (signed
+              distance fusion)
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../meshes.html">meshes</a>,
+              <a href="../learned-scenes.html">learned scenes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>1997</td>
+            <td>
+              M. Garland, P. S. Heckbert, "Surface simplification using quadric
+              error metrics," <em>Proc. SIGGRAPH 97</em>, pp. 209-216;
+              <a
+                href="https://doi.org/10.1145/258734.258849"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/258734.258849</a
+              >;
+              <a
+                href="https://www.cs.cmu.edu/~garland/Papers/quadrics.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>Fast, good-quality mesh simplification</td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td><a href="../meshes.html">meshes</a></td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Hardware, architectures and real time (5)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>1982</td>
+            <td>
+              J. H. Clark, "The Geometry Engine: a VLSI geometry system for
+              graphics," <em>Computer Graphics</em> (SIGGRAPH 82) 16(3):127-133;
+              <a
+                href="https://doi.org/10.1145/965145.801272"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/965145.801272</a
+              >
+            </td>
+            <td>Transform and clip in custom very-large-scale integration (VLSI) chips
+              rather than central processing unit (CPU) software</td>
+            <td>Seminal Graphics (1998)</td>
+            <td>
+              <a href="../affine-transforms.html">affine transforms</a>,
+              <a href="../viewing.html">viewing</a>, this chapter
+            </td>
+          </tr>
+          <tr>
+            <td>1987</td>
+            <td>
+              R. L. Cook, L. Carpenter, E. Catmull, "The Reyes image rendering
+              architecture," <em>Computer Graphics</em> (SIGGRAPH 87)
+              21(4):95-102;
+              <a
+                href="https://doi.org/10.1145/37402.37414"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/37402.37414</a
+              >;
+              <a
+                href="https://graphics.pixar.com/library/Reyes/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Film-quality rendering of complex scenes: dice to
+              micropolygons
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../rasterization.html">rasterization</a>, this chapter
+            </td>
+          </tr>
+          <tr>
+            <td>1993</td>
+            <td>
+              K. Akeley, "RealityEngine graphics," <em>Proc. SIGGRAPH 93</em>,
+              pp. 109-116;
+              <a
+                href="https://doi.org/10.1145/166117.166131"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/166117.166131</a
+              >
+            </td>
+            <td>
+              Antialiased, texture-mapped polygons in real time in hardware
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../rasterization.html">rasterization</a>,
+              <a href="../texture-mapping.html">texture mapping</a>,
+              <a href="../antialiasing.html">antialiasing</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2002</td>
+            <td>
+              P.-P. Sloan, J. Kautz, J. Snyder, "Precomputed radiance transfer
+              for real-time rendering in dynamic, low-frequency lighting
+              environments," <em>ACM TOG</em> 21(3):527-536 (SIGGRAPH 2002);
+              <a
+                href="https://doi.org/10.1145/566654.566612"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/566654.566612</a
+              >;
+              <a
+                href="https://www.ppsloan.org/publications/shillum_final23.pdf"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Soft shadows and interreflection at interactive rates via
+              spherical harmonics
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              <a href="../light-transport-pbr.html">light transport</a>,
+              <a href="../illumination.html">illumination</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2004</td>
+            <td>
+              I. Buck, T. Foley, D. Horn, J. Sugerman, K. Fatahalian, M.
+              Houston, P. Hanrahan, "Brook for GPUs: stream computing on
+              graphics hardware," <em>ACM TOG</em> 23(3):777-786 (SIGGRAPH
+              2004);
+              <a
+                href="https://doi.org/10.1145/1015706.1015800"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/1015706.1015800</a
+              >;
+              <a
+                href="https://graphics.stanford.edu/papers/brookgpu/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              General computation on graphics processing units (GPUs); precursor of
+              CUDA-style (Compute Unified Device Architecture) programming
+            </td>
+            <td>Seminal Graphics Papers vol. 2 (2023)</td>
+            <td>
+              this chapter,
+              <a href="../neural-nets-embeddings.html">neural networks</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+      <details>
+        <summary>Neural rendering and generative models (6)</summary>
+        <table>
+          <tr>
+            <th>year</th>
+            <th>paper</th>
+            <th>problem addressed</th>
+            <th>influence signal</th>
+            <th>chapter</th>
+          </tr>
+          <tr>
+            <td>2020</td>
+            <td>
+              B. Mildenhall, P. P. Srinivasan, M. Tancik, J. T. Barron, R.
+              Ramamoorthi, R. Ng, "NeRF: representing scenes as neural radiance
+              fields for view synthesis," <em>ECCV 2020</em>, LNCS, Springer,
+              pp. 405-421;
+              <a
+                href="https://doi.org/10.1007/978-3-030-58452-8_24"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1007/978-3-030-58452-8_24</a
+              >;
+              <a
+                href="https://arxiv.org/abs/2003.08934"
+                target="_blank"
+                rel="noopener"
+                >arXiv:2003.08934</a
+              >
+            </td>
+            <td>Photoreal novel views from photos, scene stored as a multilayer perceptron (MLP)</td>
+            <td>none recorded</td>
+            <td>
+              <a href="../learned-scenes.html">learned scenes</a>,
+              <a href="../neural-nets-embeddings.html">neural networks</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2020</td>
+            <td>
+              J. Ho, A. Jain, P. Abbeel, "Denoising diffusion probabilistic
+              models," <em>NeurIPS 2020</em>;
+              <a
+                href="https://arxiv.org/abs/2006.11239"
+                target="_blank"
+                rel="noopener"
+                >arXiv:2006.11239</a
+              >
+            </td>
+            <td>
+              High-quality image generation by learning to reverse a noising
+              process
+            </td>
+            <td>none recorded</td>
+            <td><a href="../diffusion-models.html">diffusion</a></td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>
+              R. Rombach, A. Blattmann, D. Lorenz, P. Esser, B. Ommer,
+              "High-resolution image synthesis with latent diffusion models,"
+              <em>CVPR 2022</em>, pp. 10674-10685;
+              <a
+                href="https://doi.org/10.1109/cvpr52688.2022.01042"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1109/cvpr52688.2022.01042</a
+              >;
+              <a
+                href="https://arxiv.org/abs/2112.10752"
+                target="_blank"
+                rel="noopener"
+                >arXiv:2112.10752</a
+              >
+            </td>
+            <td>
+              Diffusion too costly at full resolution; diffuse in a learned
+              latent space
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../diffusion-models.html">diffusion</a>,
+              <a href="../neural-nets-embeddings.html">neural networks</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>
+              T. Müller, A. Evans, C. Schied, A. Keller, "Instant neural
+              graphics primitives with a multiresolution hash encoding,"
+              <em>ACM TOG</em> 41(4), pp. 1-15 (SIGGRAPH 2022);
+              <a
+                href="https://doi.org/10.1145/3528223.3530127"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/3528223.3530127</a
+              >;
+              <a
+                href="https://arxiv.org/abs/2201.05989"
+                target="_blank"
+                rel="noopener"
+                >arXiv:2201.05989</a
+              >
+            </td>
+            <td>
+              NeRF training took hours; hash-grid encoding cuts it to seconds
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../learned-scenes.html">learned scenes</a>,
+              <a href="../neural-nets-embeddings.html">neural networks</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2022</td>
+            <td>
+              B. Poole, A. Jain, J. T. Barron, B. Mildenhall, "DreamFusion:
+              text-to-3D using 2D diffusion," <em>ICLR 2023</em> (arXiv 2022);
+              <a
+                href="https://arxiv.org/abs/2209.14988"
+                target="_blank"
+                rel="noopener"
+                >arXiv:2209.14988</a
+              >
+            </td>
+            <td>
+              3D assets from text with no 3D training data (score distillation)
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../diffusion-models.html">diffusion</a>,
+              <a href="../learned-scenes.html">learned scenes</a>
+            </td>
+          </tr>
+          <tr>
+            <td>2023</td>
+            <td>
+              B. Kerbl, G. Kopanas, T. Leimkühler, G. Drettakis, "3D Gaussian
+              splatting for real-time radiance field rendering,"
+              <em>ACM TOG</em> 42(4), pp. 1-14 (SIGGRAPH 2023);
+              <a
+                href="https://doi.org/10.1145/3592433"
+                target="_blank"
+                rel="noopener"
+                >doi:10.1145/3592433</a
+              >;
+              <a
+                href="https://repo-sam.inria.fr/fungraph/3d-gaussian-splatting/"
+                target="_blank"
+                rel="noopener"
+                >open copy</a
+              >
+            </td>
+            <td>
+              Radiance fields at real-time rates by rasterizing anisotropic
+              Gaussians
+            </td>
+            <td>none recorded</td>
+            <td>
+              <a href="../learned-scenes.html">learned scenes</a>,
+              <a href="../rasterization.html">rasterization</a>
+            </td>
+          </tr>
+        </table>
+      </details>
+
+      <h2 id="software">Free software</h2>
+      <p>
+        All free of charge; the five that are
+        <strong>not open source</strong> are marked in the license column
+        (licenses as of 2026-10-02).
+      </p>
+      <table>
+        <tr>
+          <th>software</th>
+          <th>license</th>
+          <th>in this course</th>
+        </tr>
+        <tr>
+          <th colspan="3">Historical renderers and classic data</th>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://github.com/POV-Ray/povray"
+              target="_blank"
+              rel="noopener"
+              >POV-Ray</a
+            >
+            (from DKBTrace, 1986 to 1989; POV-Ray from 1991)
+          </td>
+          <td>AGPL-3.0 from version 3.7</td>
+          <td>
+            ray tracing; a text scene language that reads as a scene graph
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.radiance-online.org"
+              target="_blank"
+              rel="noopener"
+              >Radiance</a
+            >
+            (Greg Ward, Lawrence Berkeley National Laboratory)
+          </td>
+          <td>Radiance Software License 1.0 (BSD-style)</td>
+          <td>validated lighting simulation</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://users.cs.utah.edu/~dejohnso/models/teapot.html"
+              target="_blank"
+              rel="noopener"
+              >Utah teapot data</a
+            >
+          </td>
+          <td>not stated (widely redistributed)</td>
+          <td>Bézier patches, tessellation</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://graphics.stanford.edu/data/3Dscanrep/"
+              target="_blank"
+              rel="noopener"
+              >Stanford 3D Scanning Repository</a
+            >
+          </td>
+          <td>own terms: research and redistribution, no commercial use</td>
+          <td>meshes, simplification</td>
+        </tr>
+        <tr>
+          <th colspan="3">Renderers and rendering libraries</th>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://github.com/mmp/pbrt-v4"
+              target="_blank"
+              rel="noopener"
+              >pbrt-v4</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>light transport, sampling, spectral color</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.mitsuba-renderer.org"
+              target="_blank"
+              rel="noopener"
+              >Mitsuba 3</a
+            >
+            and Dr.Jit (EPFL)
+          </td>
+          <td>BSD-3-Clause</td>
+          <td>differentiable and inverse rendering</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://github.com/LuxCoreRender/LuxCore"
+              target="_blank"
+              rel="noopener"
+              >LuxCoreRender</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>unbiased rendering</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://appleseedhq.net" target="_blank" rel="noopener"
+              >appleseed</a
+            >
+            (no release since 2019)
+          </td>
+          <td>MIT</td>
+          <td>production-style rendering with Open Shading Language (OSL)</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.cycles-renderer.org"
+              target="_blank"
+              rel="noopener"
+              >Cycles</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>path tracing with node shading</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://docs.blender.org/manual/en/latest/render/eevee/"
+              target="_blank"
+              rel="noopener"
+              >EEVEE</a
+            >
+            (in Blender)
+          </td>
+          <td>GPL-2.0-or-later</td>
+          <td>a rasterizer beside Cycles on the same scene</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.embree.org" target="_blank" rel="noopener"
+              >Intel Embree</a
+            >,
+            <a href="https://www.ospray.org" target="_blank" rel="noopener"
+              >OSPRay</a
+            >,
+            <a
+              href="https://www.openimagedenoise.org"
+              target="_blank"
+              rel="noopener"
+              >Open Image Denoise</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>ray-tracing kernels, volume rendering, learned denoising</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://renderman.pixar.com" target="_blank" rel="noopener"
+              >Pixar RenderMan, Non-Commercial</a
+            >
+          </td>
+          <td><strong>free, not open source</strong> (proprietary)</td>
+          <td>production rendering</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://developer.nvidia.com/designworks/optix/download"
+              target="_blank"
+              rel="noopener"
+              >NVIDIA OptiX SDK</a
+            >
+          </td>
+          <td><strong>free, not open source</strong> (NVIDIA SDK license)</td>
+          <td>GPU ray tracing on RTX hardware</td>
+        </tr>
+        <tr>
+          <th colspan="3">Modeling, content creation and engines</th>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.blender.org" target="_blank" rel="noopener"
+              >Blender</a
+            >
+            (released under the GPL on 13 October 2002 after a user-funded
+            buyout)
+          </td>
+          <td>GPL-2.0-or-later</td>
+          <td>every chapter</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.meshlab.net" target="_blank" rel="noopener"
+              >MeshLab</a
+            >
+            (ISTI-CNR, Pisa)
+          </td>
+          <td>GPL-3.0</td>
+          <td>scan cleaning, simplification, remeshing</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://openscad.org" target="_blank" rel="noopener"
+              >OpenSCAD</a
+            >
+          </td>
+          <td>GPL-2.0 with a CGAL linking exception</td>
+          <td>constructive solid geometry (CSG) trees written as code</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.freecad.org" target="_blank" rel="noopener"
+              >FreeCAD</a
+            >
+          </td>
+          <td>LGPL-2.1</td>
+          <td>parametric computer-aided design (CAD), boundary representation (B-rep)
+            and non-uniform rational B-splines (NURBS)</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.sidefx.com/products/houdini-apprentice/"
+              target="_blank"
+              rel="noopener"
+              >Houdini Apprentice</a
+            >
+          </td>
+          <td>
+            <strong>free, not open source</strong>; non-commercial, renders
+            capped at 1920 by 1080, watermarked
+          </td>
+          <td>procedural modeling, simulation</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://godotengine.org" target="_blank" rel="noopener"
+              >Godot Engine</a
+            >
+          </td>
+          <td>MIT</td>
+          <td>scene graphs, shaders, interaction</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://unity.com/products/unity-personal"
+              target="_blank"
+              rel="noopener"
+              >Unity Personal</a
+            >
+          </td>
+          <td>
+            <strong>free tier, not open source</strong>; under $200K revenue and
+            funds raised in 12 months
+          </td>
+          <td>the course&rsquo;s engine track</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.unrealengine.com"
+              target="_blank"
+              rel="noopener"
+              >Unreal Engine</a
+            >
+          </td>
+          <td>
+            <strong>free to download, not open source</strong>; source available
+            to licensees
+          </td>
+          <td>real-time rendering reference</td>
+        </tr>
+        <tr>
+          <th colspan="3">Libraries, interfaces and standards</th>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.khronos.org/opengl/"
+              target="_blank"
+              rel="noopener"
+              >OpenGL</a
+            >
+            (4.6, 2017) and
+            <a
+              href="https://www.khronos.org/webgl/"
+              target="_blank"
+              rel="noopener"
+              >WebGL</a
+            >
+          </td>
+          <td>royalty-free specifications</td>
+          <td>the course demos run on WebGL</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.vulkan.org" target="_blank" rel="noopener"
+              >Vulkan</a
+            >
+          </td>
+          <td>royalty-free specification</td>
+          <td>explicit raster and ray-tracing pipelines</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://threejs.org" target="_blank" rel="noopener"
+              >three.js</a
+            >,
+            <a href="https://www.babylonjs.com" target="_blank" rel="noopener"
+              >Babylon.js</a
+            >
+          </td>
+          <td>MIT; Apache-2.0</td>
+          <td>the course&rsquo;s web track</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://openusd.org" target="_blank" rel="noopener"
+              >OpenUSD</a
+            >
+            (Pixar, open since 2016)
+          </td>
+          <td>
+            Tomorrow Open Source Technology License 1.0 (Apache 2.0 with a
+            different trademark section)
+          </td>
+          <td>scene description and composition</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://github.com/alembic/alembic"
+              target="_blank"
+              rel="noopener"
+              >Alembic</a
+            >,
+            <a href="https://openexr.com" target="_blank" rel="noopener"
+              >OpenEXR</a
+            >,
+            <a
+              href="https://github.com/AcademySoftwareFoundation/OpenColorIO"
+              target="_blank"
+              rel="noopener"
+              >OpenColorIO</a
+            >,
+            <a
+              href="https://github.com/AcademySoftwareFoundation/OpenShadingLanguage"
+              target="_blank"
+              rel="noopener"
+              >Open Shading Language</a
+            >
+          </td>
+          <td>BSD-3-Clause</td>
+          <td>geometry caches, HDR images, color management, shaders</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.openvdb.org" target="_blank" rel="noopener"
+              >OpenVDB</a
+            >,
+            <a href="https://materialx.org" target="_blank" rel="noopener"
+              >MaterialX</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>sparse volumes; portable materials</td>
+        </tr>
+        <tr>
+          <td>
+            <a
+              href="https://www.khronos.org/gltf/"
+              target="_blank"
+              rel="noopener"
+              >glTF 2.0</a
+            >
+            (ISO/IEC 12113:2022)
+          </td>
+          <td>royalty-free specification</td>
+          <td>the course&rsquo;s asset format</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://libigl.github.io" target="_blank" rel="noopener"
+              >libigl</a
+            >
+          </td>
+          <td>MPL-2.0 core; GPL-3.0 modules</td>
+          <td>geometry processing</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.cgal.org" target="_blank" rel="noopener"
+              >CGAL</a
+            >
+          </td>
+          <td>
+            GPL-3.0-or-later and LGPL-3.0-or-later, plus a commercial license
+          </td>
+          <td>robust computational geometry</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://www.open3d.org" target="_blank" rel="noopener"
+              >Open3D</a
+            >,
+            <a href="https://pytorch3d.org" target="_blank" rel="noopener"
+              >PyTorch3D</a
+            >
+          </td>
+          <td>MIT; BSD-3-Clause</td>
+          <td>point clouds; differentiable rendering</td>
+        </tr>
+        <tr>
+          <td>
+            <a href="https://docs.nerf.studio" target="_blank" rel="noopener"
+              >nerfstudio</a
+            >,
+            <a href="https://docs.gsplat.studio" target="_blank" rel="noopener"
+              >gsplat</a
+            >,
+            <a
+              href="https://developer.nvidia.com/kaolin"
+              target="_blank"
+              rel="noopener"
+              >NVIDIA Kaolin</a
+            >
+          </td>
+          <td>Apache-2.0</td>
+          <td>learned scenes</td>
+        </tr>
+      </table>
+      <!-- to source: Rayshade and BMRT (no live primary source; resources.md marks them not verified) -->
+
+      <div class="hands">
+        <span class="tag">Start here</span>
+        <ol>
+          <li>
+            <strong>Ray Tracing in One Weekend</strong> (<a
+              href="https://raytracing.github.io"
+              target="_blank"
+              rel="noopener"
+              >raytracing.github.io</a
+            >): write a ray tracer in a weekend.
+          </li>
+          <li>
+            <strong>Blender</strong> (<a
+              href="https://www.blender.org"
+              target="_blank"
+              rel="noopener"
+              >blender.org</a
+            >): render one scene in EEVEE and in Cycles and compare.
+          </li>
+          <li>
+            <strong>The Book of Shaders</strong>, then
+            <strong>Shadertoy</strong>: write a fragment shader in the browser.
+          </li>
+          <li>
+            <strong>three.js examples</strong> (<a
+              href="https://threejs.org"
+              target="_blank"
+              rel="noopener"
+              >threejs.org</a
+            >): scene graphs and viewing in the browser, the stack the course
+            demos use.
+          </li>
+          <li>
+            <strong>pbr-book.org</strong>: read chapter 1 of the free 4th
+            edition.
+          </li>
+          <li>
+            <strong>Poly Haven</strong> and the
+            <strong>Stanford 3D Scanning Repository</strong>: free HDR
+            environments, textures and the bunny.
+          </li>
+          <li>
+            <strong>Ke-Sen Huang&rsquo;s lists</strong>: find this year&rsquo;s papers from SIGGRAPH (the ACM Special Interest
+            Group on Computer Graphics and Interactive Techniques) with free PDFs.
+          </li>
+        </ol>
+      </div>
+
+      <div class="aside">
+        <span class="tag">How to read a SIGGRAPH paper</span>
+        First pass: the abstract, then every figure and caption in order
+        (graphics papers carry most of their argument in figures), then the
+        results: what exactly is compared, and is the baseline fair? Second
+        pass, only if the paper still matters: the method, with a pencil. Follow
+        citations backward from a modern paper&rsquo;s related work to the
+        papers in the history chapter. Look for the project page, which usually has
+        video, code and data.
+      </div>
+
+      
+      <footer>
+        CSS 551 &middot; course text &middot; Reading and Software, supplement to A History of
+        Computer Graphics v4.0 &middot; prepared by Dr. Marcel Gavriliu. Image
+        credits appear in each caption.
+        <a href="../history-of-graphics.html">Back to the chapter</a>.
+      </footer>
+    </div>
+  </body>
+</html>

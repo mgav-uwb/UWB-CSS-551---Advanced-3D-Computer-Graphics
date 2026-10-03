@@ -1,19 +1,26 @@
 <!--
   CSS 551 · L01 (Thursday October 1, week 1, in person): welcome, the course in
-  brief, then The Big Picture, part 1 (history eras 1 to 4).
+  brief, then The Big Picture, part 1 (rebuilt 2026-10-03; the original deck is in
+  lectures/archive/L01-big-picture-1-v1/).
 
   COMPOSITION: index.html mounts L01-open.md (this file: title, the course in
-  brief, tonight), ../../topics/big-picture-eras-1-4.md (~72 min), L01-discuss.md
-  (discussion ~20 min and the wrap). Week 1 has no quiz and no homework out.
+  brief, tonight), ../../topics/history-what-is-cg.md,
+  ../../topics/history-machines.md,
+  ../../topics/history-problems-1.md, then L01-discuss.md
+  (discussion, the setup slide for next Thursday, the wrap). Week 1 has no quiz
+  and no homework out.
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
-    0:00  Title, welcome, the course in brief, tonight        ~12 min (this file)
-    0:12  The big picture, eras 1 to 4                         ~72 min (topic)
-    1:24  buffer                                               ~16 min
-    1:40  Discussion: three questions, then the wrap           ~20 min
+    0:00  Title, welcome, the course in brief, tonight   ~12 min (this file, 7 slides)
+    0:12  What computer graphics is, where it is used     ~13 min (13 slides)
+    0:25  The early machines, 1958 to 1972                ~18 min (16 slides)
+    0:43  Problems and solutions, 1959 to about 1982      ~50 min (26 slides)
+    1:33  Discussion: four questions                      ~20 min (5 slides)
+    1:53  Before next Thursday, wrap                       ~3 min (2 slides)
+    1:56  buffer                                           ~4 min
     2:00  end
-  The buffer absorbs the Utah era, which runs long; if it is not needed, take
-  questions on the course logistics before the discussion.
+  69 slides. If the problems deck runs long, the buffer absorbs it; the
+  discussion keeps its 20 minutes.
 
   Facts on these slides come from the syllabus and Plan C
   (planning/css551-au26-plan-c-2026-09-29.md): 1000 points (homework 200, quizzes best 6 of 8 at 40 = 240, midterm 200,
@@ -30,7 +37,7 @@
 
 **Lecture 1: The Big Picture, part 1**
 
-*Seventy-five years, eight eras, in order.*
+*What computer graphics is, the machines that started it, and the problems it solved first.*
 
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
@@ -98,12 +105,12 @@ How a computer turns a description of a 3D world into a picture, and, increasing
 
 ## Tonight
 
-**Eight eras, 1950 to today**, each idea taught in the era that made it the point. Tonight, the first four:
+The field's history, organized by problem:
 
-1. interactive pictures are born (1950–1968)
-2. the Utah school invents the pipeline (1968–1980)
-3. chasing the photograph (1975–1990)
-4. the raster machines (1980–2000)
+1. **what computer graphics is**, among its neighbors, and where it is used
+2. **the early machines**, 1958 to 1972: Sketchpad on the TX-2 first, each machine with its price
+3. **problems and solutions**, 1959 to about 1982: the problem, the named solutions, the people and organizations
+4. **discussion**: four questions on tonight's numbers
 
-Reading: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 1 to 4.
+Reading: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 1 to 5.
 

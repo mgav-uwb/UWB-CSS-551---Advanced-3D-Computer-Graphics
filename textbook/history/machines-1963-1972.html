@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Machines, 1963 to 1972 - CSS 551 course text supplement</title>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        svg: { fontCache: "global" },
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+    ></script>
+    <link rel="stylesheet" href="../textbook.css" />
+    <style>
+      .cost {
+        border: 1px solid #c9c2a8;
+        background: #fbf8ee;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .cost .tag {
+        color: #8a6d1f;
+      }
+      .cost .grade {
+        font-weight: 600;
+      }
+      .lag {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .who {
+        font-family: system-ui, sans-serif;
+        font-size: 13.5px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .placeholder-note {
+        font-family: system-ui, sans-serif;
+        font-size: 12.5px;
+        color: #8a6d1f;
+      }
+    </style>
+    <style>
+      .pending {
+        border: 2px dashed #b9c0d0;
+        border-radius: 8px;
+        padding: 28px 16px;
+        text-align: center;
+        color: #5c6270;
+        font-style: italic;
+        background: #f6f8fb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        <a href="../history-of-graphics.html">A History of Computer Graphics</a>
+        &middot; <a href="../index.html">All chapters</a>.
+      </p>
+
+      <h1>Machines, 1963 to 1972</h1>
+
+      <p class="lead">
+        Word sizes, memory, rates, dates and secondary sources for the machines
+        after Sketchpad. Their photographs and cost boxes are in Section 3 of
+        <a href="../history-of-graphics.html#early"
+          >A History of Computer Graphics</a
+        >.
+      </p>
+
+      <h2 id="ibm2250">IBM 2250 (1964)</h2>
+      <p>
+        International Business Machines (IBM) announced the 2250 Display Unit in
+        April 1964 as a peripheral of the System/360 (Weisberg). Its manual (IBM
+        GA27-2701) describes 1,024 by 1,024 addressable positions over a 12 by
+        12 inch area; points, horizontal and vertical vectors and short
+        45-degree vectors in the basic unit, with an &ldquo;Absolute
+        Vectors&rdquo; feature for any angle; 4 bytes of buffer per point or
+        vector; an optional local buffer of 4,096 or 8,192 bytes from which the
+        display refreshed itself; and a light pen with alphanumeric and
+        programmed function keyboards. In 1972 Machover called the 2250 series
+        &ldquo;probably the most widely used graphic terminals over the past
+        five years&rdquo;.
+      </p>
+
+      <h2 id="pdp1">
+        DEC PDP-1, the Type 30 display, and <em>Spacewar!</em> (1960 to 1962)
+      </h2>
+      <p>
+        The Digital Equipment Corporation (DEC), of Maynard, Massachusetts,
+        delivered its first PDP-1 in 1960. The 1963 handbook gives an 18-bit
+        word, 4,096 words of core at 5 µs (expandable to 65,536) and
+        &ldquo;100,000 additions per second.&rdquo; Its Type 30 display was a
+        16-inch cathode-ray tube (CRT) plotting random points, 1,024 by 1,024
+        addressable over 9.25 by 9.25 inches (512 per axis distinguishable), at
+        20,000 points per second, with a Type 32 light pen. DEC built 53 PDP-1s,
+        the last in 1969, and later wrote that some of the first had graphic
+        displays, &ldquo;the first commercially available graphic terminals for
+        computers&rdquo; (DEC, 1978; the company&rsquo;s own claim).
+      </p>
+      <p>
+        On the PDP-1 at the Massachusetts Institute of Technology (MIT),
+        <em>Spacewar!</em> was conceived in 1961 by Steve Russell, Martin Graetz
+        and Wayne Wiitanen, written first by Russell and improved in spring 1962
+        by Samson, Edwards and Graetz; it sent &ldquo;over 20,000 points per
+        second to the Type 30 display&rdquo; and spread to other PDP-1 sites
+        through DEC&rsquo;s user society (Computer History Museum, CHM).
+      </p>
+
+      <h2 id="tablet-mouse">
+        Input: the RAND Tablet and Engelbart&rsquo;s mouse (1964 to 1968)
+      </h2>
+      <p>
+        M. R. Davis and T. O. Ellis at the RAND Corporation, under funding from
+        the Advanced Research Projects Agency (ARPA), described the RAND Tablet
+        in 1964 (<a
+          href="https://doi.org/10.7249/RM4122"
+          target="_blank"
+          rel="noopener"
+          >RAND RM-4122-ARPA</a
+        >;
+        <a
+          href="https://doi.org/10.1145/1464052.1464080"
+          target="_blank"
+          rel="noopener"
+          >American Federation of Information Processing Societies (AFIPS) Fall
+          Joint Computer Conference 1964</a
+        >). It is reported to have had a 10 by 10 inch surface at 100 lines per
+        inch. Machover (1972) notes that &ldquo;the light pen could not be used
+        with storage tube systems&rdquo; (<a
+          href="../history-of-graphics.html#storage-tubes"
+          >storage tubes</a
+        >), which pushed tablet development.
+      </p>
+      <p>
+        At the Stanford Research Institute (SRI), Douglas Engelbart&rsquo;s
+        Augmentation Research Center built NLS (the oN-Line System). His patent
+        for an &ldquo;X-Y position indicator for a display system,&rdquo; two
+        perpendicular wheels driving potentiometers, was filed on 21 June 1967
+        and granted on 17 November 1970 (US 3,541,541); this is the mouse. A
+        museum label dates the first prototype to 1964 and credits Bill English
+        with building it. NLS was shown to the Fall Joint Computer Conference in
+        San Francisco on 9 December 1968 (<a
+          href="https://doi.org/10.1145/1476589.1476645"
+          target="_blank"
+          rel="noopener"
+          >Engelbart and English, &ldquo;A research center for augmenting human
+          intellect,&rdquo; AFIPS 1968</a
+        >); the demonstration is reported to have lasted 90 minutes before about
+        1,000 people.
+      </p>
+
+      <h2 id="hmd">The head-mounted display (Harvard, 1968)</h2>
+      <p>
+        In a 1965 essay, &ldquo;The Ultimate Display,&rdquo; Sutherland
+        described the display as &ldquo;a looking glass into a mathematical
+        wonderland&rdquo; (<a
+          href="https://worrydream.com/refs/Sutherland_1965_-_The_Ultimate_Display.pdf"
+          target="_blank"
+          rel="noopener"
+          >Sutherland, 1965</a
+        >). Three years later he described one he had built. The work was
+        &ldquo;performed at Harvard University, supported in part by&rdquo;
+        ARPA, the Office of Naval Research (ONR) and Bell Telephone Laboratories
+        (Bell Labs), after early work at Lincoln Laboratory (<a
+          href="https://doi.org/10.1145/1476589.1476686"
+          target="_blank"
+          rel="noopener"
+          >Sutherland, &ldquo;A head-mounted three dimensional display,&rdquo;
+          AFIPS Fall Joint Computer Conference 1968</a
+        >). Philco&rsquo;s Headsight of 1961 had already put a remote
+        camera&rsquo;s picture in front of the eyes (Carlson, sec. 17.1);
+        Sutherland&rsquo;s showed the computer&rsquo;s own drawing.
+      </p>
+      <p>
+        The system was a pipeline of special-purpose units: a matrix multiplier,
+        a clipping divider, an analog line generator, a headset with two
+        miniature CRTs, mechanical and ultrasonic sensors for head position, and
+        a general-purpose computer. It drew &ldquo;3000 lines at 30 frames per
+        second,&rdquo; &ldquo;a little over 10 microseconds per line.&rdquo; The
+        matrix multiplier transformed an endpoint in about 5 µs with 16
+        multiplications, &ldquo;about 3,000,000 multiplications per
+        second&rdquo;; the clipping divider clipped a line in about 10 µs and
+        did the perspective division. Each CRT&rsquo;s picture was &ldquo;about
+        one half of an inch square,&rdquo; seen as a virtual image about 18
+        inches away over a 40-degree field of view, overlaid on the room by
+        half-silvered mirrors. The paper calls it a pipeline: &ldquo;The matrix
+        multiplier, clipping divider, and line-generator are connected in a
+        &lsquo;pipe-line&rsquo; arrangement.&rdquo; The ceiling-mounted head
+        sensor later gave the device its nickname, the Sword of Damocles, which
+        the paper does not use.
+      </p>
+      <p>
+        The paper also names the next problem: &ldquo;showing
+        &lsquo;opaque&rsquo; objects with hidden lines removed is beyond our
+        present capability&rdquo;; the only real-time solution it knew of was
+        &ldquo;a very expensive special-purpose computer at NASA Houston&rdquo;
+        (<a href="../history-of-graphics.html#p-hidden">visibility</a>).
+      </p>
+
+      <h2 id="lds1">Evans &amp; Sutherland LDS-1 (1969)</h2>
+      <p>
+        Evans &amp; Sutherland (E&amp;S) turned the head-mounted display&rsquo;s
+        pipeline into a product. Its Line Drawing System-1 (LDS-1) is reported
+        to have shipped first to Bolt Beranek and Newman in August 1969, with
+        hardware 4 by 4 matrix transforms of homogeneous vertices driving a
+        vector display, and to have gone to users including the National Aeronautics and Space
+        Administration (NASA) Ames Research Center, the Port
+        Authority of New York, MIT, Case Western Reserve and the
+        <em>Los Angeles Times</em> (1970 reference manual, via a secondary
+        source). A 1970 E&amp;S advertisement in <em>Datamation</em> gives its
+        speed: &ldquo;10 microseconds typical for processing each line,&rdquo;
+        about 100,000 lines a second.
+      </p>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Machines, 1963 to 1972, supplement to A History of
+        Computer Graphics v4.0 &middot; prepared by Dr. Marcel Gavriliu. Image
+        credits appear in each caption.
+        <a href="../history-of-graphics.html">Back to the chapter</a>.
+      </footer>
+    </div>
+  </body>
+</html>

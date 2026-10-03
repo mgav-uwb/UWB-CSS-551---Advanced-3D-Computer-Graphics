@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L02 · The Big Picture, part 2</title>
+  <title>CSS 551 · L02 · The Big Picture, part 2 (draft)</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -64,6 +64,46 @@
     /* curated media slides */
     .reveal .media-shot { max-height: 420px; width: auto; }
     .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
+
+    /* History decks: Dense named-not-explained slides: text beside a picture, a cost box,
+       a footer of organizations, three-up application grids, timeline crops. */
+    .reveal h2 { font-size: 1.22em; margin-bottom: 14px; }
+    .reveal .cols { display: flex; gap: 22px; align-items: flex-start; text-align: left; }
+    .reveal .cols .txt { flex: 1 1 57%; min-width: 0; font-size: 0.58em; line-height: 1.32; }
+    .reveal .cols .txt p { margin: 0 0 8px 0; }
+    .reveal .cols .txt ul { margin: 0 0 0 1em; }
+    .reveal .cols .txt li { margin-bottom: 5px; }
+    .reveal .cols .pic { flex: 1 1 43%; min-width: 0; text-align: center; }
+    .reveal .cols .pic img { max-height: 330px; max-width: 100%; width: auto; display: block; margin: 0 auto; }
+    .reveal .cols .pic .credit { margin-bottom: 8px; }
+    /* stacked variant: image across the full width, text below it */
+    .reveal .cols.stack { flex-direction: column; gap: 6px; }
+    .reveal .cols.stack .pic { order: -1; width: 100%; }
+    .reveal .cols.stack .pic img { width: 100%; max-height: 190px; object-fit: contain; }
+    .reveal .cols.stack .txt { width: 100%; }
+    /* stacked, two images side by side above the text */
+    .reveal .cols.stack .pic.duo { display: flex; gap: 16px; justify-content: center; align-items: flex-end; }
+    .reveal .cols.stack .pic.duo > div { min-width: 0; flex: 0 1 auto; }
+    .reveal .cols.stack .pic.duo img { width: auto; max-width: 100%; max-height: 170px; }
+    .reveal .cost { display: block; background: #f2f6f4; border-left: 4px solid var(--accent); padding: 5px 9px; margin-top: 8px; }
+    .reveal .orgs { display: block; font-size: 15px; color: #4b5568; margin-top: 10px; text-align: left; border-top: 1px solid #d6dae3; padding-top: 5px; }
+    .reveal .wide { font-size: 0.6em; text-align: left; line-height: 1.35; }
+    .reveal .grid3 { display: flex; gap: 16px; text-align: left; font-size: 0.53em; line-height: 1.3; }
+    .reveal .grid3 > div { flex: 1 1 0; min-width: 0; }
+    .reveal .grid3 img { height: 200px; width: auto; max-width: 100%; object-fit: contain; display: block; margin: 0 auto; }
+    .reveal .grid3 .credit { text-align: center; margin-bottom: 6px; }
+    .reveal .grid3 p { margin: 0; }
+    .reveal .map { overflow: hidden; width: 940px; margin: 0 auto; }
+    .reveal .map img, .reveal .map-axis img { width: 940px; max-width: none; max-height: none; margin: 0; display: block; }
+    .reveal .map-axis { overflow: hidden; width: 940px; height: 36px; margin: 0 auto; }
+    .reveal .map-axis img { margin-top: -1261px; }
+    .reveal .figslide img { max-height: 470px; max-width: 100%; width: auto; }
+    .reveal .pipefig img { width: 100%; max-height: 300px; margin: 0 0 6px 0; }
+    .reveal .films { font-size: 0.82em; }
+    .reveal .films table { margin-bottom: 14px; }
+    .reveal .filmrow img { width: auto; margin: 0 auto; display: block; }
+    .reveal .filmrow { display: flex; gap: 12px; justify-content: center; align-items: flex-end; }
+    .reveal .filmrow > div { min-width: 0; }
   </style>
 </head>
 <body>
@@ -74,7 +114,17 @@
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/big-picture-eras-5-7.md"
+      <section data-markdown="../../topics/history-problems-2.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/history-pipelines.md"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/history-studios-films.md"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -84,7 +134,7 @@
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/big-picture-neural-era.md"
+      <section data-markdown="../../topics/history-frontier.md"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -134,6 +184,7 @@
   </script>
   <!-- Presenter companion: press N for a synced notes tab (see lib/presenter.js) -->
   <script src="../../lib/presenter.js"></script>
+  <script src="../../lib/image-zoom.js"></script>
   <!-- Grid review: press G for a zoomable, linearized grid of all slides -->
   <script src="../../lib/grid-review.js"></script>
 </body>

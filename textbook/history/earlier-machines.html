@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Earlier Machines, 1945 to 1962 - CSS 551 course text supplement
+    </title>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        svg: { fontCache: "global" },
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+    ></script>
+    <link rel="stylesheet" href="../textbook.css" />
+    <style>
+      .cost {
+        border: 1px solid #c9c2a8;
+        background: #fbf8ee;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .cost .tag {
+        color: #8a6d1f;
+      }
+      .cost .grade {
+        font-weight: 600;
+      }
+      .lag {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .who {
+        font-family: system-ui, sans-serif;
+        font-size: 13.5px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .placeholder-note {
+        font-family: system-ui, sans-serif;
+        font-size: 12.5px;
+        color: #8a6d1f;
+      }
+    </style>
+    <style>
+      .pending {
+        border: 2px dashed #b9c0d0;
+        border-radius: 8px;
+        padding: 28px 16px;
+        text-align: center;
+        color: #5c6270;
+        font-style: italic;
+        background: #f6f8fb;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        <a href="../history-of-graphics.html">A History of Computer Graphics</a>
+        &middot; <a href="../index.html">All chapters</a>.
+      </p>
+
+      <h1>Earlier Machines, 1945 to 1962</h1>
+
+      <p class="lead">
+        The machines and applications that came before Sketchpad (1963), with
+        which Section 3 of
+        <a href="../history-of-graphics.html#early"
+          >A History of Computer Graphics</a
+        >
+        begins.
+      </p>
+
+      <h2 id="early-problems">Applications before the machines</h2>
+      <p>
+        <strong>Air defense.</strong> After 1949 the United States needed to
+        fuse the returns of hundreds of radars into real-time aircraft tracks,
+        display them to operators, let an operator select one, and direct
+        interceptors at it. The system that did it, the Semi-Automatic Ground
+        Environment (SAGE), had in its final form &ldquo;hundreds of radars, 24
+        direction centers, and 3 combat centers&rdquo;; its Cape Cod prototype
+        tracked 48 aircraft and controlled 10 simultaneous interceptions in
+        September 1953 (Massachusetts Institute of Technology (MIT) Lincoln
+        Laboratory history). It had to run without stopping: the duplexed
+        machines at the System Development Corporation&rsquo;s site had an
+        operating ratio of 97.3% in the first five months of 1960 (Weik&rsquo;s
+        1961 survey of US computers for the Ballistic Research Laboratories,
+        BRL).
+      </p>
+      <p>
+        <strong>Manufacturing by numerical control (NC).</strong> Machine tools
+        driven by punched tape needed the shape of every part as numbers.
+        Lockheed-Georgia reported that preparing each control tape for the 1,500
+        NC parts of the C-141 transport took &ldquo;an average of 60
+        hours&rdquo;, and expected interactive graphics to cut that to about 10
+        hours (<em>Wall Street Journal</em>, 1966, as quoted by Weisberg,
+        <em>The Engineering Design Revolution</em>, 2008).
+        <!-- to source: MIT Servomechanisms Lab NC milling machine, 1952 (McDonough and Susskind pointer only) -->
+      </p>
+      <p>
+        <strong>Car body design.</strong> Car shapes were defined by clay models
+        and full-size drawings. General Motors (GM) and International Business Machines (IBM) set out to define them in the computer (DAC-1,
+        below).
+      </p>
+      <p>
+        <strong>Structured drawing.</strong> A drawing stored as geometry plus
+        relations records that two lines are parallel or that one rivet appears
+        forty times. Sutherland wrote that at the outset of his work &ldquo;no
+        one had ever drawn engineering drawings&rdquo; on a computer this way.
+      </p>
+      <p>
+        <strong>Interactive instead of batch computing.</strong> In 1963 most
+        computing was batch processing: submit a job, wait for the output.
+        Sutherland: &ldquo;we have been writing letters to rather than
+        conferring with our computers.&rdquo;
+      </p>
+      <p>
+        <strong>Animated simulation output.</strong> At Bell Telephone
+        Laboratories (Bell Labs) Edward Zajac made a computer-generated
+        perspective film of a satellite&rsquo;s attitude in orbit (<a
+          href="https://doi.org/10.1145/363958.363993"
+          target="_blank"
+          rel="noopener"
+          >Zajac, &ldquo;Computer-made perspective movies as a scientific and
+          communication tool,&rdquo; <em>Communications of the ACM</em> (CACM)
+          7(3), 1964</a
+        >), and his colleague Ken Knowlton wrote BEFLIX, a language for making
+        animated films (<a
+          href="https://doi.org/10.1145/1464122.1464130"
+          target="_blank"
+          rel="noopener"
+          >Knowlton, 1964</a
+        >). At Boeing, William Fetter later wrote that &ldquo;we&rdquo; at
+        Boeing coined the term &ldquo;computer graphics&rdquo; in 1960,
+        crediting his supervisor Verne Hudson.
+      </p>
+      <p>
+        <strong>The price of admission.</strong> Carl Machover, surveying the
+        industry in 1972, wrote: &ldquo;Five years ago, the price of admission
+        into Interactive Computer Graphics was spending about $50,000 or more
+        ... Today ... less than $10,000,&rdquo; and, of the early buyers,
+        &ldquo;much justification for computer graphics was based on
+        faith!&rdquo; (<a
+          href="https://ohiostate.pressbooks.pub/app/uploads/sites/45/2017/09/displays-machover.pdf"
+          target="_blank"
+          rel="noopener"
+          >Machover, &ldquo;Computer graphics terminals: a backward look,&rdquo;
+          American Federation of Information Processing Societies (AFIPS) Spring
+          Joint Computer Conference, 1972</a
+        >). As late as 1971 there were about 1,000 interactive cathode-ray tube
+        (CRT) graphic terminals installed in the United States, against 100,000
+        line printers (CACM, January 1971, as quoted by Columbia
+        University&rsquo;s computing history pages).
+      </p>
+
+      <h2 id="whirlwind">Whirlwind (MIT, 1945 to 1959)</h2>
+      <p>
+        Whirlwind was built at the MIT Digital Computer Laboratory under Jay
+        Forrester and Robert Everett, sponsored by the Office of Naval Research
+        (ONR). It was begun during the Second World War for the Navy as a flight
+        simulator and moved from analog to digital design (Computer History
+        Museum, CHM); Carlson dates its first demonstration to 1951 and calls it
+        the first computer to display text and graphics in real time (<a
+          href="https://archive.org/details/ETC3236"
+          target="_blank"
+          rel="noopener"
+          >Carlson, &ldquo;Computer Graphics and Computer Animation: A
+          Retrospective Overview,&rdquo; Ohio State, sec. 2.1</a
+        >).
+      </p>
+      <p>
+        Its 1961 configuration (BRL survey): a 16-bit word; 6,144 words of
+        magnetic core memory at 7 µs per read-and-rewrite, plus two drums of
+        36,848 words; an addition in 22 µs; 14,500 vacuum tubes and no
+        transistors; a computer room of 450 square feet and 37,000 pounds. Its displays were CRTs used as oscilloscopes:
+        &ldquo;vectors at the rate of 6,000 vectors/sec and characters at the
+        rate of 3,000 char/sec,&rdquo; on twenty-five 16-inch and nineteen
+        5-inch scopes, with 13 light guns for pointing. The light gun, a
+        light-sensing pointer the operator aimed at the screen, was invented at
+        the laboratory by Everett (Lincoln Laboratory history). One was built.
+      </p>
+      <p>
+        In August and September 1953 magnetic core replaced the electrostatic
+        storage tubes; by the Lincoln Laboratory&rsquo;s account the
+        machine&rsquo;s speed doubled, its input rate quadrupled, memory
+        maintenance fell from four hours a day to two hours a week, and the mean
+        time between failures rose from two hours to two weeks. A computer that
+        ran for weeks made a continental air-defense system plausible.
+      </p>
+      <figure>
+        <img
+          src="../../media/history/photo-whirlwind-chm.jpg"
+          data-cat="photo-whirlwind-chm"
+          style="max-width: min(520px, 100%)"
+          alt="Racks and panels of the Whirlwind computer on display at the Computer History Museum."
+        />
+        <figcaption>
+          Whirlwind at the Computer History Museum, built from 1945,
+          demonstrated 1951 &middot; Marcin Wichary &middot; CC BY 2.0 &middot;
+          via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <div class="cost">
+        <span class="tag">Cost &middot; Whirlwind</span>
+        MIT&rsquo;s request to ONR for fiscal 1949: $1.5 million (1949) =
+        <strong>$20.3 million</strong> in 2026 $ (&times;13.527) (reported in a
+        2015 thesis citing Redmond and Smith, <em>Project Whirlwind</em>, 1980).
+        Conversion here and below: nominal price &times; 321.943 / CPI-U of the
+        year (US Consumer Price Index for All Urban Consumers, annual averages;
+        321.943 is the 2025 average), rounded to three significant figures.
+        Running budget reported at about $1 million a year in the early 1950s =
+        <strong>about $13.4 million a year</strong> (&times;13.359, 1950
+        assumed).<br />
+        Today: a Raspberry Pi Pico 2, from $5, has 520 KB of memory, about 43 times Whirlwind&rsquo;s 12 KB of core
+        in 1961.
+      </div>
+
+      <h2 id="sage">
+        SAGE and the AN/FSQ-7 (Lincoln Laboratory, IBM, SDC, 1951 to 1963)
+      </h2>
+      <p>
+        SAGE was the air-defense system that Whirlwind made feasible. MIT
+        Lincoln Laboratory designed it; IBM built the computers; the software
+        came from the RAND Corporation&rsquo;s System Development Division,
+        which became the System Development Corporation (SDC); the MITRE
+        Corporation took over system engineering from 1958 (Lincoln Laboratory
+        and IBM history pages). The computer, the AN/FSQ-7, had a 32-bit word
+        with 16-bit half-word arithmetic &ldquo;for convenience in two
+        dimensional geometric calculations&rdquo;, 69,632 words of core at 6 µs
+        per computer, and drums of 135,168 and 18,432 words. Each site ran two
+        computers, one as a hot spare: the duplex system held 50,000 tubes and
+        170,000 diodes, filled 22,500 square feet and weighed 275 tons, and the
+        computers drew 750 kW (the 1961 BRL survey; the Lincoln Laboratory page
+        gives 250 tons and 3,000 kW for the whole installation). The 1961 BRL
+        survey counts 25 duplex systems; other sources count differently, from
+        23 sites to 27 centers.
+      </p>
+      <p>
+        The operators saw the air picture on a 19-inch Charactron CRT made by
+        Hughes. The 1957 paper by the system&rsquo;s designers gives its load:
+        &ldquo;Every two and one half seconds, the computer generates about two
+        hundred different types of displays requiring up to 20,000 characters,
+        18,000 points and 5,000 lines&rdquo; (<a
+          href="https://ed-thelen.org/sage.html"
+          target="_blank"
+          rel="noopener"
+          >Everett, Zraket and Bennington, Eastern Joint Computer Conference,
+          1957</a
+        >). Each center had over 100 operator stations, and operators identified
+        a track by pointing a light gun, a descendant of Everett&rsquo;s, at it.
+        The software had over 500,000 lines of code, and the program brought, by
+        IBM&rsquo;s account, 80% of IBM&rsquo;s computing revenue between 1952
+        and 1955.
+      </p>
+      <figure>
+        <img
+          src="../../media/history/photo-sage-console.jpg"
+          data-cat="photo-sage-console"
+          style="max-width: min(460px, 100%)"
+          alt="A SAGE operator console with its round situation display and a light gun on a cable."
+        />
+        <figcaption>
+          SAGE console and light gun at the Computer History Museum, about 1958
+          &middot; Tomwsulcer &middot; CC0 &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+      <figure>
+        <img
+          src="../../media/history/photo-sage-room.jpg"
+          data-cat="photo-sage-room"
+          style="max-width: min(520px, 100%)"
+          alt="A SAGE computer room with rows of cabinets and operator consoles."
+        />
+        <figcaption>
+          SAGE computer room, about 1958 &middot; U.S. Air Force &middot; public
+          domain
+        </figcaption>
+      </figure>
+      <div class="cost">
+        <span class="tag">Cost &middot; SAGE</span>
+        Whole program: about $8 billion in 1964 dollars =
+        <strong>$83.1 billion</strong> in 2026 $ (&times;10.385) (IBM and CHM;
+        other estimates run to $10 to $12 billion). One AN/FSQ-7: $30 million,
+        year not stated, 1958 assumed =
+        <strong>$334 million</strong> (&times;11.140) (IBM). The Lincoln
+        Laboratory history says the cost and staffing &ldquo;exceeded that of
+        the Manhattan Project&rdquo;.<br />
+        Today: a 16 GB Raspberry Pi 5 ($305) holds about 61,700 times one
+        AN/FSQ-7&rsquo;s 272 KB of core.
+      </div>
+
+      <h2 id="tx2">TX-0 and TX-2 (MIT Lincoln Laboratory, 1956 and 1958)</h2>
+      <p>
+        Lincoln Laboratory built two experimental transistor computers under
+        Wesley Clark as chief architect (Buxton et al., panel on Lincoln Laboratory
+        at the 2005 Conference on Human Factors in Computing Systems, CHI). The TX-0 was &ldquo;an experimental digital
+        computer used to test advance design techniques, including very large
+        core storage and transistor circuitry&rdquo;: an 18-bit word, 65,536
+        words of core, 83,000 additions per second from 3,500 transistors, and a
+        CRT that plotted a spot in 16 µs (the 1961 BRL survey). It moved to MIT
+        in 1958 because, in Clark&rsquo;s words, &ldquo;what MIT needed at that
+        time was a computer that you could get your hands on.&rdquo;
+      </p>
+      <p>
+        The TX-2, commissioned in June 1958, had a 36-bit word that could be
+        split into two, three or four sub-words, a main memory of 65,536 words
+        of core with a 6.4 µs cycle, 64 index registers, 200,000 36-bit
+        additions per second, and about 61,500 transistors (the 1961 BRL survey;
+        a figure of 22,000 transistors elsewhere has no source). Its display
+        plotted points with 10 bits of resolution per axis and had a light pen;
+        Sutherland gives its rate as &ldquo;about 100,000&rdquo; spots per
+        second at most. Its circuits were, by Clark&rsquo;s colleagues&rsquo;
+        account, &ldquo;virtually identical&rdquo; to the modules the Digital
+        Equipment Corporation (DEC) sold in its first years, before its first
+        computer.
+      </p>
+      <figure>
+        <img
+          src="../../media/history/commons-tx2-module.jpg"
+          data-cat="commons-tx2-module"
+          style="max-width: min(480px, 100%)"
+          alt="A TX-2 circuit module."
+        />
+        <figcaption>
+          A TX-2 circuit module &middot; Jnc, via Wikimedia Commons, CC BY-SA
+          2.5
+        </figcaption>
+      </figure>
+      <div class="cost">
+        <span class="tag">Cost &middot; TX-0 and TX-2</span>
+        <strong>Not found.</strong><br />
+        Today: the $5 Raspberry Pi Pico 2 has 1.8 times the TX-2&rsquo;s 288 KB
+        main memory.
+      </div>
+      <p>
+        Sketchpad ran on the TX-2 from 1961 to 1963 (<a
+          href="../history-of-graphics.html#sketchpad"
+          >main text, Section 3</a
+        >).
+      </p>
+
+      <h2 id="dac1">DAC-1 (General Motors and IBM, 1960 to 1967)</h2>
+      <p>
+        DAC-1, often called the first computer-aided design system, was built by
+        General Motors Research Laboratories with IBM. Its dates come from one
+        history, Krull&rsquo;s 1994 article in the
+        <em>IEEE Annals of the History of Computing</em> (<a
+          href="https://doi.org/10.1109/MAHC.1994.298419"
+          target="_blank"
+          rel="noopener"
+          >doi</a
+        >): IBM accepted the development contract in November 1960, a full
+        demonstration was given at IBM Kingston in December 1962, the system
+        went into production in April 1963, it was shown publicly at the Fall
+        Joint Computer Conference in Detroit in 1964, and the project ended in
+        1967. It reportedly ran on an IBM 7090, later a 7094-II, with an IBM 780
+        display, later a 2250. The CHM says that IBM &ldquo;completed its Design
+        Augmented by Computer (DAC-1) software for General Motors in 1964&rdquo;
+        and that its light pen &ldquo;was used for selecting as well as
+        drawing&rdquo;; another account describes a capacitance screen and a
+        metal pencil instead.
+        <!-- to source: settle the light-pen versus capacitance-screen conflict from GM's Search (1964) and Datamation (1966) -->
+      </p>
+      <figure>
+        <div class="pending" data-cat="photo-dac1">
+          Figure to come: the DAC-1 design console at General Motors.
+        </div>
+        <figcaption>
+          DAC-1 (General Motors and IBM), 1964 &middot; General Motors &middot;
+          Used under fair use for teaching and commentary.
+        </figcaption>
+      </figure>
+      <div class="cost">
+        <span class="tag">Cost &middot; DAC-1</span>
+        <strong>Not found</strong>, nor the number built.
+      </div>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Earlier Machines, 1945 to 1962, supplement to A History of
+        Computer Graphics v4.0 &middot; prepared by Dr. Marcel Gavriliu. Image
+        credits appear in each caption.
+        <a href="../history-of-graphics.html">Back to the chapter</a>.
+      </footer>
+    </div>
+  </body>
+</html>

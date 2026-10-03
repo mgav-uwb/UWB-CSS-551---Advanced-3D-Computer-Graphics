@@ -1,101 +1,93 @@
 <!--
-  CSS 551 · L02 discussion and wrap (~30 min). Five peer-instruction questions;
-  answers and worked solutions in the notes only.
+  CSS 551 · L02 discussion and wrap (2026-10-03; ~20 min of questions,
+  ~2 min wrap). Four peer-instruction questions; answers and worked solutions
+  in the notes only.
 
-  NUMBERS, node-checked (textbook/figures/numbers-history.json and the history
-  chapter's exercises):
-    Q1  74 min = 4,440 s against 1/200 s: factor 888,000, log2 = 19.76, about
-        19.8 doublings in 38 years. Distractors: 5.9 (log10 of the film-over-game
-        ratio, orders of magnitude), 12.1 (log2 4,440: compared with one second,
-        the 200 frames per second dropped), 38 (the years).
-    Q2  1000/90 = 11.1 ms per frame, 5.6 ms per view (two views). Distractors:
-        16.7 (60 Hz), 11.1 (per frame), 2.8 (halved twice).
-    Q3  mip chain 1024 down to 1: extra = sum over k of 4^-k = 0.3333, 33 %.
-        Distractors: 25 % (only the first level), 50 % (halving, the 1D sum),
-        100 % (doubling).
-    Q4  512 x 512 x 3 = 786,432 against 64 x 64 x 4 = 16,384: 48. Distractors:
-        8 (the side ratio), 64 (pixels only, channels ignored), 192 (the
-        latent's 4 channels ignored).
-    Q5  premultiplied F = (0.3, 0.3, 0), alpha 0.6, over B = (0, 0, 0.5, 1):
-        F + 0.4 B = (0.3, 0.3, 0.2). Distractors: (0.18, 0.18, 0.2) (F multiplied
-        by alpha again), (0.3, 0.3, 0.3) (B weighted by alpha), (0.3, 0.3, 0.5)
-        (B not attenuated). topics/film-pipeline.md, "Over, by hand".
+  NUMBERS, node-checked against the chapter (planning/history-draft/
+  history-of-graphics.html v0.5, Sections 5, 8, 12 and Exercises 7, 8) and
+  figures/numbers-history-draft.json (fbCost.firstToLast, pricePerf.triangleTrend):
+    Q1  $1,914,903 / $0.061 = 31,391,852; log2 = 24.90 halvings in 50 years
+        (one every 2.0 years). Distractors: 7.5 (log10, orders of magnitude),
+        31.4 (the ratio in millions), 50 (the years). Slides: problems-2,
+        "Display memory, 1975 to 2025".
+    Q2  2025 pixel: 4 bytes x $0.061 / 1,048,576 = $2.327e-7; $1.83 / that =
+        7,864,320, about 7.9 million. Distractors: 31.5 million (per-MB ratio,
+        bytes per pixel ignored), 126 million (multiplied by 4 instead of
+        divided), 30 (dollars per pixel against dollars per MB). Slides:
+        problems-2 "Display memory"; problems-1 "The first RAM frame buffer".
+    Q3  22,178 / 0.133 = 166,752; its 11th root = 2.98, about 3.0 a year
+        (17.3 doublings in 11 years). Distractors: 1.41 (doubling every two
+        years), 15,159 (the ratio divided by 11), 17.3 (the doublings). Slide:
+        pipelines, "Price and performance" (the copied figure's "x3.0 a year"
+        subtitle is removed).
+    Q4  4 h = 14,400 s against 1/60 s: 864,000 (the chapter's "about 860,000").
+        Distractors: 14,400 (seconds, the frame time ignored), 432,000 (30 frames
+        a second), 51,840,000 (multiplied by 60 twice). Slides: pipelines, "Ideas
+        wait for hardware"; film-pipeline, "The two budgets, one more time".
 
   reveal.js: FLAT; notes follow "Note:"; never two "_" on one line outside a fence.
 -->
 
 ### Discussion
 
-<small>(~30 min) · vote · argue in pairs for two minutes · vote again</small>
+<small>(~20 min): vote, argue in pairs for two minutes, vote again</small>
 
 
 ---
 
-## Question 1: Whitted's frame, today
+## Question 1: how fast display memory got cheap
 
-Whitted's 1980 ray-traced image took **74 minutes**. Suppose the same algorithm renders the same image today at **200 frames per second**. How many **doublings** of hardware speed is that?
+Display memory cost **$1,914,903 per MB** in 1975 (the E&S frame buffer) and **$0.061 per MB** in 2025 (an RTX 5090, processor included), both in 2026 dollars. How many **halvings** of price is that?
 
-- **A.** 5.9
-- **B.** 12.1
-- **C.** 19.8
-- **D.** 38
-
-
----
-
-## Question 2: the headset's budget
-
-A VR headset refreshes at **90 Hz** and renders **one image per eye** each frame. What is the time budget **per image**?
-
-- **A.** 16.7 ms
-- **B.** 11.1 ms
-- **C.** 5.6 ms
-- **D.** 2.8 ms
+- **A.** 7.5
+- **B.** about 25
+- **C.** 31.4
+- **D.** 50
 
 
 ---
 
-## Question 3: what mipmaps cost
+## Question 2: one pixel, then and now
 
-A **1024 × 1024** texture gets a full mipmap chain: 512 × 512, 256 × 256, and so on down to 1 × 1. How much **extra memory** does the chain add, as a fraction of the original?
+The 1975 E&S frame buffer cost **$1.83 a pixel** (8 bits) in 2026 dollars. A 2025 card's memory costs **$0.061 per MB** (1 MB = 1,048,576 bytes), and a pixel today takes **4 bytes**. How many times cheaper is a pixel?
 
-- **A.** 25 %
-- **B.** 33 %
-- **C.** 50 %
-- **D.** 100 %
-
-
----
-
-## Question 4: why latent diffusion fits
-
-Latent diffusion runs its walk on a **64 × 64 × 4** latent instead of a **512 × 512 × 3** RGB image. By what factor does that shrink the numbers per step?
-
-- **A.** 8
-- **B.** 48
-- **C.** 64
-- **D.** 192
+- **A.** about 30
+- **B.** about 7.9 million
+- **C.** about 31.5 million
+- **D.** about 126 million
 
 
 ---
 
-## Question 5: one pixel, composited
+## Question 3: triangles per dollar
 
-A render layer's pixel, **premultiplied**, is F = (0.30, 0.30, 0.00) with α = **0.6**. It goes **over** an opaque background pixel B = (0.00, 0.00, 0.50). What color comes out?
+Triangles per second per 2026 dollar went from **0.133** (1988, Personal IRIS) to **22,178** (1999, GeForce 256). By what **factor per year** did that grow?
 
-- **A.** (0.18, 0.18, 0.20)
-- **B.** (0.30, 0.30, 0.20)
-- **C.** (0.30, 0.30, 0.30)
-- **D.** (0.30, 0.30, 0.50)
+- **A.** 1.41
+- **B.** about 3.0
+- **C.** 17.3
+- **D.** 15,159
+
+
+---
+
+## Question 4: the two budgets
+
+A game renders a frame at **60 frames a second**. A film frame takes **4 hours** on one machine. How many game frames' worth of time is one film frame?
+
+- **A.** 14,400
+- **B.** 432,000
+- **C.** 864,000
+- **D.** 51,840,000
 
 
 ---
 
 ## Wrap
 
-Each era changed what a scene **is** (triangles, shader programs, scans, Gaussians, network weights) while the machinery underneath (cameras, rasterization, sampling, integrals, compositing) carried over unchanged. Ideas wait a median of **21 years** for the hardware budget to reach them, which makes today's research the roadmap.
+Every period moved a stage of the pipeline into hardware once memory and arithmetic got cheap enough, made it programmable, and then merged it into one pool; display memory halved in price about every two years, and ideas waited a median of **21 years** from paper to routine use.
 
-- **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 5 to 10; <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11; <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3
-- **Quiz 1**: Thursday, the last 20 minutes, on this lecture and Thursday's
+- **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 6 to 12; <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11; <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3
+- **Quiz 1**: Thursday, the last 20 minutes
 - **Due**: nothing yet; HW1 goes out Thursday
 

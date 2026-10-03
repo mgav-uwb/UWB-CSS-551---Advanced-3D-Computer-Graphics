@@ -36,5 +36,5 @@
 - **Twenty-three problems**, each posed and then worked: the first twelve one per major topic; then the rigid inverse, look-at, `P`, the viewport, barycentric weights, bilinear filtering, the mip level, a ray and a sphere, importance sampling, attention, guidance
 - **Discussion**, then **Quiz 8**
 
-<small>Reading: the course text, <a href="../../textbook/history-of-graphics.html#era-map">A History of Computer Graphics, Section 10</a>, and the pitfall blocks of every chapter.</small>
+<small>Reading: the course text, <a href="../../textbook/history-of-graphics.html#map">A History of Computer Graphics</a>, and the pitfall blocks of every chapter.</small>
 

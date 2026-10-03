@@ -1,191 +1,2103 @@
 {
+ "generated_by": "tools/gen-textbook-figures-history.mjs",
+ "note": "all 2026 $ use CPI-U 2025 annual average 321.943 (HC 1, EM)",
+ "cpi": {
+  "base": 321.943,
+  "baseYear": 2025,
+  "table": {
+   "1949": 23.8,
+   "1958": 28.9,
+   "1963": 30.6,
+   "1964": 31,
+   "1965": 31.5,
+   "1966": 32.4,
+   "1968": 34.8,
+   "1970": 38.8,
+   "1972": 41.8,
+   "1973": 44.4,
+   "1974": 49.3,
+   "1975": 53.8,
+   "1976": 56.9,
+   "1977": 60.6,
+   "1979": 72.6,
+   "1980": 82.4,
+   "1981": 90.9,
+   "1983": 99.6,
+   "1984": 103.9,
+   "1985": 107.6,
+   "1986": 109.6,
+   "1987": 113.6,
+   "1988": 118.3,
+   "1990": 130.7,
+   "1993": 144.5,
+   "1996": 156.9,
+   "1999": 166.6,
+   "2001": 177.1,
+   "2002": 179.9,
+   "2005": 195.3,
+   "2006": 201.6,
+   "2008": 215.303,
+   "2018": 251.107,
+   "2022": 292.655,
+   "2025": 321.943
+  }
+ },
+ "fieldsIO": {
+  "kind": "schematic, our synthesis",
+  "src": "FA 1.3",
+  "cells": [
+   {
+    "field": "computer graphics",
+    "io": "model to image",
+    "g": "A",
+    "src": "Foley et al. 1990 p. 2"
+   },
+   {
+    "field": "computer vision",
+    "io": "image to model",
+    "g": "A",
+    "src": "Szeliski 2022 p. 5"
+   },
+   {
+    "field": "image processing",
+    "io": "image to image",
+    "g": "A",
+    "src": "Gonzalez and Woods 2008 p. 2"
+   },
+   {
+    "field": "computational photography",
+    "io": "light to image",
+    "g": "A",
+    "src": "Raskar and Tumblin 2007"
+   },
+   {
+    "field": "visualization",
+    "io": "data to image",
+    "g": "A/B",
+    "src": "Munzner 2014; McCormick et al. 1987"
+   },
+   {
+    "field": "HCI and UX",
+    "io": "person and system",
+    "g": "B",
+    "src": "Hewett et al. 1992"
+   },
+   {
+    "field": "computational geometry",
+    "io": "geometry to geometry",
+    "g": "A",
+    "src": "Preparata and Shamos 1985 (FA 1.1)"
+   },
+   {
+    "field": "neural rendering, inverse graphics",
+    "io": "image to model to image",
+    "g": "A",
+    "src": "Tewari et al. 2020; Kulkarni et al. 2015"
+   }
+  ]
+ },
+ "timeline": [
+  {
+   "family": "Interaction and displays",
+   "solutions": [
+    {
+     "year": 1951,
+     "name": "Whirlwind",
+     "src": "EM P2 Whirlwind (first demonstrated 1951, Carlson)",
+     "g": "B"
+    },
+    {
+     "year": 1953,
+     "name": "Cape Cod (SAGE)",
+     "src": "EM P1 (Sept 1953)",
+     "g": "B"
+    },
+    {
+     "year": 1958,
+     "name": "TX-2",
+     "src": "EM P2 TX-0/TX-2",
+     "g": "A"
+    },
+    {
+     "year": 1963,
+     "name": "Sketchpad",
+     "src": "PT 1",
+     "g": "A"
+    },
+    {
+     "year": 1964,
+     "name": "IBM 2250",
+     "src": "EM P2 IBM 2250",
+     "g": "B"
+    },
+    {
+     "year": 1968,
+     "name": "HMD; mouse demo",
+     "src": "EM P2 HMD; Engelbart (C for demo details)",
+     "g": "A"
+    },
+    {
+     "year": 1986,
+     "name": "NASA VIEW",
+     "src": "FA 2.9",
+     "g": "A"
+    },
+    {
+     "year": 1992,
+     "name": "CAVE",
+     "src": "FA 2.9",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Frame buffers",
+   "solutions": [
+    {
+     "year": 1968,
+     "name": "BRAD",
+     "src": "HC 2.1",
+     "g": "B"
+    },
+    {
+     "year": 1973,
+     "name": "SuperPaint",
+     "src": "HC 2.1 (Shoup)",
+     "g": "B"
+    },
+    {
+     "year": 1975,
+     "name": "E&S frame buffer",
+     "src": "HC 2.1 (Smith)",
+     "g": "B"
+    },
+    {
+     "year": 1981,
+     "name": "IBM CGA",
+     "src": "HC 2.1",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "VGA",
+     "src": "HC 2.1 (price A, date C)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Curves and surfaces",
+   "solutions": [
+    {
+     "year": 1959,
+     "name": "de Casteljau",
+     "src": "PT 2",
+     "g": "B"
+    },
+    {
+     "year": 1964,
+     "name": "Ferguson",
+     "src": "PT 2",
+     "g": "A"
+    },
+    {
+     "year": 1967,
+     "name": "Coons patch",
+     "src": "PT 2",
+     "g": "A"
+    },
+    {
+     "year": 1972,
+     "name": "Bézier",
+     "src": "PT 2",
+     "g": "A"
+    },
+    {
+     "year": 1975,
+     "name": "NURBS",
+     "src": "PT 2 (Versprille)",
+     "g": "B"
+    },
+    {
+     "year": 1978,
+     "name": "Catmull-Clark",
+     "src": "PT 9",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "Loop",
+     "src": "PT 9",
+     "g": "B"
+    },
+    {
+     "year": 1998,
+     "name": "subdivision in film",
+     "src": "PT 9 (DeRose, Kass, Truong)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Lines and clipping",
+   "solutions": [
+    {
+     "year": 1965,
+     "name": "Bresenham",
+     "src": "PT 4",
+     "g": "A"
+    },
+    {
+     "year": 1967,
+     "name": "Cohen-Sutherland",
+     "src": "PT 5",
+     "g": "C"
+    },
+    {
+     "year": 1968,
+     "name": "clipping divider",
+     "src": "PT 5",
+     "g": "A"
+    },
+    {
+     "year": 1974,
+     "name": "Sutherland-Hodgman",
+     "src": "PT 5",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Hidden lines and surfaces",
+   "solutions": [
+    {
+     "year": 1963,
+     "name": "Roberts",
+     "src": "PT 3",
+     "g": "A"
+    },
+    {
+     "year": 1967,
+     "name": "Appel",
+     "src": "PT 3",
+     "g": "A"
+    },
+    {
+     "year": 1969,
+     "name": "Warnock",
+     "src": "PT 3",
+     "g": "A"
+    },
+    {
+     "year": 1970,
+     "name": "Watkins",
+     "src": "PT 3",
+     "g": "B"
+    },
+    {
+     "year": 1972,
+     "name": "painter's",
+     "src": "PT 3",
+     "g": "A"
+    },
+    {
+     "year": 1974,
+     "name": "z-buffer",
+     "src": "PT 3 (Catmull; Straßer)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Shading and reflection",
+   "solutions": [
+    {
+     "year": 1967,
+     "name": "Torrance-Sparrow",
+     "src": "PT 12",
+     "g": "A"
+    },
+    {
+     "year": 1971,
+     "name": "Gouraud",
+     "src": "PT 7",
+     "g": "A"
+    },
+    {
+     "year": 1975,
+     "name": "Phong",
+     "src": "PT 7",
+     "g": "A"
+    },
+    {
+     "year": 1977,
+     "name": "Blinn",
+     "src": "PT 12",
+     "g": "A"
+    },
+    {
+     "year": 1982,
+     "name": "Cook-Torrance",
+     "src": "PT 12",
+     "g": "A"
+    },
+    {
+     "year": 2012,
+     "name": "Disney BRDF",
+     "src": "PT 27",
+     "g": "A"
+    },
+    {
+     "year": 2013,
+     "name": "UE4 shading",
+     "src": "PT 27",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Surface detail",
+   "solutions": [
+    {
+     "year": 1974,
+     "name": "texture mapping",
+     "src": "PT 8",
+     "g": "A"
+    },
+    {
+     "year": 1976,
+     "name": "environment maps",
+     "src": "PT 8",
+     "g": "A"
+    },
+    {
+     "year": 1978,
+     "name": "bump mapping",
+     "src": "PT 8",
+     "g": "A"
+    },
+    {
+     "year": 1983,
+     "name": "mipmaps",
+     "src": "PT 8",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Procedural and example texture",
+   "solutions": [
+    {
+     "year": 1985,
+     "name": "noise; solid texture",
+     "src": "PT 20",
+     "g": "A"
+    },
+    {
+     "year": 1991,
+     "name": "reaction-diffusion",
+     "src": "V4 p-procedural (Turk; Witkin-Kass, doi 10.1145/122718.122749, .122750)",
+     "g": "A"
+    },
+    {
+     "year": 1995,
+     "name": "pyramid synthesis",
+     "src": "V4 p-procedural (Heeger-Bergen, doi 10.1145/218380.218446)",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "Worley cells",
+     "src": "V4 p-procedural (doi 10.1145/237170.237267)",
+     "g": "A"
+    },
+    {
+     "year": 1999,
+     "name": "Efros-Leung",
+     "src": "V4 p-procedural (doi 10.1109/ICCV.1999.790383)",
+     "g": "A"
+    },
+    {
+     "year": 2001,
+     "name": "image quilting",
+     "src": "V4 p-procedural (doi 10.1145/383259.383296)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Shadows",
+   "solutions": [
+    {
+     "year": 1977,
+     "name": "shadow volumes",
+     "src": "PT 13",
+     "g": "A"
+    },
+    {
+     "year": 1978,
+     "name": "shadow maps",
+     "src": "PT 13",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "filtered shadow maps",
+     "src": "PT 13",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Aliasing and sampling",
+   "solutions": [
+    {
+     "year": 1977,
+     "name": "Crow names aliasing",
+     "src": "PT 14",
+     "g": "A"
+    },
+    {
+     "year": 1983,
+     "name": "motion blur",
+     "src": "PT 14",
+     "g": "A"
+    },
+    {
+     "year": 1984,
+     "name": "A-buffer",
+     "src": "PT 14",
+     "g": "A"
+    },
+    {
+     "year": 1986,
+     "name": "stochastic sampling",
+     "src": "PT 14",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Rays and global illumination",
+   "solutions": [
+    {
+     "year": 1968,
+     "name": "ray casting",
+     "src": "PT 6",
+     "g": "A"
+    },
+    {
+     "year": 1980,
+     "name": "Whitted",
+     "src": "PT 6",
+     "g": "A"
+    },
+    {
+     "year": 1984,
+     "name": "radiosity",
+     "src": "PT 19",
+     "g": "A"
+    },
+    {
+     "year": 1986,
+     "name": "rendering equation",
+     "src": "PT 21",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "photon mapping",
+     "src": "PT 21",
+     "g": "A"
+    },
+    {
+     "year": 2006,
+     "name": "Arnold, Monster House",
+     "src": "PT 28",
+     "g": "A"
+    },
+    {
+     "year": 2017,
+     "name": "denoisers",
+     "src": "PT 29",
+     "g": "A"
+    },
+    {
+     "year": 2018,
+     "name": "RT cores",
+     "src": "PT 29",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Too many polygons",
+   "solutions": [
+    {
+     "year": 1976,
+     "name": "hierarchical LOD",
+     "src": "PT 10",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "progressive meshes",
+     "src": "PT 10",
+     "g": "A"
+    },
+    {
+     "year": 1997,
+     "name": "quadric error metrics",
+     "src": "PT 10",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Animation and physics",
+   "solutions": [
+    {
+     "year": 1976,
+     "name": "skeleton keyframes",
+     "src": "PT 11",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "deformable models",
+     "src": "PT 23",
+     "g": "A"
+    },
+    {
+     "year": 1998,
+     "name": "implicit cloth",
+     "src": "PT 23",
+     "g": "A"
+    },
+    {
+     "year": 1999,
+     "name": "stable fluids",
+     "src": "PT 23",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Motion capture",
+   "solutions": [
+    {
+     "year": 1980,
+     "name": "sensor capture",
+     "src": "V4 p-mocap (Calvert, doi 10.1145/965105.807492)",
+     "g": "A"
+    },
+    {
+     "year": 1983,
+     "name": "optical capture",
+     "src": "PT 11 (Sturman)",
+     "g": "B"
+    },
+    {
+     "year": 1984,
+     "name": "Vicon (Oxford Metrics)",
+     "src": "V4 p-mocap (vicon.com about-us)",
+     "g": "A"
+    },
+    {
+     "year": 2002,
+     "name": "motion graphs",
+     "src": "V4 p-mocap (doi 10.1145/566570.566605)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Computational geometry",
+   "solutions": [
+    {
+     "year": 1975,
+     "name": "k-d tree; Voronoi",
+     "src": "V4 p-geometry (Bentley doi 10.1145/361002.361007; Shamos-Hoey doi 10.1109/SFCS.1975.8)",
+     "g": "A"
+    },
+    {
+     "year": 1977,
+     "name": "PADL (CSG)",
+     "src": "V4 p-geometry (doi 10.1109/C-M.1977.217601)",
+     "g": "A"
+    },
+    {
+     "year": 1980,
+     "name": "BSP tree",
+     "src": "V4 p-geometry (doi 10.1145/965105.807481)",
+     "g": "A"
+    },
+    {
+     "year": 1985,
+     "name": "quad-edge",
+     "src": "V4 p-geometry (doi 10.1145/282918.282923)",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "CGAL",
+     "src": "V4 p-geometry (doi 10.1007/BFb0014496)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Measured reflectance",
+   "solutions": [
+    {
+     "year": 1977,
+     "name": "BRDF defined",
+     "src": "V4 p-brdf (doi 10.6028/NBS.MONO.160)",
+     "g": "A"
+    },
+    {
+     "year": 1992,
+     "name": "Ward gonioreflectometer",
+     "src": "V4 p-brdf (doi 10.1145/133994.134078)",
+     "g": "A"
+    },
+    {
+     "year": 1999,
+     "name": "image-based BRDF",
+     "src": "V4 p-brdf (doi 10.1007/978-3-7091-6809-7_13)",
+     "g": "A"
+    },
+    {
+     "year": 2000,
+     "name": "light stage",
+     "src": "V4 p-brdf (doi 10.1145/344779.344855)",
+     "g": "A"
+    },
+    {
+     "year": 2003,
+     "name": "MERL database",
+     "src": "V4 p-brdf (doi 10.1145/882262.882343)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Procedural modeling",
+   "solutions": [
+    {
+     "year": 1968,
+     "name": "L-systems",
+     "src": "V4 p-procmodel (doi 10.1016/0022-5193(68)90079-9)",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "PRISMS (SideFX)",
+     "src": "V4 p-procmodel (sidefx.com about)",
+     "g": "A"
+    },
+    {
+     "year": 1990,
+     "name": "Algorithmic Beauty of Plants",
+     "src": "V4 p-procmodel (doi 10.1007/978-1-4613-8476-2)",
+     "g": "A"
+    },
+    {
+     "year": 2001,
+     "name": "procedural cities",
+     "src": "V4 p-procmodel (doi 10.1145/383259.383292)",
+     "g": "A"
+    },
+    {
+     "year": 2006,
+     "name": "CGA shape",
+     "src": "V4 p-procmodel (doi 10.1145/1141911.1141931)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Implicit surfaces and level sets",
+   "solutions": [
+    {
+     "year": 1982,
+     "name": "blobby models",
+     "src": "V4 p-implicit (doi 10.1145/357306.357310)",
+     "g": "A"
+    },
+    {
+     "year": 1986,
+     "name": "soft objects",
+     "src": "V4 p-implicit (doi 10.1007/BF01900346)",
+     "g": "A"
+    },
+    {
+     "year": 1988,
+     "name": "level sets",
+     "src": "V4 p-implicit (doi 10.1016/0021-9991(88)90002-2)",
+     "g": "A"
+    },
+    {
+     "year": 2002,
+     "name": "particle level set",
+     "src": "V4 p-implicit (doi 10.1145/566654.566645; Foster-Fedkiw 2001 doi 10.1145/383259.383261)",
+     "g": "A"
+    },
+    {
+     "year": 2013,
+     "name": "VDB",
+     "src": "V4 p-implicit (doi 10.1145/2487228.2487235)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Nature and fuzzy objects",
+   "solutions": [
+    {
+     "year": 1967,
+     "name": "coast of Britain",
+     "src": "PT 15",
+     "g": "A"
+    },
+    {
+     "year": 1980,
+     "name": "Vol Libre",
+     "src": "PT 15",
+     "g": "C"
+    },
+    {
+     "year": 1982,
+     "name": "stochastic fractals",
+     "src": "PT 15",
+     "g": "A"
+    },
+    {
+     "year": 1983,
+     "name": "particle systems",
+     "src": "PT 17",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Film production",
+   "solutions": [
+    {
+     "year": 1984,
+     "name": "shade trees; alpha",
+     "src": "PT 22; PT 18",
+     "g": "A"
+    },
+    {
+     "year": 1987,
+     "name": "Reyes",
+     "src": "PT 22",
+     "g": "A"
+    },
+    {
+     "year": 1990,
+     "name": "RenderMan SL",
+     "src": "PT 22",
+     "g": "A"
+    },
+    {
+     "year": 1995,
+     "name": "Toy Story",
+     "src": "FA 2.4 (CHM)",
+     "g": "B"
+    },
+    {
+     "year": 2016,
+     "name": "RenderMan RIS",
+     "src": "PT 28",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Volumes and captured light",
+   "solutions": [
+    {
+     "year": 1987,
+     "name": "marching cubes",
+     "src": "PT 24",
+     "g": "A"
+    },
+    {
+     "year": 1988,
+     "name": "volume rendering",
+     "src": "PT 24",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "light fields",
+     "src": "PT 25",
+     "g": "A"
+    },
+    {
+     "year": 1997,
+     "name": "HDR radiance maps",
+     "src": "PT 25",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Scanning and reconstruction",
+   "solutions": [
+    {
+     "year": 1982,
+     "name": "structured light",
+     "src": "V4 p-scanning (doi 10.1016/0146-664X(82)90096-X)",
+     "g": "A"
+    },
+    {
+     "year": 1994,
+     "name": "range scans",
+     "src": "PT 25",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "VRIP; Facade",
+     "src": "V4 p-scanning (doi 10.1145/237170.237269; 10.1145/237170.237191)",
+     "g": "A"
+    },
+    {
+     "year": 2000,
+     "name": "Digital Michelangelo",
+     "src": "V4 p-scanning (doi 10.1145/344779.344849)",
+     "g": "A"
+    },
+    {
+     "year": 2006,
+     "name": "Photo Tourism; Poisson",
+     "src": "V4 p-scanning (doi 10.1145/1141911.1141964; 10.2312/SGP/SGP06/061-070)",
+     "g": "A"
+    },
+    {
+     "year": 2010,
+     "name": "PMVS",
+     "src": "V4 p-scanning (doi 10.1109/TPAMI.2009.161)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Points, hair, illustration",
+   "solutions": [
+    {
+     "year": 1985,
+     "name": "points as primitive",
+     "src": "V4 p-points (UNC TR 85-022)",
+     "g": "A"
+    },
+    {
+     "year": 1989,
+     "name": "Kajiya-Kay fur",
+     "src": "V4 p-hair (doi 10.1145/74333.74361)",
+     "g": "A"
+    },
+    {
+     "year": 1990,
+     "name": "G-buffers",
+     "src": "V4 p-npr (doi 10.1145/97880.97901)",
+     "g": "A"
+    },
+    {
+     "year": 1994,
+     "name": "pen and ink",
+     "src": "V4 p-npr (doi 10.1145/192161.192184)",
+     "g": "A"
+    },
+    {
+     "year": 1998,
+     "name": "Gooch shading",
+     "src": "V4 p-npr (doi 10.1145/280814.280950)",
+     "g": "A"
+    },
+    {
+     "year": 2000,
+     "name": "QSplat",
+     "src": "V4 p-points (doi 10.1145/344779.344940)",
+     "g": "A"
+    },
+    {
+     "year": 2001,
+     "name": "surface splatting",
+     "src": "V4 p-points (doi 10.1145/383259.383300)",
+     "g": "A"
+    },
+    {
+     "year": 2003,
+     "name": "hair scattering",
+     "src": "V4 p-hair (doi 10.1145/1201775.882345)",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Real-time hardware",
+   "solutions": [
+    {
+     "year": 1982,
+     "name": "Geometry Engine",
+     "src": "PT 16",
+     "g": "A"
+    },
+    {
+     "year": 1985,
+     "name": "Pixel-Planes",
+     "src": "PT 16",
+     "g": "A"
+    },
+    {
+     "year": 1988,
+     "name": "SGI GT",
+     "src": "PT 16",
+     "g": "A"
+    },
+    {
+     "year": 1993,
+     "name": "RealityEngine",
+     "src": "PT 16",
+     "g": "A"
+    },
+    {
+     "year": 1996,
+     "name": "Voodoo",
+     "src": "PT 26",
+     "g": "A"
+    },
+    {
+     "year": 1999,
+     "name": "GeForce 256",
+     "src": "PT 26",
+     "g": "A"
+    },
+    {
+     "year": 2001,
+     "name": "GeForce3",
+     "src": "PT 26",
+     "g": "A"
+    },
+    {
+     "year": 2007,
+     "name": "CUDA",
+     "src": "PA era 7",
+     "g": "A"
+    },
+    {
+     "year": 2018,
+     "name": "DLSS",
+     "src": "PT 30",
+     "g": "A"
+    }
+   ]
+  },
+  {
+   "family": "Learned images and scenes",
+   "solutions": [
+    {
+     "year": 2014,
+     "name": "GANs",
+     "src": "PT 33",
+     "g": "A"
+    },
+    {
+     "year": 2015,
+     "name": "diffusion",
+     "src": "PT 33 (Sohl-Dickstein et al.)",
+     "g": "A"
+    },
+    {
+     "year": 2020,
+     "name": "NeRF; DDPM",
+     "src": "PT 31; PT 33",
+     "g": "A"
+    },
+    {
+     "year": 2022,
+     "name": "Instant NGP; latent diffusion",
+     "src": "PT 31; PT 33",
+     "g": "A"
+    },
+    {
+     "year": 2023,
+     "name": "3D Gaussian splatting",
+     "src": "PT 32",
+     "g": "A"
+    }
+   ]
+  }
+ ],
+ "timelineCounts": {
+  "families": 25,
+  "solutions": 135
+ },
+ "pipelines": [
+  {
+   "file": "fig-pipe-vector-1963.svg",
+   "era": "Era 1: vector display with a display processor",
+   "representative": "Sketchpad on the TX-2 (1963) drew from the main program; the IBM 2250 (1964) refreshed its own display list",
+   "src": "PA era 1 (Blythe 2008, B; Myer and Sutherland 1968, A); EM P2 IBM 2250, Sketchpad",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "builds the display list"
+    },
+    "geometry, vertex": {
+     "kind": "host software (CPU)",
+     "note": "transform in software"
+    },
+    "clip and project": {
+     "kind": "host software (CPU)",
+     "note": "clip in software"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "vector line generator"
+    },
+    "fragment, pixel": {
+     "kind": "stage absent",
+     "note": "no pixels"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "refreshes a vector CRT"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "frame buffer, display",
+     "kind": "dedicated hardware",
+     "name": "display-list processor",
+     "note": "2250: 8 KB buffer"
+    }
+   ]
+  },
+  {
+   "file": "fig-pipe-framebuffer-1975.svg",
+   "era": "Era 2: host computer plus frame buffer",
+   "representative": "E&S frame buffer at NYIT, 1975: 512 by 512 by 8 bits, $80,000",
+   "src": "PA era 2 (Shoup 2001, Smith 2001, A participant accounts); HC 2.1",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "paint, model"
+    },
+    "geometry, vertex": {
+     "kind": "host software (CPU)",
+     "note": "transform"
+    },
+    "clip and project": {
+     "kind": "host software (CPU)",
+     "note": "clip"
+    },
+    "rasterize": {
+     "kind": "host software (CPU)",
+     "note": "scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "host software (CPU)",
+     "note": "host writes pixels"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "memory, video scan-out"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "frame buffer, display",
+     "kind": "dedicated hardware",
+     "name": "colour map",
+     "note": "lookup table"
+    }
+   ]
+  },
+  {
+   "file": "fig-pipe-sgi-1983.svg",
+   "era": "Era 3a: fixed-function geometry hardware",
+   "representative": "SGI IRIS (1983 on) with Clark’s Geometry Engine (1982)",
+   "src": "PA era 3a (Clark 1982, A; Akeley 1993, A; IRIS 1000 date C)",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "scene, display list"
+    },
+    "geometry, vertex": {
+     "kind": "dedicated hardware",
+     "note": "Geometry Engines: matrices"
+    },
+    "clip and project": {
+     "kind": "dedicated hardware",
+     "note": "Geometry Engines: clip, scale"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "dedicated hardware",
+     "note": "flat colour only"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "raster display"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "geometry, vertex",
+     "kind": "dedicated hardware",
+     "name": "12 Geometry Engine chips",
+     "note": "shared by both stages"
+    },
+    {
+     "under": "fragment, pixel",
+     "kind": "host software (CPU)",
+     "name": "hidden surfaces",
+     "note": "left to the application"
+    }
+   ]
+  },
+  {
+   "file": "fig-pipe-voodoo-1996.svg",
+   "era": "Era 4: raster-only PC accelerator",
+   "representative": "3dfx Voodoo Graphics card, 1996, $299: \"only accelerates the inner rasterization loop\"",
+   "src": "PA era 4 (SST-1 spec, A); HC 4 (Boot Nov 1996, A)",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "game on the PC"
+    },
+    "geometry, vertex": {
+     "kind": "host software (CPU)",
+     "note": "transform, lighting"
+    },
+    "clip and project": {
+     "kind": "host software (CPU)",
+     "note": "clip"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "setup on host to 1998"
+    },
+    "fragment, pixel": {
+     "kind": "dedicated hardware",
+     "note": "texture, Gouraud, fog, z"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "3D only; 2D card kept"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "fragment, pixel",
+     "kind": "dedicated hardware",
+     "name": "texture unit",
+     "note": "2 MB texture memory"
+    }
+   ]
+  },
+  {
+   "file": "fig-pipe-tnl-1999.svg",
+   "era": "Era 5: hardware transform and lighting",
+   "representative": "NVIDIA GeForce 256, 1999: \"15 million sustained polygons per second\"; card $349.99",
+   "src": "PA era 5 (NVIDIA release 31 Aug 1999, A); HC 4",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "draw calls"
+    },
+    "geometry, vertex": {
+     "kind": "dedicated hardware",
+     "note": "transform and lighting"
+    },
+    "clip and project": {
+     "kind": "dedicated hardware",
+     "note": "clip, divide, viewport"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "setup, scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "dedicated hardware",
+     "note": "configurable combiners"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "z, blend, scan-out"
+    }
+   },
+   "extraUnits": []
+  },
+  {
+   "file": "fig-pipe-programmable-2001.svg",
+   "era": "Era 6: programmable vertex and pixel stages",
+   "representative": "NVIDIA GeForce3 (2001), programmable vertex engine; ATI Radeon 9700 (2002), programmable pixels",
+   "src": "PA era 6 (Lindholm et al. 2001, A; GeForce3 pixel stage: conflict, configurable vs \"pixel shader\")",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "draw calls, shaders"
+    },
+    "geometry, vertex": {
+     "kind": "programmable GPU",
+     "note": "vertex shader"
+    },
+    "clip and project": {
+     "kind": "dedicated hardware",
+     "note": "clip, divide, viewport"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "setup, scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "programmable GPU",
+     "note": "pixel shader"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "z, blend, scan-out"
+    }
+   },
+   "extraUnits": []
+  },
+  {
+   "file": "fig-pipe-unified-2006.svg",
+   "era": "Era 7: unified shaders and GPU compute",
+   "representative": "NVIDIA GeForce 8800 GTX, 2006: 128 unified stream processors, $599; CUDA 2007",
+   "src": "PA era 7 (NVIDIA TB-02787-001, A; Blythe 2006, A); HC 4",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "draw and dispatch calls"
+    },
+    "geometry, vertex": {
+     "kind": "programmable GPU",
+     "note": "vertex shader, unified pool"
+    },
+    "clip and project": {
+     "kind": "dedicated hardware",
+     "note": "clip, divide, viewport"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "setup, scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "programmable GPU",
+     "note": "pixel shader, same pool"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "z, blend, scan-out"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "application",
+     "kind": "programmable GPU",
+     "name": "compute (CUDA, 2007)",
+     "note": "same processor pool"
+    },
+    {
+     "under": "clip and project",
+     "kind": "programmable GPU",
+     "name": "geometry shader",
+     "note": "Direct3D 10"
+    }
+   ]
+  },
+  {
+   "file": "fig-pipe-rtx-2018.svg",
+   "era": "Era 8: ray-tracing cores, tensor cores, mesh shaders",
+   "representative": "NVIDIA GeForce RTX 2080 (Turing), 2018: RT cores, tensor cores, $699",
+   "src": "PA era 8 (Turing whitepaper, A; DXR 2018, A); HC 4",
+   "stages": {
+    "application": {
+     "kind": "host software (CPU)",
+     "note": "draw, dispatch, trace"
+    },
+    "geometry, vertex": {
+     "kind": "programmable GPU",
+     "note": "vertex or mesh shader"
+    },
+    "clip and project": {
+     "kind": "dedicated hardware",
+     "note": "clip, divide, viewport"
+    },
+    "rasterize": {
+     "kind": "dedicated hardware",
+     "note": "setup, scan conversion"
+    },
+    "fragment, pixel": {
+     "kind": "programmable GPU",
+     "note": "pixel, ray shaders"
+    },
+    "frame buffer, display": {
+     "kind": "dedicated hardware",
+     "note": "z, blend, scan-out"
+    }
+   },
+   "extraUnits": [
+    {
+     "under": "application",
+     "kind": "programmable GPU",
+     "name": "task, compute shaders",
+     "note": "GPU-driven work"
+    },
+    {
+     "under": "fragment, pixel",
+     "kind": "dedicated hardware",
+     "name": "RT cores",
+     "note": "BVH traversal, ray-triangle"
+    },
+    {
+     "under": "frame buffer, display",
+     "kind": "dedicated hardware",
+     "name": "tensor cores",
+     "note": "DLSS upscaling"
+    }
+   ]
+  }
+ ],
+ "fbCost": {
+  "points": [
+   {
+    "year": 1975,
+    "device": "E&S frame buffer (first)",
+    "nominal": 80000,
+    "memoryMB": 0.25,
+    "price2026": 478726,
+    "perMB2026": 1915000,
+    "includes": "frame buffer only",
+    "src": "HC 2.1, Smith 2023",
+    "g": "B"
+   },
+   {
+    "year": 1976,
+    "device": "E&S at NYIT",
+    "nominal": 60000,
+    "memoryMB": 0.25,
+    "price2026": 339483,
+    "perMB2026": 1358000,
+    "includes": "frame buffer only",
+    "src": "HC 2.1, Smith 2023",
+    "g": "B"
+   },
+   {
+    "year": 1977,
+    "device": "NYIT 24-bit (3 E&S)",
+    "nominal": 180000,
+    "memoryMB": 0.75,
+    "price2026": 956266,
+    "perMB2026": 1275000,
+    "includes": "three buffers",
+    "src": "HC 2.1, derived from Smith 2023",
+    "g": "B"
+   },
+   {
+    "year": 1980,
+    "device": "Ikonas",
+    "nominal": 56500,
+    "memoryMB": 0.25,
+    "price2026": 220750,
+    "perMB2026": 883000,
+    "includes": "processor, matrix units, monitor",
+    "src": "HC 2.1, NASA CR-159330",
+    "g": "A"
+   },
+   {
+    "year": 1980,
+    "device": "Genisco GCT-3000",
+    "nominal": 50000,
+    "memoryMB": 1,
+    "price2026": 195354,
+    "perMB2026": 195400,
+    "includes": "whole system",
+    "src": "HC 2.1, NASA CR-159330",
+    "g": "A"
+   },
+   {
+    "year": 1980,
+    "device": "Ramtek 9400",
+    "nominal": 87000,
+    "memoryMB": 2.5,
+    "price2026": 339916,
+    "perMB2026": 136000,
+    "includes": "whole system",
+    "src": "HC 2.1, NASA CR-159330",
+    "g": "A"
+   },
+   {
+    "year": 1981,
+    "device": "AED 512",
+    "nominal": 13000,
+    "memoryMB": 0.0938,
+    "price2026": 46042,
+    "perMB2026": 491100,
+    "includes": "interface, monitor",
+    "src": "HC 2.1, DTIC ADA108793",
+    "g": "A"
+   },
+   {
+    "year": 1981,
+    "device": "ADI",
+    "nominal": 16000,
+    "memoryMB": 0.125,
+    "price2026": 56668,
+    "perMB2026": 453300,
+    "includes": "interface, monitor, encoder",
+    "src": "HC 2.1, DTIC ADA108793",
+    "g": "A"
+   },
+   {
+    "year": 1981,
+    "device": "IBM CGA",
+    "nominal": 300,
+    "memoryMB": 0.0156,
+    "price2026": 1063,
+    "perMB2026": 68000,
+    "includes": "PC card",
+    "src": "HC 2.1, IBM announcement",
+    "g": "A"
+   },
+   {
+    "year": 1984,
+    "device": "EGA 64 KB",
+    "nominal": 524,
+    "memoryMB": 0.0625,
+    "price2026": 1624,
+    "perMB2026": 25980,
+    "includes": "PC card",
+    "src": "HC 2.1, PC World 1985",
+    "g": "A"
+   },
+   {
+    "year": 1984,
+    "device": "EGA 256 KB",
+    "nominal": 982,
+    "memoryMB": 0.25,
+    "price2026": 3043,
+    "perMB2026": 12170,
+    "includes": "PC card, memory kits",
+    "src": "HC 2.1, PC World 1985",
+    "g": "A"
+   },
+   {
+    "year": 1986,
+    "device": "Pixar Image Computer",
+    "nominal": 122000,
+    "memoryMB": 24,
+    "price2026": 358367,
+    "perMB2026": 14930,
+    "includes": "SIMD processor",
+    "src": "HC 2.1, Pixar release",
+    "g": "A"
+   },
+   {
+    "year": 1987,
+    "device": "VGA",
+    "nominal": 595,
+    "memoryMB": 0.25,
+    "price2026": 1686,
+    "perMB2026": 6745,
+    "includes": "PC card",
+    "src": "HC 2.1 (price A, date C)",
+    "g": "A"
+   },
+   {
+    "year": 1996,
+    "device": "Voodoo (Righteous 3D)",
+    "nominal": 299,
+    "memoryMB": 4,
+    "price2026": 614,
+    "perMB2026": 153.4,
+    "includes": "rasterizer, texture units",
+    "src": "HC 2.1, Boot 1996",
+    "g": "A"
+   },
+   {
+    "year": 1999,
+    "device": "GeForce 256",
+    "nominal": 349.99,
+    "memoryMB": 32,
+    "price2026": 676,
+    "perMB2026": 21.14,
+    "includes": "GPU",
+    "src": "HC 2.1, Creative release",
+    "g": "A"
+   },
+   {
+    "year": 2006,
+    "device": "GeForce 8800 GTX",
+    "nominal": 599,
+    "memoryMB": 768,
+    "price2026": 957,
+    "perMB2026": 1.246,
+    "includes": "GPU",
+    "src": "HC 2.1, CPU magazine 2007",
+    "g": "A"
+   },
+   {
+    "year": 2018,
+    "device": "RTX 2080",
+    "nominal": 699,
+    "memoryMB": 8192,
+    "price2026": 896,
+    "perMB2026": 0.1094,
+    "includes": "GPU",
+    "src": "HC 2.1, NVIDIA newsroom",
+    "g": "A"
+   },
+   {
+    "year": 2022,
+    "device": "RTX 4090",
+    "nominal": 1599,
+    "memoryMB": 24576,
+    "price2026": 1759,
+    "perMB2026": 0.07157,
+    "includes": "GPU",
+    "src": "HC 2.1, NVIDIA newsroom",
+    "g": "A"
+   },
+   {
+    "year": 2025,
+    "device": "RTX 5090",
+    "nominal": 1999,
+    "memoryMB": 32768,
+    "price2026": 1999,
+    "perMB2026": 0.061,
+    "includes": "GPU",
+    "src": "HC 2.1, NVIDIA newsroom",
+    "g": "A"
+   }
+  ],
+  "dram": {
+   "src": "HC 3 (McCallum, archived 2023-05-30), cheapest row per year",
+   "g": "B",
+   "points": [
+    {
+     "year": 1965,
+     "nominalPerMB": 2642412,
+     "perMB2026": 27000000
+    },
+    {
+     "year": 1970,
+     "nominalPerMB": 734003,
+     "perMB2026": 6090000
+    },
+    {
+     "year": 1973,
+     "nominalPerMB": 399360,
+     "perMB2026": 2900000
+    },
+    {
+     "year": 1974,
+     "nominalPerMB": 314573,
+     "perMB2026": 2050000
+    },
+    {
+     "year": 1975,
+     "nominalPerMB": 49920,
+     "perMB2026": 298725
+    },
+    {
+     "year": 1977,
+     "nominalPerMB": 36800,
+     "perMB2026": 195503
+    },
+    {
+     "year": 1979,
+     "nominalPerMB": 6704,
+     "perMB2026": 29729
+    },
+    {
+     "year": 1981,
+     "nominalPerMB": 4479,
+     "perMB2026": 15863
+    },
+    {
+     "year": 1983,
+     "nominalPerMB": 1980,
+     "perMB2026": 6400
+    },
+    {
+     "year": 1985,
+     "nominalPerMB": 300,
+     "perMB2026": 898
+    },
+    {
+     "year": 1987,
+     "nominalPerMB": 133,
+     "perMB2026": 377
+    },
+    {
+     "year": 1990,
+     "nominalPerMB": 46,
+     "perMB2026": 113
+    },
+    {
+     "year": 1993,
+     "nominalPerMB": 27.5,
+     "perMB2026": 61.27
+    },
+    {
+     "year": 1996,
+     "nominalPerMB": 5.25,
+     "perMB2026": 10.77
+    },
+    {
+     "year": 1999,
+     "nominalPerMB": 0.78,
+     "perMB2026": 1.51
+    },
+    {
+     "year": 2002,
+     "nominalPerMB": 0.13,
+     "perMB2026": 0.233
+    },
+    {
+     "year": 2005,
+     "nominalPerMB": 0.116,
+     "perMB2026": 0.191
+    },
+    {
+     "year": 2008,
+     "nominalPerMB": 0.01,
+     "perMB2026": 0.015
+    },
+    {
+     "year": 2011,
+     "nominalPerMB": 0.0051,
+     "perMB2026": 0.0073
+    },
+    {
+     "year": 2015,
+     "nominalPerMB": 0.0037,
+     "perMB2026": 0.005
+    },
+    {
+     "year": 2019,
+     "nominalPerMB": 0.0027,
+     "perMB2026": 0.0034
+    },
+    {
+     "year": 2023,
+     "nominalPerMB": 0.0015,
+     "perMB2026": 0.0016
+    }
+   ]
+  },
+  "firstToLast": {
+   "ratio": 31400000,
+   "halvings": 24.9,
+   "years": 50,
+   "yearsPerHalving": 2.01,
+   "ordersOfMagnitude": 7.5
+  },
+  "premium1975": 6.4,
+  "premiumCGA1981": 4.3,
+  "premiumVGA1987": 17.9,
+  "esPerPixel1975": {
+   "nominal": 0.305,
+   "y2026": 1.83
+  }
+ },
+ "pricePerf": {
+  "triangles": [
+   {
+    "year": 1988,
+    "system": "Personal IRIS (entry)",
+    "rate": 5800,
+    "rateText": "5,800 lit 4-sided polygons/s",
+    "nominal": 15990,
+    "price2026": 43515,
+    "perDollar": 0.1333,
+    "src": "HC 4, CGW Oct 1988",
+    "g": "A"
+   },
+   {
+    "year": 1993,
+    "system": "Crimson RealityEngine",
+    "rate": 1100000,
+    "rateText": "1.1M Tmesh/s",
+    "nominal": 99900,
+    "price2026": 222575,
+    "perDollar": 4.942,
+    "src": "HC 4, SGI price sheet 19 May 1993 (OCR)",
+    "g": "A"
+   },
+   {
+    "year": 1993,
+    "system": "Onyx/2 RealityEngine2",
+    "rate": 1600000,
+    "rateText": "1.6M Tmesh/s",
+    "nominal": 159900,
+    "price2026": 356254,
+    "perDollar": 4.491,
+    "src": "HC 4, SGI price sheet 19 May 1993 (OCR)",
+    "g": "A"
+   },
+   {
+    "year": 1996,
+    "system": "Voodoo (card only; host does setup)",
+    "rate": 350000,
+    "rateText": "350,000 triangles/s on a P90 (vendor)",
+    "nominal": 299,
+    "price2026": 614,
+    "perDollar": 570.5,
+    "src": "HC 4, Edge 33 and Boot 1996",
+    "g": "A"
+   },
+   {
+    "year": 1999,
+    "system": "GeForce 256",
+    "rate": 15000000,
+    "rateText": "15M sustained polygons/s (vendor)",
+    "nominal": 349.99,
+    "price2026": 676,
+    "perDollar": 22180,
+    "src": "HC 4, NVIDIA and Creative releases",
+    "g": "A"
+   }
+  ],
+  "flops": [
+   {
+    "year": 1999,
+    "card": "GeForce 256",
+    "gflops": 50,
+    "kind": "marketing total",
+    "nominal": 349.99,
+    "price2026": 676,
+    "gflopsPerDollar": 0.07393,
+    "src": "HC 5c",
+    "g": "A"
+   },
+   {
+    "year": 2001,
+    "card": "GeForce3",
+    "gflops": 76,
+    "kind": "marketing total",
+    "nominal": 400,
+    "price2026": 727,
+    "gflopsPerDollar": 0.1045,
+    "src": "HC 5c (price at $400, CGW 2001)",
+    "g": "A"
+   },
+   {
+    "year": 2006,
+    "card": "GeForce 8800 GTX",
+    "gflops": 520,
+    "kind": "programmable FP32 peak",
+    "nominal": 599,
+    "price2026": 957,
+    "gflopsPerDollar": 0.5436,
+    "src": "HC 5c",
+    "g": "A"
+   },
+   {
+    "year": 2018,
+    "card": "RTX 2080",
+    "gflops": 10000,
+    "kind": "FP32 peak",
+    "nominal": 699,
+    "price2026": 896,
+    "gflopsPerDollar": 11.16,
+    "src": "HC 5c, Turing whitepaper",
+    "g": "A"
+   },
+   {
+    "year": 2022,
+    "card": "RTX 4090",
+    "gflops": 82600,
+    "kind": "FP32 peak",
+    "nominal": 1599,
+    "price2026": 1759,
+    "gflopsPerDollar": 46.96,
+    "src": "HC 5c, Ada whitepaper",
+    "g": "A"
+   },
+   {
+    "year": 2025,
+    "card": "RTX 5090",
+    "gflops": 104800,
+    "kind": "FP32 peak",
+    "nominal": 1999,
+    "price2026": 1999,
+    "gflopsPerDollar": 52.43,
+    "src": "HC 5c, Blackwell whitepaper",
+    "g": "A"
+   }
+  ],
+  "triangleTrend": {
+   "ratio": 166392,
+   "years": 11,
+   "perYear": 2.98,
+   "doublings": 17.3,
+   "yearsPerDoubling": 0.63
+  },
+  "flopsTrend": {
+   "ratio": 709,
+   "years": 26,
+   "perYear": 1.29,
+   "doublings": 9.5,
+   "yearsPerDoubling": 2.75,
+   "note": "1999 and 2001 are marketing totals counting fixed-function work; 2006 on are FP32 peaks"
+  },
+  "caveat": "definitions differ (lit vs unlit, polygons vs triangles, peak vs measured); SGI prices are whole workstations, the Voodoo price excludes the host PC; no vendor triangle rates after 1999 (HC 4)"
+ },
+ "costThenNow": {
+  "rows": [
+   {
+    "label": "One AN/FSQ-7 (SAGE), 1958 assumed",
+    "nominal": 30000000,
+    "year": 1958,
+    "price2026": 334196886,
+    "src": "EM P2 SAGE, P3 (year assumed)",
+    "g": "B",
+    "now": false
+   },
+   {
+    "label": "Whirlwind, one year (FY1949 ONR request)",
+    "nominal": 1500000,
+    "year": 1949,
+    "price2026": 20290525,
+    "src": "EM P2 Whirlwind",
+    "g": "C",
+    "now": false
+   },
+   {
+    "label": "IBM 2250 III system, 1970",
+    "nominal": 280000,
+    "year": 1970,
+    "price2026": 2323300,
+    "src": "EM P2 IBM 2250",
+    "g": "C",
+    "now": false
+   },
+   {
+    "label": "PDP-1 base, 1963",
+    "nominal": 120000,
+    "year": 1963,
+    "price2026": 1262522,
+    "src": "EM P2 PDP-1 (DEC price list)",
+    "g": "A",
+    "now": false
+   },
+   {
+    "label": "IBM 2250 improved model, 1966",
+    "nominal": 76800,
+    "year": 1966,
+    "price2026": 763124,
+    "src": "EM P2 IBM 2250",
+    "g": "B",
+    "now": false
+   },
+   {
+    "label": "3-D rotation hardware, 1972 (upper)",
+    "nominal": 70000,
+    "year": 1972,
+    "price2026": 539139,
+    "src": "EM P2 LDS-1 (Machover 1972)",
+    "g": "A",
+    "now": false
+   },
+   {
+    "label": "E&S frame buffer, 1975",
+    "nominal": 80000,
+    "year": 1975,
+    "price2026": 478726,
+    "src": "HC 2.1 (Smith 2023)",
+    "g": "B",
+    "now": false
+   },
+   {
+    "label": "PDP-1 4K-word core module, 1963",
+    "nominal": 30000,
+    "year": 1963,
+    "price2026": 315630,
+    "src": "EM P2 PDP-1",
+    "g": "A",
+    "now": false
+   },
+   {
+    "label": "RAND Tablet, 1964",
+    "nominal": 18000,
+    "year": 1964,
+    "price2026": 186935,
+    "src": "EM P2 RAND Tablet",
+    "g": "C",
+    "now": false
+   },
+   {
+    "label": "PDP-1 Type 30A display, 1963",
+    "nominal": 14300,
+    "year": 1963,
+    "price2026": 150450,
+    "src": "EM P2 PDP-1 (OCR)",
+    "g": "A",
+    "now": false
+   },
+   {
+    "label": "Tektronix 4010, 1972",
+    "nominal": 3950,
+    "year": 1972,
+    "price2026": 30423,
+    "src": "EM P2 storage tubes",
+    "g": "B",
+    "now": false
+   },
+   {
+    "label": "MacBook Air 13-inch (M5), 2026",
+    "nominal": 1299,
+    "year": 2026,
+    "price2026": 1299,
+    "src": "EM P3 (apple.com, read 2026-10-02)",
+    "g": "A",
+    "now": true
+   },
+   {
+    "label": "Raspberry Pi 5, 16 GB, 2026",
+    "nominal": 305,
+    "year": 2026,
+    "price2026": 305,
+    "src": "EM P3 (raspberrypi.com, read 2026-10-02)",
+    "g": "A",
+    "now": true
+   },
+   {
+    "label": "Raspberry Pi Pico 2, 2026",
+    "nominal": 5,
+    "year": 2026,
+    "price2026": 5,
+    "src": "EM P3 (raspberrypi.com, read 2026-10-02)",
+    "g": "A",
+    "now": true
+   }
+  ],
+  "ratios": {
+   "pdp1OverPi5": 4139,
+   "fsq7OverPi5": 1095727,
+   "esFrameBufferOverPi5": 1570,
+   "tek4010OverMacBookAir": 23.4,
+   "pdp1CorePerBit2026": 4.28,
+   "pi5PerBit": 2.2e-9,
+   "perBitRatio": 1900000000,
+   "fsq7MemoryInPi5": 61681
+  },
+  "notFound": [
+   "TX-2",
+   "DAC-1",
+   "LDS-1 (rotation hardware used as proxy)",
+   "HMD"
+  ]
+ },
  "lags": [
   {
    "idea": "head-mounted display",
    "from": 1968,
    "to": 2016,
    "arrival": "consumer VR headsets ship",
-   "years": 48
+   "g": "A/B",
+   "years": 48,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "z-buffer",
    "from": 1974,
    "to": 1996,
    "arrival": "3dfx Voodoo, a consumer card with a depth buffer",
-   "years": 22
+   "g": "A",
+   "years": 22,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "texture mapping",
    "from": 1974,
    "to": 1996,
    "arrival": "the same card, texturing in silicon",
-   "years": 22
+   "g": "A",
+   "years": 22,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "bump mapping",
    "from": 1978,
    "to": 2004,
    "arrival": "per-pixel normal mapping on every surface (Doom 3)",
-   "years": 26
+   "g": "A/C",
+   "years": 26,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
-   "idea": "Catmull–Clark subdivision",
+   "idea": "Catmull-Clark subdivision",
    "from": 1978,
    "to": 1997,
    "arrival": "Geri’s Game, the first subdivision character",
-   "years": 19
+   "g": "A",
+   "years": 19,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "recursive ray tracing",
    "from": 1980,
    "to": 2018,
    "arrival": "ray-tracing cores in a consumer GPU",
-   "years": 38
+   "g": "A",
+   "years": 38,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "mipmaps",
    "from": 1983,
    "to": 1996,
    "arrival": "mipmapped texturing on a consumer card",
-   "years": 13
+   "g": "A",
+   "years": 13,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "path tracing",
    "from": 1986,
    "to": 2006,
    "arrival": "a feature film rendered by path tracing (Monster House, Arnold)",
-   "years": 20
+   "g": "A/B",
+   "years": 20,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "programmable shading (shade trees)",
    "from": 1984,
    "to": 2001,
    "arrival": "GeForce 3, the first consumer shader hardware",
-   "years": 17
+   "g": "A",
+   "years": 17,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   },
   {
    "idea": "radiance fields (NeRF)",
    "from": 2020,
    "to": 2023,
    "arrival": "real-time splatting of captured scenes",
-   "years": 3
+   "g": "A",
+   "years": 3,
+   "src": "AU (lag row); AU26 gen-textbook-figures-history.mjs"
   }
  ],
  "lagStats": {
+  "n": 10,
   "mean": 22.8,
+  "median": 21,
   "min": 3,
-  "max": 48,
-  "median": 21
- },
- "budgets": [
-  {
-   "name": "VR headset, 90 Hz",
-   "seconds": 0.011111111111111112,
-   "kind": "real time",
-   "log10": -1.95
-  },
-  {
-   "name": "game or demo, 60 Hz",
-   "seconds": 0.016666666666666666,
-   "kind": "real time",
-   "log10": -1.78
-  },
-  {
-   "name": "film, 24 frames per second (playback)",
-   "seconds": 0.041666666666666664,
-   "kind": "real time",
-   "log10": -1.38
-  },
-  {
-   "name": "Whitted’s 1980 image, VAX-11/780",
-   "seconds": 4440,
-   "kind": "offline",
-   "log10": 3.65
-  },
-  {
-   "name": "a feature-film frame, 1990s to today",
-   "seconds": 14400,
-   "kind": "offline",
-   "log10": 4.16
-  }
- ],
- "budgetRatio": {
-  "filmOverGame": 860000,
-  "whittedOverGame": 270000,
-  "ordersOfMagnitude": 5.9
- },
- "map": {
-  "eras": [
-   {
-    "era": "1 birth",
-    "chapters": [
-     "interaction",
-     "scene-graphs"
-    ]
-   },
-   {
-    "era": "2 Utah",
-    "chapters": [
-     "rasterization",
-     "meshes",
-     "texture-mapping",
-     "illumination",
-     "curves-surfaces"
-    ]
-   },
-   {
-    "era": "3 photograph",
-    "chapters": [
-     "ray-tracing",
-     "light-transport-pbr",
-     "color"
-    ]
-   },
-   {
-    "era": "4 raster machines",
-    "chapters": [
-     "vectors",
-     "affine-transforms",
-     "viewing",
-     "rasterization",
-     "antialiasing"
-    ]
-   },
-   {
-    "era": "5 programmable",
-    "chapters": [
-     "texture-mapping",
-     "illumination",
-     "rotation"
-    ]
-   },
-   {
-    "era": "6 capture",
-    "chapters": [
-     "meshes",
-     "curves-surfaces",
-     "animation"
-    ]
-   },
-   {
-    "era": "7 real time",
-    "chapters": [
-     "light-transport-pbr",
-     "antialiasing",
-     "interaction"
-    ]
-   },
-   {
-    "era": "8 neural",
-    "chapters": [
-     "neural-nets-embeddings",
-     "image-space",
-     "diffusion-models",
-     "learned-scenes"
-    ]
-   }
-  ],
-  "chapters": 20,
-  "edges": 28
+  "max": 48
  }
 }

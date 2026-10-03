@@ -10,9 +10,9 @@
   (the alpha channel, Porter-Duff over worked in premultiplied form, why premultiply,
   associativity, deep compositing worked); color management (linear light, ACES);
   matching CG to a plate; where learned models are entering the pipeline.
-  NEEDS:   the eras topics (path tracing, the two budgets, textures); nothing else.
-  COMPANION: mounted in L02 between topics/big-picture-eras-5-7.md and
-    topics/big-picture-neural-era.md.
+  NEEDS:   the history decks (path tracing, textures); nothing else.
+  COMPANION: mounted in L02 between topics/history-studios-films.md and
+    topics/history-frontier.md.
   DEMOS:   none. FIGURES: ../../textbook/figures/rt-convergence.svg, col-blend.png;
     media per ../../media/overview/CREDITS.md (mocap, point-cloud, fluid-sim).
   NUMBERS: computed by node in tools/gen-lecture-figures-a.mjs (the over operator,
@@ -150,7 +150,7 @@ Ratio **400 : 1** in one image. No single exposure records both: at 1/1000 s the
 - **previs**: a rough, fast version of the whole sequence: gray models, blocked cameras, timing; the director cuts the film before it is made
 - **layout**: the final cameras and set dressing, shot by shot
 - **animation**: animators key the rig's controls at **24 frames per second**; many shots are posed "on twos" (12 poses a second) and refined
-- the animation is **curves** over time, the keyframe demo of the eras topic at studio scale
+- the animation is **curves** over time, keyframes and interpolation at studio scale
 
 
 ---

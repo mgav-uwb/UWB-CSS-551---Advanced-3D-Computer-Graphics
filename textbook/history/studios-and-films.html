@@ -1,0 +1,1271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Studios and Films - CSS 551 course text supplement</title>
+    <script>
+      window.MathJax = {
+        tex: { inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]] },
+        svg: { fontCache: "global" },
+      };
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"
+    ></script>
+    <link rel="stylesheet" href="../textbook.css" />
+    <style>
+      .cost {
+        border: 1px solid #c9c2a8;
+        background: #fbf8ee;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin: 12px 0;
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .cost .tag {
+        color: #8a6d1f;
+      }
+      .cost .grade {
+        font-weight: 600;
+      }
+      .lag {
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .who {
+        font-family: system-ui, sans-serif;
+        font-size: 13.5px;
+        color: #555;
+        margin: 4px 0 12px;
+      }
+      .placeholder-note {
+        font-family: system-ui, sans-serif;
+        font-size: 12.5px;
+        color: #8a6d1f;
+      }
+    </style>
+    <style>
+      .pending {
+        border: 2px dashed #b9c0d0;
+        border-radius: 8px;
+        padding: 28px 16px;
+        text-align: center;
+        color: #5c6270;
+        font-style: italic;
+        background: #f6f8fb;
+      }
+      .figrow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .figrow figure {
+        flex: 1 1 260px;
+        margin: 12px 0;
+      }
+      .figrow figure img {
+        max-height: 300px;
+        width: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <p class="note">
+        <a href="../history-of-graphics.html">A History of Computer Graphics</a>
+        &middot; <a href="../index.html">All chapters</a>.
+      </p>
+
+      <h1>Studios and Films</h1>
+
+      <p class="lead">
+        The companies that made computer-generated imagery (CGI) for film, from
+        the first commercial studios of the 1970s to the visual-effects (VFX)
+        and animation studios of today, and a timeline of films with the technical first or landmark each is
+        known for, expanding
+        <a href="../history-of-graphics.html#studios-films"
+          >CGI studios and films</a
+        >
+        in A History of Computer Graphics. Where sources disagree about a
+        &ldquo;first,&rdquo; the claim is narrowed to what they support and the
+        disagreement is named.
+      </p>
+
+      <h2 id="first-generation">The first generation, 1962 to 1987</h2>
+      <p>
+        Before 1980 a frame of shaded 3D imagery took minutes to hours on a
+        mainframe or minicomputer and had to be photographed onto film by a
+        custom film recorder. A handful of companies built that whole chain
+        themselves, sold it to advertisers and television networks, and took
+        the occasional film job. Most of them closed or were absorbed by 1987.
+      </p>
+
+      <h3 id="iii">Information International Inc. (III, Triple-I), Los Angeles</h3>
+      <p>
+        Founded in 1962 to make digital film scanners and image-processing
+        equipment, III formed a motion-picture group under John Whitney Jr. and
+        Gary Demos in the 1970s. Its prototype image-processing system made
+        the pixelated point of view of the robot gunslinger in
+        <em>Westworld</em> (1973): Whitney&rsquo;s own account in
+        <em>American Cinematographer</em> describes each frame as 3,600
+        rectangles at about one minute of computing a frame, and names III
+        staff Russ Ham and Dean Anschultz. The group went on to
+        <em>Futureworld</em> (1976, a digitized head of Peter Fonda),
+        <em>Looker</em> (1981, a digitized actress) and <em>Tron</em> (1982),
+        and made a test X-wing fighter for George Lucas. Its equipment was its
+        own: PDP-10 computers, the Foonly F-1, a 1,000-line frame buffer and the
+        PFR-80 film recorder, with the Tranew renderer (Jim Blinn, Frank Crow
+        and others) and Craig Reynolds&rsquo;s ASAS animation language. III
+        called the process Digital Scene Simulation. Whitney and Demos left in
+        1981, and the graphics group closed soon after; several of its staff
+        formed the Symbolics Graphics Division.
+      </p>
+
+      <h3 id="magi">MAGI (Mathematical Applications Group Inc.), Elmsford, New York</h3>
+      <p>
+        MAGI was founded in 1966 to compute nuclear-radiation exposure. Its
+        engineer Robert Goldstein traced radiation from a source through solid
+        geometry; turned around to trace light from the eye, the same program
+        became SynthaVision (published by Goldstein and Nagel in 1971), one of
+        the first ray-casting renderers. Objects were built from solid
+        primitives combined with Boolean operators (constructive solid
+        geometry). The graphics business started in 1972. MAGI was the largest
+        of the four <em>Tron</em> vendors, with about 15 minutes of the
+        film&rsquo;s computer imagery (light cycles, recognizers, tanks), and
+        afterwards hired Ken Perlin, whose noise function later won an Academy
+        Technical Achievement Award (1997). Six MAGI veterans founded Blue Sky
+        Studios in 1987.
+      </p>
+
+      <h3 id="abel">Robert Abel and Associates, Los Angeles</h3>
+      <p>
+        Bob Abel and Con Pederson founded the studio in 1971 for motion-control
+        and slit-scan effects in commercials and network promotions. It moved
+        to vector graphics on Evans &amp; Sutherland displays (the opening of
+        Disney&rsquo;s <em>The Black Hole</em>, 1979) and then to raster
+        rendering through its software division, Abel Image Research, whose
+        programmers included Bill Kovacs and Roy Hall. Abel animated parts of
+        <em>Tron</em> and many award-winning commercials, among them
+        <em>Brilliance</em>, a chrome robot for the Canned Food Information
+        Council. Omnibus Computer Graphics bought the studio in October 1986.
+      </p>
+
+      <h3 id="digital-effects">Digital Effects Inc., New York</h3>
+      <p>
+        Founded in 1978 by Judson Rosebush, Jeff Kleiser and five partners, it
+        made the title sequence and the Bit character for <em>Tron</em> and
+        closed in 1986.
+      </p>
+
+      <h3 id="digital-productions">Digital Productions, Los Angeles</h3>
+      <p>
+        Whitney and Demos founded Digital Productions in 1981, financed by
+        Control Data Corporation, around a leased Cray supercomputer, a
+        Cray-1S replaced by a Cray X-MP in 1983. Its first large job was
+        <em>The Last Starfighter</em> (1984): roughly 25 minutes of computer-graphics (CG) spaceships and battles rendered at 2,000 by 2,560 pixels, in place of
+        physical models (accounts vary between about 250 and 300 shots).
+        Demos later wrote that it was the first time highly detailed CG images
+        were integrated with live action as realistic scene elements rather
+        than as monitor graphics. It also made the Jupiter sequence of
+        <em>2010</em> (1984). Whitney and Demos received an Academy Scientific
+        and Engineering Award for the photorealistic simulation of motion
+        picture photography by computer. The Cray was ruinously expensive;
+        Omnibus took over the company in June 1986.
+      </p>
+      <figure>
+        <img
+          src="../../media/history/commons-cray-xmp.jpg"
+          data-cat="commons-cray-xmp"
+          style="max-width: min(360px, 100%)"
+          alt="A Cray X-MP supercomputer: a C-shaped tower of blue panels with a bench seat around its base."
+        />
+        <figcaption>
+          A Cray X-MP, the model Digital Productions rendered on (this one
+          belonged to the National Security Agency) &middot; NSA &middot;
+          Public domain &middot; via Wikimedia Commons
+        </figcaption>
+      </figure>
+
+      <h3 id="omnibus">The 1987 collapse</h3>
+      <p>
+        Omnibus Computer Graphics of Toronto bought Digital Productions (June
+        1986) and Abel (October 1986, $7.3 million) to dominate the market. By
+        1987 it was in default on about $30 million of debt and the three
+        studios closed together (accounts give dates from March to May 1987).
+        Their staff founded or joined the next generation: Rhythm &amp; Hues,
+        Metrolight, deGraf/Wahrman, and Sony Pictures Imageworks among others;
+        Omnibus&rsquo;s PRISMS software went to Kim Davidson and Greg
+        Hermanovic, who founded Side Effects Software and later wrote Houdini.
+      </p>
+
+      <h3 id="nyit">New York Institute of Technology Computer Graphics Laboratory (NYIT CGL)</h3>
+      <p>
+        Alexander Schure, NYIT&rsquo;s founder, set up the lab on Long Island
+        in 1974 to make a computer-animated feature, and hired Edwin Catmull from
+        Utah to run it. Alvy Ray Smith, David DiFrancesco, Lance Williams,
+        Fred Parke, Garland Stern and others followed. The lab produced the
+        integral alpha channel (Catmull and Smith), the Paint and Tween
+        programs, shadow maps (Williams 1978), mipmaps (Williams 1983) and
+        Catmull-Clark subdivision (1978); the planned feature, <em>The
+        Works</em>, was never finished. In 1979 George Lucas recruited Catmull
+        and much of the team for Lucasfilm.
+      </p>
+
+      <h3 id="pdi-early">Pacific Data Images (PDI), Sunnyvale</h3>
+      <p>
+        Carl Rosendahl founded PDI in 1980, joined by Richard Chuang (1981) and
+        Glenn Entis (1982). It wrote its own software in C, rendered direct to
+        video for television graphics, and by its own account held over half of
+        that market in 1985. PDI built Waldo C. Graphic for Jim Henson (1988),
+        a CG puppet driven in real time by a puppeteer, and the face morphs in
+        Michael Jackson&rsquo;s <em>Black or White</em> video (1991), whose
+        feature-based morphing algorithm Beier and Neely published in 1992. Its
+        later history is under <a href="#pdi">DreamWorks</a> below.
+      </p>
+
+      <h2 id="lucasfilm">Lucasfilm, ILM and Pixar</h2>
+
+      <h3 id="ilm">Industrial Light &amp; Magic (ILM)</h3>
+      <p>
+        Lucas founded ILM in 1975, in a warehouse in Van Nuys, California, to
+        make the effects for <em>Star Wars</em>; John Dykstra ran it, and it
+        moved to San Rafael after the film. ILM&rsquo;s own history states that
+        from 1980 to 1992 its work received 18 Academy Award nominations
+        and, with one exception, won the visual-effects Oscar every year. In
+        the computer era it delivered the stained-glass knight of
+        <em>Young Sherlock Holmes</em> (1985, with the Lucasfilm Computer
+        Division), the water pseudopod of <em>The Abyss</em> (1989), the
+        liquid-metal T-1000 of <em>Terminator 2</em> (1991), the dinosaurs of
+        <em>Jurassic Park</em> (1993), Davy Jones in <em>Pirates of the
+        Caribbean: Dead Man&rsquo;s Chest</em> (2006) and the StageCraft light-emitting diode (LED) volume of
+        <em>The Mandalorian</em> (2019). Photoshop began there:
+        John Knoll, an ILM motion-control technician, and his brother Thomas
+        wrote it in 1987. Visual-effects supervisor Dennis Muren led much of
+        the transition from models to CG. Disney agreed to buy Lucasfilm,
+        ILM included, for $4.05 billion in October 2012. ILM counts 16 Oscar
+        wins from 50 nominations.
+      </p>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/commons-letterman-ilm.jpg"
+            data-cat="commons-letterman-ilm"
+            alt="A white three-storey building with large windows and a footbridge, set in lawns and trees."
+          />
+          <figcaption>
+            Letterman Digital Arts Center, Presidio of San Francisco, where
+            Lucasfilm and ILM are based &middot; Frank Schulenburg &middot; CC
+            BY-SA 4.0 &middot; via Wikimedia Commons
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/commons-dennis-muren.jpg"
+            data-cat="commons-dennis-muren"
+            alt="Dennis Muren, a grey-haired man in a dark suit, at an awards event."
+          />
+          <figcaption>
+            Dennis Muren, ILM visual-effects supervisor, 2007 &middot;
+            lukeford.net &middot; CC BY-SA 2.5 &middot; via Wikimedia Commons
+          </figcaption>
+        </figure>
+      </div>
+
+      <h3 id="lucasfilm-cd">The Lucasfilm Computer Division, 1979 to 1986</h3>
+      <p>
+        Catmull&rsquo;s group was hired to bring digital methods to film:
+        a laser film scanner and recorder (DiFrancesco), digital compositing,
+        digital editing (EditDroid) and audio (SoundDroid), and a renderer fit
+        for film. Its papers set the rendering agenda of the 1980s: particle
+        systems (Reeves 1983), the A-buffer (Carpenter 1984), distributed ray
+        tracing (Cook, Porter, Carpenter 1984), shade trees (Cook 1984),
+        compositing algebra (Porter and Duff 1984) and the Reyes architecture
+        (Cook, Carpenter, Catmull 1987). Its first film work was the Genesis
+        sequence of <em>Star Trek II: The Wrath of Khan</em> (1982), about a
+        minute of entirely computer-generated imagery with fractal mountains
+        by Loren Carpenter and a wall of fire made of particle systems by
+        William Reeves. John Lasseter, who had left Disney, animated
+        <em>The Adventures of Andr&eacute; and Wally B.</em>, shown at the 1984
+        conference of the Association for Computing Machinery&rsquo;s Special
+        Interest Group on Computer Graphics (SIGGRAPH).
+      </p>
+      <figure>
+        <img
+          src="../../media/history/film-genesis.jpg"
+          data-cat="film-genesis"
+          style="max-width: min(620px, 100%)"
+          alt="A planet seen from space with a ring of fire spreading across its surface."
+        />
+        <figcaption>
+          <em>Star Trek II: The Wrath of Khan</em>, the Genesis sequence
+          (1982): particle systems and fractal terrain by the Lucasfilm
+          Computer Division &middot; Paramount Pictures &middot; Used under
+          fair use for teaching and commentary.
+        </figcaption>
+      </figure>
+
+      <h3 id="pixar">Pixar</h3>
+      <p>
+        When Lucas decided to sell the division, Steve Jobs paid Lucasfilm $5
+        million for its technology and put another $5 million into a new
+        company; the papers were signed at the end of January 1986, with
+        Catmull as president and Smith as vice president, and about 40 staff
+        moved over. For five years Pixar was mainly a hardware and software
+        company: it sold the Pixar Image Computer, published the RenderMan
+        Interface (1988) and licensed RenderMan from 1989, and paid for
+        Lasseter&rsquo;s small animation group with commercials. The group&rsquo;s
+        shorts carried the reputation: <em>Luxo Jr.</em> (1986) was the first
+        3D computer-animated film nominated for an Academy Award, and
+        <em>Tin Toy</em> (1988) won the animated-short Oscar, apparently the
+        first computer-animated film to do so. Pixar also built the Computer Animation Production System (CAPS) for
+        Disney (below). In 1991 Disney contracted Pixar for a feature, and
+        <em>Toy Story</em> (1995) became the first feature-length film made
+        entirely with computer animation. Pixar went public the same year. Disney agreed to buy Pixar for $7.4 billion in stock in
+        January 2006 and closed in May 2006; Catmull became president of both
+        Pixar and Walt Disney Animation Studios.
+      </p>
+      <p>
+        Pixar&rsquo;s renderer has an unusual record. RenderMan received an
+        Academy Scientific and Engineering Award in 1993 and, in 2001, an Award
+        of Merit (an Oscar statuette) to Catmull, Carpenter and Robert Cook, the
+        first for a software package. <em>Geri&rsquo;s Game</em> (1997)
+        introduced subdivision surfaces to production (DeRose, Kass and Truong
+        1998). RenderMan was rebuilt as a path tracer in the 2010s:
+        <em>Monsters University</em> (2013) used ray-traced global
+        illumination, and <em>Finding Dory</em> (2016) was the first Pixar
+        feature in which visibility, shadows, reflections, indirect light and
+        subsurface scattering were all computed by path tracing.
+      </p>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/commons-ed-catmull.jpg"
+            data-cat="commons-ed-catmull"
+            alt="Edwin Catmull, seated on stage, talking with gestures in a conversation."
+          />
+          <figcaption>
+            Edwin Catmull at Stanford, 2014 &middot; Steve Jurvetson &middot; CC
+            BY 2.0 &middot; via Wikimedia Commons
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/commons-alvy-ray-smith.jpg"
+            data-cat="commons-alvy-ray-smith"
+            alt="Portrait of Alvy Ray Smith, a bearded man."
+          />
+          <figcaption>
+            Alvy Ray Smith, co-founder of Pixar &middot; Alvy Ray Smith
+            &middot; CC BY-SA 3.0 &middot; via Wikimedia Commons
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/photo-pixar-image-computer.jpg"
+            data-cat="photo-pixar-image-computer"
+            alt="The Pixar Image Computer, a rack-mounted cabinet."
+          />
+          <figcaption>
+            The Pixar Image Computer (1986), the product Pixar was founded to
+            sell &middot; Adam Schuster &middot; CC BY 2.0 &middot; via
+            Wikimedia Commons
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/commons-pixar-hq.jpg"
+            data-cat="commons-pixar-hq"
+            alt="Pixar's brick headquarters building in Emeryville behind a lawn."
+          />
+          <figcaption>
+            Pixar&rsquo;s headquarters in Emeryville, California &middot;
+            Sharon Hahn Darlin &middot; CC BY 2.0 &middot; via Wikimedia
+            Commons
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2 id="disney">Walt Disney Animation Studios: CAPS to Hyperion</h2>
+      <p>
+        CAPS, built by Pixar and Disney in the late 1980s, scanned the animators&rsquo; drawings and
+        replaced hand inking, painting and the camera stand with digital ink,
+        paint and compositing. It was first used for a single shot, the closing
+        rainbow of <em>The Little Mermaid</em> (1989); <em>The Rescuers Down
+        Under</em> (1990) was made entirely with it, which Guinness lists as
+        the first fully digital feature film. CAPS also let Disney mix 3D
+        backgrounds with drawn characters, as in the ballroom of
+        <em>Beauty and the Beast</em> (1991), the first animated film
+        nominated for Best Picture. The CAPS team received an Academy
+        Scientific and Engineering Award in 1992. The studio turned to fully
+        CG features in the 2000s; its research group published the Disney principled bidirectional reflectance distribution
+        function (BRDF; Burley 2012) and the material point method (MPM) for
+        snow (Stomakhin et al. 2013), linked to <em>Frozen</em> (2013). Its
+        own path tracer, Hyperion, has rendered all of the studio&rsquo;s CG
+        images since <em>Big Hero 6</em> (2014).
+      </p>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/commons-wdas-building.jpg"
+            data-cat="commons-wdas-building"
+            alt="The Roy E. Disney Animation Building in Burbank, seen across a park."
+          />
+          <figcaption>
+            The Roy E. Disney Animation Building, Burbank, home of Walt Disney
+            Animation Studios &middot; Coolcaesar &middot; CC BY-SA 4.0
+            &middot; via Wikimedia Commons
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-frozen.jpg"
+            data-cat="film-frozen"
+            alt="A rendered snowball rolling and breaking apart, from the snow-simulation paper."
+          />
+          <figcaption>
+            Snow simulated with the material point method (Stomakhin et al.
+            2013), the paper&rsquo;s render &middot; The Walt Disney Company
+            &middot; Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2 id="animation-studios">Feature-animation studios</h2>
+
+      <h3 id="pdi">PDI/DreamWorks</h3>
+      <p>
+        In 1996 PDI signed a co-production deal with the new DreamWorks SKG
+        (one later account dates the first stake to 1995). Its first feature,
+        <em>Antz</em> (1998), opened a month before Pixar&rsquo;s <em>A
+        Bug&rsquo;s Life</em>. DreamWorks took majority control in February
+        2000, and <em>Shrek</em> (2001) won the first Academy Award for Best
+        Animated Feature. PDI also won Academy technical awards for its
+        animation system (1997) and for Nick Foster&rsquo;s fluid tools (1998).
+        DreamWorks Animation closed the Northern California studio in its
+        2015 restructuring.
+      </p>
+
+      <h3 id="blue-sky">Blue Sky Studios</h3>
+      <p>
+        Founded in February 1987 by six people who had met at MAGI on
+        <em>Tron</em> (Chris Wedge, Michael Ferraro, Carl Ludwig, Alison Brown,
+        David Brown and Eugene Troubetzkoy), Blue Sky wrote its own
+        ray-tracing renderer, CGI Studio, with a strong emphasis on physically
+        based light. Wedge&rsquo;s short <em>Bunny</em> won the animated-short
+        Oscar in 1999. Fox acquired control through its effects company VIFX
+        (1997) and kept Blue Sky when it sold VIFX in 1999; <em>Ice Age</em>
+        followed in 2002. Disney, which inherited the studio when it bought
+        21st Century Fox, closed it in April 2021.
+      </p>
+
+      <h3 id="illumination">Illumination Mac Guff</h3>
+      <p>
+        Chris Meledandri founded Illumination in 2007. Its films were animated
+        by Mac Guff in Paris, starting with <em>Despicable Me</em> (2010); in
+        late 2011 Universal bought Mac Guff&rsquo;s animation unit for
+        Illumination and renamed it Illumination Mac Guff.
+      </p>
+
+      <h3 id="animal-logic">Animal Logic</h3>
+      <p>
+        Zareh Nalbandian and Chris Godfrey founded Animal Logic in Sydney in
+        1991 as a VFX and design studio. Its first CG feature, George
+        Miller&rsquo;s <em>Happy Feet</em> (2006), won the Animated Feature
+        Oscar. Netflix agreed to
+        buy the studio in July 2022.
+      </p>
+
+      <h2 id="vfx-houses">Visual-effects houses</h2>
+
+      <h3 id="digital-domain">Digital Domain</h3>
+      <p>
+        James Cameron, makeup-effects artist Stan Winston and former ILM
+        general manager Scott Ross founded Digital Domain in Venice,
+        California, in 1993. Its <em>Titanic</em> (1997) work, a CG ship with
+        motion-captured digital passengers, won the visual-effects Oscar, as
+        did <em>The Curious Case of Benjamin Button</em> (2008), whose CG head
+        carried Brad Pitt&rsquo;s performance as the aged Benjamin.
+      </p>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-titanic.jpg"
+            data-cat="film-titanic"
+            alt="A wide shot of the Titanic at sea with passengers on deck."
+          />
+          <figcaption>
+            <em>Titanic</em> (1997): CG ship and digital passengers by Digital
+            Domain &middot; Paramount Pictures and 20th Century Studios
+            &middot; Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-benjamin-button.jpg"
+            data-cat="film-benjamin-button"
+            alt="The aged Benjamin Button, an old man's face."
+          />
+          <figcaption>
+            <em>The Curious Case of Benjamin Button</em> (2008): a CG head
+            driven by the actor&rsquo;s captured performance (Digital Domain)
+            &middot; Paramount Pictures and Warner Bros. &middot; Used under
+            fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+
+      <h3 id="weta">Weta Digital (W&#275;t&#257; FX)</h3>
+      <p>
+        Peter Jackson, Richard Taylor and Jamie Selkirk founded Weta Digital in
+        Wellington, New Zealand, in 1993. For <em>The Lord of the Rings</em>
+        (2001 to 2003) Stephen Regelous wrote Massive, which animated battle
+        crowds as autonomous agents, each with a small rule-based brain
+        (Scientific and Engineering Award, 2004), and the studio built Gollum
+        from Andy Serkis&rsquo;s captured performance. Weta won the
+        visual-effects Oscar for all three films, then for <em>King Kong</em>,
+        <em>Avatar</em> (2009) and <em>Avatar: The Way of Water</em> (2022),
+        and wrote Manuka, a spectral path tracer (2018). In 2021 Unity bought
+        Weta&rsquo;s software tools and engineers for $1.625 billion; the
+        effects business stayed with Jackson and became W&#275;t&#257; FX in
+        March 2022.
+      </p>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-lotr-massive.jpg"
+            data-cat="film-lotr-massive"
+            alt="A huge army massed before a fortress at night."
+          />
+          <figcaption>
+            <em>The Lord of the Rings: The Two Towers</em> (2002): Helm&rsquo;s
+            Deep armies animated by Massive agents (Weta Digital) &middot; New
+            Line Cinema &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-gollum.jpg"
+            data-cat="film-gollum"
+            alt="Gollum, a gaunt CG creature with large eyes."
+          />
+          <figcaption>
+            Gollum, built from Andy Serkis&rsquo;s performance (Weta; the frame
+            may be from <em>The Hobbit</em>) &middot; New Line Cinema &middot;
+            Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+
+      <h3 id="imageworks">Sony Pictures Imageworks</h3>
+      <p>
+        Sony formed an in-house effects unit in Culver City in 1992 and named
+        it Imageworks in 1993; Ken Ralston, from ILM, led its expansion from
+        1995. Imageworks won the visual-effects Oscar for <em>Spider-Man 2</em>
+        (2004), made <em>The Polar Express</em> (2004) with full-body and face
+        performance capture of the cast, and, with Solid Angle, developed the
+        Arnold path tracer, whose <em>Monster House</em> (2006) was the first
+        feature-length film rendered with path tracing. It moved its
+        headquarters to Vancouver in 2014.
+      </p>
+
+      <h3 id="rhythm-hues">Rhythm &amp; Hues</h3>
+      <p>
+        Former Abel staff founded Rhythm &amp; Hues in Los Angeles in 1987. It
+        won the visual-effects Oscar for <em>Babe</em> (1995), with its talking
+        animals, and again for <em>Life of Pi</em> (2012); the second award
+        came in February 2013, days after the company filed for bankruptcy.
+      </p>
+
+      <h3 id="framestore">Framestore</h3>
+      <p>
+        Founded in London in 1986, Framestore won the visual-effects Oscar for
+        <em>Gravity</em> (2013): actors were lit inside a box of 196 LED panels
+        that displayed the rendered environment, so the light on their faces
+        matched the CG world around them.
+      </p>
+
+      <h3 id="dneg">Double Negative (DNEG)</h3>
+      <p>
+        Double Negative was founded in London in 1998, merged with Prime Focus
+        World in 2014 and renamed itself DNEG in 2018. For
+        <em>Interstellar</em> (2014) it wrote DNGR, the Double Negative
+        Gravitational Renderer, which traces bundles of light rays through the
+        curved spacetime of a spinning black hole; the method was published
+        with physicist Kip Thorne (James et al. 2015), and the film won the
+        visual-effects Oscar.
+      </p>
+      <figure>
+        <img
+          src="../../media/history/film-interstellar.png"
+          data-cat="film-interstellar"
+          style="max-width: min(560px, 100%)"
+          alt="A black hole with a bright accretion disk bent above and below it by gravitational lensing."
+        />
+        <figcaption>
+          <em>Interstellar</em> (2014): the black hole Gargantua rendered with
+          DNGR (DNEG) &middot; Warner Bros. Entertainment and Paramount
+          Pictures &middot; Used under fair use for teaching and commentary.
+        </figcaption>
+      </figure>
+
+      <h3 id="mpc">MPC</h3>
+      <p>
+        The Moving Picture Company, a London studio, created most of the
+        animals and environments of <em>The Jungle Book</em> (2016), whose
+        visual-effects Oscar it shared with Weta Digital&rsquo;s supervisors.
+        Its parent, Technicolor Creative Studios, went into administration in
+        February 2025.
+      </p>
+
+      <h2 id="software">Software from the studios</h2>
+      <p>
+        Most commercial 3D packages used in film came from a studio or were
+        proven on a film first.
+      </p>
+      <div style="overflow-x: auto">
+      <table>
+        <tr>
+          <th>package</th>
+          <th>origin</th>
+          <th>film use and fate</th>
+        </tr>
+        <tr>
+          <td>RenderMan</td>
+          <td>Lucasfilm Reyes renderer; Pixar, interface 1988, product 1989</td>
+          <td>
+            the standard film renderer of the 1990s and 2000s; path tracer from
+            the 2010s; first software to receive an Oscar statuette (2001)
+          </td>
+        </tr>
+        <tr>
+          <td>Wavefront</td>
+          <td>Santa Barbara, 1984 (Bill Kovacs, from Abel)</td>
+          <td>bought Abel Image Research; merged into Alias|Wavefront, 1995</td>
+        </tr>
+        <tr>
+          <td>Alias</td>
+          <td>Toronto, 1983</td>
+          <td>
+            used by ILM on <em>The Abyss</em> and <em>Terminator 2</em>;
+            PowerAnimator on <em>Jurassic Park</em>
+          </td>
+        </tr>
+        <tr>
+          <td>Maya</td>
+          <td>Alias|Wavefront (owned by Silicon Graphics), shipped February 1998</td>
+          <td>Autodesk bought Alias in 2005 to 2006; still a film standard</td>
+        </tr>
+        <tr>
+          <td>Softimage</td>
+          <td>Montreal, 1986 (Daniel Langlois)</td>
+          <td>
+            on <em>Jurassic Park</em>; owned by Microsoft (1994), Avid (1998),
+            Autodesk (2008); last release 2015
+          </td>
+        </tr>
+        <tr>
+          <td>Houdini</td>
+          <td>
+            Side Effects Software, Toronto, 1987, from Omnibus&rsquo;s PRISMS;
+            Houdini 1.0 in 1996
+          </td>
+          <td>procedural effects: destruction, fluids, crowds</td>
+        </tr>
+        <tr>
+          <td>Massive</td>
+          <td>Stephen Regelous at Weta Digital</td>
+          <td>
+            crowd agents for <em>The Lord of the Rings</em>; Academy award 2004
+          </td>
+        </tr>
+        <tr>
+          <td>Arnold</td>
+          <td>Marcos Fajardo (Solid Angle) with Sony Pictures Imageworks</td>
+          <td>
+            first path-traced feature, <em>Monster House</em> (2006); Autodesk
+            bought Solid Angle in 2016; Academy award 2017
+          </td>
+        </tr>
+        <tr>
+          <td>Hyperion</td>
+          <td>Walt Disney Animation Studios</td>
+          <td>all of the studio&rsquo;s CG since <em>Big Hero 6</em> (2014)</td>
+        </tr>
+        <tr>
+          <td>Manuka</td>
+          <td>Weta Digital</td>
+          <td>spectral path tracer, described in 2018</td>
+        </tr>
+      </table>
+      </div>
+
+      <h2 id="timeline">Films and their firsts</h2>
+      <p>
+        Each &ldquo;first&rdquo; is worded as narrowly as the sources allow;
+        Oscars are dated by ceremony year.
+      </p>
+      <div style="overflow-x: auto">
+      <table>
+        <tr>
+          <th>year</th>
+          <th>film</th>
+          <th>studio</th>
+          <th>first or landmark</th>
+        </tr>
+        <tr>
+          <td>1973</td>
+          <td><em>Westworld</em></td>
+          <td>III</td>
+          <td>
+            the robot&rsquo;s pixelated point of view; generally cited as the
+            first digital image processing in a feature film
+          </td>
+        </tr>
+        <tr>
+          <td>1976</td>
+          <td><em>Futureworld</em></td>
+          <td>III; Catmull and Parke (Utah)</td>
+          <td>
+            among the first 3D computer-generated images in a feature:
+            Catmull&rsquo;s animated hand (1972), Parke&rsquo;s face and a
+            digitized head of Peter Fonda (some accounts give
+            <em>Star Wars</em> or <em>Looker</em> the 3D first instead)
+          </td>
+        </tr>
+        <tr>
+          <td>1977</td>
+          <td><em>Star Wars</em></td>
+          <td>ILM; Larry Cuba (University of Illinois at Chicago)</td>
+          <td>
+            wireframe animation of the Death Star trench for the briefing scene,
+            programmed in Tom DeFanti&rsquo;s GRASS language
+          </td>
+        </tr>
+        <tr>
+          <td>1979</td>
+          <td><em>Alien</em></td>
+          <td>System Simulation Ltd, London (Brian Wyvill)</td>
+          <td>wireframe orbit and descent displays on the ship&rsquo;s monitors</td>
+        </tr>
+        <tr>
+          <td>1981</td>
+          <td><em>Looker</em></td>
+          <td>III</td>
+          <td>a digitized actress as a 3D model; called by one participant the first shaded 3D CG in a feature</td>
+        </tr>
+        <tr>
+          <td>1982</td>
+          <td><em>Tron</em></td>
+          <td>MAGI, III, Abel, Digital Effects</td>
+          <td>
+            the first feature to use 3D CG extensively: about 15 minutes from
+            MAGI alone, and CG backgrounds in over 200 scenes
+          </td>
+        </tr>
+        <tr>
+          <td>1982</td>
+          <td><em>Star Trek II: The Wrath of Khan</em></td>
+          <td>Lucasfilm Computer Division</td>
+          <td>
+            the Genesis sequence, one of the earliest entirely computer-generated
+            sequences in a feature: fractal terrain and particle systems
+          </td>
+        </tr>
+        <tr>
+          <td>1984</td>
+          <td><em>The Last Starfighter</em></td>
+          <td>Digital Productions</td>
+          <td>
+            about 25 minutes of CG spaceships in place of models, rendered on a
+            Cray X-MP; realistic CG scene elements in live action
+          </td>
+        </tr>
+        <tr>
+          <td>1985</td>
+          <td><em>Young Sherlock Holmes</em></td>
+          <td>ILM; Lucasfilm Computer Division</td>
+          <td>
+            the stained-glass knight, cited by ILM as the first all-CG character
+            in a feature film (animated by John Lasseter)
+          </td>
+        </tr>
+        <tr>
+          <td>1986</td>
+          <td><em>Luxo Jr.</em> (short)</td>
+          <td>Pixar</td>
+          <td>first 3D computer-animated film nominated for an Academy Award (1987)</td>
+        </tr>
+        <tr>
+          <td>1988</td>
+          <td><em>Tin Toy</em> (short)</td>
+          <td>Pixar</td>
+          <td>first computer-animated film to win an Academy Award (1989)</td>
+        </tr>
+        <tr>
+          <td>1989</td>
+          <td><em>The Abyss</em></td>
+          <td>ILM</td>
+          <td>
+            the water pseudopod: a CG creature with refraction and reflection,
+            mimicking the actors&rsquo; faces; visual-effects Oscar (1990)
+          </td>
+        </tr>
+        <tr>
+          <td>1990</td>
+          <td><em>The Rescuers Down Under</em></td>
+          <td>Walt Disney Feature Animation (CAPS, with Pixar)</td>
+          <td>first feature made entirely with digital ink, paint and compositing</td>
+        </tr>
+        <tr>
+          <td>1991</td>
+          <td><em>Terminator 2: Judgment Day</em></td>
+          <td>ILM</td>
+          <td>
+            the liquid-metal T-1000; per ILM, the first lead character created
+            at least in part with CG; visual-effects Oscar (1992)
+          </td>
+        </tr>
+        <tr>
+          <td>1991</td>
+          <td><em>Beauty and the Beast</em></td>
+          <td>Walt Disney Feature Animation</td>
+          <td>
+            CAPS ballroom: drawn characters in a 3D CG set; first animated
+            film nominated for Best Picture
+          </td>
+        </tr>
+        <tr>
+          <td>1993</td>
+          <td><em>Jurassic Park</em></td>
+          <td>ILM; Stan Winston Studio</td>
+          <td>
+            photoreal CG animals in live action, in fewer than 60 shots;
+            visual-effects Oscar (1994)
+          </td>
+        </tr>
+        <tr>
+          <td>1995</td>
+          <td><em>Toy Story</em></td>
+          <td>Pixar</td>
+          <td>
+            first feature-length film made entirely with computer animation;
+            Special Achievement Award to Lasseter (1996)
+          </td>
+        </tr>
+        <tr>
+          <td>1997</td>
+          <td><em>Titanic</em></td>
+          <td>Digital Domain</td>
+          <td>CG ship and motion-captured digital passengers; visual-effects Oscar (1998)</td>
+        </tr>
+        <tr>
+          <td>1998</td>
+          <td><em>Antz</em></td>
+          <td>PDI/DreamWorks</td>
+          <td>DreamWorks&rsquo;s first animated feature</td>
+        </tr>
+        <tr>
+          <td>1999</td>
+          <td><em>The Matrix</em></td>
+          <td>several vendors (VFX supervisor John Gaeta)</td>
+          <td>
+            &ldquo;bullet time&rdquo;: 120 still cameras fired in sequence along
+            a path planned in 3D, a refinement of earlier time-slice
+            photography; visual-effects Oscar (2000)
+          </td>
+        </tr>
+        <tr>
+          <td>2001</td>
+          <td><em>Final Fantasy: The Spirits Within</em></td>
+          <td>Square Pictures</td>
+          <td>
+            listed by Guinness as the first computer-animated feature with
+            photorealistic characters
+          </td>
+        </tr>
+        <tr>
+          <td>2001</td>
+          <td><em>Shrek</em></td>
+          <td>PDI/DreamWorks</td>
+          <td>first winner of the Academy Award for Best Animated Feature (2002)</td>
+        </tr>
+        <tr>
+          <td>2001</td>
+          <td><em>Monsters, Inc.</em></td>
+          <td>Pixar</td>
+          <td>simulated fur on Sulley, reportedly about 2.3 million hairs</td>
+        </tr>
+        <tr>
+          <td>2001 to 2003</td>
+          <td><em>The Lord of the Rings</em></td>
+          <td>Weta Digital</td>
+          <td>
+            Massive crowd agents; Gollum from captured performance (<em>The Two
+            Towers</em>, 2002); three visual-effects Oscars
+          </td>
+        </tr>
+        <tr>
+          <td>2004</td>
+          <td><em>The Polar Express</em></td>
+          <td>Sony Pictures Imageworks</td>
+          <td>
+            a whole cast animated from body and face performance capture (an
+            earlier feature, <em>Sinbad: Beyond the Veil of Mists</em>, 2000,
+            is also credited as all motion-captured)
+          </td>
+        </tr>
+        <tr>
+          <td>2006</td>
+          <td><em>Pirates of the Caribbean: Dead Man&rsquo;s Chest</em></td>
+          <td>ILM</td>
+          <td>
+            Imocap: motion capture on location during principal photography
+            (Davy Jones); visual-effects Oscar (2007)
+          </td>
+        </tr>
+        <tr>
+          <td>2006</td>
+          <td><em>Monster House</em></td>
+          <td>Sony Pictures Imageworks</td>
+          <td>first feature-length film rendered with path tracing (Arnold)</td>
+        </tr>
+        <tr>
+          <td>2008</td>
+          <td><em>The Curious Case of Benjamin Button</em></td>
+          <td>Digital Domain</td>
+          <td>a CG head carrying a lead actor&rsquo;s performance; visual-effects Oscar (2009)</td>
+        </tr>
+        <tr>
+          <td>2009</td>
+          <td><em>Avatar</em></td>
+          <td>Weta Digital and others</td>
+          <td>
+            head-mounted face cameras and a virtual camera on the capture
+            stage; visual-effects Oscar (2010)
+          </td>
+        </tr>
+        <tr>
+          <td>2013</td>
+          <td><em>Gravity</em></td>
+          <td>Framestore</td>
+          <td>
+            actors lit by an LED light box showing the rendered environment;
+            visual-effects Oscar (2014)
+          </td>
+        </tr>
+        <tr>
+          <td>2013</td>
+          <td><em>Frozen</em></td>
+          <td>Walt Disney Animation Studios</td>
+          <td>snow simulated with the material point method</td>
+        </tr>
+        <tr>
+          <td>2014</td>
+          <td><em>Interstellar</em></td>
+          <td>Double Negative</td>
+          <td>
+            DNGR: a black hole rendered by tracing ray bundles through curved
+            spacetime, published as physics; visual-effects Oscar (2015)
+          </td>
+        </tr>
+        <tr>
+          <td>2014</td>
+          <td><em>Big Hero 6</em></td>
+          <td>Walt Disney Animation Studios</td>
+          <td>first film rendered with the Hyperion path tracer; Animated Feature Oscar (2015)</td>
+        </tr>
+        <tr>
+          <td>2016</td>
+          <td><em>Finding Dory</em></td>
+          <td>Pixar</td>
+          <td>Pixar&rsquo;s first feature fully computed with RenderMan path tracing</td>
+        </tr>
+        <tr>
+          <td>2016</td>
+          <td><em>The Jungle Book</em></td>
+          <td>MPC; Weta Digital</td>
+          <td>
+            photoreal CG animals and jungle around one live actor shot on
+            stage; visual-effects Oscar (2017)
+          </td>
+        </tr>
+        <tr>
+          <td>2019</td>
+          <td><em>The Mandalorian</em> (series)</td>
+          <td>ILM</td>
+          <td>
+            the first ILM StageCraft LED volume: game-engine (Unreal)
+            backgrounds rendered from the tracked camera, filmed in camera
+          </td>
+        </tr>
+        <tr>
+          <td>2022</td>
+          <td><em>Avatar: The Way of Water</em></td>
+          <td>W&#275;t&#257; FX</td>
+          <td>
+            performance capture under water and coupled water simulation in
+            about two thirds of the shots; visual-effects Oscar (2023)
+          </td>
+        </tr>
+      </table>
+      </div>
+
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-young-sherlock.jpg"
+            data-cat="film-young-sherlock"
+            alt="A knight made of stained glass stepping out of a church window."
+          />
+          <figcaption>
+            <em>Young Sherlock Holmes</em> (1985): the stained-glass knight
+            (ILM and the Lucasfilm Computer Division) &middot; Paramount
+            Pictures &middot; Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-luxo.jpg"
+            data-cat="film-luxo"
+            alt="Two articulated desk lamps, a large one and a small one, with a ball."
+          />
+          <figcaption>
+            <em>Luxo Jr.</em> (1986), Pixar &middot; Pixar (The Walt Disney
+            Company) &middot; Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-abyss.jpg"
+            data-cat="film-abyss"
+            alt="A tentacle of clear water rising from a pool, shaped into a face."
+          />
+          <figcaption>
+            <em>The Abyss</em> (1989): the water pseudopod (ILM) &middot; 20th
+            Century Studios &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-t2.jpg"
+            data-cat="film-t2"
+            alt="The chrome T-1000 rising out of a floor."
+          />
+          <figcaption>
+            <em>Terminator 2</em> (1991): the liquid-metal T-1000 (ILM)
+            &middot; StudioCanal &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-jurassic.jpg"
+            data-cat="film-jurassic"
+            alt="A Tyrannosaurus rex at night in the rain."
+          />
+          <figcaption>
+            <em>Jurassic Park</em> (1993): ILM&rsquo;s CG dinosaurs &middot;
+            Universal Pictures &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-toy-story.jpg"
+            data-cat="film-toy-story"
+            alt="Woody and Buzz Lightyear."
+          />
+          <figcaption>
+            <em>Toy Story</em> (1995), the first feature made entirely with
+            computer animation (Pixar) &middot; Pixar (The Walt Disney Company)
+            &middot; Used under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-monsters-inc.jpg"
+            data-cat="film-monsters-inc"
+            alt="Sulley, a large furry blue monster."
+          />
+          <figcaption>
+            <em>Monsters, Inc.</em> (2001): Sulley&rsquo;s simulated fur
+            (Pixar) &middot; Pixar (The Walt Disney Company) &middot; Used under
+            fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-final-fantasy.jpg"
+            data-cat="film-final-fantasy"
+            alt="Aki Ross, a CG woman with long hair."
+          />
+          <figcaption>
+            <em>Final Fantasy: The Spirits Within</em> (2001): Aki Ross (Square
+            Pictures) &middot; Square Enix and Columbia Pictures &middot; Used
+            under fair use for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-davy-jones.jpg"
+            data-cat="film-davy-jones"
+            alt="Davy Jones, a character with a beard of octopus tentacles."
+          />
+          <figcaption>
+            <em>Pirates of the Caribbean: Dead Man&rsquo;s Chest</em> (2006):
+            Davy Jones, captured on set with Imocap (ILM) &middot; The Walt
+            Disney Company &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-avatar.jpg"
+            data-cat="film-avatar"
+            alt="Actors in performance-capture suits with head-mounted cameras."
+          />
+          <figcaption>
+            <em>Avatar</em> (2009): performance capture with head-mounted face
+            cameras &middot; 20th Century Studios &middot; Used under fair use
+            for teaching and commentary.
+          </figcaption>
+        </figure>
+      </div>
+      <div class="figrow">
+        <figure>
+          <img
+            src="../../media/history/film-finding-dory.jpg"
+            data-cat="film-finding-dory"
+            alt="Dory, a blue tang fish, under water."
+          />
+          <figcaption>
+            <em>Finding Dory</em> (2016), Pixar&rsquo;s first fully path-traced
+            feature &middot; Disney/Pixar &middot; Used under fair use for
+            teaching and commentary.
+          </figcaption>
+        </figure>
+        <figure>
+          <img
+            src="../../media/history/film-mandalorian.jpg"
+            data-cat="film-mandalorian"
+            alt="The Mandalorian in armor in a desert landscape."
+          />
+          <figcaption>
+            <em>The Mandalorian</em> (2019), shot in ILM&rsquo;s StageCraft LED
+            volume (the frame shows the series, not the stage) &middot;
+            Lucasfilm Ltd. &middot; Used under fair use for teaching and
+            commentary.
+          </figcaption>
+        </figure>
+      </div>
+
+      <h2 id="disputed">Disputed firsts</h2>
+      <ul>
+        <li>
+          <strong>First 3D CG in a feature.</strong> <em>Futureworld</em> (1976)
+          is the usual answer; one participant&rsquo;s history gives
+          <em>Star Wars</em> (1977) for 3D wireframe and <em>Looker</em> (1981)
+          for shaded 3D.
+        </li>
+        <li>
+          <strong>First entirely computer-generated sequence.</strong> The
+          Genesis sequence (1982) is often called the first; the Computer
+          History Museum says &ldquo;one of the earliest,&rdquo; and the
+          makers&rsquo; own accounts claim no first.
+        </li>
+        <li>
+          <strong>First CG character.</strong> ILM credits the stained-glass
+          knight (1985); <em>Tron</em>&rsquo;s Bit (1982) is the other
+          candidate. A Lucasfilm text also calls the <em>Abyss</em> pseudopod
+          (1989) the first wholly computer-generated character, which conflicts
+          with both.
+        </li>
+        <li>
+          <strong>First computer-animated Oscar nominee.</strong> <em>Hunger</em>
+          (National Film Board of Canada), a 2D computer-animated short, was
+          nominated in 1975, so <em>Luxo Jr.</em> is the first 3D nominee.
+        </li>
+        <li>
+          <strong>Bullet time.</strong> Time-slice photography with camera
+          arrays predates <em>The Matrix</em> by more than a decade.
+        </li>
+        <li>
+          <strong><em>Tron</em> and the effects Oscar.</strong> The story that
+          the Academy ruled computer effects &ldquo;cheating&rdquo; rests on
+          later anecdote; the film&rsquo;s nominations were for costume design
+          and sound.
+        </li>
+      </ul>
+
+      <h2 id="sources">Sources</h2>
+      <ul>
+        <li>
+          Wayne Carlson,
+          <a href="https://archive.org/details/ETC3236" target="_blank" rel="noopener"
+            ><em>Computer Graphics and Computer Animation: A Retrospective
+            Overview</em></a
+          >, Ohio State University, 2017, chapters 5, 6, 8, 11 and 14.
+        </li>
+        <li>
+          Academy of Motion Picture Arts and Sciences, ceremony pages
+          (oscars.org/oscars/ceremonies) and Scientific and Technical Awards
+          pages.
+        </li>
+        <li>
+          John Whitney Jr., &ldquo;Creating the Special Effects for <em>Westworld</em>,&rdquo; <em>American Cinematographer</em>, Nov. 1973;
+          Alvy Ray Smith, &ldquo;Special Effects for <em>Star Trek II</em>: The Genesis Demo,&rdquo; <em>American Cinematographer</em> 63(10), Oct. 1982;
+          Smith,
+          <a href="http://alvyray.com/Pixar/default.htm" target="_blank" rel="noopener"
+            >Pixar founding documents</a
+          >.
+        </li>
+        <li>
+          Gary Demos, Maxine Brown, Richard Weinberg, &ldquo;Digital Scene
+          Simulation,&rdquo; <em>Proceedings of the IEEE</em> 72(1), 1984;
+          Demos, &ldquo;My personal history in the early explorations of
+          computer graphics,&rdquo; <em>The Visual Computer</em> 21(12), 2005.
+        </li>
+        <li>
+          Per Christensen and Wojciech Jarosz, &ldquo;The Path to Path-Traced
+          Movies,&rdquo; <em>Foundations and Trends in Computer Graphics and
+          Vision</em> 10(2), 2016; the 2018 <em>ACM Transactions on
+          Graphics</em> papers on RenderMan, Arnold, Hyperion and Manuka.
+        </li>
+        <li>
+          Studio pages: ilm.com, pixar.com, renderman.pixar.com, wetafx.co.nz,
+          framestore.com, dneg.com, digitaldomain.com; company filings with the
+          U.S. Securities and Exchange Commission for the Lucasfilm, Pixar,
+          Alias and Softimage acquisitions; trade press (<em>Animation World
+          Magazine</em>, <em>Variety</em>, <em>Deadline</em>,
+          <em>Computer Graphics World</em>).
+        </li>
+      </ul>
+
+      <footer>
+        CSS 551 &middot; course text &middot; Studios and Films, supplement to A History of
+        Computer Graphics v4.0 &middot; prepared by Dr. Marcel Gavriliu. Image
+        credits appear in each caption.
+        <a href="../history-of-graphics.html">Back to the chapter</a>.
+      </footer>
+    </div>
+  </body>
+</html>
