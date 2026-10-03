@@ -221,8 +221,10 @@
         pixel and lets the nearest surface win (invented independently the same
         year by Wolfgang Stra&szlig;er in Berlin). It sorts nothing and needs no
         knowledge of the scene, only memory, which in 1974 was the one thing it could not have:
-        a 512-by-512 depth buffer at 16 bits is four million bits, and memory then cost on the
-        order of a cent per bit. Catmull&rsquo;s thesis gave the field a second gift in the same
+        a 512-by-512 depth buffer at 16 bits is four million bits, and memory then cost about
+        four cents a bit: the first Evans &amp; Sutherland frame buffer, 256 KB, sold for $80,000 in
+        1975 (<a href="https://alvyray.com/DigitalLight/ANNOTATIONS_DigitalLight_v29Jun23.pdf"
+        target="_blank" rel="noopener">Smith, annotations to <em>A Biography of the Pixel</em></a>). Catmull&rsquo;s thesis gave the field a second gift in the same
         document, <strong>texture mapping</strong>, the idea of gluing an image onto a
         surface, and a third, subdivision of curved patches, that will
         return twice in this chapter. It is preserved online:
@@ -1523,10 +1525,10 @@
       <h2 id="exercises">11 &middot; Exercises</h2>
       <div class="ex">
         <span class="tag">Exercise 1 (the z-buffer&rsquo;s cost)</span>
-        A 512-by-512 depth buffer at 16 bits per pixel, in 1974, at roughly one cent per bit of
+        A 512-by-512 depth buffer at 16 bits per pixel, in 1974, at roughly four cents per bit of
         memory. What did the z-buffer cost, and what did it buy for that price?
         <details><summary>Solution</summary>
-          \(512 \times 512 \times 16 = 4{,}194{,}304\) bits, about $42,000 at a cent per bit, for the
+          \(512 \times 512 \times 16 = 4{,}194{,}304\) bits, about $168,000 at four cents a bit (about $1.1 million in 2026 dollars), for the
           depth buffer alone, before the color buffer. What it bought was the end of sorting: a
           hidden-surface algorithm that needs no knowledge of the scene, handles any number of
           interpenetrating objects, and costs the same per pixel however complex the scene. It

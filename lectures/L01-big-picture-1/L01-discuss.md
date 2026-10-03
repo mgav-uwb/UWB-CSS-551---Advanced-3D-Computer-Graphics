@@ -9,10 +9,11 @@
         = 49,766,400, bits counted as bytes).
     Q2  depths arrive red 5.0, green 2.0, blue 3.5 (smaller is nearer), buffer
         cleared to far: red written, green written, blue rejected; green, 2 writes.
-    Q3  512 x 512 x 16 = 4,194,304 bits at one cent a bit = $41,943 (the history
-        chapter's Exercise 1, "about $42,000"). Distractors: $2,621 (262,144
-        pixels, the 16 bits forgotten), $5,243 (2 bytes per pixel priced per
-        byte), $335,544 (bits multiplied by 8 again).
+    Q3  512 x 512 x 16 = 4,194,304 bits at four cents a bit = $167,772 (the
+        history chapter's Exercise 1, "about $168,000"; 2026-10-02 correction from
+        one cent: E&S frame buffer $80,000 for 256 KB in 1975, Smith). Distractors:
+        $10,486 (262,144 pixels, the 16 bits forgotten), $20,972 (2 bytes per
+        pixel priced per byte), $1,342,177 (bits multiplied by 8 again).
 
   reveal.js: FLAT; notes follow "Note:"; never two "_" on one line outside a fence.
 -->
@@ -58,12 +59,12 @@ What color ends in the framebuffer, and how many **color writes** happened?
 
 ## Question 3: what the z-buffer cost in 1974
 
-A **512 × 512** depth buffer at **16 bits per pixel**, with memory at about **one cent per bit**. What did the depth buffer alone cost?
+A **512 × 512** depth buffer at **16 bits per pixel**, with memory at about **four cents per bit**. What did the depth buffer alone cost?
 
-- **A.** $2,621
-- **B.** $5,243
-- **C.** $41,943
-- **D.** $335,544
+- **A.** $10,486
+- **B.** $20,972
+- **C.** $167,772
+- **D.** $1,342,177
 
 
 ---
