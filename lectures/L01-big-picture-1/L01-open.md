@@ -37,7 +37,9 @@
 
 **Lecture 1: The Big Picture, part 1**
 
-*What computer graphics is, the machines that started it, and the problems it solved first.*
+> "The ultimate display would, of course, be a room within which the computer can control the existence of matter."
+
+<small>Ivan Sutherland, "The Ultimate Display," IFIP Congress, 1965</small>
 
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 

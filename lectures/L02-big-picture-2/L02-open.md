@@ -33,7 +33,9 @@
 
 **Lecture 2: The Big Picture, part 2**
 
-*The programmable pipeline, captured reality, real time, and the neural era.*
+> "The art challenges the technology, and the technology inspires the art."
+
+<small>John Lasseter (attributed; quoted by Pixar)</small>
 
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
