@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L03 (Thursday October 8, week 2, in person): The interactive loop,
-  MVC, and the tool (Unity and WebGL side by side). HW1 goes out; Quiz 1 at
-  the end.
+  MVC, and the tool (Unity and WebGL side by side). HW1 goes out. No quiz:
+  Quiz 1 is Thursday October 15 (L03, L04, HW1).
 
   COMPOSITION: index.html mounts L03-open.md (this file), then
   ../../topics/interactive-loop-tool.md (~50 min), then
@@ -13,7 +13,7 @@
     0:03  The loop, MVC and interaction, the two tracks          ~50 min (topic)
     0:53  Physics inside the loop                                ~27 min (topic)
     1:20  Discussion: four questions, HW1 walk-through, wrap     ~20 min
-    1:40  Quiz 1 (paper, 15 to 20 minutes)                       ~20 min
+    1:40  HW1 setup help, both tracks; buffer                    ~20 min
     2:00  end
 
   reveal.js: FLAT; notes follow "Note:"; plain text math; never two "_" on
@@ -39,7 +39,7 @@
 2. **model, view, controller**: one model, two views; undo as commands; events, hit testing, picking, dragging, the arcball; latency and VR
 3. **the tool, two tracks**: Unity's editor, objects, scripts, clocks and Transform; the WebGL track's demo anatomy; implement and replace
 4. **physics inside the loop**: particles, springs, cloth and fluids on the fixed step
-5. discussion, the **HW1** walk-through, then **Quiz 1**
+5. discussion, the **HW1** walk-through, then setup help for HW1
 
 Reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3.
 

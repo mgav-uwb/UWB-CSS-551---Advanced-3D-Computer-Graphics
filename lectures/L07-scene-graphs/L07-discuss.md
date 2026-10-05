@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L07 discussion, HW3 walk-through and wrap (~20 min), then the quiz.
+  CSS 551 · L07 discussion, HW3 walk-through and wrap (~20 min), the end of class.
   Three peer-instruction questions; answers ONLY in the notes; numbers computed by node against
   lib/core/xform.js (makeTRS, axisAngleMatrix, matMul, applyMat4) and from
   textbook/figures/numbers-foundations.json (aff) and numbers-pipeline.json (sg).
@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~20 min, then Quiz 3)</small>
+<small>(~20 min)</small>
 
 
 ---
@@ -95,5 +95,4 @@ A scene graph is a tree of local transforms, and each node's world matrix is the
 
 - **Read:** [Scene Graphs](../../textbook/scene-graphs.html)
 - **Due:** HW3, Wednesday October 28, 11:59 PM
-- **Now:** Quiz 3, twenty minutes, on paper
 

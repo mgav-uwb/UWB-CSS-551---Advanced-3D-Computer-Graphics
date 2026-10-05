@@ -51,7 +51,7 @@
 <header>
   <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
   <h1>Schedule, Autumn 2026</h1>
-  <div class="meta">Tue 5:45–7:45 PM online · Thu 5:45–7:45 PM in person, UW2-305 · quiz in the last 20 minutes of Thursday from week 2 · homework out Thursday, due the next Wednesday 11:59 PM on Canvas · <a href="../index.html">hub</a> · <a href="../syllabus/index.html">syllabus</a></div>
+  <div class="meta">Tue 5:45–7:45 PM online · Thu 5:45–7:45 PM in person, UW2-305 · quiz in the first 20 minutes of Thursday from week 3 (Quiz 6 on Canvas, Thanksgiving week) · homework out Thursday, due the next Wednesday 11:59 PM on Canvas · <a href="../index.html">hub</a> · <a href="../syllabus/index.html">syllabus</a></div>
 </header>
 <div data-quote style="margin:0 0 18px"></div>
 
@@ -76,23 +76,23 @@ const WEEKS = [
   { wk:'2', kind:'',
     tue:{ date:'Oct 6', title:'The Big Picture, part 2', sub:'problems and solutions from 1980; pipelines; studios and films; the film pipeline; the new frontier', href:'lectures/L02-big-picture-2/index.html' },
     thu:{ date:'Oct 8', title:'The interactive loop, MVC, and the tool', sub:'Unity and WebGL side by side', href:'lectures/L03-loop-mvc-tool/index.html' },
-    read:[['interaction.html','Interactive Systems'],['unity-basics.html','Unity for This Course'],['webgl-basics.html','WebGL and three.js for This Course']], quiz:'Q1', hw:{ n:1, out:'Oct 8', due:'Wed Oct 14', what:'orientation: the loop and MVC' } },
+    read:[['interaction.html','Interactive Systems'],['unity-basics.html','Unity for This Course'],['webgl-basics.html','WebGL and three.js for This Course']], quiz:null, hw:{ n:1, out:'Oct 8', due:'Wed Oct 14', what:'orientation: the loop and MVC' } },
   { wk:'3', kind:'',
     tue:{ date:'Oct 13', title:'Vectors', sub:'dot, cross, lines, planes', href:'lectures/L04-vectors/index.html' },
     thu:{ date:'Oct 15', title:'Rotation', sub:'axis-angle, quaternions, Euler angles', href:'lectures/L05-rotation/index.html' },
-    read:[['vectors.html','Vectors'],['rotation.html','Rotation']], quiz:'Q2', hw:{ n:2, out:'Oct 15', due:'Wed Oct 21', what:'vectors and rotation: EX1–EX6' } },
+    read:[['vectors.html','Vectors'],['rotation.html','Rotation']], quiz:'Q1', hw:{ n:2, out:'Oct 15', due:'Wed Oct 21', what:'vectors and rotation: EX1–EX6' } },
   { wk:'4', kind:'',
     tue:{ date:'Oct 20', title:'Affine transformations', sub:'over homogeneous coordinates', href:'lectures/L06-affine/index.html' },
     thu:{ date:'Oct 22', title:'Scene graphs', sub:'hierarchical modeling', href:'lectures/L07-scene-graphs/index.html' },
-    read:[['affine-transforms.html','Affine Transformations'],['scene-graphs.html','Scene Graphs']], quiz:'Q3', hw:{ n:3, out:'Oct 22', due:'Wed Oct 28', what:'TRS by hand, pivots, a three-node chain' } },
+    read:[['affine-transforms.html','Affine Transformations'],['scene-graphs.html','Scene Graphs']], quiz:'Q2', hw:{ n:3, out:'Oct 22', due:'Wed Oct 28', what:'TRS by hand, pivots, a three-node chain' } },
   { wk:'5', kind:'',
     tue:{ date:'Oct 27', title:'Viewing', sub:'the camera frame, V, P, the chain', href:'lectures/L08-viewing/index.html' },
     thu:{ date:'Oct 29', title:'Rasterization and antialiasing', sub:'', href:'lectures/L09-rasterization-antialiasing/index.html' },
-    read:[['viewing.html','Viewing'],['rasterization.html','Rasterization'],['antialiasing.html','Sampling and Antialiasing']], quiz:'Q4', hw:{ n:4, out:'Oct 29', due:'Wed Nov 4', what:'V and P by hand; one triangle rasterized' } },
+    read:[['viewing.html','Viewing'],['rasterization.html','Rasterization'],['antialiasing.html','Sampling and Antialiasing']], quiz:'Q3', hw:{ n:4, out:'Oct 29', due:'Wed Nov 4', what:'V and P by hand; one triangle rasterized' } },
   { wk:'6', kind:'',
     tue:{ date:'Nov 3', title:'Meshes and texture mapping', sub:'', href:'lectures/L10-meshes-textures/index.html' },
     thu:{ date:'Nov 5', title:'Illumination', sub:'Lambert, Phong, lights, tone mapping', href:'lectures/L11-illumination/index.html' },
-    read:[['meshes.html','Polygonal Meshes'],['texture-mapping.html','Texture Mapping'],['illumination.html','Local Illumination'],['unity-shaders.html','Unity Shaders']], quiz:'Q5', hw:{ n:5, out:'Nov 5', due:'Wed Nov 11', what:'the grid mesh, the placement matrix, a lit shader' } },
+    read:[['meshes.html','Polygonal Meshes'],['texture-mapping.html','Texture Mapping'],['illumination.html','Local Illumination'],['unity-shaders.html','Unity Shaders']], quiz:'Q4', hw:{ n:5, out:'Nov 5', due:'Wed Nov 11', what:'the grid mesh, the placement matrix, a lit shader' } },
   { wk:'7', kind:'bridge',
     tue:{ date:'Nov 10', title:'Light transport, PBR, and ray tracing', sub:'the rendering equation, which the neural models approximate; midterm review in the discussion slot', href:'lectures/L12-light-transport-ray-tracing/index.html' },
     thu:{ date:'Nov 12', title:'Midterm (first 75 min, weeks 1–6), then path tracing and the Cornell box', sub:'', href:'lectures/L13-path-tracing/index.html' },
@@ -100,11 +100,11 @@ const WEEKS = [
   { wk:'8', kind:'neural',
     tue:{ date:'Nov 17', title:'Neural networks and embeddings', sub:'', href:'lectures/L14-neural-nets-embeddings/index.html' },
     thu:{ date:'Nov 19', title:'The space of images', sub:'', href:'lectures/L15-image-space/index.html' },
-    read:[['neural-nets-embeddings.html','Neural Networks and Embeddings'],['image-space.html','The Space of Images']], quiz:'Q6', hw:{ n:7, out:'Nov 19', due:'Wed Nov 25', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
+    read:[['neural-nets-embeddings.html','Neural Networks and Embeddings'],['image-space.html','The Space of Images']], quiz:'Q5', hw:{ n:7, out:'Nov 19', due:'Wed Nov 25', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
   { wk:'9', kind:'neural',
     tue:{ date:'Nov 24', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:'lectures/L16-diffusion-1/index.html' },
     thu:{ date:'Nov 26', title:'Thanksgiving, no class', sub:'', href:null, off:true },
-    read:[['diffusion-models.html','Diffusion Models']], quiz:null, hw:null },
+    read:[['diffusion-models.html','Diffusion Models']], quiz:'Q6 (Canvas)', hw:null },
   { wk:'10', kind:'neural',
     tue:{ date:'Dec 1', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:'lectures/L17-diffusion-2/index.html' },
     thu:{ date:'Dec 3', title:'Learned scenes', sub:'neural radiance fields, 3D Gaussian splatting', href:'lectures/L18-learned-scenes/index.html' },

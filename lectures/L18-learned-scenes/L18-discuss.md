@@ -72,5 +72,5 @@ Out tonight, due **Wednesday December 9, 11:59 PM**. JavaScript (the WebGL track
 - A learned scene is **one place, learned from its photographs**: a field rendered by an integral, or Gaussians rendered by your rasterizer with your `V` and a Jacobian of your `P`
 - Both composite front to back with the same `C = Σ Tᵢαᵢcᵢ`; they differ in **what a sample is** and **how many there are**
 
-**Reading**: <a href="../../textbook/learned-scenes.html">Learned Scenes</a>. **Due**: HW8, Wednesday December 9, 11:59 PM. **Now**: Quiz 7.
+**Reading**: <a href="../../textbook/learned-scenes.html">Learned Scenes</a>. **Due**: HW8, Wednesday December 9, 11:59 PM.
 

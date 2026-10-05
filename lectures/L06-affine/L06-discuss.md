@@ -89,5 +89,5 @@ An affine map is a linear part plus a shift; one extra coordinate makes it one 4
 
 - **Read:** [Affine Transformations](../../textbook/affine-transforms.html)
 - **Due:** HW2, Wednesday October 21, 11:59 PM
-- **Thursday:** lecture, the HW3 walk-through, and Quiz 3 (this week's two lectures and HW2)
+- **Thursday:** Quiz 2 in the first 20 minutes (Lecture 5, tonight's lecture, HW2), then the lecture and the HW3 walk-through
 

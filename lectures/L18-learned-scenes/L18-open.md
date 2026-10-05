@@ -1,21 +1,22 @@
 <!--
   CSS 551 · L18, Thursday December 3 (in person): Learned Scenes.
-  Plan C (planning/css551-au26-plan-c-2026-09-29.md), week 10. Quiz 7 follows the discussion.
+  Plan C (planning/css551-au26-plan-c-2026-09-29.md), week 10. Quiz 7 opens the class.
 
   COMPOSITION: index.html mounts L18-open.md (title + tonight), then
   ../../topics/learned-scenes.md (~78 min), then L18-discuss.md (discussion and
-  the HW8 walk-through, 20 min, + wrap). The last 20 minutes are Quiz 7, on paper.
+  the HW8 walk-through, 20 min, + wrap). The first 20 minutes are Quiz 7, on paper.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
   never two "_" on one markdown line outside a code fence; no "next time".
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
-    0:00  Opening                                        2 min
-    0:02  Learned scenes: NeRF and 3DGS (topic, 49 slides)  78 min
-    1:20  Discussion: three questions                    8 min
-    1:28  HW8 walk-through                               8 min
-    1:36  Wrap                                           2 min
-    1:38  (buffer 2 min)  1:40  Quiz 7, 20 min           2:00 end
+    0:00  Quiz 7, on paper (L16, L17)                   20 min
+    0:20  Opening                                        2 min
+    0:22  Learned scenes: NeRF and 3DGS (topic, 49 slides)  78 min
+    1:40  Discussion: three questions                    8 min
+    1:48  HW8 walk-through                               8 min
+    1:56  Wrap                                           2 min
+    1:58  (buffer 2 min)                                 2:00 end
 -->
 
 ## CSS 551
@@ -29,6 +30,17 @@
 
 ---
 
+## Quiz 7
+
+**Laptops and phones away.** A pencil and the quiz sheet, nothing else.
+
+- **20 minutes**, 5:45 to 6:05 PM: 8 multiple-choice questions, 5 points each
+- **Covers**: Lecture 16, diffusion models I (Tuesday, November 24); Lecture 17, diffusion models II (Tuesday, December 1)
+- Mark one letter per question in the grid on the first page; only the grid is graded
+
+
+---
+
 ## Tonight
 
 - **Poses first**: structure from motion, one triangulation by hand; capturing well
@@ -36,7 +48,7 @@
 - **Faster and sharper**: hash grids, cones against aliasing, unbounded scenes, signed distances
 - **3D Gaussian splatting**: **one splat projected by hand**; bytes, dilation, tiles, the sort; clone and split; **three splats blended**; popping; live
 - **Back to meshes, and judging a scene**: marching squares and cubes, 2DGS; PSNR, SSIM, LPIPS
-- **Discussion**, the **HW8 walk-through**, then **Quiz 7**
+- **Discussion**, then the **HW8 walk-through**
 
 <small>Reading: the course text, <a href="../../textbook/learned-scenes.html">Learned Scenes</a>, where every number tonight is worked with a figure.</small>
 

@@ -78,5 +78,5 @@ A vector is a displacement; the dot measures alignment and casts shadows; the cr
 
 - **Read:** [Vectors](../../textbook/vectors.html), sections 1 to 8
 - **Due:** HW1, Wednesday October 14, 11:59 PM
-- **Thursday:** lecture, the HW2 walk-through, and Quiz 2 (this week's two lectures and HW1)
+- **Thursday:** Quiz 1 in the first 20 minutes (Lecture 3, tonight's lecture, HW1), then the lecture and the HW2 walk-through
 

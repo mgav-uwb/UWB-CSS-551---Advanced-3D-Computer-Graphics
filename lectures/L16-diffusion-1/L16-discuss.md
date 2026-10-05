@@ -68,5 +68,5 @@ On the spiral with the exact denoiser, 300 particles, **50 steps**: DDIM (σ = 0
 
 **Read:** [Diffusion Models](../../textbook/diffusion-models.html), Sections 1 to 6
 
-**Due:** HW7, Wednesday November 25, 11:59 PM · **Thursday:** Thanksgiving, no class
+**Due:** HW7, Wednesday November 25, 11:59 PM · **Thursday:** Thanksgiving, no class · **Quiz 6**: on Canvas, Thursday November 26, 12:00 AM to Sunday November 29, 11:59 PM; 20 minutes, alone, no notes; on Lecture 15 and HW7
 

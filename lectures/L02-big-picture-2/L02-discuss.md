@@ -88,6 +88,6 @@ A game renders a frame at **60 frames a second**. A film frame takes **4 hours**
 Every period moved a stage of the pipeline into hardware once memory and arithmetic got cheap enough, made it programmable, and then merged it into one pool; display memory halved in price about every two years, and ideas waited a median of **21 years** from paper to routine use.
 
 - **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 6 to 12; <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11; <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3
-- **Quiz 1**: Thursday, the last 20 minutes
+- **Quiz 1**: Thursday, October 15, the first 20 minutes, on Thursday's lecture, the vectors lecture and HW1; no quiz this Thursday
 - **Due**: nothing yet; HW1 goes out Thursday
 

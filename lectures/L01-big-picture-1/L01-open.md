@@ -24,7 +24,7 @@
 
   Facts on these slides come from the syllabus and Plan C
   (planning/css551-au26-plan-c-2026-09-29.md): 1000 points (homework 200, quizzes best 6 of 8 at 40 = 240, midterm 200,
-  final 360; decided 2026-09-30), quizzes from week 2, midterm Thu Nov 12, final Thu Dec 17, homework out Thursday
+  final 360; decided 2026-09-30), quizzes from week 3 in the first 20 minutes of Thursday (decided 2026-10-05), midterm Thu Nov 12, final Thu Dec 17, homework out Thursday
   due Wednesday 11:59 PM, two 48-hour late tokens. The site syllabus governs.
 
   reveal.js: FLAT; notes follow "Note:"; no math; never two "_" on one line
@@ -62,8 +62,8 @@ How a computer turns a description of a 3D world into a picture, and, increasing
 | Meeting | Minutes | What happens |
 | --- | --- | --- |
 | Tuesday, online (live, not recorded) | 90 + 30 | lecture with the demos, then discussion |
+| Thursday, first 20 minutes | 20 | **the weekly quiz**, on paper, from week 3 |
 | Thursday, in person | 80 + 20 | lecture, then discussion and the homework walk-through |
-| Thursday, last 20 minutes | 15–20 | **the weekly quiz**, on paper, from week 2 |
 
 **Homework** goes out Thursday and is due the next **Wednesday at 11:59 PM** on Canvas, so Thursday's quiz can assume it was done.
 

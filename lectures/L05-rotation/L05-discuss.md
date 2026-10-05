@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L05 discussion, HW2 walk-through and wrap (~20 min), then the quiz.
+  CSS 551 · L05 discussion, HW2 walk-through and wrap (~20 min), the end of class.
   Two peer-instruction questions; answers ONLY in the notes; numbers computed by node
   against lib/core/xform.js (quatFromAxisAngle). Distractors are the topic's pitfalls.
 -->
 
 ### Discussion
 
-<small>(~20 min, then Quiz 2)</small>
+<small>(~20 min)</small>
 
 
 ---
@@ -71,5 +71,4 @@ A rotation is where the axes land; Rodrigues spins the across-axis part; a quate
 
 - **Read:** [Rotation](../../textbook/rotation.html), sections 1 to 8
 - **Due:** HW2, Wednesday October 21, 11:59 PM
-- **Now:** Quiz 2, twenty minutes, on paper
 

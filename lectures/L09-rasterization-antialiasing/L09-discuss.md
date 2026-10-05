@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~20 min, then the quiz)</small>
+<small>(~20 min)</small>
 
 
 ---
@@ -55,5 +55,4 @@ The full specification and the rubric numbers: [HW4](../../homework/hw04/index.h
 - Inside is **three edge functions ≥ 0**; the same three numbers, divided by the twice-area, are the **barycentric weights**; attributes are interpolated in **1/w**
 - One sample per pixel **aliases**: a frequency above Nyquist returns as `|f − k·fs|`. Supersample, prefilter, or accumulate over time
 - **Due**: HW3 was due yesterday. **Out**: HW4, due Wednesday November 4
-- **Now**: Quiz 4, 20 minutes, on paper: viewing, rasterization and antialiasing, and HW3
 

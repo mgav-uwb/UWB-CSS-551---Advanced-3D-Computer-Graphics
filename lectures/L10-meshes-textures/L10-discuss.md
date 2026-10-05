@@ -76,5 +76,5 @@ A game draws fur on a character with **16 shells**. Seen from the front it reads
 - A mesh is a **vertex array** plus **index triples**; the **cross product** of two edges is the face normal, and winding picks its sign
 - A texture is a **lookup**: UVs per vertex, interpolated, **placed** by a 3×3 matrix, **filtered** by bilinear and the mipmap level `log₂` of the footprint
 - **Due**: HW4, Wednesday November 4, 11:59 PM
-- **Thursday**: **Quiz 5**, on this week's two lectures and HW4
+- **Thursday**: **Quiz 4** in the first 20 minutes, on Lecture 9, tonight's lecture and HW4
 

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L03 discussion, HW1 walk-through, and wrap (~20 min); Quiz 1 follows.
+  CSS 551 · L03 discussion, HW1 walk-through, and wrap (~20 min); setup help follows.
 
   NUMBERS, node-checked:
     Q1  2 units/s at 90 Hz: 2/90 = 0.0222 per frame; 5 units take 225 frames
@@ -97,5 +97,6 @@ The loop reads input, updates the state, and redraws, and motion written as rate
 
 - **Read**: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3
 - **Due**: HW1, Wednesday October 14, 11:59 PM, on Canvas
-- **Now**: Quiz 1, on paper, 15 to 20 minutes, on Tuesday's lecture and tonight's
+- **Quiz 1**: Thursday October 15, the first 20 minutes: tonight's lecture, Tuesday's, and HW1
+- **Now**: HW1 setup help, both tracks
 

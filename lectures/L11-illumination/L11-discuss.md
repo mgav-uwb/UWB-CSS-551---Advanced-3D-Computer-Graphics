@@ -6,7 +6,7 @@
 
 ### Discussion
 
-<small>(~20 min, then the quiz)</small>
+<small>(~20 min)</small>
 
 
 ---
@@ -67,5 +67,4 @@ Graded on the page's inputs and on a hidden set; the shader is graded by eye.
 - A lit point is **three dot products per light**: `max(0, N·L)`, `max(0, R·V)^s`, plus a constant ambient; normals move by `(M⁻¹)ᵀ`
 - The sum is unbounded; **tone-map** it (Reinhard `x/(1 + x)`) before display
 - **Out**: HW5, due Wednesday November 11. **Midterm**: Thursday November 12, first 75 minutes, weeks 1–6
-- **Now**: Quiz 5, 20 minutes, on paper: meshes, texture mapping, illumination, and HW4
 

@@ -62,5 +62,5 @@ An 8-bit sRGB texture stores the code value 128. What linear value should the sh
 - One chain carried the course: from model coordinates to pixels, then run backwards to learn a scene, then steered by its buffers to learn images
 - Every learned method of the last five weeks stands on the foundation weeks: the dot product, the quaternion, `V` and `P`, compositing, sampling
 
-**Final examination**: Thursday December 17, 5:45 PM, in person, two hours, cumulative with weeks 7 to 11 weighted. **Now**: Quiz 8.
+**Final examination**: Thursday December 17, 5:45 PM, in person, two hours, cumulative with weeks 7 to 11 weighted.
 

@@ -90,5 +90,5 @@ An encoder outputs `μ = 0`, `σ = 0.5` for one latent number. Its KL penalty `�
 - Guidance extrapolates past the conditional estimate: sharper, less varied, clamped at the rail; rescaling, intervals and distillation are its repairs
 - Score distillation turns an image model into a **judge of renders**; with a differentiable renderer it trains a 3D scene, and it averages rather than samples
 
-**Reading**: the course text, <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 3.2 and 5 to 9. **Thursday**: Quiz 7 at the end of class; HW8 goes out.
+**Reading**: the course text, <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 3.2 and 5 to 9. **Thursday**: Quiz 7 in the first 20 minutes, on Lecture 16 and tonight's lecture; HW8 goes out.
 

@@ -10,7 +10,7 @@
 
 ### Discussion
 
-<small>(~20 min, then Quiz 6)</small>
+<small>(~20 min)</small>
 
 
 ---
@@ -88,5 +88,5 @@ Specification and skeletons: [HW7](../../homework/hw07/index.html)
 
 **Read:** [The Space of Images](../../textbook/image-space.html), all sections
 
-**Due:** HW7, Wednesday November 25, 11:59 PM · **Now:** Quiz 6
+**Due:** HW7, Wednesday November 25, 11:59 PM · **Quiz 6**: on Canvas, Thursday November 26, 12:00 AM to Sunday November 29, 11:59 PM; 20 minutes, alone, no notes; on tonight's lecture and HW7
 

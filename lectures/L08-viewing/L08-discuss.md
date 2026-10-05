@@ -77,5 +77,5 @@ A camera is a frame and a lens: `V` is the inverse of the camera's pose, built f
 
 - **Read:** [Viewing](../../textbook/viewing.html)
 - **Due:** HW3, Wednesday October 28, 11:59 PM
-- **Thursday:** lecture, the HW4 walk-through, and Quiz 4 (this week's two lectures and HW3)
+- **Thursday:** Quiz 3 in the first 20 minutes (Lecture 7, tonight's lecture, HW3), then the lecture and the HW4 walk-through
 

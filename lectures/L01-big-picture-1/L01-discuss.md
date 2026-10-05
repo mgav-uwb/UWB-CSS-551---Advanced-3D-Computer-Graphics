@@ -84,7 +84,7 @@ A **512 × 512** depth buffer at **16 bits per pixel**, with memory at about **f
 
 ## Before next Thursday (October 8)
 
-HW1 goes out on October 8. Get your tools working this week, not that night.
+HW1 goes out on October 8; Quiz 1 is October 15. Get your tools working this week.
 
 | | Unity track | WebGL track |
 | --- | --- | --- |
@@ -105,4 +105,5 @@ Graphics began as the display end of machines built for air defense, aircraft an
 - **Read**: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 1 to 5, and the <a href="../../syllabus/index.html">syllabus</a>
 - **Before next Thursday**: pick a track, install and read as on the previous slide
 - **Due**: nothing yet
+- **Quiz 1**: Thursday, October 15, the first 20 minutes, on Lectures 3 and 4 and HW1; the history lectures are on the exams, not on a quiz
 

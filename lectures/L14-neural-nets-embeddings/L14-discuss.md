@@ -86,5 +86,5 @@ Your classifier's final layer outputs logits **(1000, 999)** and the loss is NaN
 
 **Read:** [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), all sections
 
-**Due:** HW6, Wednesday November 18, 11:59 PM
+**Due:** HW6, Wednesday November 18, 11:59 PM · **Thursday:** Quiz 5 in the first 20 minutes, on Lectures 12 and 13, tonight's lecture, and HW6
 

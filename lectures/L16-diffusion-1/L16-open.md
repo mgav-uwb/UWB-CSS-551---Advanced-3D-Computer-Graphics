@@ -2,7 +2,7 @@
   CSS 551 · L16 · Tuesday November 24, 2026 (week 9, online): Diffusion models I.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
   tonight), ../../topics/diffusion-1.md (~88 min), L16-discuss.md (discussion + wrap).
-  Thursday November 26 is Thanksgiving: no class, no quiz, no homework out.
+  Thursday November 26 is Thanksgiving: no class and no homework out; Quiz 6 is on Canvas, Nov 26 to 29 (L15, HW7).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
   markdown line outside a code fence.
