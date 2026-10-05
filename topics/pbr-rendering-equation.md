@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~46 min, 29 slides).
+  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~47 min, 37 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/pbr-rendering-equation.md"> among others; it
   carries no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -24,6 +24,11 @@
   v2 (Plan C, 2026-09-29): expanded from ~20 to ~40 min for the light-transport
   lecture; the D formula on the hand evaluation corrected to 1/(πα²); em-dashes removed.
 
+  v3 (2026-10-05, L12 to ~80 slides): a point light to a pixel; a cosine-or-albedo check; the hemisphere
+  integral π and ρ/π derived; 2π/(s + 2) derived; GGX evaluated away from the mirror (f = 0.0202); F0 from the
+  index (water, glass, diamond, Brewster); a metal-or-plastic highlight check; the diffuse-plus-specular energy
+  pitfall (1.21 against 0.88 at 80°). Numbers from node and the chapter's hands-on code.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no KaTeX
   plugin). Never two "_" on one markdown line outside a code fence; backtick names
@@ -33,7 +38,7 @@
 
 ### Honest light: from Phong to the rendering equation
 
-<small>(~46 min)</small>
+<small>(~47 min)</small>
 
 
 ---
@@ -114,6 +119,22 @@ A point light's I is constant; the E it puts on a table falls as I cos θ / d²;
 
 ---
 
+## Worked: from a point light to a pixel
+
+A bulb of intensity `I = 10 W/sr`, `d = 2 m` from a matte table (ρ = 0.6), light arriving 60° from the normal:
+
+```text
+   irradiance on the table:   E  = I cos θ / d²  = 10 × 0.5 / 4      = 1.25 W/m²
+   radiance toward the eye:   Lo = (ρ/π) · E     = 0.191 × 1.25      = 0.239 W/(m²·sr)
+   move the bulb to 4 m:      E  = 0.3125,  Lo = 0.060                (inverse square)
+   move the camera to 4 m:    Lo = 0.239                              (radiance does not fade)
+```
+
+Moving the **light** dims the table; moving the **camera** does not.
+
+
+---
+
 ## The rendering equation
 
 Kajiya, 1986: the balance of light at a surface point `p`, for the outgoing direction `ωo` toward the eye:
@@ -146,6 +167,18 @@ Replace the sky by **three small distant lights**, so the integral becomes a sum
 
 - the **cosine**, not the BRDF, makes light 3 nearly irrelevant: it is grazing
 - Lo does not depend on ωo at all: a constant BRDF is the **definition** of matte
+
+
+---
+
+## Check: what costs more light?
+
+The three-light example (ρ = 0.6, Lo = 0.460). Which change lowers Lo more?
+
+- **A.** halve the albedo, ρ = 0.3
+- **B.** move light 1 from 20° to 70° from the normal
+- **C.** they cost about the same
+- **D.** neither: the BRDF is constant, so Lo does not change
 
 
 ---
@@ -194,6 +227,23 @@ A **physical** BRDF must obey exactly the rules Phong broke:
 
 ---
 
+## The cosine over the hemisphere, integrated
+
+Write a direction by its angle θ from the normal and its azimuth φ; the patch of solid angle is `dω = sin θ dθ dφ`:
+
+```text
+   ∫Ω cos θ dω  =  ∫ from φ = 0 to 2π  ∫ from θ = 0 to π/2   cos θ sin θ dθ dφ
+                =  2π · [ sin² θ / 2 ] from 0 to π/2
+                =  2π · ½  =  π  =  3.1416          (a midpoint sum of 100,000 strips: 3.1415927)
+
+   a matte surface reflecting a fraction ρ:   ∫ f cos dω = f · π = ρ    ⇒    f = ρ / π
+```
+
+The π in every Lambertian shader is this integral, not a convention.
+
+
+---
+
 ## BRDF lobes, drawn
 
 <img src="../../textbook/figures/pbr-lobes.svg" class="media-shot" style="max-height: 280px;" alt="polar plots of reflectance for a fixed incoming direction: a Lambertian half-circle, a glossy lobe around the mirror direction, and a sharp specular spike">
@@ -220,6 +270,24 @@ Light straight down the normal, Phong's specular lobe with ks = 1: how much leav
 
 - a broad lobe (s ≤ 4) sends out **more** light than came in; a sharp one sends out almost **none**
 - **normalized Phong** multiplies by (s + 2)/2π: sharper highlights become **brighter**, as a real surface's do
+
+
+---
+
+## The Phong lobe's total, derived
+
+Light down the normal, so the mirror direction is the normal and the lobe is `cos^s θ`:
+
+```text
+   ∫Ω cos^s θ · cos θ dω  =  2π ∫ from 0 to π/2  cos^(s+1) θ · sin θ dθ
+   substitute c = cos θ,  dc = −sin θ dθ:
+                          =  2π ∫ from 0 to 1  c^(s+1) dc  =  2π / (s + 2)
+
+   s = 1:    2π/3   = 2.094        returns twice what arrives
+   s = 32:   2π/34  = 0.185        a numerical sum in node gives 0.1848 as well
+```
+
+The same substitution at s = 0 gives π: the plain cosine over the hemisphere.
 
 
 ---
@@ -293,6 +361,23 @@ Normal up, light at 30° on one side, eye at 30° on the other, plastic (`F0 = 0
 
 ---
 
+## Worked: away from the mirror direction
+
+Same plastic, α = 0.3; light 20° on one side, eye 50° on the other:
+
+```text
+   h = normalize(ωi + ωo) = (0.259, 0, 0.966)        15° from the normal: halfway between −20° and 50°
+   D  = α² / (π ((n·h)² (α² − 1) + 1)²)                                       = 1.257
+   G1(ωi) = 0.997      G1(ωo) = 0.970                  G  = 0.967
+   F  = 0.04 + 0.96 (1 − ωo·h)⁵,  ωo·h = 0.819                                 = 0.0402
+   f_spec = 1.257 × 0.967 × 0.0402 / (4 × 0.940 × 0.643)                       = 0.0202
+```
+
+D, off its peak, does almost all the work: 1.257 against 3.537 at the mirror, and `f_spec` falls from 0.0465 to 0.0202.
+
+
+---
+
 ## Fresnel, exactly
 
 Schlick's `F0 + (1 − F0)(1 − cos θ)⁵` is an approximation. The exact reflectance splits by polarization:
@@ -323,6 +408,21 @@ Schlick is low in the middle (21 % at 60°) and a little high at grazing. It sur
 
 ---
 
+## F0 from the index of refraction
+
+At normal incidence both polarizations agree: `F0 = ((n1 − n2) / (n1 + n2))²`, from air (`n1 = 1`):
+
+| material | n | F0 | Brewster's angle |
+| --- | --- | --- | --- |
+| water | 1.33 | 0.020 | 53.1° |
+| glass | 1.5 | 0.040 | 56.3° |
+| diamond | 2.42 | 0.172 | 67.5° |
+
+Water at Brewster: `Rs = 0.078`, `Rp = 0`: the glare off a lake at 53° is entirely s-polarized, and a polarizing filter removes all of it.
+
+
+---
+
 
 ## Metals and dielectrics: the metallic slider
 
@@ -339,6 +439,18 @@ Gold's F0 is (0.967, 0.803, 0.324) head-on, rising toward white at grazing: the 
 
 ---
 
+## Check: a red ball, metal or plastic
+
+Base color `(1, 0, 0)`, roughness 0.3, lit by one white light. What color is the **highlight**?
+
+- **A.** red if metallic = 1; white if metallic = 0
+- **B.** white in both cases
+- **C.** red in both cases
+- **D.** white if metallic = 1; red if metallic = 0
+
+
+---
+
 ## Energy: the furnace test
 
 <img src="../../textbook/figures/pbr-furnace.svg" class="media-shot" style="max-height: 205px;" alt="directional albedo of the single-scattering microfacet model against roughness, for several viewing angles, falling well below one at high roughness">
@@ -351,6 +463,20 @@ Put a perfectly reflective surface (F = 1) inside a uniformly lit sphere: it sho
 ```
 
 The lost light bounced **between facets**, which the model ignores. Multiple-scattering compensation adds it back; without it, a roughness texture is also a darkness texture.
+
+
+---
+
+## Pitfall: diffuse and specular both at full strength
+
+A white plastic (ρ = 0.8, F0 = 0.04) seen at 80° from the normal. Schlick: `F = 0.04 + 0.96 (1 − cos 80°)⁵ = 0.41`.
+
+```text
+   diffuse albedo + specular reflectance, added:      0.80 + 0.41           = 1.21     more out than in
+   diffuse scaled by (1 − F), as energy requires:     0.80 × 0.59 + 0.41    = 0.88
+```
+
+The light that reflects at the surface is not there to enter the body. Scale the diffuse term by `1 − F` (or by `1 − E_spec`), not add it whole.
 
 
 ---

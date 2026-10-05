@@ -366,6 +366,9 @@ const HANDOUTS = {
   scenes:   { href:"textbook/learned-scenes.html",
               title:"Text · Learned Scenes",
               desc:"NeRF and its volume-rendering integral; 3D Gaussian splatting; learned scenes against learned images" },
+  inverse:  { href:"textbook/inverse-rendering.html",
+              title:"Text · Inverse and Differentiable Rendering",
+              desc:"images to scene parameters: ill-posedness, autodiff, shading gradients, the visibility discontinuity and its fixes, Mitsuba 3, priors" },
 };
 
 // ───────── interactive demos (keyed; lib/demo.html?demo=…) ─────────
@@ -414,6 +417,8 @@ const DEMOS = {
     desc:"drag viscosity/stiffness/particles/steps: a particle fluid, dam break or drop into a pool; live density error and step time" },
   "fur": { title:"Fur: 100,000 Hairs, Kajiya-Kay Lit, Live",
     desc:"drag lightAz/lightEl/shine/rootShade (instant) or hairs/length/gravity/curl (regrows): strands on the Stanford bunny; live hair, vertex and timing readout" },
+  "inverse-render": { title:"Inverse Rendering: Fit a Sphere's Albedo, Light and Shape to a Target Image",
+    desc:"press play: Adam fits albedo, light and sphere to a hidden target through hand-written gradients; toggle hard/soft edges to see the silhouette gradient vanish" },
   "mlp-fit": { title:"A Neural Network Is a Function: Train One to Fit a Curve, Live",
     desc:"drag epochs/hidden: a two-layer network trained in the browser by gradient descent on twelve points; the curve bends as the loss falls" },
   "embed-map": { title:"Embeddings: The Trained Denoiser's Class Vectors, Mapped",
@@ -450,7 +455,7 @@ const LECTURES = {
   L17:{ title:"Diffusion models II", href:"lectures/L17-diffusion-2/index.html" },
   L18:{ title:"Learned scenes", href:"lectures/L18-learned-scenes/index.html" },
   L19:{ title:"Generative 3D and video", href:"lectures/L19-generative-3d-video/index.html" },
-  L20:{ title:"Synthesis and review", href:"lectures/L20-synthesis-review/index.html" },
+  L20:{ title:"Inverse rendering", href:"lectures/L20-inverse-rendering/index.html" },
 };
 const HW = n => ({ n, href:`homework/hw0${n}/index.html` });
 
@@ -476,8 +481,8 @@ const WEEKS = [
     handouts:["diffusion"], demos:["diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
   { id:"W10", title:"Diffusion models II and learned scenes", tue:"L17", thu:"L18", hw:HW(8), quiz:"Q7", neural:true,
     handouts:["diffusion","scenes"], demos:["gsplat"] },
-  { id:"W11", title:"Generative 3D and video; synthesis", tue:"L19", thu:"L20", hw:null, quiz:"Q8", neural:true,
-    handouts:["scenes","history"], demos:[] },
+  { id:"W11", title:"Generative 3D and video; inverse rendering", tue:"L19", thu:"L20", hw:null, quiz:"Q8", neural:true,
+    handouts:["scenes","inverse"], demos:["inverse-render"] },
   { id:"F",   title:"Final examination, Thursday December 17, 5:45 PM", tue:null, thu:null, hw:null, quiz:"Final", handouts:[], demos:[] },
 ];
 
@@ -552,7 +557,7 @@ const CATALOG = [
   ["Illumination and light transport", ["illumination", "brdf-lobe"]],
   ["Networks and the space of images", ["mlp-fit", "embed-map", "diffusion-image"]],
   ["Diffusion models", ["diffusion-2d", "diffusion-digits", "diffusion-net"]],
-  ["Learned scenes", ["gsplat"]],
+  ["Learned scenes", ["gsplat", "inverse-render"]],
 ];
 const listed = new Set(CATALOG.flatMap(([, ks]) => ks));
 const extra = Object.keys(DEMOS).filter((k) => !listed.has(k));

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Generative 3D and video, networks in the renderer, VR (~68 min, densified 2026-09-29).
+  CSS 551 · TOPIC DECK: Generative 3D and video, networks in the renderer, VR (~84 min, densified 2026-09-29, expanded 2026-10-05).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/generative-3d-video.md"> among others; it carries no
   logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -14,7 +14,12 @@
   NEEDS:   the diffusion topics (guidance, latents, cross-attention, score distillation); the learned-scenes
            topic (NeRF, splats, the differentiable renderer); viewing (lookAt, the projection); ray tracing
            (Monte Carlo error); illumination (Lambert).
-  DEMOS:   none. Media: ../../media/generative/video-strip.jpg, credit line verbatim from media/generative/CREDITS.md.
+  EXPANDED 2026-10-05: the epipolar line checked and a match's depth worth; check on per-pixel unknowns; the softmax
+           step by step; why a predictor's error compounds; four DDIM steps live (diffusion-2d); which frame has the
+           pixel; Halton by radical inverse; alpha/(2 - alpha) derived; upscaling spends frames; photometric stereo;
+           pixels per degree; stereo disparity in pixels; check on vergence at 0.25 m. Numbers computed with
+           lib/core/xform.js and lib/core/diffusion.js in node.
+  DEMOS:   data-demo="diffusion-2d" data-controls="steps,stochastic" (demo-full). Media: ../../media/generative/video-strip.jpg, credit line verbatim from media/generative/CREDITS.md.
   FIGURES: ../../lectures/L19-generative-3d-video/figures/{attention-cost,drift}.svg and numbers.json;
            ../../lectures/L17-diffusion-2/figures/sds-toy.svg (tools/gen-lecture-figures-d2.mjs).
   PAPERS:  DreamFusion, Video Diffusion Models (Ho et al. 2022), NeRF, 3DGS; added 2026-09-29, every identifier
@@ -37,7 +42,7 @@
 
 ### Generative 3D and video
 
-<small>(~68 min)</small>
+<small>(~84 min)</small>
 
 
 ---
@@ -139,6 +144,22 @@ A pixel of view 0 does not fix a depth; the points along its ray project to a **
 
 ---
 
+## The line, checked, and what a match is worth
+
+```text
+   slope from the near point to X:   (0.1421 − 0.3718) / (0 − (−0.7829))  = −0.2934
+   slope from X to the far point:    (−0.0960 − 0.1421) / (0.8115 − 0)    = −0.2934      one line
+
+   along the line, NDC x moves 1.594 per unit of depth along camera 0's ray
+   a 256-pixel-wide view: one pixel = 2/256 = 0.0078 NDC   →   depth error 0.0078 / 1.594 = 0.0049
+```
+
+- a match **on** the line fixes the depth: searching for the NDC x = 0 crossing recovers 1.964, the distance to X
+- a match one pixel off moves the depth by 0.0049 at this 90° baseline; a narrow baseline makes the line shorter and the same pixel worth more depth
+
+
+---
+
 ## The camera as a condition
 
 Zero-1-to-3 (Liu et al. 2023, arXiv:2303.11328): condition an image model on **one input image** and a **relative camera change**, and it draws the object from the new viewpoint.
@@ -173,6 +194,18 @@ A one-pass reconstructor that places one Gaussian per pixel of four 256×256 vie
 
 - the problem is **under-determined** almost five times over; the answer comes from what the network learned about **objects in general**
 - that is why these networks train on about a million objects: the prior does most of the work
+
+
+---
+
+## Check: more views, same ratio
+
+The same one-pass design (one Gaussian of 14 numbers per pixel) is given **six** views of **512×512** instead of four of 256×256. Unknowns per measurement:
+
+- **A.** 4.67, unchanged
+- **B.** 1.17, four times fewer
+- **C.** 18.7, four times more
+- **D.** 3.11, six views against four
 
 
 ---
@@ -406,6 +439,24 @@ One token of frame `t` attends to the tokens at the **same position** in frames 
 
 ---
 
+## The softmax, step by step
+
+The same three keys and values, every intermediate number:
+
+```text
+   frame    q·k     ÷ √2       e^score     weight = e / 6.456     weight · v
+   t−1      1.20    0.8485     2.336       0.362                  (0.289, 0.072)
+   t        1.25    0.8839     2.420       0.375                  (0.262, 0.112)
+   t+1      0.75    0.5303     1.699       0.263                  (0.026, 0.237)
+                               sum 6.456                          sum (0.578, 0.422)
+```
+
+- dividing by `√d` keeps the scores' spread independent of the key length, so the softmax does not saturate as `d` grows
+- a score gap of 0.35 becomes a weight ratio of only `e^0.35 = 1.42`: attention **blends**, it does not pick
+
+
+---
+
 ## Consistency by construction: render, then restyle
 
 Keep the scene and the camera in the pipeline, and let a model paint each frame:
@@ -449,6 +500,26 @@ A **world model** predicts the next frame from the previous frames and a control
 
 ---
 
+## Why the error compounds
+
+Write the per-frame step `d` (height change between frames) for both:
+
+```text
+   renderer:    D(k) = D(k−1) + g·dt²                 from the state; nothing carries over
+   predictor:   d(k) = 1.01 · d(k−1) + g·dt²          from its own last two frames
+   step error:  e(k) = d(k) − D(k) = 1.01 · e(k−1) + 0.01 · D(k−1)
+
+   frame:                 10          30          60
+   step error (m/frame):  0.0067      0.0153      0.0087
+   height error (m):      0.035       0.274       0.696        (the sum of the step errors)
+```
+
+- every frame keeps all the old error, grown by 1 %, and adds 1 % of the current velocity: nothing ever **removes** error, since there is no state to compare against
+- a bias ten times smaller (0.1 %) still leaves 0.053 m at frame 60; only a reference outside the loop resets the error
+
+
+---
+
 ## A world model's loop
 
 ```js
@@ -481,6 +552,19 @@ Valevski et al. (2024, arXiv:2408.14837):
 
 - the frame budget of an interactive renderer, met by a diffusion model **only** because four steps suffice here
 - human raters were "only slightly better than random chance" at telling short clips from the real game (its abstract)
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Four steps, live
+
+<div class="cockpit" data-demo="diffusion-2d" data-controls="steps,stochastic"><pre class="viz-fallback">  the course's exact denoiser on the spiral, sampled from pure noise with DDIM
+  drag steps to 4, the GameNGen budget: the particles stop between the arms
+  mean distance to the nearest data point (seed 11, 300 particles):
+    4 steps 0.098      20 steps 0.019      50 steps 0.009
+  four steps from pure noise are not enough here; a next frame is mostly fixed by its context frames</pre></div>
 
 
 ---
@@ -537,6 +621,26 @@ Between rendered frames A and B, a generated frame places each pixel **halfway a
 
 ---
 
+## Which frame has the pixel
+
+One row: a foreground object covers `x = 100…139` in frame A and moves +8 px by frame B; the background is still.
+
+```text
+   frame A:       object at 100…139
+   frame B:       object at 108…147
+   middle frame:  object at 104…143          (each pixel halfway along its motion)
+
+   background at 100…103 in the middle frame:   hidden in A, visible in B   →  copy from B only
+   background at 144…147 in the middle frame:   visible in A, hidden in B   →  copy from A only
+   background elsewhere:                        visible in both             →  blend A and B
+```
+
+- a 200-row object leaves two strips of 4 × 200 = 800 pixels each that only **one** frame can supply
+- the renderer's **depth** says which surface is in front at each pixel; without it, the generator guesses and the edges shimmer
+
+
+---
+
 ## Jitter: a new sub-pixel sample every frame
 
 Temporal upscalers and antialiasing move the projection by a **sub-pixel offset** each frame, from a low-discrepancy sequence:
@@ -549,6 +653,27 @@ Temporal upscalers and antialiasing move the projection by a **sub-pixel offset*
 
 - over frames, each pixel is sampled at many positions: **supersampling spread over time**
 - the offset goes into `P` as a tiny translation of the projected image; motion vectors undo it when frames are combined
+
+
+---
+
+## Halton, by radical inverse
+
+Write the frame index in base b, mirror its digits behind the point:
+
+```text
+   i     base 2    mirrored    value       base 3    mirrored    value
+   1     1         0.1         0.5         1         0.1         0.3333
+   2     10        0.01        0.25        2         0.2         0.6667
+   3     11        0.11        0.75        10        0.01        0.1111
+   4     100       0.001       0.125       11        0.11        0.4444
+   5     101       0.101       0.625       12        0.21        0.7778
+
+   frame 2 offset:  (0.25 − 0.5, 0.6667 − 0.5) = (−0.250, 0.167)        the previous slide's second row
+```
+
+- every new point lands in the **largest remaining gap**: after 4 frames the base-2 coordinate has visited each quarter of the pixel's width once
+- two coprime bases keep the x and y sequences from lining up into a diagonal
 
 
 ---
@@ -566,6 +691,40 @@ Blend each new frame into a history with weight α (after reprojecting the histo
 
 - 19 samples' worth of noise reduction for the cost of one sample per frame, as long as the reprojection is right
 - where it is wrong (disocclusions, fast motion) the history must be **rejected**, and the noise returns: the ghosting artifact
+
+
+---
+
+## The history's noise, derived
+
+Unroll the recurrence: frame k frames ago carries weight `α(1 − α)ᵏ`:
+
+```text
+   history = α·x₀ + α(1−α)·x₁ + α(1−α)²·x₂ + …        weights sum to α / (1 − (1−α)) = 1
+   independent frames, variance v each:
+   Var = v · α² · (1 + (1−α)² + (1−α)⁴ + …) = v · α² / (1 − (1−α)²) = v · α / (2 − α)
+
+   α = 0.1:   0.1 / 1.9 = 0.0526      a simulation of 200,000 frames:  0.053
+```
+
+- the weights are geometric, so the history has no fixed window: old frames fade, they never drop out
+- smaller α: less noise, longer memory, more ghosting when the reprojection is wrong
+
+
+---
+
+## Upscaling spends frames
+
+Render 1920×1080, display 3840×2160: each rendered sample stands for **4** display pixels.
+
+```text
+   jitter moves the sample among the 4 display pixels under each rendered pixel, frame by frame
+   one sample per display pixel:   at least 4 frames  =  4 × 16.7 ms = 66.7 ms at 60 fps
+   the history at α = 0.1:         about 19 frames' worth  →  19 / 4 = 4.75 samples per display pixel
+```
+
+- a still camera converges to more detail than one frame contains; a fast pan resets the history and the image softens
+- this is why upscalers read **motion vectors**: reprojection keeps the 19 frames of samples usable while the camera moves
 
 
 ---
@@ -642,6 +801,25 @@ The captured pixel says only `albedo × shading = 0.566`:
 
 ---
 
+## Two known lights pin it down
+
+Photograph the same floor point again with the light **overhead**. Each explanation of the first photo predicts the second:
+
+```text
+   explanation of 0.566 under the 45° light        predicted under the overhead light
+   albedo 0.800, normal up                         0.800 · cos 0°  = 0.800
+   albedo 0.566, normal facing the 45° light       0.566 · cos 45° = 0.400
+   albedo 0.707, normal tilted 8.13°               0.707 · cos 8.13° = 0.700
+
+   measured: 0.800   →   solve  tan θ = (0.566/0.800 − cos 45°) / sin 45°  →  θ = 0.0°, albedo 0.800
+```
+
+- two lights give two equations for two unknowns (albedo and the normal's tilt): **photometric stereo** (Woodham 1980)
+- a light stage does the same with dozens of known lights, and recovers specular parameters as well
+
+
+---
+
 ## Relightable captures
 
 Store the ingredients instead of the product, per splat or per sample:
@@ -667,6 +845,23 @@ Store the ingredients instead of the product, per splat or per sample:
 
 - every frame is rendered **twice**, from two cameras, at more than twice a monitor's pixel count
 - dropping a frame is not a hitch but **discomfort**: the budget is a hard deadline
+
+
+---
+
+## How sharp a headset is
+
+Resolution on a headset is counted in **pixels per degree** of the visual field:
+
+```text
+   2064 pixels across about 100°:        20.6 pixels per degree
+   20/20 vision resolves 1 arcminute:    60 pixels per degree
+   ratio:                                60 / 20.6 = 2.9 times short in each direction
+   matching the eye over 100°:           6,000 pixels across, per eye
+```
+
+- a monitor at a normal desk distance gives more pixels per degree than this headset does
+- this is why antialiasing and texture filtering matter more in VR: each pixel covers more of the world, and shimmer is magnified by head motion
 
 
 ---
@@ -735,6 +930,24 @@ Two cameras, offset by half the interpupillary distance (about 63 mm between the
 
 ---
 
+## Stereo disparity in pixels
+
+The angle between the two eyes' lines of sight, at 20.6 pixels per degree:
+
+```text
+   distance    angle     disparity
+   0.5 m       7.21°     148.8 px
+   1 m         3.61°      74.5 px
+   2 m         1.80°      37.2 px
+   10 m        0.36°       7.5 px
+```
+
+- disparity halves with each doubling of distance: depth precision is spent on the near field
+- at 10 m a one-pixel rendering error is 13 % of the whole disparity; at 0.5 m it is under 1 %
+
+
+---
+
 ## Focus and vergence disagree
 
 The eyes **converge** on a virtual object's depth, but **focus** at the display's fixed optical distance:
@@ -747,6 +960,18 @@ The eyes **converge** on a virtual object's depth, but **focus** at the display'
 
 - in the real world the two always agree; in a headset they conflict for near objects, a cause of eye strain
 - varifocal and light-field displays try to put focus back; neither is in mainstream headsets
+
+
+---
+
+## Check: a close object
+
+The same headset focuses at 1.5 m. A virtual object is held at **0.25 m**. The vergence-accommodation mismatch is:
+
+- **A.** 4.00 diopters
+- **B.** 3.33 diopters
+- **C.** 1.25 diopters
+- **D.** 1.33 diopters
 
 
 ---

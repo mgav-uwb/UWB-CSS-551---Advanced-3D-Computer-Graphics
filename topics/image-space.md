@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~78 min, 48 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~82 min, 57 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -20,6 +20,9 @@
   downsampling; resamplers and bicubic overshoot (1.0625); stretch and gamma; shot noise; chroma
   subsampling; lossless vs lossy; PSNR by the numbers; SSIM on two patches (0.934); averaging
   frames; the render's many buffers; inverse problems, the null space (737,280), priors; papers.
+  EXPANDED (2026-10-05): four checks (midpoint 9.25, checkerboard spectrum, equalizing two values,
+  the 2× null space 49,152); two 3-tap blurs' responses (box −0.333 at π); the median filter; a 1D
+  Laplacian pyramid; one JPEG coefficient quantized (−50.9 → −2 → −48); a nearest neighbor measured.
   NEEDS:   vectors and dot products; the neural-nets-embeddings topic for "encoder" and "embedding";
            the antialiasing lecture for the sampling slide (named, not required).
            Companion of topics/diffusion-1.md, which picks up "noise is the missing choice".
@@ -40,7 +43,7 @@
 
 ### The space of images
 
-<small>(~78 min)</small>
+<small>(~82 min)</small>
 
 
 ---
@@ -138,6 +141,18 @@ A 3 and an 8 as vectors in [−1, 1]⁴⁰⁰: ‖a − b‖ = **18.5**, 0.925 p
 - the midpoint is a **double exposure**, not a digit anyone would write
 - its nearest neighbor in the dataset (a 3) is **0.46** per pixel away; a real digit's nearest neighbor is **0.49** away on average
 - as close to the data as a real digit is, and still **not** one: the set of meaningful images is **curved**, not a subspace
+
+
+---
+
+## Check: how far is the midpoint?
+
+The 3 and the 8 are ‖a − b‖ = 18.5 apart. How far is the midpoint ½(a + b) from the 3?
+
+- **A.** 18.5
+- **B.** 9.25
+- **C.** 13.1
+- **D.** 0, since it contains the 3
 
 
 ---
@@ -352,6 +367,18 @@ For an m × n image, the coefficient at horizontal frequency u and vertical freq
 
 ---
 
+## Check: the spectrum of a checkerboard
+
+The 4 × 4 checkerboard x_ij = ½ + ½(−1)^(i+j). Which coefficients of its Fourier transform are nonzero?
+
+- **A.** only X₀₀ = 8
+- **B.** X₀₀ = 8 and X₂₂ = 8
+- **C.** X₀₀ = 8, X₁₁ = 4 and X₃₃ = 4
+- **D.** all sixteen, since the pattern has sharp edges
+
+
+---
+
 ## The convolution theorem
 
 Convolution in space is **multiplication** in frequency:
@@ -364,6 +391,25 @@ Convolution in space is **multiplication** in frequency:
 - a **box** blur's spectrum is a sinc with **negative lobes**: some frequencies are inverted, which shows as ringing and faint stripes
 - for a large kernel, transform, multiply and transform back: cost O(n log n) instead of O(n·k²)
 - read backward: **sampling** multiplies by a comb, so the spectrum **repeats**, and overlapping copies are aliasing
+
+
+---
+
+## Two 3-tap blurs, frequency by frequency
+
+The response of a kernel at frequency ω (radians per pixel) is the factor that frequency is multiplied by:
+
+```text
+   binomial [1 2 1]/4    H(ω) = ½ + ½ cos ω          box [1 1 1]/3    H(ω) = (1 + 2 cos ω)/3
+
+   ω = 0       (flat)           1.000                                  1.000
+   ω = π/2     (period 4 px)    0.500                                  0.333
+   ω = 2π/3    (period 3 px)    0.250                                  0
+   ω = π       (period 2 px)    0                                      −0.333
+```
+
+- applied to (1, −1, 1, −1, …): the binomial returns **all 0**; the box returns (−0.333, 0.333, …), the stripes **inverted** at a third of their contrast
+- the box's negative lobe is the convolution theorem's "inverted frequencies", in one line of numbers
 
 
 ---
@@ -437,6 +483,26 @@ Add back the detail a blur removes: `y = x + k·(x − blur(x))`.
 
 ---
 
+## A filter that is not linear: the median
+
+Replace each pixel by the **median** of its neighborhood instead of a weighted sum:
+
+```text
+   salt noise, 1D        x = (0.2, 0.2, 1.0, 0.2, 0.2)
+   3-tap box, middle three    0.467  0.467  0.467       the spike smeared over three pixels
+   3-tap median, middle three 0.2    0.2    0.2         the spike removed
+
+   a step edge           x = (0, 0, 0, 1, 1, 1)
+   3-tap box                  0  0.333  0.667  1        the edge blurred
+   3-tap median               0  0      1      1        the edge kept
+```
+
+- the median removes **salt-and-pepper** noise (isolated wrong pixels) and keeps edges; a blur smears both
+- not linear: median(x + y) ≠ median(x) + median(y), so it has **no kernel** and no frequency response
+
+
+---
+
 ## Scale: image pyramids
 
 **Gaussian pyramid**: blur, drop every other row and column, repeat. **Laplacian pyramid**: at each level store what the next coarser level lost, `L_k = G_k − up(G_k+1)`; rebuild exactly by working back up.
@@ -450,6 +516,26 @@ Add back the detail a blur removes: `y = x + k·(x − blur(x))`.
 ```
 
 - halving by dropping pixels scores **26.9 dB** against the exact area average; blur-then-drop scores **29.4 dB**
+
+
+---
+
+## A Laplacian pyramid in one dimension, worked
+
+Four samples, the smallest pyramid: halve by averaging pairs, upsample by repeating.
+
+```text
+   G0           = (2, 4, 8, 6)
+   G1           = ((2+4)/2, (8+6)/2)       = (3, 7)
+   up(G1)       = (3, 3, 7, 7)
+   L0 = G0 − up(G1)                         = (−1, 1, 1, −1)       the detail between the two scales
+
+   rebuild:  L0 + up(G1) = (2, 4, 8, 6)    exact
+```
+
+- stored: L0 and G1, six numbers for four; the 2D pyramid's overhead is the smaller **4/3**
+- the rebuild is exact for **any** choice of blur and upsampler, because L0 is defined as whatever up(G1) misses
+- the detail level is small where the signal is smooth: a compressor gives it few bits
 
 
 ---
@@ -495,6 +581,18 @@ The **histogram** counts pixels by value: nothing about content, a great deal ab
 - **equalization**: map each value v to C(v), the fraction of pixels at or below v; monotone, so brighter stays brighter
 - worked, from the render's cumulative distribution: 0.1 ↦ 0.28, 0.3 ↦ 0.29, 0.5 ↦ 0.71, 0.8 ↦ 0.96; the mean rises from 0.404 to 0.555
 - the black spike cannot be spread: equalization maps **values**, not pixels
+
+
+---
+
+## Check: equalizing a two-valued image
+
+Half the pixels are 0.2 and half are 0.8. After histogram equalization the two values are:
+
+- **A.** 0 and 1
+- **B.** 0.5 and 1.0
+- **C.** 0.2 and 0.8, unchanged
+- **D.** 0.25 and 0.75
 
 
 ---
@@ -549,6 +647,25 @@ Cut into 8 × 8 blocks, transform each to the cosine basis, **divide by a quanti
 | 10 | 3.3 | 28.3 dB |
 
 <img src="../../textbook/figures/img-jpeg.png" class="media-shot" style="max-height: 120px;" alt="the render and its reconstructions at JPEG quality 90, 50 and 10">
+
+
+---
+
+## One coefficient through the quantizer
+
+The block's coefficient at vertical frequency 5, horizontal 0: **−50.9**. Its quality-50 table entry: **24**.
+
+```text
+   quantize      round(−50.9 / 24)  = round(−2.12) = −2        the integer stored
+   dequantize    −2 × 24            = −48
+   error         −50.9 − (−48)      = −2.9         in this one coefficient
+
+   quality 10    the table × 5: entry 120
+   quantize      round(−50.9 / 120) = round(−0.42) = 0          the coefficient is gone
+```
+
+- at quality 10 the block loses its horizontal stripe, the 2.5-cycle pattern of the box's edge, which **blurs into the wall**
+- quantization error is at most **half a table entry** per coefficient: 12 at quality 50 for this entry, 60 at quality 10
 
 
 ---
@@ -696,6 +813,27 @@ All 1,999,000 pairwise distances between the 2,000 digits (pixels in [−1, 1]):
 
 ---
 
+## Measuring a neighbor with the course library
+
+From `css551/`, with the 2,000 digits the demos load:
+
+```js
+const nd = await import('./lib/core/diffusion-nd.js');
+const data = nd.makeDataset(bytes, labels, 400);        // pixels in [−1, 1]
+const a = data.x.subarray(0, 400), b = data.x.subarray(400, 800);
+let s = 0; for (let j = 0; j < 400; j++) s += (a[j] - b[j]) ** 2;
+const rest = { x: data.x.subarray(400), y: null, n: 1999, d: 400 };
+const near = nd.nearestIndex(a, rest);                   // brute force over 1,999
+```
+
+```text
+   labels 0 1     distance 21.48     per pixel 1.074     farther than a typical pair (20.1)
+   nearest other to digit 0: index 610, label 0, 0.400 per pixel = 8.0 in total
+```
+
+
+---
+
 ## The sheet has structure
 
 <img src="../../textbook/figures/img-pca-digits.svg" class="media-shot" style="max-height: 300px;" alt="the 2,000 digits projected onto their two principal directions, colored by class">
@@ -735,6 +873,18 @@ Downsampling by 4 in each direction, by averaging 4 × 4 blocks:
 
 - add any of those patterns to an image and its downsampled version **does not change**
 - a super-resolution method must choose **one** of the images that downsample to the observation: interpolation picks the smoothest; a learned prior picks one that **looks like a photograph**
+
+
+---
+
+## Check: the null space of a 2 × halving
+
+A 256 × 256 **gray** image is halved by averaging each 2 × 2 block. How many dimensions does the observation lose?
+
+- **A.** 16,384
+- **B.** 49,152
+- **C.** 65,536
+- **D.** 196,608
 
 
 ---

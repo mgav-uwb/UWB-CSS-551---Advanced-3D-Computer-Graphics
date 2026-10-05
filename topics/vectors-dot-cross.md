@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Vectors: dot and cross products, frames, lines and planes (~88 min).
+  CSS 551 · TOPIC DECK: Vectors: dot and cross products, frames, lines and planes (~90 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/vectors-dot-cross.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -18,6 +18,14 @@
   crosses; the 2D perp-dot product and line-line intersection; the distance between
   skew lines; ray against sphere; Unity's Vector3 and its traps. Numbers from
   tools/gen-lecture-figures-a.mjs and textbook/vectors.html Section 8.
+  ADDED 2026-10-05 (expansion to the 80-slide target): checks on an angle, a non-unit
+  projection and a winding; the dot past 1 (NaN) and the atan2 angle in both tracks; the
+  algebra rules (linearity, antisymmetry, non-associativity); is-it-a-basis by the triple
+  product; the frame's parallel-input failure; dots need an orthonormal frame; point to
+  segment in the WebGL track; a ray meets the ground; barycentric interpolation of
+  attributes and the weights in both tracks; three.js's Vector3 mutation trap. Numbers from
+  node against lib/core/xform.js, Math.fround, and lib/vendor/three.module.js; textbook
+  Exercises 1, 2, 4, 7, 8, 9.
   NEEDS:   nothing beyond high-school vectors; the demo state a=(2,1,0), b=(1,2,1) is reused in every worked example.
   DEMOS:   data-demo="dot-cross" data-controls="ax,ay,bx,by" (under the lecture page's 200px crop).
            Fallback numbers: a.b = 4, |a| = 2.24, |b| = 2.45, theta = 43.1 deg, a x b = (1, -2, 3).
@@ -37,7 +45,7 @@
 
 ### Vectors: dot and cross products, frames, lines and planes
 
-<small>(~88 min)</small>
+<small>(~90 min)</small>
 
 
 ---
@@ -147,7 +155,7 @@ Reverse the subtraction (`A - R`) and the ball flies **away** from the target.
 
 ### The dot product
 
-<small>(~22 min)</small>
+<small>(~24 min)</small>
 
 ---
 
@@ -249,6 +257,18 @@ if ((v1.magnitude > float.Epsilon) && (v2.magnitude > float.Epsilon))
 
 ---
 
+## Check: an angle by hand
+
+What is the angle between **(1, 1, 0)** and **(1, 0, 1)**?
+
+- **A.** 45°
+- **B.** 60°
+- **C.** 90°
+- **D.** 30°
+
+
+---
+
 ## Projection: split a into two parts
 
 <img src="../../textbook/figures/vec-dot-projection.svg" alt="a split into a part along b and a part across b" style="height:300px">
@@ -274,6 +294,18 @@ Check perpendicularity: `a-perp . b` must be **0**:
 ```text
 (4/3)(1) + (-1/3)(2) + (-2/3)(1) = 4/3 - 2/3 - 2/3 = 0   OK
 ```
+
+
+---
+
+## Check: a shadow on a non-unit direction
+
+Split **a = (3, 4, 0)** along **c = (1, 1, 0)**. What is the along part?
+
+- **A.** (7, 7, 0)
+- **B.** (3.5, 3.5, 0)
+- **C.** (4.95, 4.95, 0)
+- **D.** (−0.5, 0.5, 0)
 
 
 ---
@@ -335,6 +367,43 @@ Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, in float32:
 | 0.0001 | 1.00000000 | 1 (returns 0) | 2.9e-8 |
 
 Below θ = sqrt(2ε) ≈ 4.9e-4 rad (0.03°) the dot rounds to exactly 1 and acos returns **0**.
+
+
+---
+
+## Pitfall: a dot just past 1
+
+Normalize **(1, 0, 4)** with every operation in float32, then dot it with itself:
+
+```text
+   |v|   = 4.1231055                 v̂ = (0.24253564, 0, 0.97014254)
+   v̂ · v̂ = 1.0000001                 acos(1.0000001) = NaN
+   (1, 1, 1) normalized the same way:  v̂ · v̂ = 0.99999994,  an angle of 0.02° to itself
+```
+
+- rounding can push the dot of two unit vectors **a hair past 1 or −1**, where acos is undefined
+- **clamp** to [−1, 1] before acos, or skip acos: the next slide
+
+
+---
+
+## Real code: an angle that never fails
+
+```csharp
+// Unity: degrees between two directions; no normalize, no clamp needed
+float AngleDeg(Vector3 a, Vector3 b) {
+    return Mathf.Atan2(Vector3.Cross(a, b).magnitude, Vector3.Dot(a, b)) * Mathf.Rad2Deg;
+}
+```
+
+```js
+// WebGL track, with lib/core/xform.js
+const angleDeg = (a, b) => Math.atan2(Math.hypot(...cross(a, b)), dot(a, b)) * 180 / Math.PI;
+angleDeg([2, 1, 0], [1, 2, 1]);   // 43.0887
+```
+
+- |a × b| = |a||b| sin θ and a · b = |a||b| cos θ: atan2 of the pair cancels **both lengths**
+- full precision near 0° and near 180°; no domain to leave
 
 
 ---
@@ -402,7 +471,7 @@ Set the demo to **a = (2, 1, 0)** and **b = (−1, 2, 1)**. Before running, pred
 
 ### The cross product
 
-<small>(~20 min)</small>
+<small>(~23 min)</small>
 
 ---
 
@@ -455,6 +524,21 @@ Vector3 v2xv1 = Vector3.Cross(v2, v1);   // equals -v1xv2
 ```
 
 <small>EX_6_1_MyScript.cs, Chap-6: draws both, in opposite directions.</small>
+
+
+---
+
+## The rules the two products obey
+
+```text
+   dot:    a · b = b · a                      a · (2b + c) = 2 a · b + a · c = 8
+   cross:  b × a = −(a × b)                   a × a = 0
+           a × (b × c) = (0, 0, −4)           (a × b) × c = (−2, −1, 0)          with c = (0, 0, 1)
+```
+
+- both are **linear** in each argument: scale or add inputs first or afterward, same answer
+- the dot is **symmetric**; the cross is **antisymmetric** and **not associative**: the brackets matter
+- a × a = 0 is the cross product's parallel test, the one the frame construction trips on
 
 
 ---
@@ -539,6 +623,18 @@ if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen si
 
 ---
 
+## Check: which way does it face?
+
+`P0 = (0, 0, 0)`, `P1 = (0, 0, −2)`, `P2 = (2, 0, 0)`. The face normal is `normalize((P1 − P0) × (P2 − P0))`. It points:
+
+- **A.** up, (0, 1, 0)
+- **B.** down, (0, −1, 0)
+- **C.** along x, (1, 0, 0)
+- **D.** nowhere: the corners are collinear
+
+
+---
+
 ## Newell's method: the normal of a polygon
 
 A four-sided face whose corner is lifted, (0, 0, 0), (1, 0, 0), (1, 1, **0.2**), (0, 1, 0), is not flat. Crosses at different corners **disagree**:
@@ -568,6 +664,22 @@ swap b and c:    a . (c x b) = -3       (the mirror-image box)
 
 ---
 
+## Worked: is it a basis?
+
+The triple product is zero exactly when three vectors lie in one plane:
+
+```text
+   (1, 2, 3), (2, 4, 6), (0, 1, 0):   (2,4,6) × (0,1,0) = (−6, 0, 2)
+                                      (1,2,3) · (−6, 0, 2) = −6 + 6 = 0     coplanar: NOT a basis
+   (1, 0, 0), (1, 1, 0), (1, 1, 1):   (1,1,0) × (1,1,1) = (1, −1, 0)
+                                      (1,0,0) · (1, −1, 0) = 1 > 0          a right-handed basis, volume 1
+```
+
+The second is a basis but **not orthonormal**: its coordinates cannot be read off by dots.
+
+
+---
+
 ## Two vectors, a whole frame
 
 <img src="../../textbook/figures/vec-frame.svg" alt="an orthonormal frame built from a and b" style="height:230px">
@@ -577,6 +689,26 @@ w = normalize(a)             = (0.894, 0.447, 0)
 u = normalize(a x b)         = (0.267, -0.535, 0.802)
 t = normalize(a x (a x b))   = (0.359, -0.717, -0.598)      raw: (3, -6, -5)
 ```
+
+
+---
+
+## When the frame cannot be built
+
+Same recipe, `a = (0, 0, 1)`, `b = (1, 0, 1)`:
+
+```text
+   w = a = (0, 0, 1)      a × b = (0, 1, 0) = u      a × u = (−1, 0, 0)      three right angles
+```
+
+Now `b = (0, 0, 2)`, parallel to a:
+
+```text
+   a × b = (0, 0, 0)      normalize(0, 0, 0) = 0 / 0 = (NaN, NaN, NaN)
+```
+
+- parallel inputs span **no plane**, so no first axis can be chosen
+- the look-at failure: an **up vector along the view direction**; test |a × b| before normalizing
 
 
 ---
@@ -593,6 +725,22 @@ rebuild:         1.789 w - 1.673 t = (1, 2, 1)             1.789² + 1.673² = 6
 
 - `1.789 = 4/sqrt(5)`: the **shadow** of b on a; `1.673`: the parallelogram **height**
 - dotting with each axis of an orthonormal frame **is** the change of coordinates
+
+
+---
+
+## Pitfall: dots need an orthonormal frame
+
+Basis `e1 = (1, 0, 0)`, `e2 = (1, 1, 0)`, `e3 = (0, 0, 1)`; the vector `v = (3, 2, 0)`:
+
+```text
+   the true coordinates:  v = 1 e1 + 2 e2          → (1, 2, 0)      found by solving
+   three dots:            (v·e1, v·e2, v·e3) = (3, 5, 0)
+   rebuild from the dots: 3 e1 + 5 e2 = (8, 5, 0)                 not v
+```
+
+- the dot recipe needs axes that are **unit** and **mutually perpendicular**
+- otherwise coordinates come from **solving** (the inverse matrix of the affine lecture), or orthonormalize first
 
 
 ---
@@ -614,7 +762,7 @@ c - (c.e1) e1 - (c.e2) e2 = (0.214, -0.429, 0.643)    ->  e3 = (0.267, -0.535, 0
 
 ### Lines, planes, and triangles
 
-<small>(~30 min)</small>
+<small>(~31 min)</small>
 
 ---
 
@@ -672,6 +820,25 @@ bool inside = (d >= 0) && (d <= v1.magnitude);     // the segment range test
 ```
 
 <small>EX_5_3_MyScript.cs, Chap-5-DotProducts. Projection length plus a range test.</small>
+
+
+---
+
+## Real code: point to segment, WebGL track
+
+```js
+import { sub, dot, normalize } from '../core/xform.js';
+const add = (p, q) => [p[0] + q[0], p[1] + q[1], p[2] + q[2]];
+const scale = (p, s) => p.map((x) => x * s);
+const v1  = sub(P1, P0);                          // segment direction
+const v1n = normalize(v1);                        // unit direction
+const d   = dot(sub(Pt, P0), v1n);                // projected distance along the line
+const foot = add(P0, scale(v1n, d));              // foot of the perpendicular
+const inside = d >= 0 && d <= Math.hypot(...v1);  // the clamp test
+// P0 = (0,0,0), P1 = (4,2,0), Pt = (6,4,0):  d = 7.155, inside = false
+```
+
+The same five steps as the C# excerpt: the library supplies **sub, dot, normalize**; the two helpers are one line each.
 
 
 ---
@@ -766,6 +933,22 @@ Ray `o + t d`, plane `n . P = D`: `t = (D - n . o) / (n . d)`. With the plane ab
 
 ---
 
+## Worked: a ray meets the ground
+
+A ray from `o = (0, 5, 0)` along `d = (0.6, −0.8, 0)`; the ground `y = 0` is `n = (0, 1, 0)`, `D = 0`:
+
+```text
+   n · d = −0.8          (the ray descends 0.8 per unit of t)
+   n · o =  5            (it starts 5 above the plane)
+   t = (D − n · o) / (n · d) = (0 − 5) / (−0.8) = 6.25
+   hit = o + 6.25 d = (3.75, 0, 0)
+```
+
+With `n · d ≥ 0` the ray climbs or runs level: **no hit**, and a drag tool keeps the object where it was.
+
+
+---
+
 ## Ray against sphere: a quadratic of dots
 
 A ray **o + t d** (unit d) against a sphere of radius r at the origin: |o + t d|² = r², so
@@ -813,6 +996,42 @@ First row by hand: `(P1 - X) x (P2 - X) = (1.5,0,0.5) x (-0.5,0,-1.5) = (0, 2, 0
 
 ---
 
+## The weights carry anything stored at the corners
+
+Same triangle, `X = (0.5, 0, −0.5)`, weights `(0.5, 0.25, 0.25)`:
+
+| stored at P0, P1, P2 | interpolated at X |
+| --- | --- |
+| colors red (1,0,0), green (0,1,0), blue (0,0,1) | (0.5, 0.25, 0.25) |
+| texture coordinates (0,0), (1,0), (0,1) | (0.25, 0.25) |
+| depths 2, 4, 6 | 0.5·2 + 0.25·4 + 0.25·6 = 3.5 |
+
+Same weights, any attribute: the rasterizer fills every pixel this way.
+
+
+---
+
+## Real code: barycentric weights, both tracks
+
+```csharp
+Vector3 n  = Vector3.Cross(P1 - P0, P2 - P0);
+float   nn = Vector3.Dot(n, n);
+float   w0 = Vector3.Dot(Vector3.Cross(P1 - X, P2 - X), n) / nn;
+float   w1 = Vector3.Dot(Vector3.Cross(P2 - X, P0 - X), n) / nn;
+float   w2 = 1f - w0 - w1;                       // the weights sum to 1
+bool inside = w0 >= 0f && w1 >= 0f && w2 >= 0f;
+```
+
+```js
+const n = cross(sub(P1, P0), sub(P2, P0)), nn = dot(n, n);
+const w0 = dot(cross(sub(P1, X), sub(P2, X)), n) / nn;
+const w1 = dot(cross(sub(P2, X), sub(P0, X)), n) / nn;
+const w2 = 1 - w0 - w1;      // X = (1, 0, -0.5): [0.25, 0.5, 0.25], inside
+```
+
+
+---
+
 ## Check it yourself
 
 From `css551/`, each line prints a number from these slides:
@@ -838,6 +1057,24 @@ Replace any library call with your own three-line version and compare.
 | a · b, a × b | `Vector3.Dot(a, b)`, `Vector3.Cross(a, b)` | same formulas; Unity's frame is **left-handed**, so the cross product obeys the **left-hand rule** on screen |
 | \|a\|, â | `a.magnitude`, `a.normalized` | a vector too short to normalize comes back as **(0, 0, 0)**, silently |
 | θ | `Vector3.Angle(a, b)` | **degrees**, not radians; arccos of the dot, with its small-angle loss |
+
+
+---
+
+## three.js's Vector3: the same atoms, one trap
+
+| the text | three.js | watch for |
+| --- | --- | --- |
+| a · b | `a.dot(b)` | returns a number; nothing changes |
+| a × b | `a.cross(b)` | **overwrites a** with a × b; `new THREE.Vector3().crossVectors(a, b)` keeps both |
+| â | `a.normalize()` | overwrites a; `a.clone().normalize()` keeps it; a zero vector stays zero |
+| θ | `a.angleTo(b)` | **radians**; a clamped arccos |
+
+```js
+const a = new THREE.Vector3(2, 1, 0), b = new THREE.Vector3(1, 2, 1);
+const n = a.cross(b);   // n IS a, and a is now (1, -2, 3)
+a.dot(b);               // 0, not 4
+```
 
 
 ---

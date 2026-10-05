@@ -1,13 +1,13 @@
 <!--
-  CSS 551 · L17 discussion (28 min) and wrap (3 min). Six peer-instruction
-  questions: project, vote, argue in pairs two minutes, vote again, then work it.
+  CSS 551 · L17 discussion (18 min) and wrap (2 min). Six peer-instruction
+  questions: project, vote, argue in pairs one minute, vote again, then work it (three minutes each).
   Answers and worked solutions are in the notes only. Every number is from
   lectures/L17-diffusion-2/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
 -->
 
 ### Discussion
 
-<small>(~28 min · six questions · vote, argue in pairs, vote again)</small>
+<small>(~18 min · six questions · vote, argue in pairs, vote again)</small>
 
 
 ---

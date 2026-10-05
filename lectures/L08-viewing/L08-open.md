@@ -1,13 +1,14 @@
 <!--
   CSS 551 · L08, Tuesday October 27, 2026 (week 5, online): Viewing.
-  Mounted by index.html: L08-open.md, ../../topics/viewing.md (~88 min), L08-discuss.md.
+  Mounted by index.html: L08-open.md, ../../topics/viewing.md (~93 min), L08-discuss.md.
 
   Plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Opening                                          2 min
     0:02  Viewing: frame, view matrix, projection,
-          the chain, camera moves (topic)                88 min
-    1:30  Discussion: five peer-instruction questions    26 min
-    1:55  Wrap                                             5 min
+          the chain, camera moves (topic)                93 min
+    1:35  Discussion: five peer-instruction questions    21 min
+    1:56  Wrap                                             4 min
+    2:00  End
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.

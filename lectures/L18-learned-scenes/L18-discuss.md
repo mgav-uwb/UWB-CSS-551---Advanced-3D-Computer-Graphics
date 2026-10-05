@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L18 discussion (10 min), HW8 walk-through (8 min), wrap (2 min).
+  CSS 551 · L18 discussion (6 min), HW8 walk-through (5 min), wrap (2 min).
   Three peer-instruction questions (the third a quick one); answers only in the notes. Numbers from
   lectures/L18-learned-scenes/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
   HW8 numbers from homework/hw08/expected.json, which match textbook/figures/numbers.json.
@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~10 min · three questions · vote, argue in pairs, vote again)</small>
+<small>(~6 min · three questions · vote, argue in pairs, vote again)</small>
 
 
 ---

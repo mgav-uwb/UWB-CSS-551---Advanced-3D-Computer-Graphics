@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · Lecture 12, the discussion slot as midterm review (28 min: the exam's
+  CSS 551 · Lecture 12, the discussion slot as midterm review (26 min: the exam's
   logistics and scope, eight questions spanning weeks 1–6) and the wrap. Answers
   only in the notes. Numbers from tools/gen-lecture-figures-c.mjs (l12_q1 to l12_q4; questions 5 to 8 computed by node).
 -->
 
 ### Midterm review
 
-<small>(~30 min)</small>
+<small>(~24 min)</small>
 
 
 ---

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Diffusion models II: conditioning, guidance, latents, control, text to 3D (~88 min, densified 2026-09-29).
+  CSS 551 · TOPIC DECK: Diffusion models II: conditioning, guidance, latents, control, text to 3D (~98 min, densified 2026-09-29, expanded to 70 slides 2026-10-05).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-2.md"> among others; it carries no
   logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -10,9 +10,17 @@
            the VAE penalty and reparameterization, the latent scale factor, what eight-fold downsampling costs; cross-attention at
            scale, Prompt-to-Prompt, text encoders; zero convolutions, rendering the conditions, inpainting channels, SDEdit;
            DreamFusion's numbers and its successors; FID's sample-size bias, precision and recall, CLIP score, memorization;
-           the guided sampler as code; what breaks and what the pipeline supplies. Also (the original list): classifier-free guidance, worked on two numbers, live, and its cost in saturated pixels; flow matching and one Euler step by hand; the three scalings; latent diffusion and the variational autoencoder; cross-attention worked on a three-word caption; ControlNet, and the depth buffer against the linear depth a condition wants; score distillation, one step by hand with the identity renderer, and what it converges to on the spiral; FID and its blind spots; the papers.
+           the guided sampler as code; what breaks and what the pipeline supplies.
+           Added 2026-10-05: Bayes' rule turning classifier guidance into the tilted density; guidance on the exact and smoothed
+           digit lookup (live and counted); the flow velocity derived; a flow path contracting then choosing (t = 0.9); matching
+           flow and diffusion noise levels by SNR; one progressive-distillation round by hand; why the noise cancels in score
+           distillation; two cameras and the renderer's Jacobian; FID in one dimension and FID against guidance; five checks
+           (clip threshold, cross-attention query, DiT tokens at 1024, zero-initialized copy, FID sample counts). Also (the original list): classifier-free guidance, worked on two numbers, live, and its cost in saturated pixels; flow matching and one Euler step by hand; the three scalings; latent diffusion and the variational autoencoder; cross-attention worked on a three-word caption; ControlNet, and the depth buffer against the linear depth a condition wants; score distillation, one step by hand with the identity renderer, and what it converges to on the spiral; FID and its blind spots; the papers.
   NEEDS:   the first diffusion topic (the forward process, the exact denoiser, DDPM and DDIM); the networks and embeddings topic (embeddings, attention); viewing (the projection matrix and the depth buffer); the learned-scenes idea of a differentiable renderer is introduced here in one slide.
-  DEMOS:   data-demo="diffusion-net" data-controls="guide,steps" (demo-full).
+  DEMOS:   data-demo="diffusion-net" data-controls="guide,steps" (demo-full);
+           data-demo="diffusion-digits" data-controls="smooth,guide" (demo-full; smooth first so the harness probe changes pixels).
+  NUMBERS: the 2026-10-05 slides were computed with node scripts on lib/core/diffusion.js and lib/core/diffusion-nd.js
+           (spiral exact denoiser, MNIST subset with the demo's seed 5); not yet in numbers.json.
   FIGURES: ../../textbook/figures/diff-*.svg|png (tools/gen-textbook-figures.mjs, numbers.json; diff-sampler-steps.svg added);
            the densified slides' numbers: lectures/L17-diffusion-2/figures/numbers.json, key "dense";
            ../../lectures/L17-diffusion-2/figures/{sds-toy,depth-buffer}.svg and numbers.json
@@ -27,7 +35,7 @@
 
 ### Diffusion models II: conditioning, guidance, latents, control, text to 3D
 
-<small>(~88 min)</small>
+<small>(~98 min)</small>
 
 
 ---
@@ -153,6 +161,18 @@ Two pixels at one step. Unconditional estimate `(0.2, 0.2)`, conditional `(0.5, 
 
 ---
 
+## Check: when does guidance first clip?
+
+`x̂₀(∅) = (0.2, 0.2)`, `x̂₀(c) = (0.5, 0.1)`, valid range [−1, 1]. The smallest `w` at which some pixel leaves the range:
+
+- **A.** `w = 2.67`
+- **B.** `w = 3`
+- **C.** `w = 12`
+- **D.** `w = 1.67`
+
+
+---
+
 ## Guidance in noise coordinates is the same guidance
 
 The denoiser's two outputs are tied by `ε̂ = (x_t − √ᾱ·x̂₀) / √(1−ᾱ)`, an **affine** map that does not depend on the condition. Guide either one and you get the same step:
@@ -213,6 +233,25 @@ Dhariwal & Nichol (2021, arXiv:2105.05233) guided with a **separate classifier**
 
 ---
 
+## Bayes turns the classifier into a difference
+
+```text
+   Bayes:            p(c | x) = p(x | c) · p(c) / p(x)
+   take the log:     log p(c | x) = log p(x | c) − log p(x) + log p(c)
+   take ∇ in x:      ∇ log p(c | x) = ∇ log p(x | c) − ∇ log p(x)          (p(c) has no x in it)
+
+   guided score:     ∇ log p(x) + w · ( ∇ log p(x | c) − ∇ log p(x) )
+                   = (1 − w) · ∇ log p(x) + w · ∇ log p(x | c)
+                   = ∇ log [ p(x)^(1−w) · p(x | c)^w ]                     the tilted density
+
+   check, the two Gaussians, x = 0.5:   ∇ log p(x) = −0.5     ∇ log p(x | c) = −(0.5 − 1)/0.25 = 2
+     classifier gradient 2 − (−0.5) = 2.5      w = 3:   −0.5 + 3·2.5 = 7.0
+     tilted N(1.2, 1/10):   −10·(0.5 − 1.2) = 7.0   ✓
+```
+
+
+---
+
 ## Negative prompts
 
 Replace the unconditional estimate by an estimate for what you **do not** want:
@@ -241,6 +280,37 @@ Replace the unconditional estimate by an estimate for what you **do not** want:
   the panel: nearest training digit, distance well above the memorization
   threshold for every sample: these digits were learned, not looked up
   MNIST (LeCun, Cortes, Burges) · CC BY-SA 3.0</pre></div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Guidance on a lookup table, live
+
+<div class="cockpit" data-demo="diffusion-digits" data-controls="smooth,guide"><pre class="viz-fallback">  2,000 MNIST digits (20×20); the denoiser is the exact posterior mean
+  digit buttons: the condition (3 by default)    guide: classifier-free w
+  smooth: kernel bandwidth h (0 = exact, every sample a training digit)
+  the panel: the selected sample beside its nearest training digit
+  MNIST (LeCun, Cortes, Burges) · CC BY-SA 3.0</pre></div>
+
+
+---
+
+## Guidance on the lookup table, counted
+
+Twelve 3s, 30 DDIM steps, the demo's seed; distance in the demo's per-pixel units (copy threshold 0.06):
+
+| smooth h | w | mean nearest-digit distance | pixels outside [−1, 1] |
+| -------- | - | --------------------------- | ---------------------- |
+| exact | 1, 2, 4, 6 | 0.000 at every w | 0.0 % |
+| 3 | 1 | 0.228 | 0.9 % |
+| 3 | 2 | 0.220 | 11.4 % |
+| 3 | 4 | 0.123 | 13.6 % |
+| 3 | 6 | 0.049 | 15.0 % |
+
+- on the smoothed lookup, guidance pulls samples **toward the most typical training 3s**: at `w = 6` the mean falls below the copy threshold
+- the overshoot past the rail grows with `w`, the clamp's raw material
 
 
 ---
@@ -314,6 +384,25 @@ If the goal is an ODE from noise to data, the forward process need not be a diff
 
 ---
 
+## Why the velocity is a rescaled denoiser
+
+```text
+   the line:          x_t = (1 − t)·x₀ + t·ε         solve for the noise:  ε = (x_t − (1 − t)·x₀) / t
+   one pair's velocity:   ε − x₀ = (x_t − (1 − t)·x₀)/t − x₀ = (x_t − x₀) / t
+
+   the network sees only x_t, so it learns the average over the pairs through x_t:
+       v(x_t, t) = E[ (x_t − x₀)/t | x_t ] = (x_t − E[x₀ | x_t]) / t = (x_t − x̂₀) / t
+
+   the posterior weights:   x_t given x₀ᵢ is Gaussian, mean (1 − t)·x₀ᵢ, variance t²
+                            wᵢ ∝ exp( −‖x_t − (1 − t)·x₀ᵢ‖² / 2t² )
+```
+
+- the same softmax as the diffusion denoiser, with `(1 − t, t)` in place of `(√ᾱ, √(1−ᾱ))`
+- squared error on `ε − x₀` is minimized by this average, exactly as squared error on `x₀` is minimized by `x̂₀`
+
+
+---
+
 ## One Euler step by hand
 
 Data `{−1, +1}`, `t = 0.5`, `x_t = 0.3`:
@@ -331,6 +420,44 @@ Data `{−1, +1}`, `t = 0.5`, `x_t = 0.3`:
 <img src="../../textbook/figures/diff-flow-paths.svg" class="media-shot" style="max-height: 175px;" alt="six particles from the same starts under DDIM and under the exact flow-matching velocity; the flow paths are straighter">
 
 - a single jump lands on the current estimate, exactly like a one-step DDIM jump; rectified flow re-pairs noise and data to straighten paths further, the route by which Stable Diffusion 3 samples in a few dozen steps
+
+
+---
+
+## A flow path first contracts, then chooses
+
+The worked example again, `x_t = 0.3`, now at **`t = 0.9`**:
+
+```text
+   scaled points (1−t)·xᵢ:   −0.1, +0.1        squared distances:  0.16, 0.04
+   logits −d²/(2·0.81):      −0.099, −0.025    weights:  0.482, 0.518
+   x̂₀ = −0.482 + 0.518 = 0.037
+   v  = (0.3 − 0.037) / 0.9 = +0.292           backward step: x = 0.3 − 0.1·0.292 = 0.271
+
+   at t = 0.5 the same x had  x̂₀ = 0.537,  v = −0.474:  the step went right, to 0.347
+```
+
+- high noise: the estimate is nearly the data mean, the field **shrinks the cloud** toward it
+- lower noise: the particle has **committed** to the `+1` side and the velocity changes sign
+
+
+---
+
+## Pitfall: the same t is not the same noise
+
+```text
+   flow matching, t = 0.5:      signal 1 − t = 0.5,  noise t = 0.5        SNR = 0.25/0.25 = 1     (0 dB)
+   diffusion, ᾱ = 1/4:          signal √ᾱ = 0.5,     noise √(1−ᾱ) = 0.866  SNR = 0.25/0.75 = 1/3  (−4.8 dB)
+
+   x = 0.3, data {−1, +1}:      flow x̂₀ = 0.537            diffusion x̂₀ = 0.197
+
+   match the SNR:   (1 − t)/t = √(1/3)  →  t = 0.634
+   rescale x:       x_flow = x · (1 − t)/√ᾱ = 0.3 · 0.732 = 0.2196
+   flow x̂₀ at (0.2196, t = 0.634):   weights 0.401, 0.599   →   0.197      the diffusion answer   ✓
+```
+
+- the two processes are the **same family**: a scale and a time change map one onto the other
+- moving a trained model between samplers needs **both** the time map and the rescaling of `x`
 
 
 ---
@@ -402,6 +529,28 @@ Flow matching guides the same way, on its velocity:
    a guided 50-step sampler:    50 steps × 2 passes = 100 network evaluations
    a distilled 4-step sampler with guidance folded in:  4 evaluations       25× fewer
 ```
+
+
+---
+
+## One distillation round by hand
+
+The student must land in **one** step where the teacher lands in **two**. On the spiral, exact denoiser, from `x = (0.6, 0.9)`:
+
+```text
+   t:        0.8              0.5              0.2
+   √ᾱ, √(1−ᾱ):  0.3067, 0.9518   0.7027, 0.7114   0.9480, 0.3183
+
+   teacher, two DDIM steps:   (0.6, 0.9) → (0.4515, 0.7312) → (0.2326, 0.4415)
+   plain DDIM, one step:      (0.6, 0.9) → (0.2061, 0.4054)                    0.0448 short
+
+   the student's target x̃₀: the estimate for which one DDIM step 0.8 → 0.2 lands on the teacher
+     x̃₀ = ( z″ − (σ″/σ)·x ) / ( α″ − (σ″/σ)·α )       σ″/σ = 0.3183/0.9518 = 0.3344
+        = ( (0.2326, 0.4415) − 0.3344·(0.6, 0.9) ) / ( 0.9480 − 0.3344·0.3067 )
+        = (0.0320, 0.1406) / 0.8455 = (0.0378, 0.1663)
+```
+
+- the student trains on `x̃₀` by the usual squared error; then it becomes the teacher and the steps halve again
 
 
 ---
@@ -543,6 +692,18 @@ The digit network's class vector becomes the caption's token vectors, read by **
 
 ---
 
+## Check: another image token asks
+
+Same caption, keys and values as the last slide (`"a"`, `"red"`, `"cube"`), `d = 2`. A token elsewhere in the image has query `q = (0, 1)`. Its update is:
+
+- **A.** `(0.490, 0.321)`
+- **B.** `(0.253, 0.512)`
+- **C.** `(0, 1)`
+- **D.** `(0.333, 0.333)`
+
+
+---
+
 ## Cross-attention at Stable Diffusion scale
 
 ```text
@@ -606,6 +767,18 @@ A token's cross-attention weights say **where** in the image each word acts. Kee
 
 ---
 
+## Check: tokens at 1024
+
+A diffusion transformer on a **1024×1024** image: 8× downsampling, 4 latent channels, 2×2 patches. Scores in one self-attention layer, one head:
+
+- **A.** 1,048,576
+- **B.** 16,777,216
+- **C.** 4,194,304
+- **D.** 268,435,456
+
+
+---
+
 ## ControlNet: structure from the pipeline
 
 <div class="two"><div>
@@ -656,6 +829,18 @@ The copy's features enter the frozen model through a layer whose weight starts a
 
 - training cannot damage the frozen model at the start, so a few thousand condition-image pairs suffice
 - the zero weight has a nonzero gradient because the copy's features `g` are not zero
+
+
+---
+
+## Check: why the copy must not start at zero
+
+`y = F(x) + w · g(x, c)` with `w = 0` at the start and `∂L/∂y = 0.4`. Suppose the trainable copy's output `g` were **also** zero at the start. After the first backward pass:
+
+- **A.** `∂L/∂w = 0.4`, training proceeds
+- **B.** `∂L/∂w = 0`, but the copy still receives a gradient
+- **C.** `∂L/∂w = 0` and the copy receives none either: nothing ever trains
+- **D.** `∂L/∂w = 0.28`, as on the slide
 
 
 ---
@@ -750,6 +935,25 @@ Optimize a 3D scene θ (a NeRF, or Gaussians) so that **its renders score well**
 
 ---
 
+## Why the noise cancels
+
+The update's residual, `ε̂ − ε`, for a denoiser that returns `x̂₀`:
+
+```text
+   the render, noised:       x_t = √ᾱ·x + √(1−ᾱ)·ε
+   the model's noise guess:  ε̂ = (x_t − √ᾱ·x̂₀) / √(1−ᾱ)
+                               = (√ᾱ·x + √(1−ᾱ)·ε − √ᾱ·x̂₀) / √(1−ᾱ)
+                               = ε + √ᾱ·(x − x̂₀) / √(1−ᾱ)
+
+   so:   ε̂ − ε = (√ᾱ / √(1−ᾱ)) · (x − x̂₀(x_t))
+```
+
+- the drawn noise drops out: the residual is the gap between the render and the model's guess at what it was, scaled by the signal-to-noise amplitude ratio
+- a weight `w(t) = √(1−ᾱ)/√ᾱ` cancels the ratio, so every `t` pulls with the same units
+
+
+---
+
 ## One score-distillation step by hand
 
 Make the "scene" a 2D point θ and the renderer the identity (`x = θ`). The image model is the exact spiral denoiser. Then
@@ -765,6 +969,26 @@ Make the "scene" a 2D point θ and the renderer the identity (`x = θ`). The ima
 ```
 
 - score distillation moves the scene **toward the denoiser's estimate of its own noised render**
+
+
+---
+
+## Two cameras: the renderer's Jacobian
+
+Scene: a 3D point `θ = (0.5, 0.5, 0.2)`. Camera A renders `(θx, θy)`, camera B `(θz, θy)`; `t`, `ε` and the denoiser as before:
+
+```text
+                render x        x̂₀(x_t)            x − x̂₀ (the weighted residual)
+   camera A:    (0.5, 0.5)      (0.0743, 0.0870)    (0.4257, 0.4130)
+   camera B:    (0.2, 0.5)      (0.0427, 0.0898)    (0.1573, 0.4102)
+
+   the Jacobian ∂x/∂θ picks coordinates;  the step on θ is Jᵀ · residual:
+   camera A:    (0.4257, 0.4130, 0)       →  θ = (0.479, 0.479, 0.2)            (lr = 0.05)
+   camera B:    (0, 0.4102, 0.1573)       →  θ = (0.5, 0.479, 0.192)
+```
+
+- each view moves **only what it sees**; only the random choice of camera reaches every coordinate
+- `θy` is seen by both cameras and pulled by both: each view is judged alone, with no agreement between them
 
 
 ---
@@ -832,6 +1056,41 @@ A generator's samples are supposed to be new, so there is no reference image. Co
 
 ---
 
+## FID on one dimension
+
+With one feature, the covariances are numbers and the trace term collapses:
+
+```text
+   tr( σg² + σr² − 2·(σg²·σr²)^½ ) = σg² + σr² − 2·σg·σr = (σg − σr)²
+
+   FID = (μg − μr)² + (σg − σr)²         the squared gap in mean, plus the squared gap in spread
+
+   generated N(0.5, 0.8²) against real N(0, 1):   0.5² + (0.8 − 1)² = 0.25 + 0.04 = 0.29
+```
+
+- FID compares **only** a mean and a spread per direction (and their correlations): any two sets with the same first two moments score 0
+- the 2,048-feature version is this, with matrices; the square root becomes a matrix square root
+
+
+---
+
+## Guidance, scored by FID
+
+Real data: the conditional `N(1, 0.5²)`. Guided samples: the tilted Gaussians of the guidance slide.
+
+```text
+   w     guided samples           FID against N(1, 0.5²)
+   1     N(1.000, 0.500²)         0
+   3     N(1.200, 0.316²)         0.200² + 0.184² = 0.040 + 0.034 = 0.074
+   7     N(1.273, 0.213²)         0.273² + 0.287² = 0.074 + 0.082 = 0.157
+```
+
+- every sample at `w = 7` is "very much a c", yet FID **worsens**: the samples are shifted and too narrow
+- FID charges for both of guidance's effects: the shift away from the data and the lost variety
+
+
+---
+
 ## FID depends on how many samples you draw
 
 The same distribution against itself should score 0. A sampled estimate is **biased upward**, and the bias shrinks with the sample count:
@@ -845,6 +1104,18 @@ The same distribution against itself should score 0. A sampled estimate is **bia
 
 - the bias falls roughly as `1/N`; with 2,048 features it is far larger at a given `N`, so papers fix `N` (commonly 50,000) and only compare at the same `N`
 - a FID difference smaller than the estimate's own noise is not a result
+
+
+---
+
+## Check: two FIDs
+
+Paper 1 reports **FID 3.1** for model A, from 10,000 samples. Paper 2 reports **FID 2.9** for model B, from 50,000 samples. Which model is closer to the data?
+
+- **A.** model A
+- **B.** model B
+- **C.** cannot tell from these numbers
+- **D.** they are equal within rounding
 
 
 ---

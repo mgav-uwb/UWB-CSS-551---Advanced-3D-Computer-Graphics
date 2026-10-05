@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L06 discussion and wrap (~30 min). Six peer-instruction questions; answers ONLY
+  CSS 551 · L06 discussion and wrap (~28 min). Six peer-instruction questions; answers ONLY
   in the notes. Numbers computed by node against lib/core/xform.js (makeTRS, axisAngleMatrix,
   matMul, applyMat4) and from textbook/figures/numbers-foundations.json (aff.obliqueScale).
 -->
 
 ### Discussion
 
-<small>(~30 min)</small>
+<small>(~28 min)</small>
 
 
 ---

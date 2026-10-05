@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L15 discussion, HW7 walk-through and wrap (~20 min). Mounted AFTER the topic.
+  CSS 551 · L15 discussion, HW7 walk-through and wrap (~16 min). Mounted AFTER the topic.
   Three peer-instruction questions (vote, argue in pairs, vote again, then work it); answers
   ONLY in the Note: blocks. Numbers from tools/gen-lecture-figures-d1.mjs
   (lectures/L16-diffusion-1/analysis/numbers-d1.json keys alias, psnrQ, tiny, fit, dctPsnr) and
@@ -10,7 +10,7 @@
 
 ### Discussion
 
-<small>(~20 min)</small>
+<small>(~16 min)</small>
 
 
 ---

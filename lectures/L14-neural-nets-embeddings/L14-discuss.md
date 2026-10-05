@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L14 discussion and wrap (~30 min). Mounted by index.html AFTER the topic.
+  CSS 551 · L14 discussion and wrap (~25 min). Mounted by index.html AFTER the topic.
   Five peer-instruction questions (vote, argue in pairs two minutes, vote again, then work it).
   Answers and worked solutions live ONLY in the Note: blocks. Every number is from
   tools/gen-lecture-figures-d1.mjs (lectures/L16-diffusion-1/analysis/numbers-d1.json, keys
@@ -8,7 +8,7 @@
 
 ### Discussion
 
-<small>(~27 min)</small>
+<small>(~22 min)</small>
 
 
 ---
@@ -83,6 +83,7 @@ Your classifier's final layer outputs logits **(1000, 999)** and the loss is NaN
 
 - a network is a function set by weights; training is the chain rule, one backward sweep per step
 - embeddings put similar things near each other; contrastive training puts words and pictures in **one space**
+- a coordinate network is one signal as a function; its encoding decides which frequencies training can reach
 
 **Read:** [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), all sections
 

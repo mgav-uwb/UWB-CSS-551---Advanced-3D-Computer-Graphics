@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Neural networks and embeddings (~88 min, 52 content slides).
+  CSS 551 · TOPIC DECK · Neural networks and embeddings (~66 min, 51 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/neural-nets-embeddings.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -21,6 +21,9 @@
   receptive fields; attention's n² cost and code; the sinusoidal time code; the embedding table
   as a linear layer; cosine vs distance; VAEs; zero-shot CLIP; what a network is not; small
   networks in graphics; a second papers table.
+  2026-10-05: paced to ~66 min so that topics/coordinate-networks.md (mounted after it in L14) fits;
+  the "what a network is not" summary table was cut; positional encoding of coordinates, spectral
+  bias, Fourier features and SIREN live in that topic.
   NEEDS:   vectors and dot products (the vectors topic). Nothing about images or diffusion.
            Companion of topics/image-space.md and topics/diffusion-1.md (the lectures after it); this
            deck names "the approximator exhibit" and "the embedding exhibit", and diffusion-1 refers
@@ -43,7 +46,7 @@
 
 ### Neural networks and embeddings
 
-<small>(~88 min)</small>
+<small>(~66 min)</small>
 
 
 ---
@@ -728,7 +731,7 @@ The diffusion denoiser must know **how much noise** it is looking at. It receive
 ```
 
 - the fast frequencies distinguish **nearby** times; the slow ones say roughly **where** in [0, 1] t is
-- the same trick encodes **positions** in a transformer and **coordinates** in NeRF (the learned-scenes lecture)
+- the same trick encodes **positions** in a transformer and **pixel or point coordinates** in a coordinate network
 
 
 ---
@@ -889,21 +892,6 @@ Classify an image with **no classifier training**: embed a caption per class and
 
 - CLIP was trained on **400 million** image-text pairs; zero-shot, its largest model matched the ImageNet accuracy of a ResNet-50 trained on ImageNet's labels (76.2 % top-1)
 - a new class is **one new sentence**, not a new dataset
-
-
----
-
-## What a network is not
-
-| expectation | what the numbers tonight show |
-| ----------- | ----------------------------- |
-| a database of its examples | smooth **between** the examples, not a lookup (the capacity figure) |
-| reliable anywhere | flat beyond the data: the hand network tends to 1.5 and −1.3 |
-| calibrated | softmax at a small temperature turns cosines 0.31 vs 0.24 into 0.999 |
-| trained by the learning rate you picked | 0.3 diverges where 0.05 fits |
-| uses all its units | dead ReLUs, vanishing gradients |
-
-- each row is a failure to plan for when a network sits inside a renderer or a tool
 
 
 ---

@@ -1,12 +1,13 @@
 <!--
   CSS 551 · L06, Tuesday October 20, 2026 (week 4, online): Affine transformations.
-  Mounted by index.html: L06-open.md, ../../topics/affine-transforms.md (~88 min), L06-discuss.md.
+  Mounted by index.html: L06-open.md, ../../topics/affine-transforms.md (~90 min), L06-discuss.md.
+  80 slides (expanded 2026-10-05 from 67).
 
   Plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Opening                                          2 min
     0:02  Affine transformations over homogeneous
-          coordinates (topic)                            88 min
-    1:30  Discussion: six peer-instruction questions     28 min
+          coordinates (topic)                            90 min
+    1:32  Discussion: six peer-instruction questions     23 min
     1:55  Wrap                                             5 min
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -28,8 +29,8 @@
 
 - **Affine maps**: a linear part and a shift; what they preserve; the determinant
 - **Homogeneous coordinates**: w = 1 points, w = 0 vectors; composition and inverse by blocks
-- **Frames and spaces**: a matrix is a frame; TRS; normals by the inverse transpose
-- **Pivots, and where affine ends**: the conjugation sandwich; the last row
+- **Frames and spaces**: a matrix is a frame; TRS and the polar decomposition; normals and planes by the inverse transpose
+- **Pivots, and where affine ends**: the conjugation sandwich; the last row and the vanishing point
 - **Discussion**: six questions, vote, argue, vote again
 
 Reading: [Affine Transformations](../../textbook/affine-transforms.html) in the course text.

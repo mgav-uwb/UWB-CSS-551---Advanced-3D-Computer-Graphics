@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Viewing: the camera frame, the view matrix, projection, the chain (~88 min).
+  CSS 551 · TOPIC DECK: Viewing: the camera frame, the view matrix, projection, the chain (~93 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/viewing.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -31,6 +31,11 @@
            6.3.Tumble CameraManipulation.cs, 6.4.DrawCameraFrustum).
   DENSIFIED 2026-09-29 (Plan C; 60+ slides per two hours): Brunelleschi and Alberti, checks on V and V as the camera's inverse, the pinhole worked, rows of P derived, a predict slide, the NDC-cube and depth-precision figures, behind-the-camera, homogeneous clipping and Sutherland-Hodgman, a near-plane clip worked, the viewport transform and the y-flip pitfall, both tracks' camera matrices and Unity's -z view space, unprojection worked and picking in both tracks, zoom versus dolly and the dolly zoom, off-axis and stereo projection, depth of field, a check-yourself slide. Numbers from numbers-pipeline.json (view) or node.
 
+  EXPANDED 2026-10-05 (L08 to ~80 slides): looking straight down (the degenerate up fixed), the depth row
+  for any near and far, a point off the sightline to the pixel, where NDC depth crosses zero, the stale-aspect
+  pitfall and resize in both tracks, a 4:3 check, orthographic depth, the frustum planes as rows of P V, the
+  p-vertex rejection of box 2, a track worked, the circle of confusion worked. Numbers from node (xform.js).
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -40,14 +45,14 @@
 
 ### Viewing: the camera, the view matrix, and projection
 
-<small>(~88 min)</small>
+<small>(~93 min)</small>
 
 
 ---
 
 ### The camera is a frame
 
-<small>(~14 min)</small>
+<small>(~13 min)</small>
 
 ---
 
@@ -125,7 +130,7 @@ The `view-matrix` demo: the model `{az, el, dist}` places the eye on a sphere ar
 
 ### The view matrix
 
-<small>(~16 min)</small>
+<small>(~17 min)</small>
 
 ---
 
@@ -249,9 +254,26 @@ Raise the elevation toward 90° with `up = (0, 1, 0)`. `|up × w| = cos(el)`:
 
 ---
 
+## Worked: looking straight down
+
+`eye = (0, 5, 0)`, `at = (0, 0, 0)`: a top-down map camera.
+
+```text
+   up = (0, 1, 0):    w = (0, 1, 0)     up × w = 0        lookAtBasis throws a RangeError
+   up = (0, 0, −1):   w = (0, 1, 0)
+                      u = (0, 0, −1) × (0, 1, 0) = (1, 0, 0)
+                      v = w × u        = (0, 0, −1)
+   V translation = (−u·eye, −v·eye, −w·eye) = (0, 0, −5)
+```
+
+The hint `(0, 0, −1)` makes world −z the top of the screen: north is up on the map.
+
+
+---
+
 ### Projection
 
-<small>(~30 min)</small>
+<small>(~35 min)</small>
 
 ---
 
@@ -301,6 +323,53 @@ Division by depth is the **only** non-linear step in the whole pipeline, and the
 | 29 mm, the demo's 45° | 45° | 72.8° at aspect 1.78 |
 | 50 mm | 27.0° | 39.6° |
 | 200 mm | 6.9° | 10.3° |
+
+
+---
+
+## Pitfall: a stale aspect ratio
+
+`P` built for aspect 1.78 (fov 45°, near 1, far 8). Two view-space points 4 units out, `(1, 0, −4)` and `(0, 1, −4)`, one unit right and one unit up of the sightline:
+
+| viewport | pixels right of center | pixels above center |
+| --- | --- | --- |
+| 1280 × 720 (matches `P`) | 217.0 | 217.3 |
+| 720 × 720 (stale `P`) | 122.1 | 217.3 |
+| 720 × 720, `P` rebuilt with aspect 1 | 217.3 | 217.3 |
+
+With the stale `P`, a square renders 1.78 times narrower than it is tall. Read the aspect from the framebuffer on **every** resize.
+
+
+---
+
+## Resize: rebuild P in both tracks
+
+```js
+// three.js: the camera caches P; changing fov or aspect does nothing until updateProjectionMatrix
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();          // recompute camera.projectionMatrix
+  renderer.setSize(innerWidth, innerHeight);
+});
+```
+
+```csharp
+// Unity: aspect follows the Game view's width / height until a script assigns it
+cam.aspect = 16f / 9f;   // now frozen: a 4:3 window renders squeezed, as on the previous slide
+cam.ResetAspect();       // back to the window's own width / height
+```
+
+
+---
+
+## Check: the window becomes 4:3
+
+A 16:9 window (aspect 1.78, fov 45°, near 1, far 8) is resized to **4:3**, and `P` is rebuilt. Which entries change?
+
+- **A.** only `P[0][0]`
+- **B.** `P[0][0]` and `P[1][1]`
+- **C.** `P[0][0]` and the depth row
+- **D.** none: `P` depends on the field of view, not the window
 
 
 ---
@@ -364,6 +433,22 @@ Two conditions, two unknowns: the depth row is the only part of `P` that is **fi
 
 ---
 
+## The depth row, for any near and far
+
+Near distance `n`, far distance `F`. The two conditions, multiplied out:
+
+```text
+   z = −n:   (−A n + B) / n = −1      ⇒   −A n + B = −n
+   z = −F:   (−A F + B) / F = +1      ⇒   −A F + B =  F
+   subtract:  A (F − n) = −(F + n)    ⇒   A = (F + n) / (n − F)
+   back-substitute:                       B = 2 F n / (n − F)
+```
+
+Check at `n = 1`, `F = 8`: `A = 9/(−7) = −1.2857`, `B = 16/(−7) = −2.2857`, the numbers of the previous slide.
+
+
+---
+
 ## Predict before you drag
 
 In the frustum demo, widen the vertical field of view from **45° to 90°** (aspect 1.78, near 1, far 8). Predict:
@@ -406,6 +491,23 @@ fov 45°, aspect 1.78, near 1, far 8: `f = 2.414`, `f/a = 1.356`, `9/(−7) = �
 
 ---
 
+## Worked: a point off the sightline
+
+Same `P`; the view-space point `(1, 1, −4)`, then a 1280 × 720 viewport:
+
+```text
+   clip:   P (1, 1, −4, 1) = (1.356,  2.414,  −1.286·(−4) − 2.286,  4) = (1.356, 2.414, 2.857, 4)
+   NDC:    divide by 4      = (0.339,  0.604,  0.714)          all three in [−1, 1]: visible
+   pixel:  px = (0.339 + 1)/2 · 1280 = 857.0
+           py = (1 − 0.604)/2 · 720  = 142.7                    upper right of the image
+   depth:  (0.714 + 1)/2              = 0.857
+```
+
+`x` and `y` are equal in view space but not in NDC: `x` is divided by the aspect.
+
+
+---
+
 ## NDC depth is not linear
 
 Same P (near 1, far 8):
@@ -415,6 +517,23 @@ Same P (near 1, far 8):
 | NDC z | −1 | −0.238 | 0.143 | 0.524 | 0.714 | 0.905 | 1 |
 
 Half the NDC range, −1 to 0, is spent between depth 1 and about 1.8. Depth resolution is **concentrated near the eye**.
+
+
+---
+
+## Where NDC depth crosses zero
+
+Set `A z + B = 0` with `z = −d`:
+
+```text
+   d_mid = B / A = 2 n F / (n + F)
+
+   near 1,   far 8:      d_mid = 16/9 = 1.778       0.778 of 7 units of depth, 11 %, use half the NDC range
+   near 0.1, far 8:      d_mid = 0.198
+   near 0.1, far 1000:   d_mid = 0.200              the far plane barely moves it
+```
+
+Halfway in NDC sits at **twice the near distance**, whatever the far plane, once `F >> n`.
 
 
 ---
@@ -461,6 +580,25 @@ Reversed z (store `1 − depth` in a float) puts the float format's dense values
    perspective:  w' = −z   ->  divide by depth   ->  far things shrink, parallels converge
    orthographic: w' = 1    ->  no divide         ->  size constant, parallels stay parallel
 ```
+
+
+---
+
+## Orthographic depth is linear
+
+The box `[−4, 4] × [−2.25, 2.25]`, near 1, far 8:
+
+```text
+           [ 0.25   0      0       0     ]
+   P_o  =  [ 0      0.444  0       0     ]        2/(r − l),  2/(t − b)
+           [ 0      0     −0.286  −1.286 ]        −2/(F − n),  −(F + n)/(F − n)
+           [ 0      0      0       1     ]        w' = 1: no divide
+
+   depth 4.5, halfway from near to far:   orthographic NDC z = −0.286·(−4.5) − 1.286 = 0
+                                          perspective (same near, far):  NDC z = 0.778
+```
+
+No `1/z`: the depth buffer's resolution is **uniform** from near to far.
 
 
 ---
@@ -512,7 +650,7 @@ One triangle in, two out: clipping can **grow** the triangle count.
 
 ### The full chain
 
-<small>(~18 min)</small>
+<small>(~17 min)</small>
 
 ---
 
@@ -622,6 +760,24 @@ Hand-building `V` from `transform.right`, `up`, `forward` gives the left-handed 
 
 ---
 
+## The frustum's planes are rows of P V
+
+Inside the left plane means NDC `x ≥ −1`, so clip `x + w ≥ 0`. Clip `x` and `w` are rows 0 and 3 of `M = P V` dotted with the world point:
+
+```text
+   left   = r3 + r0        right = r3 − r0        bottom = r3 + r1
+   top    = r3 − r1        near  = r3 + r2        far    = r3 − r2
+
+   the demo camera:   r2 = (−0.693, −0.440, −0.990, 6.934)
+                      r3 = (−0.539, −0.342, −0.770, 7.171)      (row 3 computes w' = depth)
+   near = r3 + r2 = (−1.232, −0.782, −1.759, 14.105)  ÷ 2.286  →  (−0.539, −0.342, −0.770, 6.171)
+```
+
+Divide by the length of `(a, b, c)` and `a x + b y + c z + d` is a signed distance: the eye gets −1, the target +6.
+
+
+---
+
 ## Frustum planes and culling
 
 <img src="../../textbook/figures/view-frustum-planes.svg" alt="the six frustum planes and three test boxes" style="height:210px">
@@ -633,6 +789,21 @@ Six planes, from the rows of `P V`, each `n · p + d ≥ 0` inside. Near: `(−0
 | [−1,1] × [−0.5,1.5] × [−1,1] | straddles | far: one corner inside, one outside |
 | [5.5,6.5] × [0,1] × [−0.5,0.5] | outside | right: even the most inside corner is at −1.127 |
 | [−0.5,0.5] × [0,1] × [−8.5,−7.5] | outside | far |
+
+
+---
+
+## Worked: one plane rejects box 2
+
+Right plane, normalized: `(−0.979, −0.203, 0.005, 4.255)`. Box 2 is `[5.5, 6.5] × [0, 1] × [−0.5, 0.5]`.
+
+```text
+   p-vertex: the corner farthest along the normal, chosen by the normal's signs
+      a < 0 → x = 5.5      b < 0 → y = 0      c > 0 → z = 0.5
+   signed distance = −0.979·5.5 − 0.203·0 + 0.005·0.5 + 4.255 = −1.127
+```
+
+Even the box's most-inside corner is 1.127 outside: **reject**, one dot product, no triangle touched. The target `(0, 0.5, 0)` scores +4.154 on the same plane.
 
 
 ---
@@ -686,7 +857,7 @@ if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
 
 ### Moving the camera
 
-<small>(~10 min)</small>
+<small>(~11 min)</small>
 
 ---
 
@@ -697,6 +868,21 @@ if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
 - **dolly**: move `eye` along the sightline: the demo's `dist`
 
 Worked dolly, distance 7 to 4: `eye' = at + 4w = (2.156, 1.868, 3.079)`. The basis is unchanged; only `−w·eye'` changes, from −7.17 to **−4.17**.
+
+
+---
+
+## Worked: a track
+
+Track right by 1 unit: `eye' = eye + u`, `at' = at + u`. The direction `eye − at` is unchanged, so the basis is unchanged:
+
+```text
+   −u·eye' = −u·eye − u·u = 0     − 1 = −1
+   −v·eye' = −v·eye − v·u = −0.47 − 0 = −0.47
+   −w·eye' = −w·eye − w·u = −7.17 − 0 = −7.17
+```
+
+One entry of `V` moves: the world slides 1 unit **left** in view space. A dolly changes only the third entry; a track along `v` only the second.
 
 
 ---
@@ -800,6 +986,22 @@ Toed-in cameras (rotating each eye inward) are the common mistake: they add vert
 | blur circle, pixels | 100.9 | 25.2 | 0 | 20.2 | 35.3 |
 
 The pinhole of tonight has **no** blur at all; film renderers add it. Focused at the hyperfocal distance, 29.8 m at f/2.8, everything from half that distance to infinity is acceptably sharp.
+
+
+---
+
+## Worked: the circle of confusion
+
+Thin lens, focal length `f`, f-number `N`, aperture `A = f/N`, focused at `d_f`. A point at distance `d` blurs to a disk of diameter
+
+```text
+   c = A · |d − d_f| / d · f / (d_f − f)
+
+   f = 50 mm, N = 2.8:   A = 17.86 mm;   d_f = 3 m;   subject at d = 5 m
+   c = 17.86 · (2000 / 5000) · (50 / 2950) = 0.121 mm   =  20.2 pixels of 6 µm
+   stop down to f/16:    A = 3.125 mm  →   c = 3.5 pixels
+   hyperfocal at f/2.8, c_max = 0.03 mm:   H = f² / (N c_max) + f = 29.8 m
+```
 
 
 ---

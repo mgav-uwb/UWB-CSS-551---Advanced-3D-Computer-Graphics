@@ -31,7 +31,7 @@
         CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
       </div>
       <div class="src">
-        Course text &middot; a network as a function, how it is trained, what it can and cannot fit, the layers that see images and sequences, and the vectors it learns to think in. Assigned by your offering&rsquo;s course site; the two live exhibits it cites are in the lecture on learned images.
+        Course text &middot; a network as a function, how it is trained, what it can and cannot fit, the layers that see images and sequences, and the vectors it learns to think in. Assigned by your offering&rsquo;s course site; the live exhibits it cites are in the lecture on neural networks.
       </div>
 
       <p class="lead">
@@ -49,6 +49,7 @@
           <li><a href="#layers">Two more layers: convolution and attention</a></li>
           <li><a href="#embeddings">Embeddings</a></li>
           <li><a href="#encoders">Encoders, decoders, and one shared space</a></li>
+          <li><a href="#coordinate">Coordinate networks</a></li>
           <li><a href="#papers">The papers</a></li>
           <li><a href="#exercises">Exercises</a></li>
         </ol>
@@ -663,7 +664,180 @@
       </p>
 
 <!-- ============================================================ -->
-      <h2 id="papers">9 &middot; The papers</h2>
+      <h2 id="coordinate">9 &middot; Coordinate networks</h2>
+      <p>
+        Every network so far was trained on many examples to answer for new ones. A
+        <strong>coordinate network</strong> is trained on one signal to reproduce that signal:
+        its input is a position, its output the value there. It isolates the function-approximation
+        nature of a network with nothing else in the way, and it is the building block of the
+        radiance fields of <a href="learned-scenes.html">the learned-scenes chapter</a>.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (coordinate network)</span>
+        An image of \(N \times N\) pixels is read as a function
+        \(f : [-1, 1]^2 \to [0, 1]^3\), \((x, y) \mapsto (r, g, b)\), sampled at the pixel centres
+        \(x = 2(i + \tfrac12)/N - 1\), \(y = 2(j + \tfrac12)/N - 1\). A coordinate network is a
+        multilayer perceptron (MLP) \(f_\theta\) fitted to those samples by minimizing
+        \(\mathcal{L}(\theta) = \frac{1}{3B}\sum_{i \in \text{batch}} \|f_\theta(x_i, y_i) - c_i\|^2\)
+        over random mini-batches of \(B\) pixels. The fit is scored by the peak signal-to-noise
+        ratio, \(\text{PSNR} = 10\log_{10}(1/\text{MSE})\) for colours in \([0, 1]\).
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (one picture, one network)</span>
+        The course&rsquo;s test card is \(64 \times 64\) pixels: a smooth backdrop, an orange disc,
+        a checkerboard of 4-pixel squares and stripes whose period falls from 16 to 3 pixels. Pixel
+        \((10, 20)\) sits at \((x, y) = (-0.6719, -0.3594)\) and has colour \((0.95, 0.35, 0.20)\).
+        The network has two hidden layers of 48 rectified linear units (ReLU):
+        \(2\cdot48 + 48 = 144\), \(48\cdot48 + 48 = 2352\) and \(48\cdot3 + 3 = 147\) weights, 2,643 in
+        all, against \(64\cdot64\cdot3 = 12{,}288\) numbers in the picture, 4.6 times fewer. There is
+        no held-out image: the training set is the signal, and overfitting is the goal. Trained with
+        Adam (\(\eta = 0.005\), \(B = 256\)), it reaches 11.82 dB after 2,000 steps (MSE 0.0658) and
+        12.10 dB after 4,000. Split by region at step 2,000: backdrop 23.54 dB, a ring along the
+        disc&rsquo;s edge 18.72 dB, stripes 11.29 dB, checkerboard 7.56 dB. A learning rate of 0.001
+        or 0.02 gives 11.63 or 11.99 dB: the blur is not a tuning problem.
+      </div>
+      <figure>
+        <img src="figures/nn-coordnet-fits.png" class="pix" alt="Four 64 by 64 panels: the test card; the plain ReLU fit, a blur with a soft disc and no checkerboard; the Fourier-feature fit, sharp with slight speckle; the SIREN fit, sharp with a softer checkerboard." />
+        <figcaption>The test card and three networks after 2,000 steps of Adam on mini-batches of 256 pixels, computed by <code>lectures/L14-neural-nets-embeddings/analysis/coord-net-figures.mjs</code> with <code>lib/core/coord-net.js</code>: ReLU on raw \((x, y)\), 11.82 dB; ReLU on Fourier features with \(\sigma = 6\), 21.21 dB; SIREN with \(\omega_0 = 30\), 18.89 dB.</figcaption>
+      </figure>
+
+      <h3>9.1 Spectral bias</h3>
+      <p>
+        A network trained by gradient descent fits the low frequencies of its target first and the
+        high frequencies late or never
+        (<a href="https://arxiv.org/abs/1806.08734" target="_blank" rel="noopener">Rahaman et al. 2019</a>).
+        A ReLU network is continuous and piecewise linear in its input, so a 4-pixel checkerboard
+        asks for a fold every 4 pixels in both directions; in the neural tangent kernel analysis of
+        <a href="https://arxiv.org/abs/2006.10739" target="_blank" rel="noopener">Tancik et al. (2020)</a>
+        the error&rsquo;s frequency components shrink at rates that fall with frequency. The same bias
+        is what made the networks of Section 5 smooth between their examples. On a picture with
+        only low frequencies (three soft Gaussian blobs) the plain network reaches 41.54 dB in 2,000
+        steps: the problem is the signal&rsquo;s frequency content, not ReLU as such.
+      </p>
+
+      <h3>9.2 Fourier features and positional encoding</h3>
+      <div class="def">
+        <span class="tag">Definition (Fourier features, positional encoding)</span>
+        A <strong>Fourier feature mapping</strong> replaces the coordinates
+        \(\mathbf v \in [0, 1]^2\) by \(\gamma(\mathbf v) = (\cos 2\pi B\mathbf v, \sin 2\pi B\mathbf v)\),
+        where \(B\) is an \(m \times 2\) matrix with entries drawn once from \(N(0, \sigma^2)\) and never
+        trained; each row is a plane wave with \(|\mathbf b|\) cycles per image width. A
+        <strong>positional encoding</strong> uses fixed octaves instead,
+        \(\gamma(p) = (\sin 2^k\pi p, \cos 2^k\pi p)_{k = 0}^{L-1}\) for each coordinate, as in NeRF
+        (<a href="https://arxiv.org/abs/2003.08934" target="_blank" rel="noopener">Mildenhall et al. 2020</a>;
+        \(L = 10\) for position, 4 for direction), and the same construction as the transformer&rsquo;s positional
+        encoding of Section 6.2 and the diffusion denoiser&rsquo;s time code.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (one pixel through the encodings)</span>
+        Pixel \((10, 20)\) has \(\mathbf v = (0.1641, 0.3203)\). With \(\sigma = 6\) the first row of
+        \(B\) is \((-6.6166, -2.0136)\): \(2\pi\,\mathbf b\cdot\mathbf v = -10.8731\), giving the pair
+        \((\cos, \sin) = (-0.1222, 0.9925)\); the second row \((-2.6317, -3.6818)\) gives phase
+        \(-10.1228\) and \((-0.7661, 0.6427)\). Sixteen rows make 32 inputs, so the first layer becomes
+        \(32\cdot48 + 48\) and the network 4,083 weights. The positional encoding of \(x = -0.6719\)
+        with \(L = 6\) has sines \((-0.8577, 0.8819, -0.8315, 0.9239, -0.7071, 1.0000)\) at
+        \(\pi, 2\pi, \ldots, 32\pi\); the \(32\pi\) pair repeats every 2 pixels of a 64-pixel image,
+        the finest pattern that grid holds. Trained like the plain network, the Fourier-feature
+        network reaches 19.24 dB at step 1,000 and 21.21 dB at step 2,000, 9.4 dB above the plain
+        network (8.7 times less error); the stripes rise from 11.29 to 22.30 dB and the checkerboard
+        from 7.56 to 18.74 dB.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        The scale \(\sigma\) trades blur against noise, and the training pixels hide the noise.
+        Evaluate the network at the corner shared by four pixels and compare with their average,
+        points training never saw. After 2,000 steps:
+        <table>
+          <tr><th>\(\sigma\)</th><th>1</th><th>3</th><th>6</th><th>12</th><th>24</th><th>48</th></tr>
+          <tr><td>PSNR on the pixels</td><td>14.79</td><td>20.04</td><td>21.21</td><td>18.72</td><td>15.55</td><td>15.11</td></tr>
+          <tr><td>PSNR between the pixels</td><td>18.06</td><td>22.58</td><td>21.03</td><td>16.34</td><td>9.12</td><td>9.02</td></tr>
+        </table>
+        At \(\sigma = 24\) many waves are faster than the grid&rsquo;s 32 cycles per width: the fit
+        passes near the pixels and is speckle between them, 6.4 dB worse than on them. A
+        coordinate network is queried between samples whenever the signal is zoomed, resampled or
+        rendered from a new view, so it must be checked off its training grid.
+      </div>
+      <figure>
+        <img src="figures/nn-coordnet-sigma.png" class="pix" alt="Three Fourier-feature fits: sigma 1 is blurred with smeared stripes; sigma 6 is sharp; sigma 48 is covered in speckle." />
+        <figcaption>Fourier features at \(\sigma = 1, 6, 48\) after 2,000 steps (14.79, 21.21, 15.11 dB on the pixels), same generator and settings as the figure above.</figcaption>
+      </figure>
+
+      <h3>9.3 SIREN: periodic activations</h3>
+      <div class="def">
+        <span class="tag">Definition (SIREN)</span>
+        A sinusoidal representation network
+        (<a href="https://arxiv.org/abs/2006.09661" target="_blank" rel="noopener">Sitzmann et al. 2020</a>)
+        uses \(\mathbf h_{k} = \sin(\omega_0(W_k\mathbf h_{k-1} + \mathbf b_k))\) in every hidden layer, with
+        \(\omega_0 = 30\), and a linear output. Its initialization is part of the method: the first
+        layer draws \(W \sim U(-1/n, 1/n)\), later layers
+        \(W \sim U(-\sqrt{6/n}/\omega_0, \sqrt{6/n}/\omega_0)\), where \(n\) is the layer&rsquo;s input
+        width. The derivative of a SIREN is again a SIREN (\(\cos\) is a shifted \(\sin\)), so its
+        gradients and Laplacians are smooth; a ReLU network&rsquo;s second derivative vanishes almost
+        everywhere. The paper fits images, audio, video, signed distance functions and solutions of
+        the Poisson, Helmholtz and wave equations.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (the initialization, and what breaks without it)</span>
+        With \(n = 2\) inputs the first layer has \(|W| \le 0.5\); with biases up to \(1/\sqrt2\), the
+        phase \(\omega_0|W\mathbf p + \mathbf b|\) reaches 51 radians, 8 periods across the image. A
+        hidden layer of width 48 has \(|W| \le \sqrt{6/48}/30 = 0.0118\), so \(\omega_0|W| \le 0.354\),
+        and the mean phase \(|\omega_0 z|\) in layer 2 over the image is 2.35 radians. Omitting the
+        \(1/\omega_0\) raises that mean to 23.87 radians: each sine sees a phase spread over many
+        periods, its output is a scramble of its input, and the fit at step 2,000 falls from 18.89 to
+        13.27 dB. \(\omega_0\) plays the role of \(\sigma\): at \(\omega_0 = 1, 5, 10, 30, 90\) the
+        PSNR on the pixels is 11.05, 11.87, 13.34, 18.89, 17.95 dB and between them 12.86, 14.16,
+        16.26, 22.56, 17.82 dB. With the same 2,643 weights as the plain network, the SIREN leads
+        early (16.01 dB at step 300 against 14.57 for Fourier features) and ends at 20.16 dB at
+        step 4,000.
+      </div>
+
+      <h3>9.4 Multiresolution hash encoding</h3>
+      <p>
+        Instant NGP
+        (<a href="https://doi.org/10.1145/3528223.3530127" target="_blank" rel="noopener">M&uuml;ller et al. 2022</a>)
+        trains the encoding itself. At each of \(L\) grid resolutions
+        \(N_l = \lfloor N_{\min} b^l\rfloor\) the point&rsquo;s cell is found, the feature vectors
+        (\(F\) numbers each) of its corners are read from a table of \(T\) entries and interpolated, and
+        the \(L \cdot F\) results are concatenated and passed to a small MLP. Coarse grids have one
+        entry per vertex; fine grids are hashed,
+        \(h(\mathbf v) = (v_1 \cdot 1 \oplus v_2 \cdot 2654435761) \bmod T\), and colliding vertices
+        share an entry. With \(T = 2^{14}\), the corners of one cell, \((37, 12), (38, 12), (37, 13),
+        (38, 13)\), hash to 13417, 13418, 11736, 11739. With \(L = 16\), \(F = 2\), \(T = 2^{19}\) the
+        tables hold at most \(16\cdot2^{19}\cdot2 = 16{,}777{,}216\) parameters, yet each point reads
+        only 4 entries per level in 2D, so a training step is cheap; in 2D with
+        \(N_{\min} = 16\), \(N_{\max} = 2048\) (\(b = 1.3819\)) the first 12 levels fit densely and the
+        last 4 are hashed. The paper reports training &ldquo;in a matter of seconds&rdquo;. The same
+        recipe, encoding plus MLP plus loss, represents video \((x, y, t)\), shapes as signed distances
+        \((x, y, z)\), and radiance fields \((x, y, z, \text{direction}) \mapsto (\text{density}, \text{colour})\),
+        whose loss compares rendered pixels with photographs (the learned-scenes chapter).
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=coord-net" target="_blank" rel="noopener">Coordinate networks</a>:
+        the three networks of this section train side by side in the browser, with sliders for
+        \(\sigma\) and \(\omega_0\); training pauses at step 2,000 on the values quoted here.
+      </div>
+      <div class="hands">
+        <span class="tag">Hands-on</span>
+        Run from the <code>css551/</code> directory with <code>node -e "…"</code>.
+        <ol>
+          <li>Train the three networks of this section for 1,000 steps:
+<pre>import('./lib/core/coord-net.js').then(C=>{const img=C.makeImage('card');
+  for(const k of ['relu','fourier','siren']){const t=C.makeTrainer(k,img);
+    for(let s=0;s<1000;s++)t.step();
+    console.log(k,C.paramCount(t.net),C.psnr(C.mse(C.render(t.net),img)).toFixed(2));}});</pre>
+            Expected: <code>relu 2643 11.67</code>, <code>fourier 4083 19.24</code>, <code>siren 2643 18.14</code>.</li>
+          <li>Encode pixel \((10, 20)\) with the Fourier features:
+<pre>import('./lib/core/coord-net.js').then(C=>{const net=C.makeNet('fourier',{sigma:6});
+  const o=new Float64Array(32);C.encode(net,-0.671875,-0.359375,o);
+  console.log(o[0].toFixed(4),o[16].toFixed(4),o[1].toFixed(4),o[17].toFixed(4));});</pre>
+            Expected: <code>-0.1222 0.9925 -0.7661 0.6427</code>, the two \((\cos, \sin)\) pairs of the worked example.</li>
+          <li>In the demo, play to step 2,000, then set \(\sigma = 48\) and play again: the Fourier panel turns to speckle. Switch the picture to <em>blobs</em> and compare the plain network&rsquo;s PSNR with its test-card value.</li>
+        </ol>
+      </div>
+
+<!-- ============================================================ -->
+      <h2 id="papers">10 &middot; The papers</h2>
       <table>
         <tr><th>Year</th><th>Paper</th><th>What it added</th></tr>
         <tr><td>1986</td><td><a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart, Hinton &amp; Williams</a></td><td>backpropagation</td></tr>
@@ -676,10 +850,15 @@
         <tr><td>2017</td><td><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Vaswani et al., Transformer</a></td><td>attention as the whole architecture</td></tr>
         <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.11239" target="_blank" rel="noopener">Ho, Jain &amp; Abbeel, DDPM</a></td><td>predict the noise; it works at scale</td></tr>
         <tr><td>2021</td><td><a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">Radford et al., CLIP</a></td><td>text and images, one space</td></tr>
+        <tr><td>2019</td><td><a href="https://arxiv.org/abs/1806.08734" target="_blank" rel="noopener">Rahaman et al.</a></td><td>spectral bias: networks learn low frequencies first</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2003.08934" target="_blank" rel="noopener">Mildenhall et al., NeRF</a></td><td>positional encoding of coordinates; radiance fields</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.10739" target="_blank" rel="noopener">Tancik et al.</a></td><td>Fourier features; the scale as a bandwidth</td></tr>
+        <tr><td>2020</td><td><a href="https://arxiv.org/abs/2006.09661" target="_blank" rel="noopener">Sitzmann et al., SIREN</a></td><td>sine activations and their initialization</td></tr>
+        <tr><td>2022</td><td><a href="https://doi.org/10.1145/3528223.3530127" target="_blank" rel="noopener">M&uuml;ller et al., Instant NGP</a></td><td>multiresolution hash encoding</td></tr>
       </table>
 
 <!-- ============================================================ -->
-      <h2 id="exercises">10 &middot; Exercises</h2>
+      <h2 id="exercises">11 &middot; Exercises</h2>
       <div class="ex">
         <span class="tag">Exercise 1 (forward pass)</span>
         With the original weights of Section 1, evaluate \(f(-0.4)\).
@@ -774,9 +953,24 @@
         </details>
       </div>
 
+      <div class="ex">
+        <span class="tag">Exercise 11 (memorizing one signal)</span>
+        A coordinate network with two hidden layers of width \(H\), two inputs and three outputs is fitted to a \(64\times64\) colour image. For which \(H\) does it have as many weights as the image has numbers? Why does a network with fewer weights still reach 21 dB on the test card once it has Fourier features?
+        <details><summary>Solution</summary>
+          Weights \(= 2H + H + H^2 + H + 3H + 3 = H^2 + 7H + 3\); setting this to 12,288 gives \(H \approx 107.5\), so \(H = 108\) (12,423 weights). At \(H = 48\) the network has 2,643 weights (4,083 with 16 Fourier frequencies), so it cannot store the pixels one by one: it compresses them into a function. The test card is mostly smooth regions and periodic patterns, which a sum of waves describes with few numbers; the residual error (21.21 dB, MSE 0.0076) is what that compression loses.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 12 (the scale, with the library or the demo)</span>
+        Using <code>lib/core/coord-net.js</code> (or the demo&rsquo;s \(\sigma\) slider and its pause at step 2,000), train the Fourier-feature network at \(\sigma = 3\) and \(\sigma = 24\), and evaluate each at the corners shared by four pixels against the four pixels&rsquo; mean. Which \(\sigma\) would you choose for a network that will be rendered at twice the resolution, and why does the PSNR on the pixels alone mislead?
+        <details><summary>Solution</summary>
+          The generator gives \(\sigma = 3\): 20.04 dB on the pixels, 22.58 dB between them; \(\sigma = 24\): 15.55 and 9.12 dB. Rendering at twice the resolution evaluates three new points for every training pixel, all between samples, so \(\sigma = 3\) (or 6, 21.03 dB between) is the choice. The training PSNR at \(\sigma = 24\) is only 4.5 dB below \(\sigma = 3\), while between the pixels the gap is 13.5 dB: high frequencies the grid cannot represent fit the samples and fill the gaps with noise.
+        </details>
+      </div>
+
       <footer>
-        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.0 &middot; prepared by Dr. Marcel
-        Gavriliu. Figures computed by <code>tools/gen-textbook-figures.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.1 &middot; prepared by Dr. Marcel
+        Gavriliu. Figures computed by <code>tools/gen-textbook-figures.mjs</code>; the coordinate-network figures by <code>lectures/L14-neural-nets-embeddings/analysis/coord-net-figures.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

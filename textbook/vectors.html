@@ -549,10 +549,13 @@
         \(10^{-40}\) that still works, but \((10^{-25})^2\) is exactly 0, so a vector of length
         \(1.4\times10^{-25}\) normalizes to \(0/0\). A vector that small arises whenever a cross product
         is taken of nearly parallel inputs (the look-at failure of Exercise 4) or a difference of two
-        nearly equal points. The guard in every library, including the course&rsquo;s, is a length test
-        before the divide; what it should return when the test fails is the caller&rsquo;s decision, and
-        <a href="meshes.html#normals">the meshes chapter</a> returns a fixed up vector for a degenerate
-        normal.
+        nearly equal points. The guard is a length test before the divide. The course library&rsquo;s
+        <code>normalize</code> has none: <code>normalize([0, 0, 0])</code> returns
+        <code>[NaN, NaN, NaN]</code>, so the test belongs to the caller. <code>lookAtBasis</code> makes it,
+        throwing a <code>RangeError</code> when eye and at coincide or when up is parallel to the view
+        direction (lengths below \(10^{-8}\)). What to return when the test fails is the caller&rsquo;s
+        decision, and <a href="meshes.html#normals">the meshes chapter</a> returns a fixed up vector for a
+        degenerate normal.
       </p>
       <p>
         Dot products of long vectors have a third, milder hazard: catastrophic cancellation. The dot
@@ -581,9 +584,10 @@ const foot = add(P0, scale(v1n, d));  // the foot of the perpendicular
 const inside = d &gt;= 0 &amp;&amp; d &lt;= Math.hypot(...v1);   // the clamp test</pre>
       <p>
         Two habits keep this code honest. Normalize before you dot when you want a length, or the
-        result is scaled by the direction&rsquo;s magnitude. And guard against zero-length
-        vectors: a zero vector has no direction, so its angle with anything is undefined and the
-        division in the cosine formula blows up.
+        result is scaled by the direction&rsquo;s magnitude. And test for zero-length
+        vectors before calling <code>normalize</code>, which does not test for you: a zero vector has no
+        direction, so its angle with anything is undefined, and the library&rsquo;s divide by a zero length
+        returns three NaNs that propagate into everything computed from them.
       </p>
       <div class="hands">
         <span class="tag">Hands-on</span>

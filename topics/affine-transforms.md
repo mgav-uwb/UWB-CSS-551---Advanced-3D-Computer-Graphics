@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~88 min).
+  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~90 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/affine-transforms.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -11,6 +11,8 @@
   SOURCE:  reframed 2026-09-18 (Plan B) from the former sessions/S04-matrices-spaces/L04-matrices-spaces.md (35 slides), whose worked numbers (T.R/R.T, the rigid inverse, the pivot at (2,0,0)) are kept digit for digit; Sung's Topic4 CDP code slides are reduced to two. Trimmed 2026-09-29 (Plan C, a 90-minute Tuesday lecture): the separate two-map composition slide was folded into the block-product slide. Real C# / shader excerpts are from Kelvin Sung's CSS 451 ClassExamples.
   DENSIFIED 2026-09-29 (Plan C; 60+ slides per two hours): the family ladder, figures for shear, points and vectors, blocks, order, normals, frame, polar, storage, pivot, projective; affine combinations; a determinant and area; winding and two mirrors; Möbius and Roberts; T·S vs S·T; predict-then-run; w in both APIs; the demo inverse; the oblique-scale and conditioning pitfalls; planes by the inverse transpose; a 2D frame both ways; storage conventions; TRS read-back and apply-and-undo; polar decomposition; costs; scale about a corner; the pivot in three.js; a projective map worked; TRS in both tracks; a check-yourself slide. Numbers from numbers-foundations.json (aff, rot) or node.
 
+  EXPANDED 2026-10-05 (80-slide target): checks on the block inverse, reading a frame and a stretched normal; the condition number; a row-vector matrix pasted as columns; the polar decomposition stepped (stretch, then rotation); mirror and shear detection in both tracks; why the inverse transpose; the normal matrix in both tracks' shaders; the ground plane moved; conjugation F X F^-1; where the parallels meet. Numbers from node against lib/core/xform.js; textbook Sections 2.1, 4.1, 6.1, 7, 8 and Exercises 2, 3, 4, 6, 10.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -20,14 +22,14 @@
 
 ### Affine transformations over homogeneous coordinates
 
-<small>(~88 min)</small>
+<small>(~90 min)</small>
 
 
 ---
 
 ### Affine maps
 
-<small>(~22 min)</small>
+<small>(~20 min)</small>
 
 ---
 
@@ -411,6 +413,18 @@ The inverse of `T·R` has the shape of `R·T`: a rotation first, then a translat
 
 ---
 
+## Check: invert by blocks
+
+`M = T(0, 3, 0) · R_z(90°)`; `R_z(90°)` has columns `(0, 1, 0)`, `(−1, 0, 0)`, `(0, 0, 1)`. What is **column 3 of M⁻¹**?
+
+- **A.** `(−3, 0, 0)`
+- **B.** `(0, −3, 0)`
+- **C.** `(3, 0, 0)`
+- **D.** `(0, 3, 0)`
+
+
+---
+
 ## Pitfall: inverting as if the matrix were TRS
 
 `M` has columns `(1.5, 0.5, 0)` and `(0.5, 1.5, 0)`: a **non-uniform scale along a diagonal**. It is affine, `det = 2`, but not `T·R·S` (its columns are not orthogonal: dot 1.5).
@@ -422,6 +436,22 @@ The inverse of `T·R` has the shape of `R·T`: a rotation first, then a translat
 ```
 
 A TRS inverse divides by column lengths and transposes; that is only right when the columns are **orthogonal**.
+
+
+---
+
+## The condition number: largest stretch over smallest
+
+`κ(A)` = the largest factor `A` stretches any direction by, over the smallest. A round trip through `A` and `A⁻¹` keeps about `κ · ε` relative accuracy:
+
+| A | stretches | κ |
+| --- | --- | --- |
+| a rotation | 1, 1, 1 | 1 |
+| diag(2, 1, 1) | 2, 1, 1 | 2 |
+| the shear `[[1, 0.5], [0, 1]]` | 1.281, 0.781 | 1.640 |
+| diag(10⁶, 1, 1) | 10⁶, 1, 1 | 10⁶ |
+
+In float32, ε = 2⁻²³ ≈ 1.2 × 10⁻⁷: at κ = 10⁶ only about one decimal digit survives.
 
 
 ---
@@ -445,7 +475,7 @@ Keep scales near 1: model in sensible units, and never "hide" an object with sca
 
 ### Frames and spaces
 
-<small>(~20 min)</small>
+<small>(~25 min)</small>
 
 ---
 
@@ -461,6 +491,18 @@ Feed the block matrix the basis vectors and the origin:
 ```
 
 An affine matrix **is** an affine frame: three axis vectors and an origin, stacked as columns. Read any placement matrix by eye: column 3 is the position, columns 0–2 are the object's axes in the world, and their lengths are its scale.
+
+
+---
+
+## Check: read a frame
+
+A matrix has columns `(0, 2, 0)`, `(−3, 0, 0)`, `(0, 0, 1)` and `(5, 5, 5)`. Position, scale, rotation?
+
+- **A.** at `(5, 5, 5)`, scale `(2, 3, 1)`, `R_z(90°)`, right-handed
+- **B.** at `(5, 5, 5)`, scale `(2, −3, 1)`, a mirror
+- **C.** at `(0, 2, 0)`, scale `(3, 2, 1)`, `R_z(90°)`
+- **D.** at `(5, 5, 5)`, scale `(2, 3, 1)`, `R_z(−90°)`
 
 
 ---
@@ -492,6 +534,22 @@ An affine matrix **is** an affine frame: three axis vectors and an origin, stack
 ```
 
 Both conventions map the point `(1, 0, 0)` to `(2, 0, −0.866)`: the numbers are transposed **and** the multiplication order is reversed (`v·M` instead of `M·v`).
+
+
+---
+
+## Pitfall: a row-vector matrix pasted as columns
+
+`T(2, 0, 0)` copied from a row-vector source without transposing: the 2 lands in the **bottom row**.
+
+```text
+   [ 1  0  0  0 ]        (0, 0, 0, 1) → w = 1  → (0, 0, 0)        should be (2, 0, 0)
+   [ 0  1  0  0 ]        (1, 0, 0, 1) → w = 3  → (0.333, 0, 0)    should be (3, 0, 0)
+   [ 0  0  1  0 ]        (2, 0, 0, 1) → w = 5  → (0.4, 0, 0)      should be (4, 0, 0)
+   [ 2  0  0  1 ]        x = −0.5     → w = 0  → a point at infinity
+```
+
+Nothing moves by 2: the object is **squashed toward the origin** by a projective divide. The tell is a bottom row other than `(0, 0, 0, 1)`.
 
 
 ---
@@ -541,6 +599,39 @@ Scale first, rotate, move; undo in reverse: move back, unrotate, unscale.
 
 ---
 
+## The polar decomposition, step 1: the stretch
+
+For the shear `A = [[1, 0.5], [0, 1]]`, the stretch comes from `AᵀA`, which forgets any rotation:
+
+```text
+   AᵀA = [ 1    0.5  ]      eigenvalues  λ = 1.125 ± √(1.125² − 1) = 1.640, 0.610
+         [ 0.5  1.25 ]      eigenvectors (0.615, 0.788) at 52.0°,  (0.788, −0.615)
+
+   stretches √1.640 = 1.281 and √0.610 = 0.781
+
+   P = √(AᵀA) = [ 0.970  0.243 ]       symmetric; det P = 1.281 · 0.781 = 1 = det A
+                [ 0.243  1.091 ]
+```
+
+
+---
+
+## The polar decomposition, step 2: the rotation
+
+```text
+   R = A P⁻¹ = [  0.970  0.243 ]      cos θ = 0.970, sin θ = −0.243   →   θ = −14.04°
+               [ −0.243  0.970 ]
+
+   check:  R P = [ 1  0.5 ]  = A   in every entry
+                 [ 0  1   ]
+```
+
+- a shear of 0.5 = a **28 % stretch** on one diagonal, a **22 % squeeze** on the other, then a **14° turn**
+- TRS stores `R · S` with `S` **diagonal**; this `P` is not diagonal, so no TRS equals `A`
+
+
+---
+
 ## Storage, pictured
 
 <img src="../../textbook/figures/aff-storage.svg" alt="the sixteen floats of a column-major matrix with the translation slots and the TRS fields an engine stores" style="height:260px">
@@ -582,6 +673,27 @@ Any affine `A` can be written as a **rotation times a symmetric stretch** (`A = 
 
 ---
 
+## Real code: detect a mirror and a shear
+
+```js
+import { normalize, dot, cross } from '../core/xform.js';
+const col = (m, j) => [m[4 * j], m[4 * j + 1], m[4 * j + 2]];
+const [c0, c1, c2] = [0, 1, 2].map((j) => col(M, j));
+const det = dot(c0, cross(c1, c2));                  // < 0: mirrored, flip the culling
+const [u0, u1, u2] = [c0, c1, c2].map(normalize);
+const shear = Math.max(Math.abs(dot(u0, u1)), Math.abs(dot(u0, u2)), Math.abs(dot(u1, u2)));
+// TRS(1,2,3, 0,60,0, 2,1,0.5): det 1, shear 0      oblique scale: det 2, shear 0.6
+```
+
+```csharp
+float det = m.determinant;                           // equals the 3x3 part's for an affine m
+Vector3 u0 = ((Vector3)m.GetColumn(0)).normalized, u1 = ((Vector3)m.GetColumn(1)).normalized;
+bool sheared = Mathf.Abs(Vector3.Dot(u0, u1)) > 1e-4f;   // and the other two pairs
+```
+
+
+---
+
 ## What an affine product costs
 
 | operation | general `4×4` | using the affine structure |
@@ -611,12 +723,63 @@ A surface direction `d` transforms by `A d`. A **normal** must stay perpendicula
 
 ---
 
+## Why the inverse transpose
+
+A normal `n` is defined by `n · d = 0` for every tangent `d`. Find `N` so that `(N n) · (A d) = 0` too:
+
+```text
+   (N n) · (A d)  =  (N n)ᵀ (A d)  =  nᵀ Nᵀ A d
+
+   choose Nᵀ A = I,  i.e.  N = (A⁻¹)ᵀ = A⁻ᵀ:      nᵀ Nᵀ A d  =  nᵀ d  =  n · d  =  0
+```
+
+- any `N` that keeps every such dot at zero is a multiple of `A⁻ᵀ`, so renormalizing afterward is all that is left
+- a rotation is orthogonal, `R⁻ᵀ = R`; a uniform scale `s I` gives `(1/s) I`, the same direction: **only non-uniform scale and shear** need it
+
+
+---
+
 ## Normals, pictured
 
 <img src="../../textbook/figures/aff-normals.svg" alt="a surface stretched by a non-uniform scale, with the naively transformed normal tilted off perpendicular and the inverse-transpose normal perpendicular" style="height:260px">
 
 Second case, from the text: tangent `(1, 1, 0)`, normal `(0.707, −0.707, 0)`, `A = diag(2, 1, 1)`:
 `A n · A d = 2.121` (wrong), `A⁻ᵀ n · A d = 0` (right).
+
+
+---
+
+## Check: a stretched surface's normal
+
+A model is scaled by `A = diag(1, 1, 3)`. A face normal was `(0, 0.707, 0.707)`. The correct world normal, renormalized:
+
+- **A.** `(0, 0.316, 0.949)`
+- **B.** `(0, 0.949, 0.316)`
+- **C.** `(0, 0.707, 0.707)`
+- **D.** `(0, 0.707, 2.121)`
+
+
+---
+
+## Real code: the normal matrix in both tracks' shaders
+
+```glsl
+// three.js ShaderMaterial: normalMatrix is supplied per object
+uniform mat3 normalMatrix;       // inverse transpose of modelViewMatrix's 3x3
+attribute vec3 normal;
+varying vec3 vN;
+void main() {
+  vN = normalize(normalMatrix * normal);     // a view-space normal
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+```
+
+```hlsl
+// Unity built-in pipeline (UnityCG.cginc)
+float3 n = UnityObjectToWorldNormal(v.normal);
+// = normalize(mul(v.normal, (float3x3)unity_WorldToObject)): normal times the INVERSE,
+//   which as a row vector is the inverse transpose
+```
 
 
 ---
@@ -634,6 +797,21 @@ A plane is a row `π = (n, d)` with `π · (x, 1) = 0`. Keep the equation true u
 ```
 
 Clipping planes, frustum planes and mirror planes all move this way.
+
+
+---
+
+## Worked: the ground plane, moved
+
+The plane `y = 0` is `π = (0, 1, 0, 0)`. Move it with `M = T(0, 2, 0) · diag(1, 3, 1)`:
+
+```text
+   M⁻¹: linear part diag(1, 1/3, 1),  translation −diag(1, 1/3, 1)(0, 2, 0) = (0, −2/3, 0)
+   π' = π · M⁻¹ = (0, 1/3, 0, −2/3)       normalized: (0, 1, 0, −2)     the plane y = 2
+   check:  M (0, 0, 0) = (0, 2, 0) and M (1, 0, 5) = (1, 2, 5) both lie on y = 2
+```
+
+The scale did nothing to a plane through the origin except be undone; the translation moved it.
 
 
 ---
@@ -683,6 +861,24 @@ Double a unit square about its corner `p = (1, 1, 0)`: `M = T(p) · S(2) · T(�
 ```
 
 <img src="../../textbook/figures/aff-pivot.svg" alt="an object rotated about an off-center pivot, with the pivot fixed" style="height:170px">
+
+
+---
+
+## Conjugation: do it in the frame where it is simple
+
+The sandwich is `M = F · X · F⁻¹` with any frame `F`, not only a translation:
+
+```text
+   F = T(p),         X = R              rotate about the point p
+   F = R_z(45°),     X = diag(2, 1, 1)  scale by 2 along the diagonal (1, 1, 0)/√2
+
+   R_z(45°) · diag(2, 1, 1) · R_z(−45°) = [ 1.5  0.5  0 ]      M (1, 1, 0) = (2, 2, 0)   doubled
+                                          [ 0.5  1.5  0 ]      M (1, −1, 0) = (1, −1, 0) unchanged
+                                          [ 0    0    1 ]
+```
+
+The oblique scale of the inverse pitfall is exactly this sandwich: a symmetric matrix, no rotation, and not a TRS.
 
 
 ---
@@ -753,6 +949,22 @@ Put a nonzero entry in the last row: `H = [[1, 0, 0], [0, 1, 0], [0, 0.5, 1]]`, 
 | (1, 2) | 2 | (0.5, 1) |
 
 The parallel lines `x = 0` and `x = 1` now **converge**: their images are 1, 0.667, 0.5 apart at `y` = 0, 1, 2.
+
+
+---
+
+## Worked: where the parallels meet
+
+Same `H`, `w = 1 + 0.5 y`, along the line `x = 1`:
+
+```text
+   (1, 6)    → w = 4     → (0.25, 1.5)
+   (1, 100)  → w = 51    → (0.02, 1.961)
+   y → ∞     →             (1/(1 + 0.5y), y/(1 + 0.5y)) → (0, 2)
+   x = 0:    (0, y)      → (0, y/(1 + 0.5y))          → (0, 2) as well
+```
+
+Every vertical line approaches **(0, 2)**: the **vanishing point**, the image of the point at infinity `(0, 1, 0)`.
 
 
 ---

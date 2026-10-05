@@ -2,14 +2,14 @@
   CSS 551 · Lecture 12 (Tuesday November 10, online): Light Transport, PBR, and Ray Tracing.
   The bridge week: the rendering equation as the thing every renderer, and later
   every neural model of images, approximates. Mounts, in order: L12-open.md,
-  ../../topics/pbr-rendering-equation.md (~46 min, 29 slides), ../../topics/ray-tracing.md
-  (~46 min, 22 slides), L12-discuss.md (the discussion slot is the midterm review).
+  ../../topics/pbr-rendering-equation.md (~47 min, 37 slides), ../../topics/ray-tracing.md
+  (~45 min, 30 slides), L12-discuss.md (the discussion slot is the midterm review).
 
   Minute plan (120 min, Tue 5:45–7:45 PM synchronous online):
     0:00  opening                                     2 min
-    0:02  light transport and PBR (topic)            46 min
-    0:48  ray tracing (topic)                        44 min
-    1:32  midterm review: logistics and eight questions spanning weeks 1–6  26 min
+    0:02  light transport and PBR (topic)            47 min
+    0:49  ray tracing (topic)                        45 min
+    1:34  midterm review: logistics and eight questions spanning weeks 1–6  24 min
     1:58  wrap                                        2 min
     2:00  end
   Demo: brdf-lobe (roughness). Numbers: numbers.json, numbers-motion.json rt.*,

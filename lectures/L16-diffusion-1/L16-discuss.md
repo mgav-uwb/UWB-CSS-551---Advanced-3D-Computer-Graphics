@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L16 discussion and wrap (~30 min). Mounted by index.html AFTER the topic.
+  CSS 551 · L16 discussion and wrap (~18 min). Mounted by index.html AFTER the topic.
   Four peer-instruction questions (vote, argue in pairs two minutes, vote again, then work it).
   Answers and worked solutions live ONLY in the Note: blocks. Numbers from
   tools/gen-lecture-figures-d1.mjs (analysis/numbers-d1.json in this folder, keys exact3, exact2,
@@ -8,7 +8,7 @@
 
 ### Discussion
 
-<small>(~27 min)</small>
+<small>(~16 min)</small>
 
 
 ---

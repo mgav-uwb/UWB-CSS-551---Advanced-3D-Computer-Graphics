@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L19 discussion (28 min) and wrap (2 min). Six peer-instruction
+  CSS 551 · L19 discussion (18 min) and wrap (2 min). Six peer-instruction
   questions; answers and worked solutions only in the notes. Numbers from
   lectures/L19-generative-3d-video/figures/numbers.json (tools/gen-lecture-figures-d2.mjs).
 -->
 
 ### Discussion
 
-<small>(~28 min · six questions · vote, argue in pairs, vote again)</small>
+<small>(~18 min · six questions · vote, argue in pairs, vote again)</small>
 
 
 ---

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~44 min, 22 slides).
+  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~45 min, 30 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/ray-tracing.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -21,13 +21,17 @@
            (tools/gen-textbook-figures-motion.mjs, -motion-2.mjs).
   NUMBERS: textbook/figures/numbers-motion.json (rt.*).
 
+  v2 (2026-10-05, L12 to ~80 slides): checks on the center ray, a triangle hit, a penumbra and BVH depth (the
+  chapter's Exercises 1, 3, 6, 7); the ray that starts inside (Exercise 2); the refracted direction in vector
+  form; total internal reflection (Exercise 5); one shadow ray with the light at t = 1. Numbers from node.
+
   reveal.js: FLAT; notes follow "Note:"; plain unicode math; never two "_" on one
   markdown line outside a code fence. Paths relative to the lecture page.
 -->
 
 ### Ray tracing
 
-<small>(~44 min)</small>
+<small>(~45 min)</small>
 
 
 ---
@@ -83,6 +87,18 @@ The projection matrix run **backward**: a pixel to the line of points that proje
 
 ---
 
+## Check: the center of the image
+
+The illumination demo's camera: e = (3, 3, 6) looking at the origin, 150 × 150 pixels, a sphere r = 1.2 at the origin. Where is the ray with `(sx, sy) = (0, 0)`, and where does it hit?
+
+- **A.** pixel (75, 75); `d = −w`; t = 7.348
+- **B.** the corner shared by pixels 74 and 75; `d = −w = (−0.408, −0.408, −0.816)`; t = 6.148
+- **C.** pixel (74, 74); `d = w`; t = 6.148
+- **D.** the corner shared by pixels 74 and 75; `d = −w`; t = 8.548
+
+
+---
+
 ## Ray against a sphere
 
 Substitute the ray into `|p − c|² = r²`. With `m = o − c` and unit d:
@@ -98,6 +114,22 @@ Substitute the ray into `|p − c|² = r²`. With `m = o − c` and unit d:
 ```
 
 Pixel (20, 20): b² − c' = −1.887, no real root: a **miss**, the ray sees the background. The normal at a hit is (p − c)/r.
+
+
+---
+
+## Pitfall: a ray that starts inside
+
+The ray from the sphere's center, `o = (0, 0, 0)`, `d = (0, 1, 0)`, against r = 1.2:
+
+```text
+   m = 0,  b = m·d = 0,  c' = m·m − r² = −1.44
+   t = 0 ± √1.44 = ±1.2        the negative root is behind the origin
+   hit at t = 1.2:  (0, 1.2, 0);   outward normal (p − c)/r = (0, 1, 0)
+   d · n = +1 > 0:  the normal faces away from the ray
+```
+
+Take the smallest **positive** root, and flip the normal when `d · n > 0`. Every refraction ray inside glass is in this case.
 
 
 ---
@@ -130,6 +162,18 @@ From (1.5, 1.5, 1): u = v = 0.75, u + v = 1.5 > 1, **outside**. The weights are 
 ```
 
 A robust tracer tests `|det| < ε`, not `det = 0`: a ray **almost** parallel gives a huge t from a tiny determinant.
+
+
+---
+
+## Check: inside the triangle?
+
+The triangle A = (0, 0, 0), B = (2, 0, 0), C = (0, 2, 0). A ray from `(0.2, 1.5, 1)` straight down, `d = (0, 0, −1)`. Möller–Trumbore gives:
+
+- **A.** u = 0.1, v = 0.75, t = 1: inside, weights (0.15, 0.1, 0.75)
+- **B.** u = 0.75, v = 0.1, t = 1: inside, weights (0.15, 0.75, 0.1)
+- **C.** u = 0.1, v = 0.75, t = 1: outside, because v > 0.5
+- **D.** det = 0: the ray is parallel
 
 
 ---
@@ -205,6 +249,37 @@ A window is nearly invisible face-on and a **mirror** at a grazing angle. Whitte
 
 ---
 
+## Worked: the refracted direction
+
+Air into glass, `η = 1/1.5`. The ray `d = (0.5, −0.866, 0)` hits a glass surface with normal `n = (0, 1, 0)` at 30°:
+
+```text
+   cos θ1 = −d·n = 0.866
+   k = 1 − η² (1 − cos² θ1) = 1 − 0.444 × 0.25 = 0.889         √k = 0.943
+   t = η d + (η cos θ1 − √k) n
+     = (0.333, −0.577, 0) + (0.577 − 0.943) (0, 1, 0)  =  (0.333, −0.943, 0)
+   angle from −n:  asin 0.333 = 19.47°          |t| = 1: no renormalizing
+   reflected ray:  d − 2 (d·n) n = (0.5, 0.866, 0)
+```
+
+
+---
+
+## Worked: total internal reflection
+
+Glass to air, `η = 1.5`: the square root's argument is `k = 1 − 2.25 sin² θ1`.
+
+```text
+   θ1 = 30°:      k = 1 − 2.25 × 0.25  =  0.438     θ2 = asin(1.5 × 0.5) = 48.6°      bends away from n
+   θ1 = 41.81°:   k ≈ 0                              θ2 = 90°: the critical angle, asin(1/1.5)
+   θ1 = 50°:      k = 1 − 2.25 × 0.587 = −0.320     no refracted ray: all of it reflects
+```
+
+A tracer tests `k < 0` and sends only the reflected ray, with weight 1, not F.
+
+
+---
+
 ## The Whitted render
 
 <img src="../../textbook/figures/rt-whitted.png" class="media-shot" style="max-height: 300px;" alt="three spheres over a checkered plane: a mirror sphere reflecting the floor upside down, a glass sphere showing an inverted view of the scene, a diffuse sphere, all with hard shadows">
@@ -229,6 +304,20 @@ Each hit on a glass surface spawns a **reflected** and a **refracted** ray, and 
 ```
 
 The depth limit and Fresnel-weighted **cutoffs** (stop when a ray's weight is tiny) keep the tree small in practice.
+
+
+---
+
+## Worked: one shadow ray
+
+A floor point `p = (2, 0, 0)`, a point light at `(2, 4, 0)`. Shadow ray `o = p`, **unnormalized** `d = light − p = (0, 4, 0)`, so the light is at t = 1:
+
+```text
+   blocker r = 1 at (2, 2, 0):      hits at t = 0.25 and 0.75    inside (ε, 1):   in shadow
+   blocker r = 1 at (2, 5.5, 0):    hits at t = 1.125 and 1.625   beyond t = 1:    lit
+```
+
+A shadow ray asks "**anything** in `(ε, 1)`?", not "what is nearest?": it stops at the first hit and never shades it. An object behind the light must not count.
 
 
 ---
@@ -279,6 +368,18 @@ Where to split a node? The probability that a random ray hitting the parent also
 
 ---
 
+## Check: how deep is the tree?
+
+A scene of **one million** triangles, a balanced BVH with **4 triangles per leaf**. Roughly how many tests does a ray that reaches one leaf make?
+
+- **A.** about 18 box tests and 4 triangle tests
+- **B.** about 36 box tests and 4 triangle tests
+- **C.** about 40 box tests and 1,000 triangle tests
+- **D.** about 1,000,000 box tests
+
+
+---
+
 ## Distributed rays: soft shadows
 
 <img src="../../textbook/figures/rt-soft-shadow.png" class="media-shot" style="max-height: 230px;" alt="a sphere over a floor lit by a square area light: one shadow ray per pixel gives a hard shadow, sixteen give a soft penumbra with noise at its edge">
@@ -293,6 +394,18 @@ Cook, Porter and Carpenter, 1984: every hard edge in a Whitted image is an **int
 ```
 
 The same idea on the lens gives **depth of field**, on the shutter **motion blur**, on the lobe **glossy** reflection: N rays, noise falling as 1/√N.
+
+
+---
+
+## Check: a sharper shadow
+
+The soft-shadow scene: penumbra width ≈ light size × sphere height / (light height − sphere height) = `1.2 × 0.5 / 2.5 = 0.24`. Raise the light from height 3 to **6**. The penumbra becomes:
+
+- **A.** 0.48: twice as wide
+- **B.** 0.109: about half as wide
+- **C.** 0.24: unchanged, the light is the same size
+- **D.** 0.12: exactly half
 
 
 ---

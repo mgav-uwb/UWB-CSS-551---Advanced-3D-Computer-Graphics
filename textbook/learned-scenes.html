@@ -415,7 +415,7 @@
         \[
           \Sigma' = J\Sigma J^\top = \begin{pmatrix} 1231 & 653 \\ 653 & 477 \end{pmatrix}.
         \]
-        Trace 1708, determinant \(1231\cdot477 - 653^2 = 160{,}852\); eigenvalues \(1608.5\) and \(100.0\); radii \(40.1\) and \(10.0\) pixels, at \(30.0^\circ\): the long axis of 0.16 units at depth 2 spans \(500\cdot0.16/2 = 40\) pixels, and the rotation survives the projection because the splat lies nearly in the image plane. Move the splat to depth 4: the radii halve to 20.0 and 5.0 pixels and the ellipse covers a quarter of the pixels. The third column of \(J\) (the depth terms) contributes nothing here because \(\Sigma\) has no \(z\) covariance with \(x\) or \(y\); tilt the splat toward the camera and those terms shear the ellipse.
+        From the unrounded entries (1231.25, 653.27, 477.25): trace 1708.5, determinant 160,854; eigenvalues \(1608.5\) and \(100.0\); radii \(40.1\) and \(10.0\) pixels, at \(30.0^\circ\): the long axis of 0.16 units at depth 2 spans \(500\cdot0.16/2 = 40\) pixels, and the rotation survives the projection because the splat lies nearly in the image plane. Move the splat to depth 4: the radii halve to 20.0 and 5.0 pixels and the ellipse covers a quarter of the pixels. The third column of \(J\) (the depth terms) reaches \(\Sigma'\) only through \(\Sigma_{zz} = 0.0016\), because \(\Sigma\) has no \(z\) covariance with \(x\) or \(y\): it adds \(62.5^2\cdot0.0016 = 6.25\), \(62.5\cdot37.5\cdot0.0016 = 3.75\) and \(37.5^2\cdot0.0016 = 2.25\) px\(^2\) to the \(xx\), \(xy\) and \(yy\) entries, small because the splat is thin and near the view axis. Tilt the splat toward the camera and its \(xz\) and \(yz\) covariances bring the depth column in at first order, shearing the ellipse.
       </div>
       <figure>
         <img src="figures/ls-splat-projection.svg" alt="Screen-space ellipses of the worked splat: three nested solid ellipses at 1, 2 and 3 sigma centered at (125, 75) pixels with radii 40 and 10 tilted 30 degrees, and three dashed ellipses half the size centered at (62, 37) for the same splat at twice the depth." />
@@ -526,8 +526,8 @@ console.log('radii px',Math.sqrt(l1).toFixed(2),Math.sqrt(l2).toFixed(2),
       </table>
       <p>
         The table&rsquo;s last row is the reason splatting spread in a year: the
-        same image quality as the best field, at a thousand times the frame
-        rate, from a representation an engine can already draw. Its memory
+        image quality within half a decibel of the best field, at about 2,200 times its frame
+        rate (134 against 0.06 frames per second), from a representation an engine can already draw. Its memory
         cost (hundreds of megabytes per room, against a few for a textured
         mesh) and its baked lighting are the open problems.
       </p>
@@ -623,9 +623,9 @@ console.log('radii px',Math.sqrt(l1).toFixed(2),Math.sqrt(l2).toFixed(2),
       </div>
       <div class="ex">
         <span class="tag">Exercise 6 (the Jacobian)</span>
-        Move the worked splat of Section 6 sideways to \(\mathbf{t} = (1.5, 0.3, 2.0)\). What changes in \(J\), and what would change in \(\Sigma'\) if the splat had a \(z\) extent?
+        Move the worked splat of Section 6 sideways to \(\mathbf{t} = (1.5, 0.3, 2.0)\). What changes in \(J\), and what changes in \(\Sigma'\)?
         <details><summary>Solution</summary>
-          Only the third column: \(-f t_x/t_z^2 = -500\cdot1.5/4 = -187.5\) in the first row. With the worked \(\Sigma\), whose \(xz\) and \(yz\) entries are zero, \(\Sigma' = J\Sigma J^\top\) is unchanged, because the third column of \(J\) multiplies only the third row and column of \(\Sigma\). Give the splat a \(z\) extent, \(\Sigma_{zz} = 0.0256\) say, and the first row of \(\Sigma'\) gains \(187.5^2\times0.0256 = 900\): a splat off to the side of the view, extended in depth, smears sideways on screen, the perspective foreshortening of its far end.
+          Only the third column: \(-f t_x/t_z^2 = -500\cdot1.5/4 = -187.5\) in the first row (it was \(-62.5\)). The worked \(\Sigma\) has zero \(xz\) and \(yz\) entries, so the third column of \(J\) reaches \(\Sigma' = J\Sigma J^\top\) only through \(\Sigma_{zz} = 0.0016\): \(\Sigma'_{xx}\) gains \(187.5^2\times0.0016 = 56.25\) px\(^2\) over the depth-free 1225 (against 6.25 at \(t_x = 0.5\)), becoming 1281.25; \(\Sigma'_{xy}\) gains \(187.5\cdot37.5\cdot0.0016 = 11.25\), becoming 660.77; \(\Sigma'_{yy}\) stays 477.25. The radii grow to 40.7 and 10.3 pixels and the angle drops to \(29.3^\circ\). A thicker splat, \(\Sigma_{zz} = 0.0256\), would gain \(187.5^2\times0.0256 = 900\) px\(^2\) in \(\Sigma'_{xx}\): a splat off to the side of the view, extended in depth, smears sideways on screen, the perspective foreshortening of its far end.
         </details>
       </div>
       <div class="ex">

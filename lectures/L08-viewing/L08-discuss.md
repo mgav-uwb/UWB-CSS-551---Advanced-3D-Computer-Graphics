@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L08 discussion and wrap (~30 min). Five peer-instruction questions; answers ONLY
+  CSS 551 · L08 discussion and wrap (~25 min). Five peer-instruction questions; answers ONLY
   in the notes. Numbers computed by node against lib/core/xform.js (lookAtBasis, perspective,
   applyMat4, perspectiveDivide) and from textbook/figures/numbers-pipeline.json (view).
 -->
 
 ### Discussion
 
-<small>(~30 min)</small>
+<small>(~21 min)</small>
 
 
 ---

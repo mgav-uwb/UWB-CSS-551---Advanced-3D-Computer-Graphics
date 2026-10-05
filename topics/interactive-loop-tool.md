@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
+  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~54 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
   TEACHES: the frame loop and its budget; continuous versus on-demand loops;
@@ -20,6 +20,9 @@
   controller's constants; latency, input to photon, and in a headset. Numbers from
   textbook/interaction.html (Sections 2, 4, 5, 7 to 10), lib/core/orbit-camera.js and
   tools/gen-lecture-figures-a.mjs. A physics-simulation topic follows this one in L03.
+  ADDED 2026-10-05 (80-slide target): click or drag, worked; pixel to NDC; snapping;
+  a missed v-sync; the Bounce script in the WebGL track. Numbers from textbook/interaction.html
+  (Sections 5 and 8, Exercises 1 and 6) and unity-basics.html Section 4.
   NEEDS:   nothing beyond the big-picture topics (the loop of era 7); vectors and
     matrices are used as pictures and printed numbers only.
   DEMOS: mvc-transform (tx,ry,s) on a demo-full slide; its matrix card must stay
@@ -46,7 +49,7 @@
 
 ### The interactive loop, MVC, and the tool
 
-<small>(~50 min) · reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3</small>
+<small>(~54 min) · reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3</small>
 
 
 ---
@@ -363,6 +366,38 @@ Cast a ray to the right; **odd** crossings means inside. Pentagon (1, 1), (5, 0.
 
 ---
 
+## Click or drag, worked
+
+The 4-pixel threshold decides, from the offsets since pointerdown:
+
+```text
+   moves (1, 0), (2, 1), (3, 1):   distances 1, 2.24, 3.16      all < 4, then up   →  CLICK: select
+   move  (3, 3):                   distance 4.24                > 4                 →  DRAGGING
+                                   from here, pointerup ends the drag and selects nothing
+```
+
+The same machine with a **timer** instead of a distance tells a tap from a long press.
+
+
+---
+
+## From a pixel to normalized device coordinates
+
+Picking runs the viewport transform backward. For pixel (px, py) of a W × H image:
+
+```text
+   s_x = 2 (px + ½) / W − 1           s_y = 1 − 2 (py + ½) / H        (pixel centers; y flips)
+
+   1920 × 1080, pixel (960, 270):   s_x = 2 · 960.5 / 1920 − 1 = 0.0005    s_y = 1 − 2 · 270.5 / 1080 = 0.499
+   150 × 150,   pixel (89, 62):     s_x = 0.1933                           s_y = 0.1667
+```
+
+- the result runs from **−1 to 1** on both axes, **y up**, whatever the window's size
+- the second pixel is the one the next slide's ray passes through
+
+
+---
+
 ## Picking in 3D: a ray from the mouse
 
 <img src="../../textbook/figures/ui-picking.svg" alt="A perspective sketch: the eye at (3, 3, 6) with a small orange near-plane rectangle in front of it, a red ray to a hit point on a blue sphere at the origin labeled with t = 6.23, and a dashed green ray landing on a grid ground plane at (0.5, 0, 1.63)." style="max-height: 270px; width: auto;">
@@ -383,6 +418,22 @@ A mouse position has two numbers; a world position has three. Add a **constraint
 ```
 
 As the mouse moves, the intersection slides along the plane, and the object follows.
+
+
+---
+
+## Snapping, worked
+
+Round the dragged value to the nearest multiple of the grid:
+
+```text
+   0.25 grid:   1.37 → 1.25     1.13 → 1.25     2.5 → 2.5
+   15° grid:    37° → 30°       52.4° → 45°     97° → 90°
+
+   soft snap, radius 0.05:   1.28 is 0.03 from 1.25 → snaps        1.37 is 0.12 away → moves freely
+```
+
+Snapping to other objects' vertices is the same test against a list of candidates: the closest within the radius wins.
 
 
 ---
@@ -411,6 +462,17 @@ Lift the mouse onto a sphere: (x, y) becomes (x, y, √(1 − x² − y²)). Dra
 <img src="../../textbook/figures/ui-latency.svg" alt="A timeline with vertical syncs at 0, 16.7, 33.3 and 50 milliseconds: an input at 3 milliseconds, a blue bar for rendering frame 1 between 16.7 and 33.3, a green bar for scanning it out between 33.3 and 50, and a dashed red line at 41.7 where the mid-screen pixel changes." style="max-height: 230px; width: auto;">
 
 Input at 3 ms, 60 Hz, double buffered: wait for the next frame **13.7** + render **16.7** + scan out to mid-screen **8.3** = **38.7 ms**, two and a half frames. At 120 Hz every term halves: **17.8 ms**.
+
+
+---
+
+## Pitfall: a missed v-sync
+
+A renderer takes **25 ms** a frame on a **60 Hz** display with v-sync:
+
+- 25 ms misses every other sync, so frames present every **33.3 ms**: **30** frames per second, not 40
+- input just after a frame starts: wait **16.7** + render to the next sync it can make **33.3** + scan out **8.3** = **58 ms**
+- one frame **over** the budget costs a **whole** refresh interval
 
 
 ---
@@ -476,6 +538,28 @@ public class Bounce : MonoBehaviour {
 ```
 
 **Awake**, **Start** once · **Update** every frame · **LateUpdate** after every Update · **FixedUpdate** on the fixed clock. Unity calls them **by name**: a misspelled `update()` is never called, and nothing warns you.
+
+
+---
+
+## The same bounce in the WebGL track
+
+```javascript
+const model = { y: 0, dir: 1 };                 // the state
+const yRange = 3, speed = 2;
+let last = performance.now();
+function frame(now) {                           // the browser calls this once per refresh
+  const dt = (now - last) / 1000;  last = now;  // seconds since the last frame
+  model.y += model.dir * speed * dt;            // rate × seconds
+  if (model.y > yRange || model.y < -yRange) model.dir = -model.dir;
+  cube.position.y = model.y;                    // the view reads the model
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+```
+
+At 60 Hz each step is 2 / 60 = **0.0333**; the top, 3 units up, takes **1.5 s** at any rate: 90 frames at 60 Hz, 45 at 30.
 
 
 ---

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L04 discussion and wrap (~30 min). Five peer-instruction questions:
+  CSS 551 · L04 discussion and wrap (~28 min). Five peer-instruction questions:
   project, vote, argue in pairs for two minutes, vote again, then work it.
   Answers ONLY in the notes. Every number computed by node against lib/core/xform.js
   (and Math.fround for question 4); distractors are the pitfalls the topic names.
@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~30 min)</small>
+<small>(~28 min)</small>
 
 
 ---

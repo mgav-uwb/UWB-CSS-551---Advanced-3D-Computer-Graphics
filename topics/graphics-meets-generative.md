@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Graphics meets generative models: the gallery, what still breaks, the merged field (~20 min, densified 2026-09-29).
+  CSS 551 · TOPIC DECK: Graphics meets generative models: the gallery, what still breaks, the merged field (~14 min, densified 2026-09-29).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/graphics-meets-generative.md"> among others; it carries no
   logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -19,7 +19,7 @@
 
 ### Graphics meets generative models
 
-<small>(~20 min)</small>
+<small>(~14 min)</small>
 
 
 ---
