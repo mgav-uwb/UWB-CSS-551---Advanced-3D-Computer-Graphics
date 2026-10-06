@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Physics inside the frame loop (~30 min).
+  CSS 551 · TOPIC DECK: Physics inside the frame loop (~44 min).
   Mounted as <section data-markdown="../../topics/physics-simulation.md">. No logistics.
 
   TEACHES: a particle as position, velocity and mass; forces to acceleration;
@@ -8,10 +8,15 @@
   substeps; stiffness versus stability; cloth as springs or as constraints (XPBD),
   one constraint projection worked; collisions by projection and tunneling; fluids
   as particles (SPH: density, pressure, viscosity, the CFL step); rigid bodies and
-  hair as particle clusters; what film and games use.
+  hair as particle clusters; rigid bodies in an engine (broad and narrow phase,
+  response, stacking, ragdolls); hair strands; what film and games use.
   NEEDS:   the interactive-loop topic (the frame loop, the two clocks, the
-    fixed-timestep accumulator). Vectors are used only as (x, y, z) triples; the
-    vectors lecture comes later.
+    fixed-timestep accumulator) and the animation topic (keyframes, skeletons).
+  RIGID BODIES (moved here 2026-10-06 from the scene-graph topic, conceptual): state and the
+    engine step, broad and narrow phase, restitution and friction, stacking and sleeping
+    (Baraff, SIGGRAPH 1989), kinematic vs dynamic and ragdolls, Unity PhysX vs three.js
+    libraries, film vs games; media ../../media/icons/sim-rigid.webp. HAIR STRANDS slide moved
+    from the texture-mapping topic (media ../../media/icons/sim-hair.webp).
   DEMOS:   cloth (stiffness,substeps) and fluid (viscosity,sound), each on a
     demo-full slide.
   NUMBERS, all from node against lib/core/sim-cloth.js, lib/core/sim-fluid.js and
@@ -40,7 +45,7 @@
     2003; Jakobsen GDC 2001 (Hitman); Mueller et al. 2007 (PBD); Macklin, Mueller and
     Chentanez MIG 2016 (XPBD); Macklin et al. SCA 2019 (small steps); Stomakhin et al.
     SIGGRAPH 2013 (Frozen snow); Brave's Taz hair solver (fxguide).
-  READING: ../../textbook/animation.html (the section on stepping a spring).
+  READING: ../../textbook/animation.html, Sections 8 to 14 (stepping a spring to hair and fur).
 
   reveal.js: FLAT; notes follow "Note:"; plain text math, no KaTeX; never two
   "_" on one markdown line outside a code fence; paths relative to the lecture page.
@@ -48,7 +53,7 @@
 
 ### Physics inside the frame loop
 
-<small>(~30 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, the section on stepping a spring</small>
+<small>(~44 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 8 to 14</small>
 
 
 ---
@@ -319,6 +324,121 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 
 ---
 
+## Hair that moves: strands you simulate
+
+- model hair as **strands**: chains of particles joined by links, rooted on the scalp
+- simulate a few thousand **guide hairs**; draw many more **children** interpolated between guides
+- each frame: gravity and **wind** push the particles, links keep each hair its length, particles that enter the head are **pushed back out**
+- **follow the leader** (Müller, Kim and Chentanez, VRIPHYS 2012): fix each particle's distance to its parent, root to tip, so hair never stretches
+
+<img src="../../media/icons/sim-hair.webp" class="media-shot" style="max-height: 190px;" alt="a pastel figure's long hair streaming back in a gusting wind">
+
+
+---
+
+### Rigid bodies in an engine
+
+<small>(~15 min)</small>
+
+
+---
+
+## A rigid body is a node that physics moves
+
+- **state**: position, orientation (a quaternion), **linear** velocity, **angular** velocity
+- **properties**: mass, how the mass is spread (the inertia), a **collider** shape
+- every fixed step the engine: adds forces (gravity, springs, your pushes), **integrates** velocity and position, then **resolves contacts**
+- the result is written back into the node's **local transform**, and the scene graph carries it from there
+
+
+---
+
+## Collisions, step one: who might touch?
+
+- testing every pair is **n²**: 1,000 bodies make about 500,000 pairs
+- **broad phase**: wrap each body in a simple **bounding volume** (a box or sphere) and keep only pairs whose volumes overlap
+- boxes are kept in a structure (a sorted list, a grid or a **tree**) so overlaps are found without checking every pair
+- the tree of boxes is a **bounding volume hierarchy** (BVH), the structure ray tracers also use
+
+
+---
+
+## Collisions, step two: where exactly?
+
+- **narrow phase**: for each surviving pair, compute the actual **contact**: the points, the direction to separate them (the **contact normal**) and how deep they overlap
+- simple shapes have exact tests: sphere against sphere, box against box, capsule against mesh
+- complex meshes are approximated by **convex pieces** or simple collider shapes, never tested triangle by triangle every frame
+
+
+---
+
+## Response: bounce, slide, stop
+
+- **restitution**: how much of the approach speed comes back as bounce (0 for clay, near 1 for a rubber ball)
+- **friction**: resists sliding along the contact; high friction makes objects stick and tumble, low friction makes them skate
+- engines apply short **impulses** (instant velocity changes) at the contact points, which is how a box hit on its corner starts to **spin**
+
+
+---
+
+## Worked: one bounce
+
+A ball arrives at **v = (3, −4, 0)** on a floor with normal **n = (0, 1, 0)**, restitution **e = 0.5**, no friction:
+
+```text
+   normal part:   (v · n) n = (0, −4, 0)        tangential part:  (3, 0, 0)
+   after:         tangential kept, normal reversed and scaled by e
+                  v' = (3, 0, 0) − 0.5 · (0, −4, 0) = (3, 2, 0)
+   speed 5 → 3.606;   kinetic energy kept: 13 / 25 = 52 %
+   it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)
+```
+
+
+---
+
+## Tumbling cubes, simulated for this course
+
+<img src="../../media/icons/sim-rigid.webp" class="media-shot" style="max-height: 300px;" alt="nine pastel cubes falling, colliding with the floor and each other, and settling on a pastel checkerboard">
+
+- nine cubes fall, hit the floor and **each other**, tumble and settle
+- each cube is a cluster of particles kept rigid by **shape matching**, the approach of NVIDIA's unified particle solver
+- a check confirms no two cubes overlap by more than **1 % of an edge** at rest
+
+
+---
+
+## Why stacking is hard
+
+- a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
+- small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
+- engines add tricks: **sleeping** (freeze bodies that stopped moving), many **solver iterations**, a small allowed overlap (a contact **slop**)
+- Baraff (SIGGRAPH 1989) treated resting contact analytically, as forces found all at once for bodies that touch at many points
+
+
+---
+
+## Kinematic, dynamic, and the ragdoll
+
+- **kinematic** body: moved by animation or code; it pushes others but nothing pushes it (a moving platform, an animated character)
+- **dynamic** body: moved by the physics engine (a crate, debris)
+- a **ragdoll** is a character's skeleton as a chain of dynamic bodies joined by joints: when a character falls, the game switches its bones from **animated to simulated**
+- blending the two (animation driving the bones as targets, physics reacting to hits) is **active ragdoll** or physics-based animation
+
+
+---
+
+## Physics engines you will meet
+
+| | Unity (the Unity track) | three.js (the WebGL track) |
+| --- | --- | --- |
+| built in | **yes**: NVIDIA PhysX | **no** physics |
+| a body | add a `Rigidbody` component | a library body, e.g. cannon-es or Rapier |
+| a shape | a `Collider` (box, sphere, capsule, mesh) | the library's shapes |
+| who moves the node | the engine writes the `Transform` | you copy the body's position and quaternion to the mesh each frame |
+
+
+---
+
 ## Fluids as particles
 
 Smoothed particle hydrodynamics (Müller, Charypar and Gross, 2003):
@@ -405,19 +525,9 @@ The dam breaks with viscosity **2.5**. Drop it to **0.2**; what changes first?
 
 ---
 
-## What to keep
+## Film and games want different physics
 
-- a simulation is **forces → accelerations → a fixed step**, many substeps per frame
-- **explicit Euler** gains energy every step; **semi-implicit Euler** is stable while **h·√(k/m) < 2**
-- stiff springs need short steps; **constraints** (XPBD) trade that for softness and never explode
-- contacts are **projections**; substeps also stop **tunneling**
-- fluids are particles with **density and pressure** in place of links, under a **CFL** step limit
-
-
----
-
-## Where this returns
-
-- **Scene graphs** (lecture 7): kinematics, inverse kinematics and skinning, then **rigid bodies and collisions**: broad and narrow phase, bounce and friction, ragdolls
-- **Meshes and texture mapping** (lecture 10): **fur** as 3D textures and shells, lit by the strand's tangent, and **hair** as simulated strands with guides and wind
+- **games**: a few milliseconds per frame, must never explode, must respond to the player; approximations are fine if they look plausible
+- **film**: no frame budget, but close-ups, directors and continuity; accuracy, many substeps, and **art direction** (the simulation is re-run until the shot looks right)
+- both simulate **what cannot be keyframed** economically: debris, stacks, crowds of objects
 

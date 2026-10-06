@@ -1,47 +1,41 @@
 <!--
-  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~54 min).
+  CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
-  TEACHES: the frame loop and its budget; continuous versus on-demand loops;
-  per-frame versus per-second motion (deltaTime); the two clocks and the
-  fixed-timestep accumulator, worked; MVC with the one-model-two-views demo and
-  a predicted matrix; what MVC buys (undo two ways, retained versus immediate
-  mode); the two homework tracks side by side; Unity's editor, object model,
-  script lifecycle, the two C# traps, the Transform's local and world values
-  worked, the matrix layout; the WebGL track's demo anatomy (makeShell,
-  makeScene, SliderRow, Mat4Panel, one update function) and how to run it;
-  implement and replace in both tracks; checking a build against the engine.
-  ADDED 2026-09-29 (densification): frame budgets at 30 to 144 Hz; the accumulator
-  in code; interpolation between steps; three time pitfalls (per-frame damping, the
-  hitch and the tunnel, float drift far from the origin); Unity's Time properties;
-  MVC's origin (Reenskaug 1979); undo as commands in code; the event table; the
-  device-pixel pitfall; 2D hit testing, target sizes and the drag state machine;
-  picking by ray and ID buffer; dragging on a plane; the arcball; the orbit
-  controller's constants; latency, input to photon, and in a headset. Numbers from
-  textbook/interaction.html (Sections 2, 4, 5, 7 to 10), lib/core/orbit-camera.js and
-  tools/gen-lecture-figures-a.mjs. A physics-simulation topic follows this one in L03.
-  ADDED 2026-10-05 (80-slide target): click or drag, worked; pixel to NDC; snapping;
-  a missed v-sync; the Bounce script in the WebGL track. Numbers from textbook/interaction.html
-  (Sections 5 and 8, Exercises 1 and 6) and unity-basics.html Section 4.
-  NEEDS:   nothing beyond the big-picture topics (the loop of era 7); vectors and
-    matrices are used as pictures and printed numbers only.
+  TEACHES: the frame loop and its budget at 30 to 144 Hz; continuous versus on-demand loops;
+  per-frame versus per-second motion (deltaTime); the two clocks and the fixed-timestep
+  accumulator, worked and in code; interpolation between steps; three time pitfalls (per-frame
+  damping, the hitch and the tunnel, float drift far from the origin); MVC with the
+  one-model-two-views demo; what MVC buys (undo two ways, retained versus immediate mode); MVC's
+  origin (Reenskaug 1979); undo as commands in code; the event table; the device-pixel pitfall;
+  2D hit testing, target sizes and the drag state machine; click or drag, worked; latency, input to
+  photon, a missed v-sync, and in a headset; the two homework tracks side by side; Unity's editor,
+  object model, script lifecycle, clocks and the two C# traps; the Bounce script in the WebGL track;
+  the WebGL track's demo anatomy and how to run it; implement and replace; checking a build
+  against the engine (the vectors review's aim).
+  RESEQUENCED 2026-10-05 (L03 "Building blocks"): nothing that needs matrices or the camera. Moved to
+  interaction-3d.md (mounted after viewing): pixel to NDC, picking in 3D, dragging on the ground,
+  snapping, the arcball, the orbit controller. Archived (old open/discuss snapshot and git history):
+  "The matrix, predicted", "The Transform: local and world, worked", "Matrices: rows, columns, and
+  the printout"; the Transform and matrix layout are taught by the affine and scene-graphs topics.
+  The mvc-transform demo's matrix card is shown as an opaque second view.
+  NEEDS:   the vectors-review topic (the aim worked); the big-picture topics (the loop of era 7).
   DEMOS: mvc-transform (tx,ry,s) on a demo-full slide; its matrix card must stay
     VISIBLE (the mounting page must not carry the big-picture overview rule
     that hides .mat-panel cards).
-  FIGURES: ../../textbook/figures/unity-{deltatime,editor,object-model,hierarchy,matrix}.svg,
-    ui-{hittest,picking,arcball,latency}.svg
+  FIGURES: ../../textbook/figures/unity-{deltatime,editor,object-model}.svg,
+    ui-{hittest,latency}.svg
     (tools/gen-textbook-figures-unity.mjs; numbers in numbers-unity.json).
   NUMBERS, all node-checked against lib/core/xform.js or taken from
     textbook/figures/numbers-unity.json and textbook/interaction.html:
     - speed 3/s: 0.05 per frame at 60 Hz, 0.1 at 30, 0.0208 at 144; 3 units after 1 s
     - fixed 20 ms at 60 Hz: carries 16.67, 13.33, 10, 6.67, 3.33, 0; 5 fixed steps per 6 frames
     - accumulator, dt 10 ms, frames 16/20/33/8/17: steps 1/2/3/1/2, carries 6/6/9/7/4, alpha 0.9 (frame 3), 0.4 (frame 5)
-    - makeTRS(1.5,0,0, 0,30,0, 2,2,2) rows: [1.732 0 1 1.5] [0 2 0 0] [-1 0 1.732 0] [0 0 0 1]
-    - parent (2,0,0) ry 90, child local (1,0,0): world (2,0,-1); grandchild (0,1,0): (2,1,-1)
-    - makeTRS(2,0.5,-1, 0,30,0, 2,2,2) rows: [1.732 0 1 2] [0 2 0 0.5] [-1 0 1.732 -1] [0 0 0 1]
+    - makeTRS(1.5,0,0, 0,30,0, 2,2,2) rows (the demo's panel): [1.732 0 1 1.5] [0 2 0 0] [-1 0 1.732 0] [0 0 0 1]
+    - aim: normalize((4,0,-2) - (1,0,2)) = (0.6, 0, -0.8)
     - undo: 3 doubles = 24 bytes; bunny 35,947 vertices x 12 bytes = 431,364 bytes per snapshot
-  READING: ../../textbook/unity-basics.html (Sections 1 to 7, 11) and
-    ../../textbook/interaction.html (Sections 1 to 3).
+  READING: ../../textbook/interaction.html (Sections 1 to 4, 7, 10) and
+    ../../textbook/unity-basics.html (Sections 1 to 5, 7, 11).
 
   reveal.js: FLAT; notes follow "Note:"; plain text math, no KaTeX; never two
   "_" on one markdown line outside a code fence; paths relative to the lecture page.
@@ -49,7 +43,7 @@
 
 ### The interactive loop, MVC, and the tool
 
-<small>(~54 min) · reading: <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 7 and 11 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 3</small>
+<small>(~50 min) · reading: <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7 and 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 7 and 11</small>
 
 
 ---
@@ -227,7 +221,7 @@ Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times
 
 ```text
    events ──▶ controller ──writes──▶ MODEL ──read by──▶ view 1 (the cube)
-                                           ──read by──▶ view 2 (the matrix)
+                                           ──read by──▶ view 2 (the sixteen numbers)
 ```
 
 Data flows **one way**. Two views of one model cannot disagree, because neither stores anything.
@@ -237,13 +231,12 @@ Data flows **one way**. Two views of one model cannot disagree, because neither 
 
 ## One model, two views: predict first
 
-The model is three numbers, **{tx, ry, s}**. Both views read one matrix:
+- the **model** is three numbers, **{tx, ry, s}**: a slide along x, a turn about y in degrees, a uniform scale
+- **view 1** draws a cube placed by those numbers
+- **view 2** prints the sixteen numbers the renderer draws that cube with
+- three sliders are the **controller**
 
-```text
-   M = T(tx, 0, 0) · Ry(ry) · S(s, s, s)
-```
-
-Predict the matrix at **tx = 1.5, ry = 30°, s = 2**, then set the sliders and read the panel.
+Predict: drag `ry` from 0 to 90. Which view changes? Is there any slider setting where the two views disagree?
 
 
 ---
@@ -254,29 +247,13 @@ Predict the matrix at **tx = 1.5, ry = 30°, s = 2**, then set the sliders and r
 
 <div class="cockpit" data-demo="mvc-transform" data-controls="tx,ry,s"><pre class="viz-fallback">  controller: three sliders (tx, ry, s) write the model
   model:      { tx, ry, s }
-  view 1:     a cube drawn with M = T(tx,0,0) · Ry(ry) · S(s,s,s)
-  view 2:     the 16 entries of that same M
+  view 1:     a cube placed by the model
+  view 2:     the 16 numbers the cube is drawn with
   at tx = 1.5, ry = 30°, s = 2:
       [ 1.732  0   1      1.5 ]
       [ 0      2   0      0   ]
       [-1      0   1.732  0   ]
       [ 0      0   0      1   ]</pre></div>
-
-
----
-
-## The matrix, predicted
-
-```text
-   M = T(1.5, 0, 0) · Ry(30°) · S(2, 2, 2)
-
-     [ 1.732   0   1.000   1.5 ]      column 1 = 2 · (cos 30°, 0, −sin 30°)
-     [ 0       2   0       0   ]      column 2 = 2 · (0, 1, 0)
-     [−1.000   0   1.732   0   ]      column 3 = 2 · (sin 30°, 0, cos 30°)
-     [ 0       0   0       1   ]      column 4 = the translation
-```
-
-Each of the first three columns is **where an axis lands**, scaled; the last column is **where the origin lands**.
 
 
 ---
@@ -377,82 +354,6 @@ The 4-pixel threshold decides, from the offsets since pointerdown:
 ```
 
 The same machine with a **timer** instead of a distance tells a tap from a long press.
-
-
----
-
-## From a pixel to normalized device coordinates
-
-Picking runs the viewport transform backward. For pixel (px, py) of a W × H image:
-
-```text
-   s_x = 2 (px + ½) / W − 1           s_y = 1 − 2 (py + ½) / H        (pixel centers; y flips)
-
-   1920 × 1080, pixel (960, 270):   s_x = 2 · 960.5 / 1920 − 1 = 0.0005    s_y = 1 − 2 · 270.5 / 1080 = 0.499
-   150 × 150,   pixel (89, 62):     s_x = 0.1933                           s_y = 0.1667
-```
-
-- the result runs from **−1 to 1** on both axes, **y up**, whatever the window's size
-- the second pixel is the one the next slide's ray passes through
-
-
----
-
-## Picking in 3D: a ray from the mouse
-
-<img src="../../textbook/figures/ui-picking.svg" alt="A perspective sketch: the eye at (3, 3, 6) with a small orange near-plane rectangle in front of it, a red ray to a hit point on a blue sphere at the origin labeled with t = 6.23, and a dashed green ray landing on a grid ground plane at (0.5, 0, 1.63)." style="max-height: 270px; width: auto;">
-
-The clicked pixel becomes a **ray** from the eye; the nearest hit is the picked object (here the sphere at **t = 6.23**). The alternative: render object **IDs** as colors and read back one pixel.
-
-
----
-
-## Dragging on the ground, worked
-
-A mouse position has two numbers; a world position has three. Add a **constraint**: the ground plane y = 0.
-
-```text
-   eye o = (3, 3, 6), ray through pixel (60, 110): d = (−0.426, −0.512, −0.746)
-   reach y = 0:  t = −o_y / d_y = 3 / 0.512 = 5.861
-   point:        o + t·d = (0.501, 0, 1.629)
-```
-
-As the mouse moves, the intersection slides along the plane, and the object follows.
-
-
----
-
-## Snapping, worked
-
-Round the dragged value to the nearest multiple of the grid:
-
-```text
-   0.25 grid:   1.37 → 1.25     1.13 → 1.25     2.5 → 2.5
-   15° grid:    37° → 30°       52.4° → 45°     97° → 90°
-
-   soft snap, radius 0.05:   1.28 is 0.03 from 1.25 → snaps        1.37 is 0.12 away → moves freely
-```
-
-Snapping to other objects' vertices is the same test against a list of candidates: the closest within the radius wins.
-
-
----
-
-## Turning an object: the arcball
-
-<img src="../../textbook/figures/ui-arcball.svg" alt="Left: a unit circle in the window with two red mouse points at (0.2, 0.1) and (0.5, 0.3) joined by a blue arc, and a gray point outside the circle projected to its rim. Right: the sphere in profile with the two points at heights z = 0.975 and 0.812." style="max-height: 230px; width: auto;">
-
-Lift the mouse onto a sphere: (x, y) becomes (x, y, √(1 − x² − y²)). Drag (0.2, 0.1) to (0.5, 0.3): p1 = (0.2, 0.1, 0.975), p2 = (0.5, 0.3, 0.812); axis = normalize(p1 × p2) = **(−0.545, 0.838, 0.026)**, angle = arccos(p1 · p2) = **22.8°** (Shoemake, 1992).
-
-
----
-
-## Orbiting: the demos' camera controller
-
-- horizontal drag: yaw **0.4° per pixel**, so a **90-pixel** drag turns **36°**
-- vertical drag: pitch, clamped short of the poles, so the horizon never flips
-- wheel: distance × **1.12** per notch out, × **0.88** per notch in; five notches out is **1.76**, five in **0.53**
-- an orbit **cannot roll**: right for inspecting an object, where the arcball is right for turning one in the hand
 
 
 ---
@@ -583,31 +484,6 @@ At 60 Hz each step is 2 / 60 = **0.0333**; the top, 3 units up, takes **1.5 s** 
 
 ---
 
-## The Transform: local and world, worked
-
-<img src="../../textbook/figures/unity-hierarchy.svg" alt="A parent at (2,0,0) turned 90 degrees about y; its child at local (1,0,0) lands at world (2,0,-1), and a grandchild at local (0,1,0) lands at (2,1,-1)" style="max-height: 280px; width: auto;">
-
-Parent at (2, 0, 0), turned 90° about y. Child at local (1, 0, 0): world = (2, 0, 0) + Ry(90°)·(1, 0, 0) = **(2, 0, −1)**. Grandchild at local (0, 1, 0): **(2, 1, −1)**.
-
-
----
-
-## Matrices: rows, columns, and the printout
-
-```text
-   TRS: t = (2, 0.5, −1), 30° about y, scale 2
-
-     [ 1.732   0   1.000   2.0 ]     Unity: m[row, col], so m[0,3] = 2
-     [ 0       2   0       0.5 ]     flat index runs DOWN columns:
-     [−1.000   0   1.732  −1.0 ]       m[12], m[13], m[14] = the translation
-     [ 0       0   0       1   ]     lib/core/xform.js: the same column-major layout
-```
-
-`Debug.Log(Matrix4x4.TRS(...))` prints these four rows; the course library prints the same numbers.
-
-
----
-
 ## WebGL track: a demo is one function
 
 ```javascript
@@ -641,7 +517,7 @@ export function make(container, { stage, controls } = {}) {
 ```
 
 - the browser's **developer console** is your Console: errors, `console.log`, and live inspection of the model
-- the math primitives are `dot`, `cross`, `normalize`, `matMul`, `makeTRS` from `lib/core/xform.js`: arrays in, arrays out
+- the math primitives are `sub`, `dot`, `cross`, `normalize` from `lib/core/xform.js`: arrays in, arrays out
 
 
 ---
@@ -652,23 +528,22 @@ Where a homework names a helper, it is **off limits**: build it from primitives,
 
 | task | Unity | three.js | build from |
 | --- | --- | --- | --- |
-| aim | `Transform.LookAt`, `Quaternion.LookRotation` | `Object3D.lookAt`, `Matrix4.lookAt` | 3 cross products |
-| camera | `Matrix4x4.LookAt`, `Matrix4x4.Perspective` | `Matrix4.makePerspective` | V, P by entry |
-| blend rotations | `Quaternion.Slerp` | `Quaternion.slerp` | the formula |
-| normals | `Mesh.RecalculateNormals` | `computeVertexNormals` | face crosses |
+| aim | `Transform.LookAt`, `Quaternion.LookRotation` | `Object3D.lookAt`, `Matrix4.lookAt` | a subtraction, a normalize, 2 crosses |
+| angle | `Vector3.Angle` | `Vector3.angleTo` | a dot and two lengths |
+| shadow on a direction | `Vector3.Project` | `projectOnVector` | a dot and a scale |
+| face normals | `Mesh.RecalculateNormals` | `computeVertexNormals` | edge crosses |
 
 
 ---
 
 ## Checking a build against the engine
 
-The Transform example, three ways:
+The aim of the vectors review, three ways:
 
 ```text
-   by hand:     child = (2, 0, 0) + Ry(90°)·(1, 0, 0) = (2, 0, −1)
-                grandchild = child + Ry(90°)·(0, 1, 0) = (2, 1, −1)
-   Unity:       grandchild.transform.position            → (2.0, 1.0, -1.0)
-   the library: matMul(matMul(P, C), G), entries 12 to 14 → [ 2, 1, -1 ]
+   by hand:     normalize(R − A) = (3, 0, −4) / 5          = (0.6, 0, −0.8)
+   Unity:       (R - A).normalized                          → (0.6, 0.0, -0.8)
+   the library: normalize(sub(R, A))                        → [ 0.6, 0, -0.8 ]
 ```
 
 Three routes, one answer: that is what a homework's **run and compare** rubric checks.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L10 · Meshes and Texture Mapping</title>
+  <title>CSS 551 · L04 · Rotation</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -38,46 +38,30 @@
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
 
-    /* curated figures from the course text */
-    .reveal .media-shot { max-height: 420px; width: auto; }
-    .reveal section small { font-size: 0.62em; }
-    /* discussion slides: the four options */
-    .reveal ul.options { list-style: none; margin-left: 0; }
-    /* compact readout panels for this lecture's embeds (data untouched; only the
-       on-slide footprint shrinks so the cockpit fits reveal's 700px budget) */
-    [data-demo] .demo-viewport { height: 196px !important; }
-    [data-demo] canvas { height: 196px !important; }
-    [data-demo] .demo-panel .mat-panel { font-size: 11px; }
-    [data-demo] .demo-panel .mat-panel td { padding: 1.5px 5px; min-width: 2.2em; }
-    [data-demo] .demo-panel .demo-hint { font-size: 10px !important; margin: 6px 0 0 !important; }
-    [data-demo] .demo-panel p { font-size: 11px !important; margin: 4px 0 0 !important; }
-    [data-demo] .demo-panel pre { font-size: 10px !important; margin: 6px 0 0 !important; padding: 6px 8px !important; }
-    /* fur embed: a wider rail so the slider has room beside its two-word label */
-    [data-demo="fur"] .demo-shell-rail--embed { flex: 0 0 290px; }
-    [data-demo="fur"] .slider-label { font-size: 11px; white-space: nowrap; }
-    [data-demo="fur"] .slider-row input[type='range'] { min-width: 90px; }
+    /* per-demo crop rules for this lecture's embeds go here */
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
-      <!-- L10-open.md, then the topics, then L10-discuss.md (lectures/README.md). -->
-      <section data-markdown="L10-open.md?v=20261005"
+      <!-- One section per file, in order: the lecture opening (L04-open.md),
+           one or more ../../topics/*.md, then discussion and wrap (L04-discuss.md). -->
+      <section data-markdown="L04-open.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/meshes.md?v=20261005"
+      <section data-markdown="../../topics/vector-geometry.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/texture-mapping.md?v=20261005"
+      <section data-markdown="../../topics/rotation-quaternions.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L10-discuss.md?v=20261005"
+      <section data-markdown="L04-discuss.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">

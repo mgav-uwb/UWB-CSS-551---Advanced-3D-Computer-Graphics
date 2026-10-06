@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L04 · Vectors</title>
+  <title>CSS 551 · L05 · Affine Transformations</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -22,7 +22,7 @@
     .reveal section ul { margin: 0.22em 0; }
     .reveal section li { margin: 0.07em 0; line-height: 1.26; }
     .reveal table { font-size: 0.78em; }
-    .reveal pre { width: 100%; box-shadow: none; font-size: 0.48em; margin: 0.36em auto; }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.46em; margin: 0.36em auto; }
     .reveal pre code { border-radius: 8px; }
     .reveal blockquote { width: 92%; }
 
@@ -38,25 +38,33 @@
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
 
-    /* per-demo crop rules for this lecture's embeds go here */
+    /* trs-order embed renders FOUR stacked matrix panels (T·R, R·T, T, R),
+       taller than S03's single panel, so compact them + shrink the viewport to
+       stay inside the 700px slide budget. Data untouched; only on-slide size. */
+    [data-demo="trs-order"] .demo-viewport { height: 168px !important; }
+    [data-demo="trs-order"] canvas { height: 168px !important; }
+    [data-demo="trs-order"] .demo-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; align-content: start; }
+    [data-demo="trs-order"] .demo-panel .demo-hint { font-size: 9px !important; margin: 3px 0 0 !important; }
+    [data-demo="trs-order"] .demo-panel .mat-panel { font-size: 8.5px; }
+    [data-demo="trs-order"] .demo-panel .mat-panel td { padding: 1.5px 4px; min-width: 2.1em; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
-      <!-- One section per file, in order: the lecture opening (L04-open.md),
-           one or more ../../topics/*.md, then discussion and wrap (L04-discuss.md). -->
-      <section data-markdown="L04-open.md?v=20261005"
+      <!-- One section per file, in order: the lecture opening (L05-open.md),
+           one or more ../../topics/*.md, then discussion and wrap (L05-discuss.md). -->
+      <section data-markdown="L05-open.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/vectors-dot-cross.md?v=20261005"
+      <section data-markdown="../../topics/affine-transforms.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L04-discuss.md?v=20261005"
+      <section data-markdown="L05-discuss.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">

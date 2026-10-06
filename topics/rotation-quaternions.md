@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Rotation: matrices, axis-angle, quaternions, Euler angles (~78 min).
+  CSS 551 · TOPIC DECK: Rotation: matrices, axis-angle, quaternions, Euler angles (~64 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/rotation-quaternions.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -13,7 +13,8 @@
   against matrices, slerp worked, the double cover and the long way round, drift measured, what Unity
   stores); Euler angles (three conventions give three poses, gimbal lock by the inner axis, extraction
   at the lock), and why quaternions dodge it.
-  NEEDS:   the vectors topic (projection split, the cross, "two vectors, a whole frame"); mount it after that topic.
+  NEEDS:   the vectors-review topic (projection split, the cross) and the vector-geometry topic ("two vectors, a whole frame"); mount it after them.
+  RESEQUENCED 2026-10-05 (L04, after vector-geometry): history table, squad, the matrix-lerp failure and the recap slide removed (squad and the matrix lerp moved to the animation topic; both are in the animation chapter, Sections 4 and 5).
   DEMOS:   data-demo="axis-angle" data-controls="angle" (under the lecture page's 200px crop).
            Fallback: axis (0,1,0), 30 deg: R columns (0.866,0,-0.5) / (0,1,0) / (0.5,0,0.866); q = (0, 0.259, 0, 0.966).
   NUMBERS: every number is from textbook/figures/numbers-foundations.json (key rot) or recomputed by
@@ -34,7 +35,7 @@
 
 ### Rotation: matrices, axis-angle, quaternions, Euler angles
 
-<small>(~78 min)</small>
+<small>(~64 min)</small>
 
 
 ---
@@ -42,19 +43,6 @@
 ### Rotation about an axis
 
 <small>(~16 min)</small>
-
----
-
-## Three names, seventy years
-
-| year | who | what |
-| --- | --- | --- |
-| 1775 | Leonhard Euler | every rotation of a rigid body about a fixed point is a single turn about **one axis** |
-| 1840 | Olinde Rodrigues | the formula that turns a vector about that axis (tonight's split-and-turn) |
-| 1843 | William Rowan Hamilton | **quaternions**, a four-number algebra whose products are rotations |
-
-Tonight follows the same order: the matrix, the axis and angle, then the four numbers engines store.
-
 
 ---
 
@@ -159,7 +147,7 @@ We can spin about x, y, or z. But a rotation can be about **any** axis, a unit v
 - store a rotation as **just that**: an axis `n` and an angle `θ` (four numbers)
 - but how do you *apply* it: rotate an arbitrary `v` about an arbitrary `n`?
 
-The answer reuses **exactly** the vectors lecture's projection split.
+The answer reuses **exactly** the projection split of the vectors review.
 
 
 ---
@@ -585,30 +573,6 @@ Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((
 
 ---
 
-## Never lerp the matrices
-
-Blend the identity and `R_z(90)` entry by entry at `t = 0.5`:
-
-```text
-   M = ½ I + ½ R = [ 0.5  −0.5 ]      columns of length 0.707, det 0.5: the object SHRINKS to half its area
-                   [ 0.5   0.5 ]      at a half turn (R_z(180)) the blend is the zero matrix: det 0, gone
-```
-
-- a matrix blend is not a rotation; the columns stop being unit and orthogonal
-- blend **the parts**: translations by lerp, rotations by slerp or nlerp, scales by lerp (or in log space)
-
-
----
-
-## More than two keys: squad
-
-<img src="../../textbook/figures/anim-squad.svg" alt="a chain of slerps with a corner at each key, and a squad curve through the same keys without the corner" style="height:190px">
-
-A chain of slerps turns at constant speed between keys but **kinks** at each key: the angular speed jumps from 60 to 82.8 degrees per unit at the middle key of the chapter's example. **Squad** (spherical quadrangle) adds inner control quaternions and holds the speed across the key: 65.1 before, 65.2 after.
-
-
----
-
 ## Drift, measured
 
 <img src="../../textbook/figures/rot-drift.svg" alt="error growth over 200,000 float32 compositions: matrix, quaternion, renormalized quaternion" style="height:220px">
@@ -781,16 +745,4 @@ Gimbal lock is a disease of the **representation**, not of rotation itself:
 2. `q = (0, 0, 0.707, 0.707)`. Where does `(1, 0, 0)` go?
 3. You slerp from `q` to `−q'`, where `q · q' = 0.5`. How far does the object turn?
 4. Unity reads `transform.eulerAngles = (90, 45, 10)`. Which single number can you change without effect if you also change another?
-
-
----
-
-## Rotation, four ways
-
-- **Matrix**: columns are the rotated axes; orthonormal, det +1, inverse = transpose; nine numbers, drifts
-- **Axis-angle (Rodrigues)**: spin the across-axis part; a dot, a cross, a scale; read back by trace and `R - Rᵀ`, but branch near 180°
-- **Quaternion**: `(sin(θ/2) n, cos(θ/2))`; compose by `*`, blend by slerp with the sign check, renormalize
-- **Euler**: three readable angles, a convention per tool, and a middle-axis 90° **lock**
-
-Engines store the quaternion, build the matrix for the GPU, and show you Euler angles.
 

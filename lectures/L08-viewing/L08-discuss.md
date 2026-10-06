@@ -1,7 +1,10 @@
 <!--
-  CSS 551 · L08 discussion and wrap (~25 min). Five peer-instruction questions; answers ONLY
+  CSS 551 · L08 discussion and wrap (~26 min). Four peer-instruction questions; answers ONLY
   in the notes. Numbers computed by node against lib/core/xform.js (lookAtBasis, perspective,
-  applyMat4, perspectiveDivide) and from textbook/figures/numbers-pipeline.json (view).
+  applyMat, perspectiveDivide) and from textbook/figures/numbers-pipeline.json (view).
+  Resequenced 2026-10-05: four questions; the old questions 2 (depth in NDC) and 4 (field of
+  view) are in ../archive/L03-L11-pre-resequence-2026-10-05/L08-viewing/L08-discuss.md;
+  question 3 (dragging on the ground) is new, for the interaction-3d topic.
 -->
 
 ### Discussion
@@ -23,19 +26,7 @@
 
 ---
 
-## Question 2: depth in NDC
-
-`P = perspective(90°, 1, near 1, far 3)`. A point at view-space depth `z = -2`, halfway between near and far. What is its NDC z?
-
-- **A.** `0`
-- **B.** `0.5`
-- **C.** `1`
-- **D.** `-0.5`
-
-
----
-
-## Question 3: the near plane
+## Question 2: the near plane
 
 With near = 0.1 and far = 1000, a 24-bit depth buffer separates surfaces about 6 mm apart at 100 m. Someone sets near = 0.01 "so nothing gets clipped". What is the separation at 100 m now?
 
@@ -47,19 +38,19 @@ With near = 0.1 and far = 1000, a 24-bit depth buffer separates surfaces about 6
 
 ---
 
-## Question 4: field of view
+## Question 3: dragging on the ground
 
-A game's setting is a **horizontal** field of view of 90° on a 16:9 screen. What is the vertical field of view it renders with?
+A pick ray starts at the eye `o = (1, 3, 4)` with unit direction `d = (0, -0.6, -0.8)`. A drag constrained to the ground plane `y = 0` puts the object where?
 
-- **A.** 90°
-- **B.** 58.7°
-- **C.** 50.6°
-- **D.** 45°
+- **A.** `(1, 0, 0)`
+- **B.** `(1, 0.75, 1)`
+- **C.** `(1, 1.2, 1.6)`
+- **D.** `(1, 0, 4)`
 
 
 ---
 
-## Question 5: behind the eye
+## Question 4: behind the eye
 
 A vertex's clip coordinates are `(0.8, -0.2, 1.5, -2)`. What should the pipeline do with it?
 
@@ -73,9 +64,9 @@ A vertex's clip coordinates are `(0.8, -0.2, 1.5, -2)`. What should the pipeline
 
 ## Wrap
 
-A camera is a frame and a lens: `V` is the inverse of the camera's pose, built from three cross products; `P` sets up the divide by depth that makes far things small, and maps the frustum to the NDC cube.
+A camera is a frame and a lens: `V` is the inverse of the camera's pose, built from three cross products; `P` sets up the divide by depth that makes far things small, and maps the frustum to the NDC cube. Run backward, the chain turns a pixel into a ray, and a ray plus a constraint is a pick, a drag or a turn.
 
-- **Read:** [Viewing](../../textbook/viewing.html)
+- **Read:** [Viewing](../../textbook/viewing.html) · [Interactive Systems](../../textbook/interaction.html), Sections 5, 6, 8 and 9
 - **Due:** HW3, Wednesday October 28, 11:59 PM
 - **Thursday:** Quiz 3 in the first 20 minutes (Lecture 7, tonight's lecture, HW3), then the lecture and the HW4 walk-through
 

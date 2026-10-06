@@ -13,7 +13,7 @@
   overdraw (6.2 M against 2.07 M shaded fragments); perspective-correct
   interpolation (u = 0.167, not 0.5); the over operator and premultiplied alpha;
   the GPU pipeline and the 8 ns per-pixel budget.
-  NEEDS:   the vectors topic (the which-side test, the cross product); the viewing
+  NEEDS:   the vectors-review topic (the perp-dot product, the cross product); the viewing
            topic (clip coordinates, the divide, NDC).
   DEMOS:   data-demo="raster" data-controls="res,angle" (under the page's crop).
   FIGURES: ../../textbook/figures/ras-*.svg (tools/gen-textbook-figures-pipeline.mjs).

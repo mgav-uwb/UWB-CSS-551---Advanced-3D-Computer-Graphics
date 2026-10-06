@@ -1,12 +1,15 @@
 <!--
-  CSS 551 · Lecture 11, discussion (20 min: two peer-instruction questions, the
-  HW5 walk-through) and the wrap. Answers only in the notes. Numbers from
-  tools/gen-lecture-figures-c.mjs (l11_q1, l11_q2) and numbers-surfaces.json.
+  CSS 551 · Lecture 11, discussion (10 min: two peer-instruction questions), the
+  HW5 walk-through and the wrap. Answers only in the notes. Numbers computed by node:
+    Q1  light at (3, 0, 0): L = normalize(2.307, −0.693, −0.693) = (0.920, −0.276, −0.276);
+        N·L = 0.212 (illumination chapter, exercise; gen-lecture-figures-c.mjs l11_q1).
+    Q2  1024 × 0.004 = 4.096, 1024 × 0.003 = 3.072; ρ = 4.096, λ = log₂ 4.096 = 2.034.
+    HW5 numbers from homework/hw05/index.html (lib/skeletons/expected.js).
 -->
 
 ### Discussion
 
-<small>(~20 min)</small>
+<small>(~20 min, with the HW5 walk-through)</small>
 
 
 ---
@@ -23,14 +26,14 @@ The demo's sphere (r = 1.2) and marked point `P = (0.693, 0.693, 0.693)`, `N = (
 
 ---
 
-## Question 2: the normal under a scale
+## Question 2: which mip level?
 
-A circle's point `(0.707, 0.707)` has normal `n = (0.707, 0.707)`. The model is scaled by **M = diag(2, 1)**. The correct unit normal of the stretched shape at the moved point is:
+A 1024 × 1024 texture. Across one pixel, `u` changes by **0.004** in x and `v` by **0.003** in y (the other derivatives are 0). Which level does a trilinear sampler read **most** from?
 
-- **A.** (0.707, 0.707)
-- **B.** (0.894, 0.447)
-- **C.** (0.354, 0.707)
-- **D.** (0.447, 0.894)
+- **A.** level 0
+- **B.** level 2
+- **C.** level 4
+- **D.** level 10
 
 
 ---
@@ -64,7 +67,9 @@ Graded on the page's inputs and on a hidden set; the shader is graded by eye.
 
 ## Wrap
 
-- A lit point is **three dot products per light**: `max(0, N·L)`, `max(0, R·V)^s`, plus a constant ambient; normals move by `(M⁻¹)ᵀ`
-- The sum is unbounded; **tone-map** it (Reinhard `x/(1 + x)`) before display
-- **Out**: HW5, due Wednesday November 11. **Midterm**: Thursday November 12, first 75 minutes, weeks 1–6
+A lit point is three dot products per light, `max(0, N·L)`, `max(0, R·V)^s` and a constant ambient, summed over the lights and tone-mapped for display. A texture lookup filters: bilinear when magnified, the mipmap level log₂ of the footprint when minified.
+
+- **Read**: [Local Illumination](../../textbook/illumination.html) · [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11
+- **Out**: HW5, due Wednesday November 11, 11:59 PM
+- **Midterm**: Thursday November 12, the first 75 minutes: Lectures 1 to 11 and HW5
 

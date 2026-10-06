@@ -5,7 +5,7 @@
   walk-through, wrap). Quiz 3, on paper, comes first.
 
   Minute plan (120 min, Thu 5:45–7:45 PM in person):
-    0:00  Quiz 3 (paper, 20 min): scene graphs, viewing, HW3
+    0:00  Quiz 3 (paper, 20 min): scene graphs (L07), viewing and interaction in 3D (L08), HW3
     0:20  opening                                     2 min
     0:22  rasterization (topic)                      46 min
     1:08  antialiasing (topic)                       34 min
@@ -34,7 +34,7 @@
 **Laptops and phones away.** A pencil and the quiz sheet, nothing else.
 
 - **20 minutes**, 5:45 to 6:05 PM: 8 multiple-choice questions, 5 points each
-- **Covers**: Lecture 7, scene graphs (Thursday, October 22); Lecture 8, viewing (Tuesday, October 27); HW3
+- **Covers**: Lecture 7, scene graphs (Thursday, October 22); Lecture 8, viewing and interaction in 3D (Tuesday, October 27); HW3
 - Mark one letter per question in the grid on the first page; only the grid is graded
 
 

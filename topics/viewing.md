@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Viewing: the camera frame, the view matrix, projection, the chain (~93 min).
+  CSS 551 · TOPIC DECK: Viewing: the camera frame, the view matrix, projection, the chain (~76 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/viewing.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -11,9 +11,8 @@
   projection matrix entry by entry, worked on a marked point with near-plane clipping; NDC depth is not
   linear and what a depth buffer can resolve (the near-plane pitfall); the full chain for one vertex
   from object space to a pixel; frustum planes and culling; orthographic projection; camera moves
-  (tumble, track, dolly) as frame edits, the dolly worked; Sung's CameraMatrices, Tumble and
-  DrawCameraFrustum code.
-  NEEDS:   the vectors topic (a frame from two vectors), the affine topic (rigid inverse, block product),
+  (tumble, track, dolly) as frame edits, the dolly worked; Sung's CameraMatrices code.
+  NEEDS:   the vector-geometry topic (a frame from two vectors), the affine topic (rigid inverse, block product),
            the scene-graphs topic (the camera as a node) helps but is not required.
   DEMOS:   data-demo="view-matrix" data-controls="az,el,dist" and data-demo="projection" data-controls="fov,near",
            each on its own slide under the lecture page's crop rules.
@@ -36,6 +35,12 @@
   pitfall and resize in both tracks, a 4:3 check, orthographic depth, the frustum planes as rows of P V, the
   p-vertex rejection of box 2, a track worked, the circle of confusion worked. Numbers from node (xform.js).
 
+  RESEQUENCED 2026-10-05 (L08 with interaction-3d, about 80 slides): unprojection, the two rays and picking
+  in both tracks moved to interaction-3d.md (mounted right after this topic); moved to the chapter only:
+  Tumble in Sung's code and drawing the frustum (Section 13; the orbit controller is in interaction-3d),
+  depth precision pictured (Section 7 figure), a track worked (Section 13), a point off the sightline
+  (Exercise 3), where NDC depth crosses zero (Exercise 5), and the recap slide.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -45,7 +50,7 @@
 
 ### Viewing: the camera, the view matrix, and projection
 
-<small>(~93 min)</small>
+<small>(~76 min)</small>
 
 
 ---
@@ -491,23 +496,6 @@ fov 45°, aspect 1.78, near 1, far 8: `f = 2.414`, `f/a = 1.356`, `9/(−7) = �
 
 ---
 
-## Worked: a point off the sightline
-
-Same `P`; the view-space point `(1, 1, −4)`, then a 1280 × 720 viewport:
-
-```text
-   clip:   P (1, 1, −4, 1) = (1.356,  2.414,  −1.286·(−4) − 2.286,  4) = (1.356, 2.414, 2.857, 4)
-   NDC:    divide by 4      = (0.339,  0.604,  0.714)          all three in [−1, 1]: visible
-   pixel:  px = (0.339 + 1)/2 · 1280 = 857.0
-           py = (1 − 0.604)/2 · 720  = 142.7                    upper right of the image
-   depth:  (0.714 + 1)/2              = 0.857
-```
-
-`x` and `y` are equal in view space but not in NDC: `x` is divided by the aspect.
-
-
----
-
 ## NDC depth is not linear
 
 Same P (near 1, far 8):
@@ -517,23 +505,6 @@ Same P (near 1, far 8):
 | NDC z | −1 | −0.238 | 0.143 | 0.524 | 0.714 | 0.905 | 1 |
 
 Half the NDC range, −1 to 0, is spent between depth 1 and about 1.8. Depth resolution is **concentrated near the eye**.
-
-
----
-
-## Where NDC depth crosses zero
-
-Set `A z + B = 0` with `z = −d`:
-
-```text
-   d_mid = B / A = 2 n F / (n + F)
-
-   near 1,   far 8:      d_mid = 16/9 = 1.778       0.778 of 7 units of depth, 11 %, use half the NDC range
-   near 0.1, far 8:      d_mid = 0.198
-   near 0.1, far 1000:   d_mid = 0.200              the far plane barely moves it
-```
-
-Halfway in NDC sits at **twice the near distance**, whatever the far plane, once `F >> n`.
 
 
 ---
@@ -559,15 +530,6 @@ near 0.1, far 1000: the smallest depth difference two surfaces need to be told a
 | 500 | 0.149 | 0.149 | 1.8e-5 |
 
 At 100 m, surfaces closer than **6 mm** share a depth value: z-fighting. The step scales as `d²/near`: near = 0.001 makes it **100 times worse**.
-
-
----
-
-## Depth precision, pictured
-
-<img src="../../textbook/figures/view-depth-precision.svg" alt="the smallest resolvable depth step against distance for fixed-point, float and reversed-z float depth buffers" style="height:300px">
-
-Reversed z (store `1 − depth` in a float) puts the float format's dense values near 0 exactly where the `1/z` curve is flat, and flattens the error curve.
 
 
 ---
@@ -808,53 +770,6 @@ Even the box's most-inside corner is 1.127 outside: **reject**, one dot product,
 
 ---
 
-## Unprojection: a pixel back to a ray
-
-Invert the chain for a pixel at NDC `(x, y)`: the view-space direction through it is
-
-```text
-   d_view = ( x / P[0][0],   y / P[1][1],   −1 ) = ( x · aspect · tan(fov/2),  y · tan(fov/2),  −1 )
-   d_world = x' u + y' v − w          (rotate by the camera's axes), then normalize
-   ray:  eye + t · d_world
-```
-
-This is the first line of every ray tracer and every mouse pick.
-
-
----
-
-## Worked: two rays from the demo's camera
-
-```text
-   center pixel, NDC (0, 0):   d_view = (0, 0, −1)          d_world = −w = (−0.539, −0.342, −0.770)
-   top-right corner, NDC (1, 1):
-       d_view = (1 / 1.3563, 1 / 2.4142, −1) = (0.737, 0.414, −1)
-       d_world = 0.737 u + 0.414 v − w = (−0.016, 0.047, −1.309)   →   normalized (−0.012, 0.036, −0.999)
-```
-
-The center ray points straight down the sightline at the target; the corner ray leans by half the field of view in each direction.
-
-
----
-
-## Picking in both tracks
-
-```js
-// three.js: NDC from the mouse, then a ray from the camera
-const ndc = new THREE.Vector2((e.clientX / w) * 2 - 1, -(e.clientY / h) * 2 + 1);
-raycaster.setFromCamera(ndc, camera);
-const hits = raycaster.intersectObjects(scene.children);
-```
-
-```csharp
-// Unity: screen pixels (origin bottom left) straight to a ray
-Ray r = cam.ScreenPointToRay(Input.mousePosition);
-if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
-```
-
-
----
-
 ### Moving the camera
 
 <small>(~11 min)</small>
@@ -868,21 +783,6 @@ if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
 - **dolly**: move `eye` along the sightline: the demo's `dist`
 
 Worked dolly, distance 7 to 4: `eye' = at + 4w = (2.156, 1.868, 3.079)`. The basis is unchanged; only `−w·eye'` changes, from −7.17 to **−4.17**.
-
-
----
-
-## Worked: a track
-
-Track right by 1 unit: `eye' = eye + u`, `at' = at + u`. The direction `eye − at` is unchanged, so the basis is unchanged:
-
-```text
-   −u·eye' = −u·eye − u·u = 0     − 1 = −1
-   −v·eye' = −v·eye − v·u = −0.47 − 0 = −0.47
-   −w·eye' = −w·eye − w·u = −7.17 − 0 = −7.17
-```
-
-One entry of `V` moves: the world slides 1 unit **left** in view space. A dolly changes only the third entry; a track along `v` only the second.
 
 
 ---
@@ -909,37 +809,6 @@ Dolly **out** and zoom **in** together, keeping the subject's height constant: `
 ```
 
 First used on film in Alfred Hitchcock's *Vertigo* (1958), which is why it is often called the Vertigo effect.
-
-
----
-
-## Tumble, in Sung's code
-
-```csharp [1-5]
-Quaternion q = Quaternion.AngleAxis(Direction * RotateDelta, transform.right);
-Matrix4x4 r = Matrix4x4.Rotate(q);
-Matrix4x4 invP = Matrix4x4.TRS(-LookAtPosition.localPosition, Quaternion.identity, Vector3.one);
-r = invP.inverse * r * invP;                    // pivot sandwich about the target
-transform.localPosition = r.MultiplyPoint(transform.localPosition);   // move the eye
-```
-
-<small>CameraManipulation.cs, 6.3.Tumble. A pivot sandwich rotates the eye about the target; then the camera re-aims.</small>
-
-
----
-
-## Drawing the frustum
-
-```csharp [1-4]
-float tanFOV = Mathf.Tan(Mathf.Deg2Rad * 0.5f * c.fieldOfView);
-float nearPlaneHeight = 2f * c.nearClipPlane * tanFOV;   // 2·near·tan(fov/2)
-float nearPlaneWidth  = c.aspect * nearPlaneHeight;
-Vector3 nearPlaneCenter = eye + c.nearClipPlane * transform.forward;
-```
-
-<small>CameraManipulation_DrawFrustum.cs, 6.4. The projection demo builds its wireframe from the same formula.</small>
-
-At the demo's defaults the near window is `±0.737 × ±0.414`: `tan 22.5° = 0.414`, times 1.78.
 
 
 ---
@@ -1012,15 +881,4 @@ Thin lens, focal length `f`, f-number `N`, aperture `A = f/N`, focused at `d_f`.
 2. Near 0.5, far 100. A student sets near to 0.01. What happens to depth resolution at 50 m?
 3. A vertex has clip coordinates `(2, 1, 3, 4)`. Is it inside the frustum? Its NDC?
 4. A game's field-of-view slider says 90° **horizontal** at 16:9. What vertical fov goes into `P`?
-
-
----
-
-## Viewing, one idea
-
-- A camera is a **frame**: `eye`, `at`, `up` to orthonormal `w`, `u`, `v` by cross products; clamp away from the pole
-- `V`: **rows = basis**, translation **−basis·eye**; the inverse of the camera's pose
-- Projection **divides by depth**: `P`'s −1 row makes `w' = −z`; NDC is the cube; depth precision lives near the eye
-- The **chain**: object, `M`, world, `V`, view, `P`, clip, divide, NDC, viewport, pixel
-- **Moving the camera** is editing the frame; `V` is rebuilt
 

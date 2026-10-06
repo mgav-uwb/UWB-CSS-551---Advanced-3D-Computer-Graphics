@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L11 · Illumination</title>
+  <title>CSS 551 · L03 · Building Blocks: Vectors, MVC, the Main Loop</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -22,7 +22,7 @@
     .reveal section ul { margin: 0.22em 0; }
     .reveal section li { margin: 0.07em 0; line-height: 1.26; }
     .reveal table { font-size: 0.78em; }
-    .reveal pre { width: 100%; box-shadow: none; font-size: 0.46em; margin: 0.36em auto; }
+    .reveal pre { width: 100%; box-shadow: none; font-size: 0.50em; margin: 0.36em auto; }
     .reveal pre code { border-radius: 8px; }
     .reveal blockquote { width: 92%; }
 
@@ -38,37 +38,39 @@
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
 
-    /* curated figures from the course text */
+    /* full-slide demo exhibits (<!-- .slide: class="demo-full" -->): the demo
+       IS the slide; grow the embed to a ~520px viewport, capped at 560px so the
+       title and the demo stay inside reveal's 700px budget. */
+    .reveal section.demo-full h2 { font-size: 1.1em; margin-bottom: 8px; }
+    section.demo-full [data-demo] { display: block; }
+    section.demo-full [data-demo] .demo-shell-root--embed { max-width: 96%; max-height: 560px; }
+    section.demo-full [data-demo] .demo-shell-scene--embed { min-height: 520px; }
+    section.demo-full [data-demo] .demo-shell-rail--embed { max-height: 520px; flex: 0 0 230px; }
+    section.demo-full [data-demo] .demo-viewport,
+    section.demo-full [data-demo] canvas { height: 520px !important; width: auto !important; }
     .reveal .media-shot { max-height: 420px; width: auto; }
-    .reveal section small { font-size: 0.62em; }
-    /* discussion slides: the four options */
-    .reveal ul.options { list-style: none; margin-left: 0; }
-    /* compact readout panels for this lecture's embeds (data untouched; only the
-       on-slide footprint shrinks so the cockpit fits reveal's 700px budget) */
-    [data-demo] .demo-viewport { height: 196px !important; }
-    [data-demo] canvas { height: 196px !important; }
-    [data-demo] .demo-panel .mat-panel { font-size: 11px; }
-    [data-demo] .demo-panel .mat-panel td { padding: 1.5px 5px; min-width: 2.2em; }
-    [data-demo] .demo-panel .demo-hint { font-size: 10px !important; margin: 6px 0 0 !important; }
-    [data-demo] .demo-panel p { font-size: 11px !important; margin: 4px 0 0 !important; }
-    [data-demo] .demo-panel pre { font-size: 10px !important; margin: 6px 0 0 !important; padding: 6px 8px !important; }
+    .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
-      <!-- L11-open.md, then the topics, then L11-discuss.md (lectures/README.md). -->
-      <section data-markdown="L11-open.md?v=20261005"
+      <section data-markdown="L03-open.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/illumination.md?v=20261005"
+      <section data-markdown="../../topics/vectors-review.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L11-discuss.md?v=20261005"
+      <section data-markdown="../../topics/interactive-loop-tool.md?v=20261006"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="L03-discuss.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">

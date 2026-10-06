@@ -1,16 +1,20 @@
 <!--
-  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~90 min).
+  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~70 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/affine-transforms.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
   Lectures compose topics in their index.html; see lectures/README.md and topics/README.md.
 
   TEACHES: the affine map x -> A x + t as the family every placement transform belongs to; what it preserves (lines, parallels, ratios) and what it does not; the determinant as volume and handedness; points versus displacements; homogeneous coordinates as the lift that makes affine maps linear (the 4x4 block [A t; 0 1], w = 1 points, w = 0 vectors); composition as the block product and why order matters (T.R vs R.T worked to the demo's numbers, live); the block inverse and the rigid case; a matrix as an affine frame (columns + origin), object versus world space; TRS as the special case engines store (and the shear it cannot); normals by the inverse transpose; pivots as conjugation with translation (I - R)p; where affine ends (the last row, projective maps, the perspective matrix of the viewing lecture).
-  NEEDS:   the vectors topic (dot, cross, projection) and the rotation topic (R_y, columns are where the axes land).
+  NEEDS:   the vectors-review topic (dot, cross, projection) and the rotation topic (R_y, columns are where the axes land).
   DEMOS:   data-demo="trs-order" data-controls="tx,ry" (under the lecture page's 200px crop). Fallback hand-verified (lib/core/xform.js): tx = 1.5, ry = 60: T.R column 3 = (1.50, 0, 0); R.T column 3 = (0.75, 0, -1.30).
   SOURCE:  reframed 2026-09-18 (Plan B) from the former sessions/S04-matrices-spaces/L04-matrices-spaces.md (35 slides), whose worked numbers (T.R/R.T, the rigid inverse, the pivot at (2,0,0)) are kept digit for digit; Sung's Topic4 CDP code slides are reduced to two. Trimmed 2026-09-29 (Plan C, a 90-minute Tuesday lecture): the separate two-map composition slide was folded into the block-product slide. Real C# / shader excerpts are from Kelvin Sung's CSS 451 ClassExamples.
   DENSIFIED 2026-09-29 (Plan C; 60+ slides per two hours): the family ladder, figures for shear, points and vectors, blocks, order, normals, frame, polar, storage, pivot, projective; affine combinations; a determinant and area; winding and two mirrors; Möbius and Roberts; T·S vs S·T; predict-then-run; w in both APIs; the demo inverse; the oblique-scale and conditioning pitfalls; planes by the inverse transpose; a 2D frame both ways; storage conventions; TRS read-back and apply-and-undo; polar decomposition; costs; scale about a corner; the pivot in three.js; a projective map worked; TRS in both tracks; a check-yourself slide. Numbers from numbers-foundations.json (aff, rot) or node.
 
+  RESEQUENCED 2026-10-05 (L05, a quiz day, 60 to 70 slides with the lecture shell): moved to the chapter only: the
+  shear, points-and-vectors, order, storage, normals and projective figure slides, the history of homogeneous
+  coordinates (Section 2), the cost of an affine product (Section 10), the polar decomposition stepped (Section 6;
+  the one-slide summary stays) and the recap slide.
   EXPANDED 2026-10-05 (80-slide target): checks on the block inverse, reading a frame and a stretched normal; the condition number; a row-vector matrix pasted as columns; the polar decomposition stepped (stretch, then rotation); mirror and shear detection in both tracks; why the inverse transpose; the normal matrix in both tracks' shaders; the ground plane moved; conjugation F X F^-1; where the parallels meet. Numbers from node against lib/core/xform.js; textbook Sections 2.1, 4.1, 6.1, 7, 8 and Exercises 2, 3, 4, 6, 10.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
@@ -22,7 +26,7 @@
 
 ### Affine transformations over homogeneous coordinates
 
-<small>(~90 min)</small>
+<small>(~70 min)</small>
 
 
 ---
@@ -73,7 +77,7 @@ A **linear** map is the special case `t = 0`: it fixes the origin. Translation i
 | affine (12) | + non-uniform scale, shear | yes | yes | no | no |
 | projective (15) | + perspective | yes | **no** | no | no |
 
-Each step up the ladder gives up one invariant. Tonight is the third rung; the viewing lecture climbs to the fourth.
+Each step up the ladder gives up one invariant. Placement transforms are the third rung; the camera's perspective is the fourth.
 
 
 ---
@@ -90,15 +94,6 @@ An affine map keeps the **structure of lines** and nothing more:
    shear  A = [[1, 0.5], [0, 1]]  on the unit square:   (0,0)→(0,0)  (1,0)→(1,0)  (0,1)→(0.5,1)  (1,1)→(1.5,1)
    the square becomes a parallelogram; the midpoint (0.5, 0.5) → (0.75, 0.5), still the midpoint of the image diagonal
 ```
-
-
----
-
-## The shear, pictured
-
-<img src="../../textbook/figures/aff-shear.svg" alt="a unit square sheared into a parallelogram, with its grid lines still straight and parallel and its midpoints still midpoints" style="height:300px">
-
-A shear is the cleanest test of "affine": every angle changes, no line bends.
 
 
 ---
@@ -197,15 +192,6 @@ A **displacement** (the vector from `q` to `p`, a velocity, a normal) feels only
 
 ---
 
-## Points and vectors, pictured
-
-<img src="../../textbook/figures/aff-points-vectors.svg" alt="a translation moving two points while the arrow between them keeps its direction and length" style="height:300px">
-
-Translate the scene: both points move, the arrow between them is the same arrow.
-
-
----
-
 ### Homogeneous coordinates
 
 <small>(~25 min)</small>
@@ -226,17 +212,6 @@ In one line: **`[A t; 0 1] · (x, 1) = (A x + t, 1)`**.
 - the top-left `3×3` is the linear part, **column 3** is the translation, the bottom row is `(0, 0, 0, 1)`
 - translation became a matrix multiply, so **every** placement transform is the same data type
 - this is why graphics is done in `4×4`: one code path, one upload to the GPU, one composition rule
-
-
----
-
-## Where homogeneous coordinates came from
-
-- **1827**: August Möbius introduces homogeneous (barycentric) coordinates in *Der barycentrische Calcul*
-- **1963**: Lawrence Roberts uses them for 3D graphics in his MIT thesis *Machine Perception of Three-Dimensional Solids*
-- today: every GPU vertex is four floats, and every placement is a `4×4`
-
-<img src="../../textbook/figures/aff-blocks.svg" alt="the 4x4 matrix divided into its linear block, translation column and bottom row" style="height:200px">
 
 
 ---
@@ -316,15 +291,6 @@ Same linear part, different translation column: **rotate then translate** drops 
 ```
 
 The scale **stretches the translation** when it acts second. Same lesson as `T·R` and `R·T`: column 3 carries the order.
-
-
----
-
-## Order, pictured
-
-<img src="../../textbook/figures/aff-order.svg" alt="an object rotated then translated beside the same object translated then rotated, landing in different places" style="height:300px">
-
-`T·R`: spin in place, then slide. `R·T`: slide, then swing about the origin on a lever arm of length `|t|`.
 
 
 ---
@@ -599,48 +565,6 @@ Scale first, rotate, move; undo in reverse: move back, unrotate, unscale.
 
 ---
 
-## The polar decomposition, step 1: the stretch
-
-For the shear `A = [[1, 0.5], [0, 1]]`, the stretch comes from `AᵀA`, which forgets any rotation:
-
-```text
-   AᵀA = [ 1    0.5  ]      eigenvalues  λ = 1.125 ± √(1.125² − 1) = 1.640, 0.610
-         [ 0.5  1.25 ]      eigenvectors (0.615, 0.788) at 52.0°,  (0.788, −0.615)
-
-   stretches √1.640 = 1.281 and √0.610 = 0.781
-
-   P = √(AᵀA) = [ 0.970  0.243 ]       symmetric; det P = 1.281 · 0.781 = 1 = det A
-                [ 0.243  1.091 ]
-```
-
-
----
-
-## The polar decomposition, step 2: the rotation
-
-```text
-   R = A P⁻¹ = [  0.970  0.243 ]      cos θ = 0.970, sin θ = −0.243   →   θ = −14.04°
-               [ −0.243  0.970 ]
-
-   check:  R P = [ 1  0.5 ]  = A   in every entry
-                 [ 0  1   ]
-```
-
-- a shear of 0.5 = a **28 % stretch** on one diagonal, a **22 % squeeze** on the other, then a **14° turn**
-- TRS stores `R · S` with `S` **diagonal**; this `P` is not diagonal, so no TRS equals `A`
-
-
----
-
-## Storage, pictured
-
-<img src="../../textbook/figures/aff-storage.svg" alt="the sixteen floats of a column-major matrix with the translation slots and the TRS fields an engine stores" style="height:260px">
-
-A `Transform` stores 10 floats (position 3, quaternion 4, scale 3) for 9 degrees of freedom; the full matrix is 16 floats for 12.
-
-
----
-
 ## Object space and world space
 
 Every object has its **own** frame; the model matrix `M` is the bridge:
@@ -694,19 +618,6 @@ bool sheared = Mathf.Abs(Vector3.Dot(u0, u1)) > 1e-4f;   // and the other two pa
 
 ---
 
-## What an affine product costs
-
-| operation | general `4×4` | using the affine structure |
-| --- | --- | --- |
-| transform a point | 16 multiplies | 9 multiplies + 3 adds |
-| compose two maps | 64 multiplies | 27 + 9 = 36 multiplies |
-| invert | general elimination | rigid: a transpose + 9 multiplies |
-
-Every engine keeps the bottom row implicit and exploits it: the `3×4` "affine matrix" of many engines is these savings made structural.
-
-
----
-
 ## Normals need the inverse transpose
 
 A surface direction `d` transforms by `A d`. A **normal** must stay perpendicular to the surface, and `A n` does not:
@@ -735,16 +646,6 @@ A normal `n` is defined by `n · d = 0` for every tangent `d`. Find `N` so that 
 
 - any `N` that keeps every such dot at zero is a multiple of `A⁻ᵀ`, so renormalizing afterward is all that is left
 - a rotation is orthogonal, `R⁻ᵀ = R`; a uniform scale `s I` gives `(1/s) I`, the same direction: **only non-uniform scale and shear** need it
-
-
----
-
-## Normals, pictured
-
-<img src="../../textbook/figures/aff-normals.svg" alt="a surface stretched by a non-uniform scale, with the naively transformed normal tilted off perpendicular and the inverse-transpose normal perpendicular" style="height:260px">
-
-Second case, from the text: tangent `(1, 1, 0)`, normal `(0.707, −0.707, 0)`, `A = diag(2, 1, 1)`:
-`A n · A d = 2.121` (wrong), `A⁻ᵀ n · A d = 0` (right).
 
 
 ---
@@ -789,7 +690,7 @@ float3 n = UnityObjectToWorldNormal(v.normal);
 A plane is a row `π = (n, d)` with `π · (x, 1) = 0`. Keep the equation true under `M`: `π' = π · M⁻¹`, i.e. `π'ᵀ = M⁻ᵀ πᵀ`.
 
 ```text
-   π = (1/3, 2/3, 2/3, −1/3)            the unit-normal plane of the vectors lecture
+   π = (1/3, 2/3, 2/3, −1/3)            the unit-normal plane of the vector-geometry topic
    π' = π · M⁻¹ = (1.238, 0.667, 0.522, −4.472)
    normalized:   n' = (0.825, 0.444, 0.348),  d' = −2.981
    check: a mapped point of the plane satisfies π' · (x', 1) = 0        (0 to 4 digits)
@@ -929,8 +830,8 @@ The bottom row `(0, 0, 0, 1)` is what keeps `w = 1`. Change it and the map is no
 ```
 
 - a matrix whose last row is not `(0,0,0,1)` is **projective**: lines still go to lines, but parallels can meet and ratios are not kept
-- `w = 0` is a **point at infinity**, which is exactly what a direction is: the vectors of tonight were points at infinity all along
-- the perspective matrix of the viewing lecture is the **one non-affine matrix** in the pipeline; the divide by `w` is its signature
+- `w = 0` is a **point at infinity**, which is exactly what a direction is: every `w = 0` vector is a point at infinity
+- the camera's perspective matrix is the **one non-affine matrix** in the pipeline; the divide by `w` is its signature
 
 
 ---
@@ -965,15 +866,6 @@ Same `H`, `w = 1 + 0.5 y`, along the line `x = 1`:
 ```
 
 Every vertical line approaches **(0, 2)**: the **vanishing point**, the image of the point at infinity `(0, 1, 0)`.
-
-
----
-
-## Projective, pictured
-
-<img src="../../textbook/figures/aff-projective.svg" alt="a grid under the projective map, its parallel lines converging toward a vanishing point" style="height:300px">
-
-Lines stay lines; parallels meet; midpoints are no longer midpoints.
 
 
 ---
@@ -1020,16 +912,4 @@ Both build `T·R·S`; `m.decompose(pos, quat, scale)` in three.js reads it back.
 2. A model matrix has `det = −2`. What happens to its triangles, and what should the renderer do?
 3. `M = T(p)·R·T(−p)` with `p = (0, 0, 3)`, `R = R_y(180)`. Column 3?
 4. A normal `(0, 1, 0)` under `A = diag(1, 4, 1)`: transform it.
-
-
----
-
-## Affine, one machine
-
-- an **affine map** is `A x + t`: lines to lines, parallels to parallels, ratios kept; `det A` is volume and handedness
-- **homogeneous coordinates** make it one `4×4` `[A t; 0 1]`: `w = 1` points move, `w = 0` vectors do not
-- **compose** by the block product `[BA, Bt + s]`, right to left: order matters through the translation
-- **invert** by `[A⁻¹, −A⁻¹t]`; rigid: `R^T` and `−R^T t`
-- a matrix **is a frame** (columns + origin); `TRS` is the 9-number case engines store; normals take `A⁻ᵀ`; pivots are `(I − R) p`
-- the last row `(0,0,0,1)` is the boundary: the perspective matrix crosses it
 

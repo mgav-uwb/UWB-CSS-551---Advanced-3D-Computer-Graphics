@@ -1,9 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Scene graphs and hierarchical modeling (~93 min).
-  RIGID BODIES (added 2026-09-30, conceptual): state and the engine step, broad and narrow
-  phase, restitution and friction, stacking and sleeping (Baraff, SIGGRAPH 1989), kinematic
-  vs dynamic and ragdolls, Unity PhysX vs three.js libraries, film vs games; media
-  ../../media/icons/sim-rigid.webp.
+  CSS 551 · TOPIC DECK: Scene graphs and hierarchical modeling (~66 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/scene-graphs.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -14,7 +10,10 @@
   Sung's SceneNode and its CompositeXform recursion; the matrix stack traced on a tree with a mirrored
   sibling; local to world and back with the inverse, the hand from three frames; the camera as a node
   (V as the inverse of its world matrix); dirty flags, bounding volumes up the tree, reuse of one mesh;
-  the inherited-shear pitfall.
+  the inherited-shear pitfall; the Unity Transform worked; three levels in two orders; a joint
+  at an end worked; the subtree claim checked on the demo.
+  MOVED 2026-10-06 (re-sequence): kinematics, inverse kinematics and skinning to topics/animation.md;
+  the rigid-bodies section to topics/physics-simulation.md; the recap slide removed.
   NEEDS:   the affine topic (block product, rigid inverse, pivot sandwich, column reading).
   DEMOS:   data-demo="scene-graph" data-controls="baseRy,armBend" (handRy and armT stay at 0).
            Fallback W_hand at baseRy = 30, armBend = 40: rows (0.66,-0.56,0.50,-0.78), (0.64,0.77,0,1.47),
@@ -38,7 +37,7 @@
 
 ### Scene graphs and hierarchical modeling
 
-<small>(~78 min)</small>
+<small>(~66 min)</small>
 
 
 ---
@@ -170,6 +169,23 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 ---
 
+## Worked: three levels, two orders
+
+`L_base = T(0, 1, 0)`, `L_arm = R_z(90°)`, `L_hand = T(2, 0, 0)`. The hand's origin, applied right to left:
+
+```text
+   W_hand · 0 = T(0,1,0) · R_z(90) · T(2,0,0) · 0
+      (0,0,0) → T(2,0,0) → (2,0,0) → R_z(90) → (0,2,0) → T(0,1,0) → (0, 3, 0)
+
+   swap the base and arm locals:  R_z(90) · T(0,1,0) · T(2,0,0) · 0
+      (2,0,0) → (2,1,0) → R_z(90) → (−1, 2, 0)
+```
+
+- the root-most factor acts **last**: a rotation above a translation swings it
+
+
+---
+
 ## The demo's arm: three locals
 
 ```text
@@ -209,6 +225,21 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 - put the **rotation** on a node whose origin is at the hinge
 - put the **geometry** on a child that shifts the mesh so the hinge is at its end
 - then animators key one rotation per joint and never touch a pivot
+
+
+---
+
+## Worked: a joint at an end
+
+A box spans `y ∈ [−1, 1]` about its origin. Hinge it by **30°** about its **lower end** and place that end at `(0, 3, 0)`:
+
+```text
+   L = T(0, 3, 0) · R_z(30°) · T(0, 1, 0)       lift the lower end to the origin, hinge, carry
+
+   translation column = (0, 3, 0) + R_z(30°)(0, 1, 0) = (−0.5, 3.866, 0)
+   lower end (0, −1, 0)  →  (0, 3, 0)            stays on the joint
+   upper end (0,  1, 0)  →  (−1, 4.732, 0)       swings by 30°
+```
 
 
 ---
@@ -419,6 +450,15 @@ const r = arm.worldToLocal(new THREE.Vector3(0, 1, 0));
 
 ---
 
+## The Transform: local and world, worked
+
+<img src="../../textbook/figures/unity-hierarchy.svg" alt="A parent at (2,0,0) turned 90 degrees about y; its child at local (1,0,0) lands at world (2,0,-1), and a grandchild at local (0,1,0) lands at (2,1,-1)" style="max-height: 280px; width: auto;">
+
+Parent at (2, 0, 0), turned 90° about y. Child at local (1, 0, 0): world = (2, 0, 0) + Ry(90°)·(1, 0, 0) = **(2, 0, −1)**. Grandchild at local (0, 1, 0): **(2, 1, −1)**.
+
+
+---
+
 ## Debugging a hierarchy: draw the frames
 
 - draw each node's **axes** at its world origin: three.js `new THREE.AxesHelper(0.3)` added to the node; Unity `Debug.DrawRay(t.position, t.right)` (and `up`, `forward`)
@@ -508,6 +548,20 @@ An edit to one node invalidates **its subtree's** world matrices and nothing els
 | a fingertip | 1 |
 
 The demo: hand yaw recomputes 1, the bend 2, the base yaw 3.
+
+
+---
+
+## Check: yaw the base to 90°
+
+At yaw 30°, bend 40°, the hand is at **(−0.779, 1.472, 0.450)**; in the base's frame it is **(−0.900, 1.272, 0)**, and the base sits at **(0, 0.2, 0)**.
+
+```text
+   yaw 90°:  (0, 0.2, 0) + R_y(90°) · (−0.900, 1.272, 0) = (0, 1.472, 0.900)
+   then change only the hand's yaw:  the hand's position does not move
+```
+
+- the base yaw recomputed **3** world matrices; the hand yaw recomputes **1**, and only an orientation changes
 
 
 ---
@@ -640,210 +694,10 @@ Parent `S(2, 1, 1)`, child `R_z(45°)`. The child's world columns:
 
 ---
 
-## Kinematics: the tree run forward and backward
-
-<img src="../../textbook/figures/anim-ik.svg" alt="a two-link arm reaching for a target, with the elbow-up and elbow-down solutions drawn" style="height:210px">
-
-- **forward kinematics**: joint angles in, hand position out: the composite rule, as tonight
-- **inverse kinematics**: hand position in, joint angles out: solve the composite rule **backward**
-
-
----
-
-## Worked: two-link inverse kinematics
-
-Links `l1 = 1`, `l2 = 0.8`; target `(1.2, 0.9)`, distance `d = 1.5`:
-
-```text
-   law of cosines at the elbow:  cos θ2 = (d² − l1² − l2²) / (2 l1 l2) = (2.25 − 1 − 0.64) / 1.6 = 0.3812
-                                 θ2 = 67.6°
-   shoulder:  θ1 = atan2(0.9, 1.2) − atan2(l2 sin θ2, l1 + l2 cos θ2) = 36.87° − 29.54° = 7.3°
-   elbow at (cos 7.3°, sin 7.3°) = (0.992, 0.128);  forward kinematics back to the tip: (1.2, 0.9)
-```
-
-
----
-
-## IK has two answers, or none
-
-```text
-   elbow down:  θ1 = 7.3°,   θ2 = 67.6°      elbow at (0.992, 0.128)
-   elbow up:    θ1 = 66.4°,  θ2 = −67.6°     elbow at (0.4, 0.916)
-   target (2, 0.5):  d = 2.062 > l1 + l2 = 1.8   unreachable: acos of a number above 1
-```
-
-Solvers pick a branch (a pole vector for knees and elbows) and **clamp** unreachable targets to the reach circle.
-
-
----
-
-## Skinning: one mesh, many bones
-
-<img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms" style="height:210px">
-
-A character is **one** mesh; each vertex follows a **weighted blend** of a few bones' transforms. Near a joint the weights share; far from it one bone owns the vertex.
-
-
----
-
-## Linear blend skinning
-
-```text
-   v' = Σ  wᵢ · Wᵢ · Bᵢ⁻¹ · v          Σ wᵢ = 1
-         i
-
-   Bᵢ   bone i's world matrix in the bind pose (when the mesh was attached)
-   Wᵢ   bone i's world matrix now
-   Bᵢ⁻¹ takes the vertex into bone i's frame; Wᵢ carries it back out, posed
-```
-
-Games cap influences at **4 bones per vertex** (glTF stores `JOINTS_0` and `WEIGHTS_0` as four each).
-
-
----
-
-## Worked: one vertex, two bones
-
-Vertex `(1.5, 0.1, 0)`, weights `0.5 / 0.5`. Bone A rotates `30°` about z at the origin; bone B (bind at `x = 1`) adds a local `45°` at its joint:
-
-```text
-   under A:   (1.249, 0.837, 0)
-   under B:   (0.899, 1.009, 0)
-   blended:   (1.074, 0.923, 0)          distance to the joint: 0.51 at rest → 0.471 posed
-```
-
-The blended point lies **between** the two rigid answers, and **closer to the joint** than either.
-
-
----
-
-## Pitfall: the candy wrapper
-
-2D vertex `(2, 0.4)`, weight `0.5`, bone B turns about `(2, 0)`:
-
-```text
-   B turns 90°:    B's image (1.6, 0),   blend (1.8, 0.2):   distance from the pivot 0.4 → 0.283
-   B turns 180°:   B's image (2, −0.4),  blend (2, 0):       distance 0: the limb collapses to its axis
-```
-
-Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion skinning** (Kavan et al., 2007) blends rotations on the sphere and keeps the volume.
-
-
----
-
-### When the tree meets physics: rigid bodies
-
-<small>(~15 min)</small>
-
-
----
-
-## A rigid body is a node that physics moves
-
-- **state**: position, orientation (a quaternion), **linear** velocity, **angular** velocity
-- **properties**: mass, how the mass is spread (the inertia), a **collider** shape
-- every fixed step the engine: adds forces (gravity, springs, your pushes), **integrates** velocity and position, then **resolves contacts**
-- the result is written back into the node's **local transform**, and the scene graph carries it from there
-
-
----
-
-## Collisions, step one: who might touch?
-
-- testing every pair is **n²**: 1,000 bodies make about 500,000 pairs
-- **broad phase**: wrap each body in a simple **bounding volume** (a box or sphere) and keep only pairs whose volumes overlap
-- boxes are kept in a structure (a sorted list, a grid or a **tree**) so overlaps are found without checking every pair
-- the bounding-volume tree is the same idea as the **BVH** of the ray tracing lecture
-
-
----
-
-## Collisions, step two: where exactly?
-
-- **narrow phase**: for each surviving pair, compute the actual **contact**: the points, the direction to separate them (the **contact normal**) and how deep they overlap
-- simple shapes have exact tests: sphere against sphere, box against box, capsule against mesh
-- complex meshes are approximated by **convex pieces** or simple collider shapes, never tested triangle by triangle every frame
-
-
----
-
-## Response: bounce, slide, stop
-
-- **restitution**: how much of the approach speed comes back as bounce (0 for clay, near 1 for a rubber ball)
-- **friction**: resists sliding along the contact; high friction makes objects stick and tumble, low friction makes them skate
-- engines apply short **impulses** (instant velocity changes) at the contact points, which is how a box hit on its corner starts to **spin**
-
-
----
-
-## Tumbling cubes, simulated for this course
-
-<img src="../../media/icons/sim-rigid.webp" class="media-shot" style="max-height: 300px;" alt="nine pastel cubes falling, colliding with the floor and each other, and settling on a pastel checkerboard">
-
-- nine cubes fall, hit the floor and **each other**, tumble and settle
-- each cube is a cluster of particles kept rigid by **shape matching**, the approach of NVIDIA's unified particle solver
-- a check confirms no two cubes overlap by more than **1 % of an edge** at rest
-
-
----
-
-## Why stacking is hard
-
-- a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
-- small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
-- engines add tricks: **sleeping** (freeze bodies that stopped moving), many **solver iterations**, a small allowed overlap (a contact **slop**)
-- Baraff (SIGGRAPH 1989) treated resting contact analytically, as forces found all at once for bodies that touch at many points
-
-
----
-
-## Kinematic, dynamic, and the ragdoll
-
-- **kinematic** body: moved by animation or code; it pushes others but nothing pushes it (a moving platform, an animated character)
-- **dynamic** body: moved by the physics engine (a crate, debris)
-- a **ragdoll** is a character's skeleton as a chain of dynamic bodies joined by joints: when a character falls, the game switches its bones from **animated to simulated**
-- blending the two (animation driving the bones as targets, physics reacting to hits) is **active ragdoll** or physics-based animation
-
-
----
-
-## Physics engines you will meet
-
-| | Unity (the Unity track) | three.js (the WebGL track) |
-| --- | --- | --- |
-| built in | **yes**: NVIDIA PhysX | **no** physics |
-| a body | add a `Rigidbody` component | a library body, e.g. cannon-es or Rapier |
-| a shape | a `Collider` (box, sphere, capsule, mesh) | the library's shapes |
-| who moves the node | the engine writes the `Transform` | you copy the body's position and quaternion to the mesh each frame |
-
-
----
-
-## Film and games want different physics
-
-- **games**: a few milliseconds per frame, must never explode, must respond to the player; approximations are fine if they look plausible
-- **film**: no frame budget, but close-ups, directors and continuity; accuracy, many substeps, and **art direction** (the simulation is re-run until the shot looks right)
-- both simulate **what cannot be keyframed** economically: debris, stacks, crowds of objects
-
-
----
-
 ## Check yourself
 
 1. `L_base = T(0, 1, 0)`, `L_child = R_z(90)`. Where does the child's local `(1, 0, 0)` land?
 2. A node has `L = S(1, 3, 1)`; its child has `L = R_z(45)`. Can the child's world transform be stored as TRS?
 3. You call three.js `parent.add(child)` on a child already placed in the world. What happens?
-4. A skinned vertex has weights `0.7, 0.2, 0.1, 0.05`. What is wrong?
-
-
----
-
-## Scene graphs, one idea
-
-- An **articulated thing** is a tree; each node owns a **local transform** in its parent's frame
-- `W_child = W_parent · L_child`: the product of locals from the root; the **recursion** (or the stack) computes it
-- **Local to world** is the composite; **world to local** its inverse; A to B is `W_B⁻¹ W_A`
-- The **camera** is a node: `V` is the inverse of its world matrix
-- **Dirty flags**, **subtree bounds**, and **shared meshes** make big trees cheap; non-uniform scale above a rotation makes **shear**
-- Animation, IK or **physics** may write a node's TRS; a **rigid body** is a node the engine moves
+4. The world point `(1, 0, -1)` lies near the arm of the two-node chain, `W_arm = R_y(90) · T(1, 0, 0)`. What are its coordinates in the arm's frame?
 

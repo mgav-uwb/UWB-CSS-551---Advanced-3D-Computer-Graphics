@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~45 min, 31 slides).
+  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~48 min, 35 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/meshes.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -9,7 +9,8 @@
   all eight triangles); the counts (n+1)², 2n², 6n²; face normals as cross
   products (flat (0, 2.25, 0), lifted (−0.6, 2.25, −0.6)); averaged vertex normals;
   flat, Gouraud and Phong shading; editing moves vertices; a surface of
-  revolution as a profile crossed with rotations; degenerate poles.
+  revolution as a profile crossed with rotations; degenerate poles; the other
+  diagonal; hard edges split vertices (a cube has 24); OBJ and glTF files.
   NEEDS:   the vectors topic (cross product); the rotation topic (R_y).
   DEMOS:   data-demo="mesh-grid" data-controls="n,lift" (under the page's crop).
   FIGURES: ../../textbook/figures/mesh-shading-modes.png, mesh-sweep.svg
@@ -27,7 +28,7 @@
 
 ### Polygonal meshes: everything is triangles
 
-<small>(~45 min)</small>
+<small>(~48 min)</small>
 
 
 ---
@@ -148,6 +149,22 @@ Apply the same split to all four quads: `index(row,col)` for the corners, `(v00,
 ```
 
 Eight triangles, 24 indices. Every interior edge is shared by two triangles; the center vertex `4` appears in **six** of them: stored once, referenced six times.
+
+
+---
+
+## The other diagonal
+
+A quad can be cut along **either** diagonal. Kelvin Sung's classroom code fans each quad from `v00`:
+
+```text
+   this topic's split, along v10–v01:    (0, 3, 1)  (1, 3, 4)
+   the fan from v00, along v00–v11:      (0, 3, 4)  (0, 4, 1)
+```
+
+- the same nine vertices and eight triangles, both wound counter-clockwise from above
+- they differ in **which edge the surface bends along** when a vertex is lifted
+- read a mesh's index array before assuming its split
 
 
 ---
@@ -305,6 +322,20 @@ n[4] = (triNormal[0] + triNormal[1] + triNormal[2]
 <img src="../../textbook/figures/mesh-shading-modes.png" class="media-shot" style="max-height: 360px;" alt="three renderings of the same 80-face icosphere: flat shaded with every facet visible; Gouraud shaded, smooth but with no highlight; Phong shaded, smooth with a specular highlight">
 
 <small>The same 80 triangles in the same positions, three times; only the normals and where they are evaluated change. Computed by the course-text generator.</small>
+
+
+---
+
+## Hard edges: one position, two normals
+
+Averaging assumes the surface is **smooth** across every edge. A cube averaged that way gets one diagonal normal per corner, `(1, 1, 1)/√3`, and shades as a rounded blob.
+
+- an edge whose two face normals differ by more than a threshold (Maya's and Blender's default: **30°**) is **hard**
+- a vertex holds **one** normal, so a hard edge forces a **split**: the vertex is stored once per smooth group, same position, different normals
+- a correctly shaded cube has **24** vertices, not 8: 6 faces × 4 corners
+- a flat-shaded 80-triangle sphere has **240** (every edge hard, 3 per triangle) against 42 smooth
+
+Texture seams force the same split: one position, two texture coordinates.
 
 
 ---
@@ -481,4 +512,46 @@ A CT scan, a fluid or a signed distance field gives **values on a grid**. Marchi
    crossing on an edge, by linear interpolation of the values:  e.g. t = 0.6 on edge 1–2
    → 4 triangles
 ```
+
+
+---
+
+## Mesh files: OBJ
+
+Wavefront **OBJ** (1990): text, one vertex or face per line, indices starting at **1**. The lifted 2×2 grid:
+
+```text
+   v -1.5 0 -1.5        f 1 4 2
+   v  0   0 -1.5        f 2 4 5
+   v  1.5 0 -1.5        f 2 5 3
+   v -1.5 0  0          f 3 5 6
+   v  0   0.4 0         f 4 7 5
+   v  1.5 0  0          f 5 7 8
+   v -1.5 0  1.5        f 5 8 6
+   v  0   0  1.5        f 6 8 9
+   v  1.5 0  1.5
+```
+
+- `f 1 4 2` is the triangle `(0, 3, 1)`: add 1 to every index
+- normals and texture coordinates are separate lists, joined per corner as `f 1/1/1 4/4/4 2/2/2`
+- no binary form, no scene graph, no animation; readable everywhere
+
+
+---
+
+
+## Mesh files: glTF
+
+**glTF 2.0** (Khronos, 2017), the interchange format for real-time work: JSON describing the scene, pointing into typed **binary buffers** the GPU uploads without parsing.
+
+```text
+   "accessors": [
+     { "componentType": 5126, "count": 9,  "type": "VEC3", "min": [-1.5,0,-1.5], "max": [1.5,0.4,1.5] },
+     { "componentType": 5126, "count": 9,  "type": "VEC3" },
+     { "componentType": 5123, "count": 24, "type": "SCALAR" } ]
+```
+
+- 5126 is float32, 5123 is uint16; mode 4 is a triangle list
+- the grid: positions 9 × 3 × 4 = **108** bytes, normals **108**, indices 24 × 2 = **48**: 264 bytes in one buffer
+- the position accessor's `min` and `max` are the bounding box a loader frames the model with
 

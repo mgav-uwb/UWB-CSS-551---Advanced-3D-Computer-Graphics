@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L07 discussion, HW3 walk-through and wrap (~20 min), the end of class.
+  CSS 551 · L07 discussion, HW3 walk-through and wrap (~32 min), the end of class.
   Three peer-instruction questions; answers ONLY in the notes; numbers computed by node against
   lib/core/xform.js (makeTRS, axisAngleMatrix, matMul, applyMat4) and from
   textbook/figures/numbers-foundations.json (aff) and numbers-pipeline.json (sg).
@@ -7,7 +7,7 @@
 
 ### Discussion
 
-<small>(~20 min)</small>
+<small>(~32 min, with the HW3 walk-through)</small>
 
 
 ---
@@ -48,18 +48,6 @@ At the default pose the hand's world matrix is `W_hand` (origin `(-0.78, 1.47, 0
 
 ---
 
-## Question 4: the platform and the crate
-
-In Unity, a moving platform carries a crate. The platform's script sets its **Transform** position every frame; it has no Rigidbody. The crate has a Rigidbody and a box collider. The crate **jitters and slides off**. What is the fix?
-
-- **A.** give the crate a mesh collider instead of a box collider
-- **B.** give the platform a Rigidbody marked **kinematic** and move it through the Rigidbody (`MovePosition`)
-- **C.** make the crate a child of the platform in the hierarchy
-- **D.** raise the crate's friction to its maximum
-
-
----
-
 ## HW3: affine and scene graphs
 
 Out tonight, due **Wed Oct 28, 11:59 PM**; Unity or WebGL. [HW3 page](../../homework/hw03/index.html)
@@ -93,6 +81,6 @@ Graded on the page's inputs and on a hidden set: a check scores only when both m
 
 A scene graph is a tree of local transforms, and each node's world matrix is the product of the locals from the root. Local to world is that product; world to local, and the camera's view matrix, are its inverse.
 
-- **Read:** [Scene Graphs](../../textbook/scene-graphs.html)
+- **Read:** [Scene Graphs](../../textbook/scene-graphs.html), Sections 1 to 14
 - **Due:** HW3, Wednesday October 28, 11:59 PM
 

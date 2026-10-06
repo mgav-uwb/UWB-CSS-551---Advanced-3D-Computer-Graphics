@@ -1,12 +1,11 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~78 min, 56 slides, incl. a short color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~60 min, 44 slides, incl. a short color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
 
   TEACHES: the light, normal and eye directions; local scope; Lambert's projected
-  area and N·L, clamped; the worked marked point (N·L = 0.988); normals under a
-  non-uniform scale and the inverse-transpose (36.9° error); the mirror vector
+  area and N·L, clamped; the worked marked point (N·L = 0.988); the mirror vector
   R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's half vector
   (H·N = 0.969); ambient; directional, point and spot lights; attenuation;
   several lights summed; HDR and Reinhard tone mapping.
@@ -17,6 +16,10 @@
   NUMBERS: textbook/figures/numbers-surfaces.json (ill.*), all recomputed by the
            surfaces generator against the demo's own vector math.
 
+  Condensed 2026-10-06 (twelve slides to the chapter only: the vectors and Lambert
+  figures, the normal transform (taught in the affine topic), the shininess table,
+  four models in eleven years, the nine-number sky, the uniform sky, the light-types
+  figure, the second light, tone mapping a real scene).
   Derived from the Plan B single-file deck sessions/S09-illumination (retired);
   the studio logistics, the light-to-shader globals slide and the CDP plan are gone.
 
@@ -28,7 +31,7 @@
 
 ### Local illumination: light, normal, eye
 
-<small>(~78 min)</small>
+<small>(~60 min)</small>
 
 
 ---
@@ -105,21 +108,9 @@ Ambient is flat, diffuse follows the cosine, specular is a small bright spot; th
 
 ---
 
-
-## The vectors at the marked point, drawn
-
-<img src="../../textbook/figures/ill-vectors.svg" class="media-shot" style="max-height: 280px;" alt="a surface point with its normal N, the light direction L, the view direction V, the mirror direction R and the half vector H">
-
-- **N** the surface normal, **L** toward the light, **V** toward the eye: all unit length, all from the point
-- **R** is L mirrored about N; **H** is halfway between L and V
-- the model uses only **dot products** of these five vectors
-
-
----
-
 ### Diffuse reflection
 
-<small>(~22 min)</small>
+<small>(~16 min)</small>
 
 ---
 
@@ -136,15 +127,6 @@ A **matte** surface (chalk, paper, unfinished wood) scatters incoming light **eq
 ```
 
 A fixed beam of light striking a surface **head-on** is concentrated on a small patch; striking at a **grazing** angle, the **same** beam smears over a larger patch, so each bit of surface catches **less**. Brightness tracks the **angle** the surface makes to the light.
-
-
----
-
-## Lambert's cosine, drawn
-
-<img src="../../textbook/figures/ill-lambert.svg" class="media-shot" style="max-height: 260px;" alt="a beam of parallel rays striking a surface head-on and at an angle; the tilted surface receives the same rays over a larger area">
-
-The same beam over a tilted patch covers an area larger by **1/cos θ**, so each unit of area receives **cos θ** as much light. At 60° the patch gets half.
 
 
 ---
@@ -292,57 +274,9 @@ The clamp earns its keep: `N·L` is almost `−1` (the point faces directly **aw
 
 ---
 
-## A trap: normals do not transform like points
-
-When you transform a model by a matrix **M** (the affine topic), you transform its **positions** by M. But transforming its **normals** by M is **wrong**: under a **non-uniform** scale the normal ends up **tilted off** the surface:
-
-```text
-   stretch a circle wide (scale x by 2):
-
-     before          transform the point by M     transform the normal by M
-      ↑ N               ↗ (still on rim)              → N no longer ⊥ surface!
-      ●──               ●────                          ●────  points the wrong way
-```
-
-A normal is **perpendicular** to the surface, and "perpendicular" is **not** preserved by non-uniform scaling. Positions and normals obey **different** transform rules: the fix is the next slide.
-
-
----
-
-## The fix: the inverse-transpose
-
-Transform a normal by the **inverse-transpose** of the model matrix, `(M⁻¹)ᵀ`, and perpendicularity is restored. It is the matrix that keeps the normal **orthogonal to the surface** after the surface deforms:
-
-```text
-   position:   p'  =  M · p
-   normal:     n'  =  (M⁻¹)ᵀ · n            then re-normalize
-```
-
-- for a **pure rotation** `(M⁻¹)ᵀ = M`, so nothing changes: the trap only bites under **scaling/shearing**
-- engines usually compute `(M⁻¹)ᵀ` for you and hand it to the shader as the "normal matrix"
-
-In Unity, `UnityObjectToWorldNormal` applies it; the Unity-shaders chapter shows the shortcut that breaks under non-uniform scale.
-
-
----
-
-## Normals under a non-uniform scale, drawn
-
-<img src="../../textbook/figures/ill-normal-transform.svg" class="media-shot" style="max-height: 250px;" alt="a circle scaled by 2 in x into an ellipse; at one point the normal transformed by M is wrong, the normal transformed by the inverse transpose is perpendicular to the surface">
-
-```text
-   the point (0.707, 0.707) of a circle, scaled by diag(2, 1):   it moves to (1.414, 0.707)
-   tangent after the scale: (−0.894, 0.447)
-   normal through M:        (0.894, 0.447)    · tangent = −0.6    36.9° off
-   normal through (M⁻¹)ᵀ:   (0.447, 0.894)    · tangent =  0      perpendicular
-```
-
-
----
-
 ### Specular and ambient
 
-<small>(~22 min)</small>
+<small>(~16 min)</small>
 
 ---
 
@@ -414,22 +348,6 @@ A raw cosine `R·V` gives a highlight **too broad** for a shiny surface. Raise i
 
 ---
 
-## Shininess: how fast the highlight falls off
-
-<img src="../../textbook/figures/ill-shininess.svg" class="media-shot" style="max-height: 200px;" alt="curves of cos to the power s for several s, narrowing as s grows">
-
-At the marked point, R·V = 0.879 and H·N = 0.969:
-
-| s | (R·V)^s, Phong | (H·N)^s, Blinn |
-| - | ------------- | -------------- |
-| 1 | 0.879 | 0.969 |
-| 4 | 0.597 | 0.881 |
-| 30 | **0.021** | 0.387 |
-| 128 | 0.00000007 | 0.018 |
-
-
----
-
 ## Honest note: the demo renders Blinn, not Phong
 
 The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial` shades with **Blinn's** variant: the **half-vector** `H = normalize(L + V)`, dotted with the **normal**:
@@ -472,21 +390,6 @@ Raising s narrows the lobe, and a narrow lobe also **reflects less total light**
 ```
 
 With the factor, a sharper highlight is **brighter and smaller** with the same total, the way a polished surface looks.
-
-
----
-
-
-## Four models in eleven years
-
-| year | who | what it added |
-| ---- | --- | ------------- |
-| 1971 | Gouraud | smooth shading: light the **vertices**, interpolate the **colors** |
-| 1975 | Phong | interpolate the **normals**, light every pixel; the specular term |
-| 1977 | Blinn | the **half vector**; reflection models grounded in optics (Torrance–Sparrow) |
-| 1982 | Cook and Torrance | a **microfacet** BRDF with Fresnel: the ancestor of PBR |
-
-Gouraud, Phong and Blinn worked at Utah; Cook and Torrance at Cornell.
 
 
 ---
@@ -538,41 +441,9 @@ Multiply the ambient term by it: contact shadows appear. A 90° crease sees half
 
 ---
 
-
-## A sky, in nine numbers
-
-<img src="../../textbook/figures/ill-sh.svg" class="media-shot" style="max-height: 200px;" alt="irradiance from a two-toned sky as a function of the normal's elevation, the exact curve and the spherical-harmonic fit lying on top of each other">
-
-A sky of radiance 1 above the horizon and 0.2 below. The irradiance a normal receives depends only on its **elevation**:
-
-```text
-   up (90°)        3.142        horizontal (0°)   1.885
-   the marked normal (35.3°)  2.611        straight down   0.628
-```
-
-Ramamoorthi and Hanrahan (2001): irradiance from **any** distant sky is captured to within a few percent by **9** spherical-harmonic coefficients. Diffuse lighting from an environment costs nine multiplies.
-
-
----
-
-
-## A uniform sky gives π
-
-Irradiance is the cosine-weighted sum of incoming radiance over the hemisphere. For a sky of radiance 1 in every direction:
-
-```text
-   E = ∫ L cos θ dω  =  π                           (not 2π: the cosine weights it)
-   a white Lambertian surface, BRDF ρ/π = 1/π:   outgoing radiance = (1/π) · π = 1
-```
-
-The **1/π** in the Lambert BRDF is what makes a white surface under a white sky exactly white: energy in equals energy out.
-
-
----
-
 ### Light sources
 
-<small>(~16 min)</small>
+<small>(~14 min)</small>
 
 ---
 
@@ -594,15 +465,6 @@ The **1/π** in the Lambert BRDF is what makes a white surface under a white sky
 - **spot**: a point light **restricted to a cone** (a **flashlight**): a point light plus a direction and a cone angle
 
 The demo used a **point** light. Real scenes mix all three.
-
-
----
-
-## The light types, drawn
-
-<img src="../../textbook/figures/ill-lights.svg" class="media-shot" style="max-height: 280px;" alt="a directional light with parallel rays, a point light radiating in all directions with falloff, and a spot light's cone with inner and outer angles">
-
-What changes between them is only **L** and a **strength** multiplier: constant for a directional light, a distance falloff for a point, a falloff times a cone factor for a spot. The lighting sum does not change.
 
 
 ---
@@ -696,21 +558,6 @@ Three dot products per light, summed. That is the entire local lighting model, e
 
 ---
 
-## Two lights, and one that adds nothing
-
-Add a second light at azimuth 200°, elevation 20°, half strength:
-
-```text
-   its L at the marked point:   N·L = −0.719      → diffuse max(0, −0.719) = 0
-                                R·V = −0.432      → specular 0
-   total diffuse: 0.988 + 0 = 0.988                 the second light is behind the surface here
-```
-
-Every light costs its evaluation **even when it contributes zero**. Culling lights by distance and cone before shading is where real-time lighting's speed comes from.
-
-
----
-
 
 ## Many lights, the cost
 
@@ -744,7 +591,7 @@ A disc light of radius 0.5 and radiance 1, straight above a point at height h, a
 
 ### High dynamic range and tone mapping
 
-<small>(~6 min)</small>
+<small>(~5 min)</small>
 
 ---
 
@@ -783,27 +630,10 @@ The simplest respectable tone-map is the **Reinhard** curve: divide each value b
 
 ---
 
-## Tone mapping a real scene
-
-<img src="../../textbook/figures/ill-tonemap.svg" class="media-shot" style="max-height: 200px;" alt="the Reinhard curve against a hard clip, with sky, cloud and sun values marked">
-
-```text
-   sky 6,  cloud 4,  sun 40                    (linear values; a white page would be about 1)
-   clipped:   1, 1, 1                          sky, cloud and sun indistinguishable
-   Reinhard:  0.857, 0.800, 0.976              three different brightnesses
-
-   exposure 0.5 first (halve everything):     sky 0.750,  sun 0.952
-```
-
-Exposure places the scene on the curve; the curve keeps everything distinct.
-
-
----
-
 
 ### Color in rendering
 
-<small>(~6 min)</small>
+<small>(~5 min)</small>
 
 
 ---

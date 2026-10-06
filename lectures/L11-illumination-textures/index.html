@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L06 · Affine Transformations</title>
+  <title>CSS 551 · L11 · Surface Appearance</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -38,33 +38,42 @@
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
 
-    /* trs-order embed renders FOUR stacked matrix panels (T·R, R·T, T, R),
-       taller than S03's single panel, so compact them + shrink the viewport to
-       stay inside the 700px slide budget. Data untouched; only on-slide size. */
-    [data-demo="trs-order"] .demo-viewport { height: 168px !important; }
-    [data-demo="trs-order"] canvas { height: 168px !important; }
-    [data-demo="trs-order"] .demo-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; align-content: start; }
-    [data-demo="trs-order"] .demo-panel .demo-hint { font-size: 9px !important; margin: 3px 0 0 !important; }
-    [data-demo="trs-order"] .demo-panel .mat-panel { font-size: 8.5px; }
-    [data-demo="trs-order"] .demo-panel .mat-panel td { padding: 1.5px 4px; min-width: 2.1em; }
+    /* curated figures from the course text */
+    .reveal .media-shot { max-height: 420px; width: auto; }
+    .reveal section small { font-size: 0.62em; }
+    /* discussion slides: the four options */
+    .reveal ul.options { list-style: none; margin-left: 0; }
+    /* compact readout panels for this lecture's embeds (data untouched; only the
+       on-slide footprint shrinks so the cockpit fits reveal's 700px budget) */
+    [data-demo] .demo-viewport { height: 196px !important; }
+    [data-demo] canvas { height: 196px !important; }
+    [data-demo] .demo-panel .mat-panel { font-size: 11px; }
+    [data-demo] .demo-panel .mat-panel td { padding: 1.5px 5px; min-width: 2.2em; }
+    [data-demo] .demo-panel .demo-hint { font-size: 10px !important; margin: 6px 0 0 !important; }
+    [data-demo] .demo-panel p { font-size: 11px !important; margin: 4px 0 0 !important; }
+    [data-demo] .demo-panel pre { font-size: 10px !important; margin: 6px 0 0 !important; padding: 6px 8px !important; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
-      <!-- One section per file, in order: the lecture opening (L06-open.md),
-           one or more ../../topics/*.md, then discussion and wrap (L06-discuss.md). -->
-      <section data-markdown="L06-open.md?v=20261005"
+      <!-- L11-open.md, then the topics, then L11-discuss.md (lectures/README.md). -->
+      <section data-markdown="L11-open.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/affine-transforms.md?v=20261005"
+      <section data-markdown="../../topics/illumination.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L06-discuss.md?v=20261005"
+      <section data-markdown="../../topics/texture-sampling.md?v=20261006"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="L11-discuss.md?v=20261006"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
