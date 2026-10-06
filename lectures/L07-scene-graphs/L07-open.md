@@ -22,6 +22,10 @@
 
 **Lecture 7: Scene Graphs and Hierarchical Modeling**
 
+> VRML 1.0 (1994), the first 3D format for the web, was based on the file format of SGI's Open Inventor scene-graph library.
+
+<small>VRML 1.0 specification (Bell, Parisi and Pesce), 1995</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

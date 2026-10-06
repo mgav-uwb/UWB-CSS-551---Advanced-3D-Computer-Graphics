@@ -22,6 +22,10 @@
 
 **Lecture 13: Path Tracing and the Cornell Box**
 
+> Eric Veach's 1997 thesis introduced multiple importance sampling; his research on efficient Monte Carlo path tracing later earned him an Academy Scientific and Technical award.
+
+<small>Veach, PhD thesis, Stanford, 1997; Academy Scientific and Technical Award, 2014</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

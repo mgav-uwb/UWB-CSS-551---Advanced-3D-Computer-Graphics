@@ -24,6 +24,10 @@
 
 **Lecture 9: Rasterization and Antialiasing**
 
+> Jack Bresenham's line algorithm, developed at IBM and published in 1965, uses integer additions only, no multiplication or division per pixel.
+
+<small>Bresenham, IBM Systems Journal, 1965</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

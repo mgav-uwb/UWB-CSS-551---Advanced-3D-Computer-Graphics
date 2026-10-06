@@ -22,6 +22,10 @@
 
 **Lecture 5: Affine Transformations**
 
+> Multiplying two 4 × 4 matrices takes 64 multiplications and 48 additions; for two affine matrices, whose last row is (0, 0, 0, 1), you can skip a quarter of that.
+
+<small>computed</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

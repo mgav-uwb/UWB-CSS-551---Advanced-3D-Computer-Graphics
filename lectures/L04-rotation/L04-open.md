@@ -25,6 +25,10 @@
 
 **Lecture 4: Rotation**
 
+> On 16 October 1843, William Rowan Hamilton carved i² = j² = k² = ijk = −1 into Broom Bridge in Dublin. The carving is gone; a plaque marks the spot, and mathematicians walk there every year.
+
+<small>Hamilton, letter to his son Archibald, 1865; plaque at Broom Bridge, Dublin</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

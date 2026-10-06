@@ -27,7 +27,10 @@
 
 **Lecture 3: Building Blocks**
 
-*Vectors, MVC, the main loop.*
+> "What I cannot create, I do not understand."
+
+<small>Richard Feynman, written on his blackboard, 1988</small>
+
 
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 

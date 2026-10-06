@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSS 551 · HW1 · The loop, MVC, and orientation</title>
+<title>CSS 551 · HW1 · The loop, input, and orientation</title>
 <style>
   :root{ --bg:#fcf8ff; --panel:#ffffff; --line:#e9def8; --ink:#2d2640; --dim:#6c6584;
          --accent:#1c8766; --accent2:#c2457e; --warn:#bf6a14; }
@@ -42,30 +42,34 @@
     #fcf8ff !important;background-attachment:fixed !important}
   h1{color:#2d2640}
   a{text-decoration-thickness:1.5px;text-underline-offset:2px}
+  .epi{margin:8px 0 6px;padding:2px 0 2px 14px;border-left:3px solid var(--line);color:#4a4360;font-size:15px}
+  .epi cite{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:2px}
 </style>
 </head>
 <body>
 <header>
-  <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
-  <h1>HW1 · The loop, MVC, and orientation</h1>
+  <h1>HW1 · The loop, input, and orientation</h1>
+  <blockquote class="epi">&ldquo;Everyone knows that debugging is twice as hard as writing a program in the first place. So if you're as clever as you can be when you write it, how will you ever debug it?&rdquo;<cite>Brian Kernighan and P. J. Plauger, The Elements of Programming Style, 2nd ed., 1978</cite></blockquote>
   <div class="meta">Out Thursday October 8 · due Wednesday October 14, 11:59 PM on Canvas · 25 points · Unity or WebGL · <a href="../../index.html">hub</a> · <a href="../../schedule/index.html">schedule</a> · <a href="../../syllabus/index.html">syllabus</a> · <a href="../index.html">all homework</a></div>
 </header>
 
-<div class="read"><b>Read before this homework:</b> <a href="../../textbook/unity-basics.html#scripts">Unity for This Course §4, the lifecycle and the two clocks</a> · <a href="../../textbook/unity-basics.html#mathtypes">§7, the math types</a> · <a href="../../textbook/unity-basics.html#rule">§11, implement and replace</a> · <a href="../../textbook/webgl-basics.html#serve">WebGL and three.js for This Course §1 to §3, serving and modules</a> · <a href="../../textbook/webgl-basics.html#loop">§5, the loop</a> · <a href="../../textbook/webgl-basics.html#homework">§10, how a homework runs</a> · <a href="../../textbook/interaction.html#loop">Interactive Systems §1 to §3 (the loop, the timestep, MVC)</a> · <a href="../../textbook/affine-transforms.html#trs">Affine Transformations §6, TRS</a></div>
+<div class="read"><b>Read before this homework:</b> <a href="../../textbook/unity-basics.html#scripts">Unity for This Course §4, the lifecycle and the two clocks</a> · <a href="../../textbook/unity-basics.html#mathtypes">§7, the math types</a> · <a href="../../textbook/unity-basics.html#rule">§11, implement and replace</a> · <a href="../../textbook/webgl-basics.html#serve">WebGL and three.js for This Course §1 to §3, serving and modules</a> · <a href="../../textbook/webgl-basics.html#loop">§5, the loop</a> · <a href="../../textbook/webgl-basics.html#homework">§10, how a homework runs</a> · <a href="../../textbook/interaction.html#loop">Interactive Systems §1 to §4 (the loop, the timestep, MVC, events)</a> · <a href="../../textbook/interaction.html#hit2d">§7, hit testing in two dimensions</a> · <a href="../../textbook/interaction.html#drag">§8, the drag gesture</a> · <a href="../../textbook/vectors.html#dot">Vectors §2 and §3, dot and cross</a></div>
 
 <h2>What you build</h2>
-<p>Three small functions behind the first thing every interactive graphics program does: move something
-      every frame at a speed that does not depend on the frame rate, turn a model's three numbers into the matrix
-      the view draws with, and aim an object at a target. The runner draws a cube with your matrix (the sliders
-      are the controller, the numbers the model, the cube and the matrix card two views of it) and an arrow aimed
+<p>Four small functions behind the first things every interactive graphics program does: move something
+      every frame at a speed that does not depend on the frame rate, decide which shape on the screen a pointer is
+      over, tell a click from a drag, and aim an object at a target. The runner draws a circle, a segment and a
+      triangle that your hit test lights up and your click-or-drag rule selects or moves (the shapes' positions are
+      the model, the pointer is the controller, the canvas and the readout are two views), next to an arrow aimed
       by your basis at a ball your loop moves.</p>
 <div class="tw"><table>
   <tr><th>JavaScript</th><th>C#</th><th>What it computes</th></tr>
 <tr><td><code>advance</code></td><td><code>Advance</code></td><td>p + velocity · dt: one frame of motion; velocity is per second, dt in seconds.</td></tr>
-<tr><td><code>trsMatrix</code></td><td><code>TrsMatrix</code></td><td>T(t) · R<sub>y</sub>(ry) · S(s, s, s) as a 4 × 4, built entry by entry. Column 0 is where the x axis lands, column 3 is t.</td></tr>
+<tr><td><code>hitTest2D</code></td><td><code>HitTest2D</code></td><td>true when a point is on a shape, in screen pixels. Circle: |p − center|² ≤ r². Segment: t = (p − a)·(b − a) / |b − a|² clamped to [0, 1], then |p − (a + t(b − a))| ≤ tol; when a = b, t = 0. Triangle: the 2D cross products (e − o) × (p − o) for the edges a→b, b→c, c→a; a hit unless one is negative and another positive.</td></tr>
+<tr><td><code>classifyPointer</code></td><td><code>ClassifyPointer</code></td><td>'drag' when the release is more than 4 pixels from the press (squared distance greater than 16), 'click' otherwise.</td></tr>
 <tr><td><code>orientBasis</code></td><td><code>OrientBasis</code></td><td>The unit axes {x, y, z} of an object at pos whose +z points at target: z = normalize(target − pos), x = normalize(up × z), y = z × x.</td></tr>
 </table></div>
-<ul><li>Angles in degrees; R<sub>y</sub> has column 0 = (cos, 0, −sin), the right-handed formula, which is also what Unity's own y rotation stores.</li><li>WebGL: matrices are column-major 16-arrays, entry (row r, column c) at index c · 4 + r. Unity: Matrix4x4 is indexed m[row, col].</li><li>The two advance checks call your function 60 times with dt = 1/60 and 20 times with dt = 1/20; both must land at the same place.</li></ul>
+<ul><li>Screen pixels: x to the right, y down. WebGL: a point is an array <code>[x, y]</code>; a shape is <code>{ kind: 'circle', center, r }</code>, <code>{ kind: 'segment', a, b, tol }</code> or <code>{ kind: 'triangle', a, b, c }</code>; the pointer positions are <code>{ x, y }</code>. Unity: <code>Vector2</code> points and the <code>Shape2D</code> struct in Checks.cs.</li><li>A point exactly on a boundary is a hit: distance r from a circle's center, distance tol from a segment, or on a triangle's edge. A triangle may come in either winding, so test that the three signs do not disagree rather than that they are all positive.</li><li>The drag threshold is 4 pixels, as in the drag state machine of Interactive Systems §8: a release exactly 4 pixels away is a click. With only the press and the release, the distance is from one to the other.</li><li>The course library's <code>dot</code>, <code>cross</code> and <code>sub</code> take 3-vectors (a 2-array gives NaN); write the 2D dot and cross products out by components.</li><li>The hit-test and pointer checks list one true or false per test point, in the order of the published inputs, and must match exactly.</li><li>The two advance checks call your function 60 times with dt = 1/60 and 20 times with dt = 1/20; both must land at the same place.</li></ul>
 
 <h2>The numbers a correct build reproduces</h2>
 <p>Each row is one check, run on your functions with the published inputs below. The same table appears under
@@ -74,20 +78,63 @@ the scene in the runner and in the Unity Console.</p>
   <tr><th>#</th><th>Check</th><th>Expected</th><th>Tolerance</th><th>Points</th></tr>
 <tr><td>1</td><td>advance: position after 1 s at 60 frames per second</td><td class="num">(3, 0, 0)</td><td class="num">0.0001</td><td>10</td></tr>
 <tr><td>2</td><td>advance: position after 1 s at 20 frames per second</td><td class="num">(3, 0, 0)</td><td class="num">0.0001</td><td>10</td></tr>
-<tr><td>3</td><td>trsMatrix(t, 30, 2): the 16 entries, column-major</td><td class="num">(1.7321, 0, -1, 0, 0, 2, 0, 0, 1, 0, 1.7321, 0, 2, 0.5, -1, 1)</td><td class="num">0.001</td><td>25</td></tr>
-<tr><td>4</td><td>trsMatrix applied to the point (1, 0, 0)</td><td class="num">(3.7321, 0.5, -2)</td><td class="num">0.001</td><td>10</td></tr>
-<tr><td>5</td><td>orientBasis: forward axis z (toward the target)</td><td class="num">(-0.5883, 0.1961, -0.7845)</td><td class="num">0.001</td><td>15</td></tr>
-<tr><td>6</td><td>orientBasis: right axis x</td><td class="num">(-0.8, 0, 0.6)</td><td class="num">0.001</td><td>15</td></tr>
-<tr><td>7</td><td>orientBasis: up axis y</td><td class="num">(0.1177, 0.9806, 0.1569)</td><td class="num">0.001</td><td>15</td></tr>
+<tr><td>3</td><td>hitTest2D circle: inside, just outside, on the circle</td><td class="num">(true, false, true)</td><td class="num">exact</td><td>6</td></tr>
+<tr><td>4</td><td>hitTest2D segment: on it, at tol, beyond tol, past endpoint b</td><td class="num">(true, true, false, false)</td><td class="num">exact</td><td>7</td></tr>
+<tr><td>5</td><td>hitTest2D segment with a == b: within tol, beyond tol</td><td class="num">(true, false)</td><td class="num">exact</td><td>4</td></tr>
+<tr><td>6</td><td>hitTest2D triangle (a, b, c): inside, outside, on an edge, on an edge's line outside</td><td class="num">(true, false, true, false)</td><td class="num">exact</td><td>6</td></tr>
+<tr><td>7</td><td>hitTest2D triangle (a, c, b), the other winding: the same four points</td><td class="num">(true, false, true, false)</td><td class="num">exact</td><td>2</td></tr>
+<tr><td>8</td><td>classifyPointer: is each release a drag? (true = 'drag', false = 'click')</td><td class="num">(false, false, false, true, true)</td><td class="num">exact</td><td>10</td></tr>
+<tr><td>9</td><td>orientBasis: forward axis z (toward the target)</td><td class="num">(-0.5883, 0.1961, -0.7845)</td><td class="num">0.001</td><td>15</td></tr>
+<tr><td>10</td><td>orientBasis: right axis x</td><td class="num">(-0.8, 0, 0.6)</td><td class="num">0.001</td><td>15</td></tr>
+<tr><td>11</td><td>orientBasis: up axis y</td><td class="num">(0.1177, 0.9806, 0.1569)</td><td class="num">0.001</td><td>15</td></tr>
 </table></div>
 <details><summary>The published inputs</summary><pre>{
  "speed": 3,
- "trs": {
-  "t": [ 2, 0.5, -1 ],
-  "ry": 30,
-  "s": 2
+ "circle": {
+  "center": [ 200, 150 ],
+  "r": 12,
+  "pts": [
+   [ 205, 154 ],
+   [ 208, 159 ],
+   [ 212, 150 ] ]
  },
- "point": [ 1, 0, 0 ],
+ "segment": {
+  "a": [ 100, 100 ],
+  "b": [ 180, 160 ],
+  "tol": 5,
+  "pts": [
+   [ 140, 130 ],
+   [ 137, 134 ],
+   [ 134, 138 ],
+   [ 188, 160 ] ]
+ },
+ "dot": {
+  "a": [ 300, 80 ],
+  "b": [ 300, 80 ],
+  "tol": 5,
+  "pts": [
+   [ 303, 84 ],
+   [ 304, 84 ] ]
+ },
+ "triangle": {
+  "a": [ 50, 50 ],
+  "b": [ 150, 60 ],
+  "c": [ 90, 140 ],
+  "pts": [
+   [ 95, 80 ],
+   [ 150, 120 ],
+   [ 100, 55 ],
+   [ 200, 65 ] ]
+ },
+ "pointer": {
+  "down": [ 400, 300 ],
+  "ups": [
+   [ 404, 300 ],
+   [ 403, 302 ],
+   [ 397, 302 ],
+   [ 403, 303 ],
+   [ 405, 301 ] ]
+ },
  "aim": {
   "pos": [ 1, 0.5, 2 ],
   "target": [ -2, 1.5, -2 ],
@@ -96,12 +143,12 @@ the scene in the runner and in the Unity Console.</p>
 }</pre></details>
 
 <h2>Implement and replace</h2>
-<p>Build each function from primitives (dot, cross, normalize, subtraction, component access, + − × ÷, sin and cos.) and use the engine's own helper, where one exists, only to
+<p>Build each function from primitives (dot, cross, normalize, subtraction, component access, + − × ÷, square root, min and max.) and use the engine's own helper, where one exists, only to
 check your result. These are off limits in your submission:</p>
 <div class="tw"><table>
   <tr><th>Track</th><th>Off limits</th></tr>
-<tr><td>WebGL (JavaScript)</td><td><code>makeTRS</code> from xform.js; <code>THREE.Matrix4.compose</code>, <code>makeRotationY</code>, <code>lookAt</code>; <code>Object3D.lookAt</code>; any Quaternion.</td></tr>
-<tr><td>Unity (C#)</td><td><code>Matrix4x4.TRS</code>, <code>Matrix4x4.Rotate</code>; <code>Quaternion.Euler</code>, <code>AngleAxis</code>, <code>LookRotation</code>; <code>Transform.LookAt</code>, <code>Transform.Rotate</code>.</td></tr>
+<tr><td>WebGL (JavaScript)</td><td><code>THREE.Raycaster</code>; <code>THREE.Triangle.containsPoint</code>, <code>getBarycoord</code>; <code>THREE.Line3.closestPointToPoint</code>; <code>THREE.Box2</code>, <code>Sphere</code> <code>containsPoint</code>; the canvas's <code>isPointInPath</code>, <code>isPointInStroke</code>; <code>THREE.Matrix4.lookAt</code>; <code>Object3D.lookAt</code>; any Quaternion.</td></tr>
+<tr><td>Unity (C#)</td><td><code>Physics2D.OverlapPoint</code>; <code>Collider2D.OverlapPoint</code>, <code>ClosestPoint</code>; <code>Bounds.Contains</code>, <code>Rect.Contains</code>; <code>RectTransformUtility.RectangleContainsScreenPoint</code>; <code>HandleUtility.DistancePointLine</code>, <code>DistancePointToLineSegment</code>; <code>EventSystem.pixelDragThreshold</code> and the drag handlers; <code>Quaternion.LookRotation</code>, <code>Matrix4x4.LookAt</code>, <code>Transform.LookAt</code>.</td></tr>
 </table></div>
 
 <h2>Getting started</h2>

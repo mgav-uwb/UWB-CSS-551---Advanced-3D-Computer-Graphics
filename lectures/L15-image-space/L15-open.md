@@ -24,6 +24,10 @@
 
 **Lecture 15: The Space of Images**
 
+> A 256 × 256 RGB image is a single point in a space of 196,608 dimensions.
+
+<small>computed: 256 × 256 × 3</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

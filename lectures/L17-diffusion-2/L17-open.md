@@ -22,6 +22,10 @@
 
 **Lecture 17: Diffusion Models II**
 
+> DDIM (2021) made the sampler deterministic and cut the steps to tens, from the same trained network.
+
+<small>Song, Meng and Ermon, arXiv:2010.02502</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

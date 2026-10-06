@@ -24,6 +24,10 @@
 
 **Lecture 19: Generative 3D and Video, and Where the Field Is Going**
 
+> DreamFusion (2022) made 3D objects from text with no 3D training data, by using a 2D image model as a critic of rendered views.
+
+<small>Poole et al., arXiv:2209.14988</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

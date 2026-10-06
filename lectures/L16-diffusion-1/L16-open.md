@@ -25,6 +25,10 @@
 
 **Lecture 16: Diffusion Models I**
 
+> DDPM (2020) used T = 1000 noise steps, and sampling ran the network once per step.
+
+<small>Ho, Jain and Abbeel, arXiv:2006.11239</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

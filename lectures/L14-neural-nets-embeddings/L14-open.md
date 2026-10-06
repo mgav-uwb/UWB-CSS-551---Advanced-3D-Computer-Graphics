@@ -24,6 +24,10 @@
 
 **Lecture 14: Neural Networks and Embeddings**
 
+> Rumelhart, Hinton and Williams popularized backpropagation in a 1986 Nature paper.
+
+<small>Nature 323, 533 to 536 (1986)</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

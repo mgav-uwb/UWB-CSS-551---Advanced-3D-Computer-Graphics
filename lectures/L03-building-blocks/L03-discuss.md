@@ -13,10 +13,12 @@
     Q4  v *= 0.95 per frame: 0.95^30 = 0.215, 0.95^60 = 0.046, ratio 4.66.
         Distractors: 0.21 (inverted), 1 (the per-second fix), 2 (frame-count ratio).
     HW1 (lib/skeletons/hw01.js, lib/skeletons/expected.js): advance() reaches
-        (3,0,0) after one second at 60 Hz and at 20 Hz; trsMatrix for
-        t = (2,0.5,-1), 30 deg, s = 2 has rows [1.732 0 1 2] [0 2 0 0.5]
-        [-1 0 1.732 -1]; it sends (1,0,0) to (3.732, 0.5, -2); orientBasis's
-        numbers are on the homework page.
+        (3,0,0) after one second at 60 Hz and at 20 Hz; hitTest2D: circle (200,150)
+        r 12 against (208,159): 64 + 81 = 145 > 144, a miss; segment (100,100) to
+        (180,160), tol 5, against (188,160): t = 1.064 clamps to 1, distance 8 to b
+        (4.8 from the infinite line), a miss; classifyPointer: release at (3,3) from
+        the press, 18 > 16, drag; at (4,0), 16, click (TRS replaced 2026-10-06:
+        matrices come in L05); orientBasis's numbers are on the homework page.
   Resequenced 2026-10-05: the old Question 3 (local to world through a parent's rotation)
   needs the scene-graph composition and is archived in
   ../archive/L03-L11-pre-resequence-2026-10-05/ (the old L03 discuss file).
@@ -79,14 +81,15 @@ A game slows a sliding puck with `v *= 0.95;` once **per frame**. After **one se
 
 ---
 
-## HW1: the loop, MVC, and orientation
+## HW1: the loop, input, and orientation
 
 Out tonight, due **Wednesday October 14, 11:59 PM**. Unity or WebGL. <a href="../../homework/hw01/index.html">The homework page</a>
 
-Three functions, each checked against numbers on the page:
+Four functions, each checked against numbers on the page:
 
 - **advance** (per second, not per frame): after one second of frames the object reaches **(3, 0, 0)** at 60 Hz **and** at 20 Hz
-- **the TRS matrix**, entry by entry, from <a href="../../textbook/affine-transforms.html">Affine Transformations</a>, Section 6: t = (2, 0.5, −1), 30° about y, s = 2 sends (1, 0, 0) to **(3.732, 0.5, −2)**
+- **hitTest2D**, in pixels: a circle by squared distance (145 > 144 is a miss), a segment by projecting and **clamping t to [0, 1]**, a triangle by the **signs of three 2D cross products**, either winding; on the boundary counts as a hit
+- **classifyPointer**: a drag only when the release is **more than 4 px** from the press; (3, 3) is a drag, (4, 0) a click
 - **orient an object** to face a target from a subtraction, a normalize and two cross products; the engine's look-at is **off limits** and is your answer key
 
 

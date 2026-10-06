@@ -25,6 +25,10 @@
 
 **Lecture 18: Learned Scenes**
 
+> The original NeRF (2020) stores a whole scene in one network of eight layers of 256 units: a few hundred thousand weights.
+
+<small>course text, Learned Scenes</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 

@@ -29,7 +29,10 @@
 
 **Lecture 11: Surface Appearance**
 
-*Illumination and texture mapping.*
+> Jim Blinn introduced bump mapping in 1978, two years after he and Martin Newell introduced environment mapping.
+
+<small>Blinn, SIGGRAPH 1978; Blinn and Newell, CACM 1976</small>
+
 
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 

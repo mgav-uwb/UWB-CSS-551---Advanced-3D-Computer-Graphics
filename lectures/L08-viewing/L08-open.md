@@ -26,6 +26,10 @@
 
 **Lecture 8: Viewing**
 
+> The camera obscura was described in Chinese Mohist writings around the 4th century BCE and by Ibn al-Haytham around 1021.
+
+<small>the Mohist Canon, about the 4th century BCE; Ibn al-Haytham, Book of Optics, about 1021</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

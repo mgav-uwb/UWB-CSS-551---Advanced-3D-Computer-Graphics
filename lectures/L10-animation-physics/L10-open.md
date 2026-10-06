@@ -24,6 +24,10 @@
 
 **Lecture 10: Animation and Physics**
 
+> Luxo Jr. (1986) was the first 3D computer-animated film nominated for an Academy Award.
+
+<small>59th Academy Awards, 1987</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

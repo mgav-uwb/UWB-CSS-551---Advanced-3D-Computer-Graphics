@@ -360,10 +360,12 @@ g.attributes.position.needsUpdate = true;</pre>
           <tr><th></th><th>check</th><th>pts</th><th>yours</th><th>expected</th></tr>
           <tr><td>&cross;</td><td>advance: position after 1 s at 60 frames per second</td><td>10</td><td>(0, 0, 0)</td><td>(3, 0, 0)</td></tr>
           <tr><td>&cross;</td><td>advance: position after 1 s at 20 frames per second</td><td>10</td><td>(0, 0, 0)</td><td>(3, 0, 0)</td></tr>
-          <tr><td>&cross;</td><td>trsMatrix(t, 30, 2): the 16 entries, column-major</td><td>25</td><td>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)</td><td>(1.7321, 0, -1, 0, 0, 2, 0, 0, 1, 0, 1.7321, 0, 2, 0.5, -1, 1)</td></tr>
-          <tr><td>&cross;</td><td>trsMatrix applied to the point (1, 0, 0)</td><td>10</td><td>(1, 0, 0)</td><td>(3.7321, 0.5, -2)</td></tr>
+          <tr><td>&cross;</td><td>hitTest2D circle: inside, just outside, on the circle</td><td>6</td><td>(false, false, false)</td><td>(true, false, true)</td></tr>
+          <tr><td>&cross;</td><td>hitTest2D segment: on it, at tol, beyond tol, past endpoint b</td><td>7</td><td>(false, false, false, false)</td><td>(true, true, false, false)</td></tr>
         </table>
-        Read <em>yours</em> against <em>expected</em> as a diagnosis. All zeros is a stub. A list that matches the
+        Read <em>yours</em> against <em>expected</em> as a diagnosis. All zeros, or all false, is a stub. A hit test
+        that is right everywhere except on the boundary compares with <code>&lt;</code> where the definition says
+        <code>&le;</code>. A list that matches the
         expected one with entries 1 and 4, 2 and 8, 3 and 12 (and so on) swapped is a transpose, the
         <code>Matrix4.set</code> trap of Section 7. A vector of the right direction and the wrong length is a missing
         normalize or a missing \(dt\). A result that is right at 60 frames per second and wrong at 20 is a step
@@ -451,7 +453,7 @@ g.attributes.position.needsUpdate = true;</pre>
       </div>
       <div class="ex">
         <span class="tag">Exercise 5 (the transpose, read from a check)</span>
-        A student&rsquo;s <code>trsMatrix</code> for HW1 returns <code>(1.7321, 0, 1, 2, 0, 2, 0, 0.5, -1, 0, 1.7321, -1, 0, 0, 0, 1)</code>. What did they do?
+        A student&rsquo;s function for \(T(2, 0.5, -1)\,R_y(30^\circ)\,S(2)\), meant to return a column-major 16-array, returns <code>(1.7321, 0, 1, 2, 0, 2, 0, 0.5, -1, 0, 1.7321, -1, 0, 0, 0, 1)</code>. What did they do?
         <details><summary>Solution</summary>
           They wrote the rows in order: the translation \((2, 0.5, -1)\) sits at indices 3, 7, 11, the bottom row of a column-major array. It is the transpose of the expected matrix, the result of the <code>Matrix4.set</code> habit applied to a plain array.
         </details>

@@ -23,6 +23,10 @@
 
 **Lecture 12: Light Transport, PBR, and Ray Tracing**
 
+> Jim Kajiya's 1986 paper The Rendering Equation stated the equation and introduced path tracing to solve it.
+
+<small>Kajiya, SIGGRAPH 1986</small>
+
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 
 

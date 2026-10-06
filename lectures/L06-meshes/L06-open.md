@@ -25,7 +25,10 @@
 
 **Lecture 6: Meshes**
 
-*Triangles, normals, and the texture coordinates they carry.*
+> For a closed triangle mesh without holes, Euler's formula V − E + F = 2 implies about twice as many triangles as vertices: the bunny's 69,451 triangles on 35,947 vertices come close.
+
+<small>course text, Polygonal Meshes; computed</small>
+
 
 <small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
 

@@ -25,6 +25,10 @@
 
 **Lecture 20: Inverse and Differentiable Rendering**
 
+> "If you can't solve a problem, then there is an easier problem you can solve: find it."
+
+<small>George Pólya, How to Solve It, 2nd ed., 1957</small>
+
 <small>Autumn 2026 · Thu 5:45–7:45 PM (in person) · Dr. Marcel Gavriliu</small>
 
 
