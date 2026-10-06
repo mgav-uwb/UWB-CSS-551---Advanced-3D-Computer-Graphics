@@ -26,10 +26,10 @@
       </p>
 
       <h1>Rotation: Axis-Angle, Quaternions, Euler Angles</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; one operation, four representations, the conversions between them, and why engines store the quaternion. Assigned by your offering&rsquo;s course site; pairs with the lecture on vectors and rotations.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;How about sending me a fourth gimbal for Christmas?&rdquo;
+        <cite>Michael Collins, Apollo 11, when Houston warned of gimbal lock, 1969</cite>
+      </blockquote>
 
       <p class="lead">
         A rotation keeps lengths and angles and fixes the origin, which makes it the best-behaved transform in graphics and, at the same time, the hardest to store well. A matrix applies it fast but drifts and cannot be blended; an axis and an angle say what it is; a quaternion stores it in four numbers that compose by multiplication and blend along a sphere; three Euler angles read nicely and lock. This chapter builds the four in that order, proves what a rotation matrix must satisfy and checks it numerically, derives Rodrigues&rsquo; formula from the projection split of <a href="vectors.html#dot">the vectors chapter</a> and then writes it as a matrix, recovers an axis and angle from a matrix, converts a quaternion to a matrix and back, verifies the quaternion sandwich on a point by hand, extracts Euler angles from a matrix and watches the extraction fail at the lock, and measures the drift with real single-precision arithmetic. One axis and angle, \((0, 1, 0)\) at \(30^\circ\), runs through the worked examples and the live demo.

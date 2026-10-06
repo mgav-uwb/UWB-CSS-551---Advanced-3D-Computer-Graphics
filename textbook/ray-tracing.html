@@ -28,10 +28,10 @@
       </p>
 
       <h1>Ray Tracing and Global Illumination</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; rendering by following light backward: camera rays, intersections with spheres, triangles and boxes, rays through instanced objects, Whitted&rsquo;s recursive shadows, reflections and refractions, the distributed rays that soften them, the acceleration structure that makes it feasible, Monte Carlo integration with importance sampling and the combination of two strategies, path tracing with a Cornell box rendered by the chapter&rsquo;s own code, light in a medium, and the other global-illumination methods. Not tied to a lecture; pairs with the light-transport chapter, which owns the rendering equation and the BRDF.
-      </div>
+      <blockquote class="epigraph fact">
+        Arthur Appel cast rays from the eye to shade and shadow solids in 1968, at IBM, twelve years before Whitted&#x27;s recursive ray tracer.
+        <cite>Appel, Some Techniques for Shading Machine Renderings of Solids, AFIPS 1968</cite>
+      </blockquote>
 
       <p class="lead">
         The rasterizer of the earlier chapters asks, for each triangle, which pixels it covers. Ray tracing asks the opposite question, for each pixel, which surface it sees, by following a ray from the eye through the pixel into the scene. The reversal costs a search per pixel and buys everything the rasterizer cannot do directly: exact shadows, mirrors, glass, and, once the rays are allowed to bounce at random, the whole of global illumination. This chapter builds the machine from its parts. It casts a camera ray through the illumination demo&rsquo;s sphere and solves the quadratic by hand, intersects a triangle two ways and a box, sends a ray into an instanced ellipsoid, traces Whitted&rsquo;s reflection and refraction tree with Snell&rsquo;s law and the Fresnel factor worked, renders a small scene with that recursion, and then softens it: an area light sampled for a penumbra and a thin lens for depth of field, both rendered. A bounding-volume hierarchy turns a scene of seventy thousand triangles from impossible to routine. The second half replaces the fixed tree by random sampling: a four-sample Monte Carlo estimate, the measured \(1/\sqrt{N}\) convergence, the two ways to sample a lighting integral and the combination that survives both failures, and a Cornell box path-traced at 8 and 512 samples per pixel next to the same scene lit directly, the difference being the indirect light a local model omits. Fog and the shader stages of a hardware ray tracer close the chapter.

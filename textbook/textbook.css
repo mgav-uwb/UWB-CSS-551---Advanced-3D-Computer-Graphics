@@ -102,3 +102,8 @@
       .pipe .st.prog { border-color: var(--demo); background: var(--demobg); }
       .pipe .st.prog strong { color: var(--demo); }
       .pipe .arr { align-self: center; color: var(--dim); flex: 0 0 auto; }
+
+/* chapter epigraph: a quote or a fact in place of a subtitle */
+.epigraph { margin: 6px 0 22px; padding: 4px 0 4px 16px; border-left: 3px solid #b9c0d0; color: #33363f; font-style: italic; font-size: 17px; }
+.epigraph.fact { font-style: normal; font-size: 16px; }
+.epigraph cite { display: block; font-style: normal; font-size: 13.5px; color: #5c6270; margin-top: 4px; }

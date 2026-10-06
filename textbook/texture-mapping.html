@@ -26,10 +26,10 @@
       </p>
 
       <h1>Texture Mapping: Coordinates, Placement, Sampling</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; how an image is attached to a surface through per-vertex coordinates, moved with a \(3\times3\) matrix, read back through a filter, precomputed into a mipmap, synthesized from a formula, and used to fake relief. Assigned by your offering&rsquo;s course site; pairs with the texture mapping lecture and the uv-placement and bump-map demos.
-      </div>
+      <blockquote class="epigraph fact">
+        “MIP” in mipmap stands for multum in parvo, Latin for “much in little”; Lance Williams introduced mipmaps in 1983.
+        <cite>Williams, Pyramidal Parametrics, SIGGRAPH 1983</cite>
+      </blockquote>
 
       <p class="lead">
         A brick wall is geometrically a rectangle. Its bricks, mortar and chips are color, not shape, and modeling them as triangles would spend millions of them on a flat picture. Texture mapping separates the two: the surface keeps its few triangles and takes its appearance from a two-dimensional image through one new per-vertex attribute, a coordinate into that image. Everything else in the chapter is an operation on that coordinate. It is interpolated by the rasterizer like any attribute, transformed by a \(3\times3\) affine matrix to place the image (the homogeneous machinery of the affine chapter, one dimension down), and finally turned into a color by a sampler that must handle both a texel spread over many pixels and many texels crowded into one. The chapter works every step on the \(2\times2\) grid of the meshes chapter and the \(8\times8\) checkerboard of the uv-placement demo, including both of the demo&rsquo;s placement matrices to the last digit, a bilinear sample by hand, the mip level a pixel selects from its derivatives, the mip pyramid of the checker, a block-compressed texel, the tangent frame of one triangle, and a bump-mapped normal. Two further uses of the machinery close it: a cube map read by direction, and a shadow map, a texture of depths compared rather than displayed.

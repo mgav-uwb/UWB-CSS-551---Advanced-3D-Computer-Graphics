@@ -27,10 +27,10 @@
       </p>
 
       <h1>Curves and Surfaces: B&eacute;zier, B-Splines, Subdivision</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; smooth shapes from a few control points: the B&eacute;zier curve and de Casteljau&rsquo;s construction, the matrix form and conversions between bases, rendering by subdivision, arc length and curvature, joining pieces with continuity, B-splines with knot vectors and de Boor&rsquo;s algorithm, rational curves, corner cutting, the bicubic patch, Catmull&ndash;Clark and Loop subdivision, and implicit surfaces. Not tied to a lecture; read it with the meshes chapter and before the animation chapter.
-      </div>
+      <blockquote class="epigraph fact">
+        Paul de Casteljau devised his curve algorithm at Citroën in 1959, in internal reports the company kept secret; Pierre Bézier published the same curves from Renault, and they carry his name.
+        <cite>Farin, A History of Curves and Surfaces in CAGD, 2002</cite>
+      </blockquote>
 
       <p class="lead">
         A triangle mesh is a list of flat pieces. A designer does not think in flat pieces; a designer moves a handful of points and expects a smooth shape to follow. This chapter is the mathematics of that expectation. A cubic B&eacute;zier curve is four control points blended by four polynomials, and de Casteljau&rsquo;s construction evaluates it with nothing but repeated midpoints; the chapter works one curve both ways at \(t = 0.5\), reads its tangent off the construction, writes the same curve as a matrix product, and renders it by splitting until the pieces are flat. It measures the curve&rsquo;s speed, arc length and curvature, since an animator and a tessellator both need them. Longer shapes are pieces joined with a continuity condition, or a B-spline whose control points act locally and whose knot vector is worked with de Boor&rsquo;s algorithm, or a rational curve that can be an exact circle. The same ideas one dimension up give the bicubic patch of the Utah teapot, and the corner-cutting idea applied to a polygon, a cube and an icosahedron gives subdivision curves and surfaces, with one step of Catmull&ndash;Clark and one of Loop worked by hand. A last section gives the other way to define a smooth shape, as the zero set of a field. The meshes that get rendered are still triangles; these are the shapes they approximate.

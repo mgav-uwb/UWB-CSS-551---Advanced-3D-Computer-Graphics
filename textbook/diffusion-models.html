@@ -27,12 +27,10 @@
       </p>
 
       <h1>Diffusion Models</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; destroy, learn to undo, sample: the mechanism, its three parameterizations, where the loss comes from, the samplers and the flows that replaced them, the knobs, how a model is judged, and the scalings to Stable Diffusion. Assigned by your offering&rsquo;s course site; pairs with the lecture&rsquo;s exhibit ladder.
-      </div>
+      <blockquote class="epigraph fact">
+        Diffusion models began in a 2015 paper by Sohl-Dickstein and colleagues that borrowed its idea from non-equilibrium thermodynamics.
+        <cite>Sohl-Dickstein et al., arXiv:1503.03585</cite>
+      </blockquote>
 
       <p class="lead">
         A diffusion model answers the one-to-many problem of <a href="image-space.html">the space of images</a> with noise: walk real images into noise on a schedule you control, train a network to undo one small step, then start from fresh noise and undo all the way. This chapter writes the recipe out, derives the exact denoiser that the course&rsquo;s demos compute, shows that predicting the image, the noise, the score and the velocity are one function in four coordinates, says where the training loss comes from, states the samplers and measures how their accuracy depends on the number of steps, presents flow matching as the straight-line version of the same idea, explains guidance and its cost, follows the three scalings that turn a digit-drawing network into Stable Diffusion, and asks how any of it is evaluated. Every stage is shown twice: on a dataset of dots small enough to draw the whole thing, and on real digits, including samples drawn from the course&rsquo;s own trained network. It closes with what still breaks and the papers.

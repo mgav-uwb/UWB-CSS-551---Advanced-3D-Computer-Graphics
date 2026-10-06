@@ -28,10 +28,10 @@
       </p>
 
       <h1>Animation and Interpolation: Keyframes, Easing, Rotations, Skinning, Simulation</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; how a scene moves: keyframes and the curves between them, the curve editor&rsquo;s handles, retiming with easing and the animator&rsquo;s principles, interpolating rotations correctly through two keys and through many, blending transforms without shrinking, forward and inverse kinematics on a chain, the bind pose and skinning, and simulation from one spring to a particle system, a cloth and a bounce. Not tied to a lecture; pairs with the keyframe demo and the scene-graph chapter.
-      </div>
+      <blockquote class="epigraph fact">
+        Hunger (1974), animated with Burtnyk and Wein&#x27;s computer keyframe interpolation at Canada&#x27;s National Research Council, was nominated for an Academy Award.
+        <cite>Burtnyk and Wein, Interactive Skeleton Techniques, CACM 1976; Academy Awards, 1975</cite>
+      </blockquote>
 
       <p class="lead">
         Everything earlier in the text places, views, builds, dresses and lights a scene at one instant. Animation is the function from time to all of that: positions, orientations, joint angles, vertex positions. Nobody authors that function frame by frame. An animator sets a few <em>keyframes</em> and the computer interpolates, and the whole subject is the question of what to interpolate and how. Positions interpolate along a curve, and the choice between straight hops and a spline is worked on the keyframe demo&rsquo;s three keys; the curve editor that animators use is a B&eacute;zier in time with one constraint worked to the failure that breaks it. Time itself is interpolated by an easing function. Rotations must not be interpolated as matrices or Euler angles, and the chapter shows what goes wrong (a shrinking matrix, a collapsed joint), works the quaternion slerp between two keys, and the squad that removes the corner between three. A skeleton is the scene-graph chain of the scene-graphs chapter driven by angles, solved forward and, for one two-link arm, inverse; its bind matrices are computed with the course library, and skinning attaches a mesh to it with the blend that produces the classic collapsing elbow. The last third is simulation: a spring stepped two ways to show why the order of two lines of code decides whether the motion stays bounded, a particle fountain, a mass-spring cloth with the step-size bound derived and measured, and a bounce.

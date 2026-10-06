@@ -26,12 +26,10 @@
       </p>
 
       <h1>Inverse and Differentiable Rendering</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; rendering as a function of scene parameters and the problem of running it backwards: why the inverse is ill-posed, analysis by synthesis, automatic differentiation, the gradients of shading and lighting, the visibility discontinuity and its four families of solutions, differentiable path tracers, what can be recovered from photographs, NeRF and Gaussian splatting as particular cases, priors, and the open problems. Assigned by your offering&rsquo;s course site; pairs with the inverse-render demo.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;All models are wrong, but some are useful.&rdquo;
+        <cite>George Box, Robustness in the Strategy of Scientific Model Building, 1979</cite>
+      </blockquote>
 
       <p class="lead">
         A renderer maps a scene&rsquo;s parameters (shapes, materials, lights, camera) to an image. Inverse rendering asks for the parameters given the image. The modern answer is to make the renderer differentiable and descend the gradient of an image loss: render, compare with the photograph, push the error back through every pixel to every parameter, and repeat. Shading and lighting differentiate by the chain rule. Visibility does not: a pixel is inside an object or outside it, and the derivative of that step is zero almost everywhere, so a naive differentiable renderer cannot see an edge move. The four families of fixes (edge sampling, reparameterization, path-space boundary integrals, and soft rasterization) are the core of the field, and the systems built on them (Mitsuba 3 and Dr.Jit) recover materials, lights, geometry and volumes from photographs. Every worked number below comes from the course&rsquo;s own 64 &times; 64 differentiable renderer, the engine of the <a href="../lib/demo.html?demo=inverse-render" target="_blank" rel="noopener">inverse-render demo</a>.

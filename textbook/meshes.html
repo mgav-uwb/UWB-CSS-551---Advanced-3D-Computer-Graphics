@@ -27,10 +27,10 @@
       </p>
 
       <h1>Polygonal Meshes: Building, Shading, and Simplifying Surfaces</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; what a triangle mesh is as data, how to build one from a formula, where its normals come from, how a profile sweeps into a surface, and how a mesh is simplified into levels of detail. Assigned by your offering&rsquo;s course site; pairs with the polygonal modeling lecture and the mesh-grid, lod, and simplify-compare demos.
-      </div>
+      <blockquote class="epigraph fact">
+        The Digital Michelangelo Project&#x27;s raw scan of the David holds 2 billion polygons.
+        <cite>Levoy et al., The Digital Michelangelo Project, SIGGRAPH 2000</cite>
+      </blockquote>
 
       <p class="lead">
         Every real-time surface is a triangle mesh: a list of vertex positions and a list of index triples, nothing more. This chapter builds one from scratch, the \(2\times2\) grid the mesh-grid demo constructs, and works every number on it: the row-major index formula, the counts \((n+1)^2\), \(2n^2\) and \(6n^2\), the face normal of one triangle as a cross product, the averaged normal at a shared vertex, and what happens to all of them when the center vertex is lifted. It then turns to what the index array says about the surface as a whole: the half-edge structure that makes adjacency queries constant-time, Euler&rsquo;s formula and manifoldness checked on the bunny, and the valence histogram. It shows the same surface shaded three ways, sweeps a profile curve into a surface of revolution, extracts a mesh from a scalar field with marching cubes, and closes with the reverse problem: taking triangles away. An edge collapse is worked with the quadric error metric on the lifted grid, and the Stanford bunny&rsquo;s measured level-of-detail ladder gives the distance rule that decides which version to draw.

@@ -26,10 +26,10 @@
       </p>
 
       <h1>Scene Graphs and Hierarchical Modeling</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; a tree of local transforms, the one rule that composes them, and everything an engine hangs on that tree: the traversal and its stack, cached world matrices, frame conversions, the camera as a node, bounding volumes, instancing, what a child cannot store, and the file format. Assigned by your offering&rsquo;s course site; pairs with the lecture on scene graphs.
-      </div>
+      <blockquote class="epigraph fact">
+        Sketchpad (1963) already had master drawings and instances: change the master and every copy changes, which is the scene graph&#x27;s instancing.
+        <cite>Sutherland, Sketchpad, MIT PhD thesis, 1963</cite>
+      </blockquote>
 
       <p class="lead">
         A robot arm, a character&rsquo;s skeleton, a solar system: things built from jointed parts, where moving a parent must carry its children along. The scene graph is the structure that guarantees this. Every node stores one local transform, written in its parent&rsquo;s frame, and every node&rsquo;s world transform is the product of the local transforms along the path from the root. This chapter states that rule, derives it from <a href="affine-transforms.html#composition">the affine chapter</a>&rsquo;s composition of frames, works a two-node chain by hand and checks it against the library, and shows the recursion that computes a whole tree once per frame, first as a recursion and then as the explicit matrix stack an engine keeps. It then covers what the tree is used for beyond drawing: which world matrices a change invalidates, converting a point between any two nodes&rsquo; frames, hanging the camera on a node, a bounding box per subtree so a whole limb is culled with one test, and instancing one mesh under many nodes. It shows, with numbers, the one thing the tree cannot hold, a shear inherited from a non-uniformly scaled parent, and ends with the chain written as glTF nodes, where a pivot becomes an extra node and a rotation becomes a quaternion.

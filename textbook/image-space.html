@@ -26,12 +26,10 @@
       </p>
 
       <h1>The Space of Images</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; images as vectors, images as functions, the bases and filters that act on them, the operations of image processing worked on a digit and on a render, how two images are compared, and why generation is a sampling problem. Assigned by your offering&rsquo;s course site; the vector view is one slide of the lecture on learned images, the rest is treated here only.
-      </div>
+      <blockquote class="epigraph fact">
+        There are 2^784, about 10^236, black-and-white 28 × 28 images. Almost none of them look like a digit.
+        <cite>computed: 784 × log₁₀ 2</cite>
+      </blockquote>
 
       <p class="lead">
         An image is a point. That sentence can be made precise in two ways, as a point of a finite-dimensional vector space with one axis per number, or as a function from the picture plane to color, and this chapter does both, shows how sampling connects them, and uses the function view to revisit aliasing and to introduce neural fields. It then does to images what linear algebra permits: changes their basis (the Fourier and cosine bases, with a transform worked by hand), convolves them with filters (a blur and an edge detector, worked on one pixel and applied to a whole render), builds pyramids of them, reshapes their histograms, compresses them the way JPEG does, and measures the distance between two of them with the two metrics every paper reports. Every claim about &ldquo;the space&rdquo; is then checked on a real dataset, 2,000 handwritten digits, with distances measured and pictures drawn. It closes with the fact that makes generation a sampling problem: the map from images to concepts is many-to-one, so its inverse is a distribution, and something must supply the missing choices.

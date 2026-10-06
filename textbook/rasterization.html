@@ -27,10 +27,10 @@
       </p>
 
       <h1>Rasterization and the GPU Pipeline</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; how a projected triangle becomes pixels: edge functions and their incremental, fixed-point evaluation, the tie rule that draws a shared edge once, clipping at the near plane, barycentric interpolation and its perspective correction, the depth buffer and early rejection, blending and premultiplied alpha, lines, and the fixed and programmable stages of the hardware that runs it all sixty times a second. Assigned by your offering&rsquo;s course site; pairs with the history lecture&rsquo;s raster era and with every lecture that renders.
-      </div>
+      <blockquote class="epigraph fact">
+        Juan Pineda&#x27;s 1988 paper made edge functions the basis of parallel rasterization, which is how GPUs still decide which pixels a triangle covers.
+        <cite>Pineda, A Parallel Algorithm for Polygon Rasterization, SIGGRAPH 1988</cite>
+      </blockquote>
 
       <p class="lead">
         After projection a triangle is three points on the image plane, and a screen is a grid of pixels. Rasterization bridges the two: for every pixel, test its center against the triangle&rsquo;s three edges, and if it is inside, blend the corner attributes to shade it. Three edge functions do the test and, normalized, are the blending weights. This chapter works one pixel by hand, then works the machinery around that pixel: how the three functions are stepped across a bounding box in fixed-point arithmetic, why a pixel whose center lies exactly on an edge shared by two triangles must be given to exactly one of them, what the clipper does to a triangle that pokes through the near plane, why edges stair-step, how the depth buffer decides which of two overlapping triangles wins and how rejecting a fragment before shading it saves the shading, why attributes must be interpolated in \(1/w\), how two transparent fragments combine and why a texture must carry premultiplied alpha, and how a line was drawn before there were triangles. It closes with the fixed and programmable stages of a GPU, the deferred and tile-based variants of the pipeline, and the frame loop.

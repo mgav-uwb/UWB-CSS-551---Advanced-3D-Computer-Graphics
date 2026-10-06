@@ -26,10 +26,10 @@
       </p>
 
       <h1>Affine Transformations over Homogeneous Coordinates</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; the family every placement transform belongs to, the lift that makes it one matrix, the two block formulas that do all the work, and the conventions, decompositions and numerics around them. Assigned by your offering&rsquo;s course site; pairs with the lecture on affine transformations.
-      </div>
+      <blockquote class="epigraph fact">
+        Homogeneous coordinates were introduced by August Ferdinand Möbius in 1827, in Der barycentrische Calcul; Lawrence Roberts brought them to 3D computer graphics in his 1963 MIT thesis.
+        <cite>Möbius, 1827; Roberts, Machine Perception of Three-Dimensional Solids, MIT, 1963</cite>
+      </blockquote>
 
       <p class="lead">
         To place a model in a scene you translate, rotate, scale and sometimes shear it, in some order, and then undo those operations for picking and for cameras. All of these are one kind of map, an affine map: a linear part and a shift. This chapter names the family and what it preserves, lifts it into homogeneous coordinates so that the whole family becomes a single \(4\times4\) matrix, and then derives from two block formulas everything the pipeline needs: why composition order matters, the inverse and how well conditioned it is, a matrix read as a coordinate frame and the same matrix read backward as a change of coordinates, the TRS decomposition engines store and the polar decomposition that explains what it leaves out, the rule for transforming normals and planes, pivots and conjugation, and finally the boundary of the family, where the perspective matrix leaves it. It also settles the question that costs more debugging time than any other in this subject, which way round the sixteen numbers are stored. Every number is computed by the course&rsquo;s own transform library.

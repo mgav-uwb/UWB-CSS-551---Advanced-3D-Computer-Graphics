@@ -28,10 +28,10 @@
       </p>
 
       <h1>Interactive Systems: Events, Model&ndash;View&ndash;Controller, Picking</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; how a person gets into the loop: the event-driven frame loop and the fixed timestep inside it, the model&ndash;view&ndash;controller separation the course&rsquo;s demos are built on and the undo it makes possible, events and device pixels, the path from a mouse position back into the world by unprojection, picking by ray and by ID buffer, hit testing in two dimensions, dragging with constraints and snapping, the drag gesture as a state machine, rotating with an arcball or an orbit, the latency between a click and the photon, and what virtual reality adds. Not tied to a lecture; pairs with every demo on the course site.
-      </div>
+      <blockquote class="epigraph fact">
+        Douglas Engelbart showed the mouse, hypertext and live video conferencing in one 90-minute session on 9 December 1968, later called the Mother of All Demos.
+        <cite>SRI International; Fall Joint Computer Conference, San Francisco, 1968</cite>
+      </blockquote>
 
       <p class="lead">
         A renderer draws a frame. An interactive system draws a frame, waits for the person, and draws the next one differently. This chapter is about the second half. It starts with the loop and the discipline that keeps it sane, model&ndash;view&ndash;controller, illustrated by the course&rsquo;s own transform demo, whose three numbers drive a cube and a matrix panel in lockstep. It then runs the viewing pipeline backward: a mouse position is a pixel, a pixel is a point in normalized device coordinates, and the inverse of the projection and view matrices turns it into a ray, worked on the same camera and pixel as the ray-tracing chapter so the two constructions can be checked against each other to four digits. That ray picks objects, or a rendered ID buffer does it in one read; it lands a dragged object on the ground plane; and two of them turn a mouse drag into a rotation by Shoemake&rsquo;s arcball, worked to the quaternion. Between those, the chapter covers what a working tool needs and a renderer does not: the event types and the device-pixel ratio that silently breaks picking, hit testing in two dimensions, snapping, a drag gesture as a state machine, undo as a consequence of the model, and a fixed timestep that keeps a simulation honest under a varying frame rate. It ends with time: how many milliseconds pass between the click and the pixel, why, and what a head-mounted display does about it.

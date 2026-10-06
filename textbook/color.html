@@ -26,10 +26,10 @@
       </p>
 
       <h1>Color, Radiometry, and Displays</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; what the three numbers in a pixel measure: light as a spectrum and as a quantity, the CIE observer that reduces a spectrum to three, chromaticity and gamuts, the sRGB space with its matrix and transfer function worked, why blending and lighting must happen in linear light, the perceptual spaces, white balance, colour deficiency, wider gamuts, HDR encodings, dithering, video colour, and what a display can and cannot show. Not tied to a lecture; read it after the illumination chapter.
-      </div>
+      <blockquote class="epigraph fact">
+        The sRGB byte value 128 is not half brightness: it decodes to about 0.216 of full linear light.
+        <cite>computed: ((128/255 + 0.055)/1.055)^2.4</cite>
+      </blockquote>
 
       <p class="lead">
         Every earlier chapter ends in a triple \((r, g, b)\) and treats it as three brightnesses. This chapter is about what those numbers are. Light is a spectrum, a power per wavelength; the eye reduces any spectrum to three responses, and the CIE observer of 1931 makes that reduction a measurable integral, evaluated here on blackbody spectra. The three responses define a space in which every color is a point, every device a region, and sRGB the region a standard monitor shows, whose matrix and curve the chapter works on one color. The curve is the part that bites: an 8-bit code is not proportional to light, so averaging codes, blending textures, or lighting in code space gives wrong answers, worked on a red-green blend that comes out either dark olive or bright yellow depending on the space. The second half goes where a renderer&rsquo;s output meets people and devices: the perceptual space CIELAB and the difference metric \(\Delta E\), the HSV picker, white balance by chromatic adaptation, what the course&rsquo;s figure palette looks like to a colour-deficient viewer, the wider gamuts of current displays, the PQ curve that encodes absolute luminance for HDR, dithering, the Y&prime;CbCr encoding of video, and the display itself: how much light it makes against the world and how many steps it can show.

@@ -26,10 +26,10 @@
       </p>
 
       <h1>Shaders in GLSL (three.js): ShaderMaterial, Uniforms, Varyings, and the Normal Matrix</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; the programmable stages of <a href="rasterization.html#pipeline">the rasterization chapter</a>&rsquo;s pipeline as three.js exposes them: the vertex and fragment shaders of a <code>ShaderMaterial</code>, the attributes, uniforms and varyings that connect them, what three.js declares for you and what a <code>RawShaderMaterial</code> leaves to you, per-pixel lighting with the normal transformed correctly, colour spaces, textures, render state, and how to read a shader error. Read after <a href="webgl-basics.html">the WebGL chapter</a> and before HW5; <a href="unity-shaders.html">the Unity shader chapter</a> covers the same ground in HLSL.
-      </div>
+      <blockquote class="epigraph fact">
+        GLSL, the OpenGL Shading Language, arrived with OpenGL 2.0 in 2004; WebGL shaders are written in its OpenGL ES dialect.
+        <cite>Khronos Group, OpenGL 2.0 specification, 2004</cite>
+      </blockquote>
 
       <p class="lead">
         A shader is a small program that the graphics card runs once per vertex or once per pixel, in parallel, with

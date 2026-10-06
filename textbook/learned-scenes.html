@@ -27,12 +27,10 @@
       </p>
 
       <h1>Learned Scenes</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; one scene learned from its own photographs: the neural radiance field and the volume integral it renders with, derived from absorption and sampled coarse to fine; 3D Gaussian splatting with the shape, projection, color and training of a splat worked; the way back from a field to a mesh; and the two learned representations set against meshes and against diffusion. Assigned by your offering&rsquo;s course site; pairs with the live splat exhibit.
-      </div>
+      <blockquote class="epigraph fact">
+        A 3D Gaussian with degree-3 spherical harmonics has 59 numbers: 3 for position, 4 for rotation, 3 for scale, 1 for opacity, and 48 for view-dependent color.
+        <cite>computed; Kerbl et al., SIGGRAPH 2023</cite>
+      </blockquote>
 
       <p class="lead">
         Rather than learn the distribution of all images, a learned scene learns one place from its photographs and renders it from viewpoints the camera never saw. This chapter states the neural radiance field and its volume-rendering integral, derives that integral from the physics of absorption so that its discrete form is not a recipe, runs it by hand along one ray, shows what goes wrong when the ray is sampled too coarsely and how a second, importance-sampled pass fixes it, and explains why Gaussian splatting replaced the network with explicit primitives and got real-time rates. For one splat it builds the covariance from a scale and a rotation, projects it to the screen through the Jacobian of the perspective divide, evaluates its view-dependent color from spherical harmonics, and blends it with two others on one pixel; it then says how a splat scene is trained and grown. A short section returns from fields to the meshes of the rest of the text by marching squares, and the chapter closes by setting both representations against meshes with the numbers their papers report, and against <a href="diffusion-models.html">diffusion models</a>, which they meet in score distillation and ControlNet.

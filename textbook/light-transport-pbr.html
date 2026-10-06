@@ -26,12 +26,10 @@
       </p>
 
       <h1>Light Transport and PBR</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; the rendering equation and physically based materials: radiance, the BRDF and its laws, microfacets with exact Fresnel, energy accounting, the metallic and roughness sliders, sampling the BRDF, image-based lighting, and what lies beyond opaque surfaces. Assigned by your offering&rsquo;s course site; pairs with the lecture that finishes the illumination story.
-      </div>
+      <blockquote class="epigraph fact">
+        Radiosity came to graphics from heat-transfer engineering, in the same 1984 paper that introduced the Cornell box.
+        <cite>Goral, Torrance, Greenberg and Battaile, SIGGRAPH 1984</cite>
+      </blockquote>
 
       <p class="lead">
         <a href="illumination.html">The illumination chapter</a> computes a point&rsquo;s color from the lights, the normal, and the eye, and nothing else in the scene. This chapter writes down the equation that balances the light energy instead, the rendering equation, reads it term by term in the radiometric units of <a href="color.html#spectrum">the color chapter</a>, and rebuilds the material term on physical foundations: the BRDF and its two laws, microfacets with the exact Fresnel equations for glass and for gold, the furnace test that measures how much energy a model loses, and the two sliders every modern engine exposes. It then does what a renderer must do with such a model: draw directions from it, evaluate it under a whole sky by the split-sum trick, and extend it past opaque surfaces to glass and skin. Every formula is evaluated by hand at least once, and every figure is computed from the same formulas. The history, from Whitted&rsquo;s rays to Kajiya&rsquo;s equation, is in <a href="history-of-graphics.html#p-rendering-equation">the history chapter</a>; the algorithms that solve the equation are in <a href="ray-tracing.html">the ray-tracing chapter</a>.

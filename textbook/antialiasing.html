@@ -26,10 +26,10 @@
       </p>
 
       <h1>Sampling and Antialiasing</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; the one problem behind jagged edges, shimmering textures, moir&eacute; and wagon wheels: a continuous picture is looked at in a finite number of places. The sampling theorem and reconstruction filters, the Fourier view, aliasing and where it comes from, prefiltering against supersampling, filter families, coverage and multisampling along an edge, antialiased lines, texture derivatives and mip selection, shading aliasing, sample patterns, and aliasing in time. Not tied to a lecture; it gathers what the rasterization, texture-mapping and image-space chapters each met in passing.
-      </div>
+      <blockquote class="epigraph">
+        &ldquo;A pixel is not a little square.&rdquo;
+        <cite>Alvy Ray Smith, Microsoft Technical Memo 6, 1995</cite>
+      </blockquote>
 
       <p class="lead">
         Three earlier chapters ran into the same wall from different sides: the rasterizer&rsquo;s stair-stepped edges, the texture sampler&rsquo;s shimmering checker, the image-space chapter&rsquo;s stripes that vanished when sampled at their own frequency. This chapter is that wall. A rendered image is a continuous function looked at on a grid of pixel centers, and the sampling theorem says exactly when the grid can represent the function and what happens when it cannot: frequencies above half the sampling rate do not disappear, they come back as lower frequencies that were never there. The chapter works the theorem on a two-tone signal reconstructed by three filters, aliases a sine by hand, renders a zone plate to see the false rings appear, and then turns to the remedies a renderer has: filter before sampling, or sample more and average. The Fourier view says why in one picture: sampling replicates the spectrum, and a filter is a window on it. Multisampling is worked pixel by pixel along one edge, a line is drawn with exact coverage, the mip level of a texture is read off its screen-space derivatives, a normal map&rsquo;s shininess is corrected for the detail it averages away, stratified sampling is measured against random sampling over two thousand trials, and the closing section treats time as one more axis, where a spinning wheel filmed at 24 frames per second is the same theorem with the same cure.

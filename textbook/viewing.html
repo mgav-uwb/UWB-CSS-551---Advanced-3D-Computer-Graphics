@@ -26,10 +26,10 @@
       </p>
 
       <h1>Viewing: the Camera, the View Matrix, and Projection</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; a camera is a frame plus a lens, and both are matrices you can build: the look-at basis, the view matrix, the pinhole and the perspective matrix entry by entry, what a depth buffer can resolve, the frustum&rsquo;s planes and what they cull, off-axis frusta, orthographic projection, the thin lens, and moving the camera. Assigned by your offering&rsquo;s course site; pairs with the lecture on 3D viewing.
-      </div>
+      <blockquote class="epigraph fact">
+        Filippo Brunelleschi demonstrated linear perspective in Florence around 1415, with a painted panel of the Baptistery viewed through a hole and a mirror.
+        <cite>Antonio Manetti, Life of Brunelleschi, 1480s</cite>
+      </blockquote>
 
       <p class="lead">
         Placing objects in a world produces nothing visible until someone says where the viewer stands and which way they look. Two matrices turn a placed world into a flat image: the view matrix, which re-expresses the world in the camera&rsquo;s own coordinate frame, and the projection matrix, which flattens depth by dividing by it. This chapter builds both from the vectors and affine maps of the earlier chapters: three cross products for the camera&rsquo;s axes, the rigid inverse for the view matrix, similar triangles for the perspective divide, and a \(4\times4\) whose last row is the one non-affine row in the pipeline. It then goes where a renderer has to go next: what a field of view means in a photographer&rsquo;s millimeters, what a 24-bit or a floating-point depth buffer can and cannot tell apart and why reversing the depth range helps by a factor of a thousand, how the six planes of the frustum fall out of the projection matrix and cull a box in six dot products, how an asymmetric frustum serves a stereo display, and what a real lens adds that the pinhole omits. Every matrix is the course library&rsquo;s own, on the demos&rsquo; own cameras, and one vertex is followed through the whole chain to the pixel and the depth value it lands on.

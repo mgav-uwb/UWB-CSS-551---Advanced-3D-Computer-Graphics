@@ -27,12 +27,10 @@
       </p>
 
       <h1>Neural Networks and Embeddings</h1>
-      <div class="subtitle">
-        CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text
-      </div>
-      <div class="src">
-        Course text &middot; a network as a function, how it is trained, what it can and cannot fit, the layers that see images and sequences, and the vectors it learns to think in. Assigned by your offering&rsquo;s course site; the live exhibits it cites are in the lecture on neural networks.
-      </div>
+      <blockquote class="epigraph fact">
+        Frank Rosenblatt demonstrated the perceptron in 1958; the Mark I Perceptron&#x27;s camera was a 20 × 20 grid of photocells, a 400-pixel image.
+        <cite>Rosenblatt, Psychological Review, 1958; Cornell Aeronautical Laboratory, Mark I Perceptron, 1960</cite>
+      </blockquote>
 
       <p class="lead">
         Three ideas underlie every model in the chapters that follow: a neural network is a function whose weights are set by examples; an embedding is a learned vector that stands for a concept, placed so that similar concepts are near; and an encoder and a decoder move between things and their embeddings, with two encoders trained side by side making words and pictures one coordinate system. This chapter states each idea, runs the smallest possible example of it by hand, and shows the same thing computed at full size from the course&rsquo;s own trained network. Between the ideas it supplies what a working model needs: the activation functions and their derivatives, backpropagation through more than one hidden layer, the optimizers that replace plain gradient descent, the overfitting that a held-out set exposes and weight decay tames, and the two layer types, convolution and attention, that image and text models are built from.

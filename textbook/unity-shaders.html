@@ -26,10 +26,10 @@
       </p>
 
       <h1>Unity Shaders: ShaderLab, the Two Programs, and the Data Between Them</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; the shader files the Unity track of the homework reads and edits: how a <code>.shader</code> file is laid out, what the vertex and fragment programs receive and return, where the matrices, textures and lights come from, how a C# script hands values to a shader, and the render state around the programs. Read before HW5 (meshes, textures, illumination) in the Unity track, and before any homework that uploads its own matrices. The WebGL track writes the same two programs in GLSL; the anatomy differs, the mathematics does not.
-      </div>
+      <blockquote class="epigraph fact">
+        Pat Hanrahan and Jim Lawson&#x27;s 1990 shading language for RenderMan made a surface&#x27;s appearance a program; programmable shaders reached consumer graphics cards about a decade later.
+        <cite>Hanrahan and Lawson, A Language for Shading and Lighting Calculations, SIGGRAPH 1990</cite>
+      </blockquote>
 
       <p class="lead">
         A shader is the program the GPU runs at two stages of the pipeline of <a href="rasterization.html#pipeline">the rasterization chapter</a>: once per vertex, to place it, and once per covered pixel, to color it. The mathematics of what those programs compute is in the texture and illumination chapters. This chapter is about the container: the ShaderLab file that wraps the two programs, the semantics that name their inputs and outputs, the built-in matrices and the values a script uploads, and the fixed-function state (culling, depth, blending) set around them. It reads the class-example projects&rsquo; own shader, a no-cull unlit shader that grows a texture, then a second texture, then a checker computed from the coordinates, then a light, and works its arithmetic at one vertex and one pixel. It closes with the errors that produce a magenta object, a black object, or a silently wrong normal, and what each means.

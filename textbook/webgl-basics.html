@@ -26,10 +26,10 @@
       </p>
 
       <h1>WebGL and three.js for This Course: the Server, the Scene Graph, and the Course Library</h1>
-      <div class="subtitle">CSS 551 &middot; Advanced 3D Computer Graphics &middot; course text</div>
-      <div class="src">
-        Course text &middot; everything the WebGL track of the homework assumes about the tools: how to serve the course and why a page opened from disk fails, how ES modules find each other, the browser&rsquo;s developer tools, three.js&rsquo;s scene, objects, geometry, materials and render loop mapped to their Unity counterparts, three.js&rsquo;s conventions against the text&rsquo;s (one trap in <code>Matrix4.set</code>), the course&rsquo;s own library, and how a homework skeleton runs and reports. Read before the first homework (HW1); return to Sections 6 and 7 before HW3 (affine and scene graphs) and to <a href="webgl-shaders.html">the shader chapter</a> before HW5.
-      </div>
+      <blockquote class="epigraph fact">
+        The Khronos Group released the WebGL 1.0 specification in March 2011, bringing GPU rendering to the browser without plug-ins.
+        <cite>Khronos Group, WebGL 1.0 specification, 2011</cite>
+      </blockquote>
 
       <p class="lead">
         Each homework (HW1 to HW6) can be done in either of two tracks, Unity or WebGL, and HW7 and HW8 in JavaScript or Python. <a href="unity-basics.html">The Unity chapter</a> serves the first track; this chapter serves the second. The WebGL track runs in a browser on the course&rsquo;s own JavaScript library, the same code behind every demo in this text, drawn with three.js, a widely used library over the browser&rsquo;s WebGL interface. There is nothing to install beyond a browser and Python. The price is that a browser is a stricter host than an editor: a page must be served, modules must be imported by exact relative paths, and errors appear in a console rather than a window. The chapter covers that ground first, then the four things a graphics course needs from three.js (the transform hierarchy, the frame loop, the matrix type and its storage, and the difference between its conventions and the text&rsquo;s), then the course library and the homework runner. It is not a three.js tutorial: lights, shadows, post-processing and loaders are left out.
