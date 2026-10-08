@@ -192,7 +192,8 @@ For nonzero **a** and **b**:
 <img src="../../textbook/figures/vecr-projection.svg" alt="u and v drawn in their own plane with v along the x axis and the angle theta between them; the shadow of u on v, length |u| cos theta = 1.633, is highlighted in green, and a dashed orange line rises from its end to the tip of u. Beside it four steps: the shadow is a right triangle's side of length |u| cos theta; replacing cos theta by the dot product gives (u . v) / |v|; the direction is v / |v|; length times direction is ((u . v) / (v . v)) v" style="height:330px">
 
 ```text
-u-along = ( (u . v) / (v . v) ) v      if |v| = 1:  u-along = (u . v) v      u-perp = u - u-along
+u-along = ( (u . v) / (v . v) ) v        v . v = |v|^2: no square root
+if |v| = 1:  u-along = (u . v) v        u-perp = u - u-along
 ```
 
 
@@ -307,7 +308,7 @@ For nonzero **a** and **b**, parallel means θ = 0° or 180°:
 
 ```text
 cross:  a x b = 0                     its length |a| |b| sin(theta) is zero
-dot:    (a . b)^2 = (a . a)(b . b)    cos(theta)^2 = 1
+dot:    (a . b)^2 = (a . a)(b . b)    a . a = |a|^2, so this is cos(theta)^2 = 1
 ```
 
 | question | test | example |
@@ -315,7 +316,9 @@ dot:    (a . b)^2 = (a . a)(b . b)    cos(theta)^2 = 1
 | a ∥ b? | a × b = 0 | (1, 2, 1) × (−2, −4, −2) = 0 |
 | same way or opposite? | sign of a · b | −12: opposite |
 | A, B, C in a line? | (B − A) × (C − A) = 0 | (1, 0, 2), (4, 0, −2), (2.2, 0, 0.4) |
-| in 2D | u ⊥ v = 0 | one number |
+| 2D vectors u, v? | ux·vy − uy·vx = 0 | (2, 1), (4, 2): 4 − 4 = 0 |
+
+In 2D, (ux, uy, 0) × (vx, vy, 0) = (0, 0, ux·vy − uy·vx): only one component to test.
 
 Floats: `|a x b| <= eps |a| |b|`, never `== 0`.
 
