@@ -15,7 +15,7 @@
   2D hit test); a face normal and its winding; the triple product as volume and handedness; Unity's
   and three.js's Vector3 with their traps.
   EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
-           from it, and the projection derived in four steps (vecr-projection.svg).
+           from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
            direction, which way a face points) and the predict-first perpendicular pair; their numbers
            are Vectors chapter Exercises 1 and 2 and the demo's note.
@@ -297,6 +297,27 @@ check:    sqrt(5) sqrt(6) sin(43.1°) = 5.477 * 0.683 ~= 3.742
 - **zero**: parallel
 - **sign**: which side, left or right turn
 - **size**: the parallelogram's area
+
+
+---
+
+## Parallel and collinear: two tests
+
+For nonzero **a** and **b**, parallel means θ = 0° or 180°:
+
+```text
+cross:  a x b = 0                     its length |a| |b| sin(theta) is zero
+dot:    (a . b)^2 = (a . a)(b . b)    cos(theta)^2 = 1
+```
+
+| question | test | example |
+| --- | --- | --- |
+| a ∥ b? | a × b = 0 | (1, 2, 1) × (−2, −4, −2) = 0 |
+| same way or opposite? | sign of a · b | −12: opposite |
+| A, B, C in a line? | (B − A) × (C − A) = 0 | (1, 0, 2), (4, 0, −2), (2.2, 0, 0.4) |
+| in 2D | u ⊥ v = 0 | one number |
+
+Floats: `|a x b| <= eps |a| |b|`, never `== 0`.
 
 
 ---
