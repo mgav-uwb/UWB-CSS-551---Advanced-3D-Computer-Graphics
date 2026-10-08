@@ -14,6 +14,8 @@
   area; the 2D perp-dot product (line intersection in its notes) and polygon area (the pentagon of the
   2D hit test); a face normal and its winding; the triple product as volume and handedness; Unity's
   and three.js's Vector3 with their traps.
+  EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
+           from it, and the projection derived in four steps (vecr-projection.svg).
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
            direction, which way a face points) and the predict-first perpendicular pair; their numbers
            are Vectors chapter Exercises 1 and 2 and the demo's note.
@@ -115,16 +117,25 @@ Their equality lets **three multiplies and two adds** answer geometric questions
 
 ---
 
-## Worked: the dot, the lengths, the angle
+## The angle between two vectors
 
-**a = (2, 1, 0)** and **b = (1, 2, 1)**, the demo's starting vectors:
+Solve the geometric definition for the angle (a and b nonzero):
 
 ```text
-a . b      = 2*1 + 1*2 + 0*1         = 4
-|a|        = sqrt(5)                 ~= 2.236
-|b|        = sqrt(6)                 ~= 2.449
-cos(theta) = (a . b) / (|a| |b|)     = 4 / sqrt(30) ~= 0.7303
-theta      = acos(0.7303)            ~= 43.1 degrees
+a . b      = |a| |b| cos(theta)
+cos(theta) = (a . b) / (|a| |b|)
+theta      = acos( (a . b) / (|a| |b|) )
+```
+
+arccos returns **0° to 180°**: the angle has no sign.
+
+For **a = (2, 1, 0)**, **b = (1, 2, 1)**, the demo's starting vectors:
+
+```text
+a . b      = 2*1 + 1*2 + 0*1     = 4
+|a| |b|    = sqrt(5) sqrt(6)     = sqrt(30) ~= 5.477
+cos(theta) = 4 / 5.477           ~= 0.7303
+theta      = acos(0.7303)        ~= 43.1 degrees
 ```
 
 
@@ -156,12 +167,32 @@ const thetaDeg = Math.acos(dot(a, b) / (len(a) * len(b))) * 180 / Math.PI;   // 
 
 ---
 
-## Projection: split a into two parts
+## Perpendicular means a zero dot product
 
-<img src="../../textbook/figures/vec-dot-projection.svg" alt="a split into a part along b and a part across b" style="height:300px">
+For nonzero **a** and **b**:
 
 ```text
-a-along = ( (a . b) / (b . b) ) * b        a-perp = a - a-along
+     a ⊥ b
+<=>  theta = 90°
+<=>  cos(theta) = 0
+<=>  |a| |b| cos(theta) = 0
+<=>  a . b = 0
+```
+
+- the test costs **three multiplies and two adds**: no square root, no arccos
+- (2, 1, 0) · (−1, 2, 1) = −2 + 2 + 0 = **0**: perpendicular
+- the zero vector has a zero dot with everything, so check the lengths first
+- in floating point, test `|a . b| <= eps * |a| |b|`, never `== 0`
+
+
+---
+
+## The projection of u onto v
+
+<img src="../../textbook/figures/vecr-projection.svg" alt="u and v drawn in their own plane with v along the x axis and the angle theta between them; the shadow of u on v, length |u| cos theta = 1.633, is highlighted in green, and a dashed orange line rises from its end to the tip of u. Beside it four steps: the shadow is a right triangle's side of length |u| cos theta; replacing cos theta by the dot product gives (u . v) / |v|; the direction is v / |v|; length times direction is ((u . v) / (v . v)) v" style="height:330px">
+
+```text
+u-along = ( (u . v) / (v . v) ) v      if |v| = 1:  u-along = (u . v) v      u-perp = u - u-along
 ```
 
 
@@ -169,14 +200,14 @@ a-along = ( (a . b) / (b . b) ) * b        a-perp = a - a-along
 
 ## Worked: the split, and the check
 
-For **a = (2, 1, 0)**, **b = (1, 2, 1)**: `a . b = 4`, `b . b = 6`, so the scalar is `4/6 = 2/3`.
+For **u = (2, 1, 0)**, **v = (1, 2, 1)**: `u . v = 4`, `v . v = 6`, so the scalar is `4/6 = 2/3`.
 
 ```text
-a-along = (2/3)(1, 2, 1) = (0.667, 1.333, 0.667)
-a-perp  = (2,1,0) - (0.667,1.333,0.667) = (1.333, -0.333, -0.667)
+u-along = (2/3)(1, 2, 1) = (0.667, 1.333, 0.667)
+u-perp  = (2,1,0) - (0.667,1.333,0.667) = (1.333, -0.333, -0.667)
 ```
 
-Check perpendicularity: `a-perp . b` must be **0**:
+Check perpendicularity: `u-perp . v` must be **0**:
 
 ```text
 (4/3)(1) + (-1/3)(2) + (-2/3)(1) = 4/3 - 2/3 - 2/3 = 0   OK
