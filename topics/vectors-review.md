@@ -14,6 +14,9 @@
   area; the 2D perp-dot product (line intersection in its notes) and polygon area (the pentagon of the
   2D hit test); a face normal and its winding; the triple product as volume and handedness; Unity's
   and three.js's Vector3 with their traps.
+  CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
+           direction, which way a face points) and the predict-first perpendicular pair; their numbers
+           are Vectors chapter Exercises 1 and 2 and the demo's note.
   SPLIT 2026-10-05 from vectors-dot-cross.md (archived in topics/archive/): frames, Gram-Schmidt, lines,
   planes, reflection, rays against planes, barycentric weights and the precision pitfalls moved to
   vector-geometry.md.
@@ -153,18 +156,6 @@ const thetaDeg = Math.acos(dot(a, b) / (len(a) * len(b))) * 180 / Math.PI;   // 
 
 ---
 
-## Check: an angle by hand
-
-What is the angle between **(1, 1, 0)** and **(1, 0, 1)**?
-
-- **A.** 45°
-- **B.** 60°
-- **C.** 90°
-- **D.** 30°
-
-
----
-
 ## Projection: split a into two parts
 
 <img src="../../textbook/figures/vec-dot-projection.svg" alt="a split into a part along b and a part across b" style="height:300px">
@@ -194,18 +185,6 @@ Check perpendicularity: `a-perp . b` must be **0**:
 
 ---
 
-## Check: a shadow on a non-unit direction
-
-Split **a = (3, 4, 0)** along **c = (1, 1, 0)**. What is the along part?
-
-- **A.** (7, 7, 0)
-- **B.** (3.5, 3.5, 0)
-- **C.** (4.95, 4.95, 0)
-- **D.** (−0.5, 0.5, 0)
-
-
----
-
 ## Sign = the in-front-of test
 
 <img src="../../textbook/figures/vec-dot-sign.svg" alt="the sign of the dot product splits space into front and behind" style="height:220px">
@@ -215,17 +194,6 @@ a . b > 0  ->  b in FRONT of a      a . b = 0  ->  b at 90 degrees      a . b < 
 ```
 
 Aim `a` = the way the drone faces, `b` = toward the target. Fire only when `a . b > 0`.
-
-
----
-
-## Predict first: a perpendicular pair
-
-Set the demo to **a = (2, 1, 0)** and **b = (−1, 2, 1)**. Before running, predict:
-
-- a · b = ?
-- θ = ?
-- a × b = ?  (and is it perpendicular to both?)
 
 
 ---
@@ -319,18 +287,6 @@ The sign tells the winding: **positive** counterclockwise, **negative** clockwis
 Vector3 n = Vector3.Cross(v1, v2);
 if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen side
 ```
-
-
----
-
-## Check: which way does it face?
-
-`P0 = (0, 0, 0)`, `P1 = (0, 0, −2)`, `P2 = (2, 0, 0)`. The face normal is `normalize((P1 − P0) × (P2 − P0))`. It points:
-
-- **A.** up, (0, 1, 0)
-- **B.** down, (0, −1, 0)
-- **C.** along x, (1, 0, 0)
-- **D.** nowhere: the corners are collinear
 
 
 ---
