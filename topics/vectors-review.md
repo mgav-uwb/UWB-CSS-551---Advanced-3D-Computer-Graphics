@@ -25,7 +25,7 @@
   planes, reflection, rays against planes, barycentric weights and the precision pitfalls moved to
   vector-geometry.md.
   NEEDS:   nothing beyond high-school vectors; the demo state a=(2,1,0), b=(1,2,1) is reused in every worked example.
-  DEMOS:   data-demo="dot-cross" data-controls="ax,ay,bx,by" (under the lecture page's 200px crop).
+  DEMOS:   data-demo="dot-cross" data-controls="ax,ay,bx,by" on a demo-full slide (the default crop hid the readout card).
            Fallback numbers: a.b = 4, |a| = 2.24, |b| = 2.45, theta = 43.1 deg, a x b = (1, -2, 3).
   NUMBERS: textbook/figures/numbers-foundations.json (key vec) or recomputed by node against
            lib/core/xform.js, Math.fround and lib/vendor/three.module.js.
@@ -259,6 +259,8 @@ Aim `a` = the way the drone faces, `b` = toward the target. Fire only when `a . 
 
 
 ---
+
+<!-- .slide: class="demo-full" -->
 
 ## Dot &amp; cross, live
 
