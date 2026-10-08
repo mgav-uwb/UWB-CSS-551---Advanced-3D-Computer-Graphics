@@ -182,9 +182,12 @@ if ((v1.magnitude > float.Epsilon) && (v2.magnitude > float.Epsilon))
 ```
 
 ```javascript
-import { dot } from '../core/xform.js';
-const len = (v) => Math.hypot(...v);
-const thetaDeg = Math.acos(dot(a, b) / (len(a) * len(b))) * 180 / Math.PI;   // 43.0887
+const d = dot(v1, v2);                       // dot from lib/core/xform.js
+if ((length(v1) > 0) && (length(v2) > 0))    // length(v) = Math.hypot(...v)
+{
+    cosTheta = d / (length(v1) * length(v2));
+    theta = Math.acos(cosTheta) * 180 / Math.PI;
+}
 ```
 
 </div>
