@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~47 min, 35 slides).
+  CSS 551 · TOPIC DECK: Light transport, from Phong to the rendering equation and PBR (~69 min, 42 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/pbr-rendering-equation.md"> among others; it
   carries no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -33,14 +33,21 @@
   results moved into the notes of "The integral as a sum" and "Metals and dielectrics"; titles without
   "Why" ("Radiance does not fade with distance", "Phong breaks the energy budget"). 35 slides.
 
+  SLOWED 2026-10-08 (L12's midterm review moved to the practice midterm; ~69 min, 42 slides): computed figures
+  (tools/gen-lecture-figures-pbr.mjs, textbook/figures/pbrr-*.svg) and derivations: irradiance and radiance pictured;
+  the solid angle of a patch, dA cos θ / r², deriving the point light's I cos θ / d²; the rendering equation
+  pictured; Li·Δω in the three-light sum instead of setting Δω to 1; bounces as a geometric series
+  (1/(1 − ρ): 2 at 0.5, 5 at 0.8); the BRDF's unit, 1/sr (0.424 at α = 0.1); the half vector and the facets
+  facing it; Snell's law before Fresnel (35.26° in glass at 60°).
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no KaTeX
   plugin). Never two "_" on one markdown line outside a code fence; backtick names
   with underscores. No <small> on math. Paths are relative to the page that mounts
-  this topic (lectures/LNN-slug/index.html or sessions/SNN/index.html).
+  this topic (lectures/LNN-slug/index.html).
 -->
 
-### Honest light: from Phong to the rendering equation
+### Light transport: from Phong to the rendering equation
 
 <small>(~47 min)</small>
 
@@ -60,19 +67,27 @@ One gap behind all three: Phong never **balances the light energy** at a point. 
 
 ---
 
-## The unit: radiance
+## Irradiance and radiance
 
-The balance is a statement about **radiance**, so the unit comes first:
+<img src="../../textbook/figures/pbrr-radiance.svg" alt="Left: a horizontal patch with light arriving from many directions over a dashed hemisphere, labeled irradiance E, all the light arriving at a patch, unit W per square meter. Right: the same patch with one narrow cone of directions running to a pixel, labeled radiance L, the light along one ray, per square meter of beam and per steradian, unit W per square meter per steradian" style="height:320px">
 
-- **flux**: power, in watts
-- **irradiance E**: flux arriving **per unit area**, W/m²; what a light meter held against the surface reads; it already includes the **cosine** (Lambert's argument)
-- **radiance L**: flux per unit area **per unit solid angle**, W/(m²·sr): the light traveling along **one ray**; constant along a ray in empty space; what a pixel measures
+- **irradiance E**: everything arriving at a patch, per m²: what a light meter lying flat reads
+- **radiance L**: the light along **one ray**, per m² of beam and per steradian of directions: what a **pixel** reads
+
+
+---
+
+## Irradiance adds up radiance
+
+Irradiance is radiance summed over every direction above the patch, each weighted by its **cosine** (Lambert's foreshortening):
 
 ```text
    E = ∫ Li(ωi) · (n·ωi) dωi        over the hemisphere Ω above the point
 
    a uniform sky of radiance 1:    E = ∫ cos θ dω = π = 3.1416
 ```
+
+Radiance is **constant along a ray** in empty space; irradiance depends on how the patch is turned.
 
 
 ---
@@ -88,6 +103,15 @@ A **solid angle** is to a sphere what an angle is to a circle: the area it cover
 ```
 
 Radiance is per steradian because a light's effect depends on **how big it looks**, not how big it is: the sun covers 0.000068 sr and still outshines the whole sky.
+
+
+---
+
+## The solid angle of a small patch
+
+<img src="../../textbook/figures/pbrr-solid-angle.svg" alt="A point light of intensity 10 watts per steradian at the left and a small patch 2 m away at the right, tilted so its normal is 60 degrees from the line to the light; a thin cone joins them. Beside it: the patch seen from the light looks smaller by cos theta and by r squared, so d omega equals dA cos theta over r squared; the flux into the patch is I d omega, so E equals I cos theta over r squared, 1.25 W per square meter" style="height:330px">
+
+Two facts the illumination topic used without proof, from one formula: **Lambert's cosine** and the **inverse square**.
 
 
 ---
@@ -158,11 +182,20 @@ Kajiya, 1986: the balance of light at a surface point `p`, for the outgoing dire
 
 ---
 
+## The rendering equation, pictured
+
+<img src="../../textbook/figures/pbrr-rendering-eq.svg" alt="A point p on a surface with its normal n and a dashed hemisphere of directions above it. Orange arrows of incoming light Li arrive from several directions, one highlighted with its angle theta to the normal; a purple lobe around the mirror direction is labeled f, the material; a green arrow leaves toward the eye, labeled Lo(p, omega o). Beside it the equation read in words: what leaves toward the eye equals what p emits plus, over every arriving direction, material times arriving light times cosine times the direction's solid angle" style="height:340px">
+
+Each arriving ray contributes **f · Li · cos θ · Δω**; Lo adds them all up.
+
+
+---
+
 ## The integral as a sum
 
-Replace the sky by **three small distant lights**, so the integral becomes a sum. A matte surface, albedo ρ = 0.6, whose BRDF is the constant ρ/π = **0.191**:
+Replace the sky by **three small distant lights**, so the integral becomes a sum. A small light gives its radiance over a small solid angle, so it enters as the product **Li·Δω** (W/m²). A matte surface, albedo ρ = 0.6, whose BRDF is the constant ρ/π = **0.191**:
 
-| light | Li | angle to n | n·ωi | f · Li · (n·ωi) |
+| light | Li·Δω | angle to n | n·ωi | f · Li·Δω · (n·ωi) |
 | ----- | -- | ---------- | ---- | --------------- |
 | 1 | 2.0 | 20° | 0.940 | 0.191 × 2.0 × 0.940 = 0.359 |
 | 2 | 0.8 | 60° | 0.500 | 0.191 × 0.8 × 0.500 = 0.076 |
@@ -190,6 +223,20 @@ Li on the right is **some other point's Lo**. The unknown appears on **both side
 
 ---
 
+## Bounces add up
+
+<img src="../../textbook/figures/pbrr-bounces.svg" alt="Two bar charts of the light carried by the direct term and by bounces 1 to 7. Left, every surface reflecting 0.5: bars 1, 0.5, 0.25, 0.13 and so on, summing to 2 times the direct light, the first four terms 1.875. Right, every surface reflecting 0.8: bars 1, 0.8, 0.64, 0.51 and so on, summing to 5 times the direct light, the first four terms 2.952" style="height:300px">
+
+```text
+   every surface reflects a fraction ρ:
+   L = Ldirect (1 + ρ + ρ² + ρ³ + …) = Ldirect / (1 − ρ)
+```
+
+A light room is mostly **indirect** light: at ρ = 0.8, four of every five parts.
+
+
+---
+
 ## Reciprocity: paths can run backward
 
 A physical BRDF is **reciprocal**: f(ωi, ωo) = f(ωo, ωi) (Helmholtz). Consequence: the light carried along a path is the same in either direction.
@@ -203,7 +250,7 @@ A physical BRDF is **reciprocal**: f(ωi, ωo) = f(ωo, ωi) (Helmholtz). Conseq
 
 ## The BRDF: the material's answer
 
-Pull one factor out of the integral: `f(p, ωi, ωo)`, the **B**idirectional **R**eflectance **D**istribution **F**unction. Given light from `ωi`, it returns the fraction that leaves toward `ωo`. It **is** the material:
+Pull one factor out of the integral: `f(p, ωi, ωo)`, the **B**idirectional **R**eflectance **D**istribution **F**unction. Given light from `ωi`, it returns how much radiance leaves toward `ωo` per unit of irradiance arriving from `ωi`. It **is** the material:
 
 ```text
    diffuse (matte)   f = constant = ρ/π    same to every direction: the flat, view-independent term
@@ -215,6 +262,26 @@ A **physical** BRDF must obey exactly the rules Phong broke:
 - **non-negative**: no negative light
 - **reciprocal**: `f(ωi, ωo) = f(ωo, ωi)`; swap light and eye, same value (Helmholtz)
 - **energy-conserving**: `∫ f · (n·ωi) dωi ≤ 1`; it reflects **at most** what arrived
+
+
+---
+
+## The BRDF's unit: per steradian
+
+```text
+   f(ωi, ωo) = dLo(ωo) / ( Li(ωi) · cos θi · dωi )
+             = outgoing radiance / arriving irradiance
+   unit:       (W/(m²·sr)) / (W/m²) = 1/sr
+```
+
+| surface | f at the mirror direction (light and eye at 30°) |
+| --- | --- |
+| matte, ρ = 0.6 | 0.191 in every direction |
+| plastic, α = 0.3 | 0.0465 (specular) |
+| plastic, α = 0.1 | 0.424 (specular) |
+| a perfect mirror | unbounded: all the light in one direction |
+
+The energy law limits the **integral** of f · cos, not the value of f.
 
 
 ---
@@ -288,15 +355,21 @@ The same substitution at s = 0 gives π: the plain cosine over the hemisphere.
 
 The physical specular BRDF models a rough surface as a field of microscopic **perfect mirrors**, the **microfacets**; a highlight is the **fraction** of them angled to bounce the light into your eye.
 
-```text
-   smooth surface              rough surface
-   ▁▁▁▁▁▁▁▁▁▁  facets aligned    ╱╲╱╲╱╲╱╲  facets scattered
-   → tight, bright highlight     → broad, dim highlight
-```
+- **smooth**: facets aligned, so a tight, bright highlight
+- **rough**: facets scattered, so a broad, dim highlight
 
 - **Cook-Torrance** multiplies three factors: **D** (how many facets face the half vector; **roughness** lives here), **G** (facets shadowing each other at grazing angles), **F** (**Fresnel**: every surface is mirror-like edge-on)
 - `f = D · G · F / (4 (n·ωi)(n·ωo))`
 - engines expose two sliders on top: **metallic** and **smoothness** (Unity's name for 1 − roughness)
+
+
+---
+
+## The half vector picks the facets
+
+<img src="../../textbook/figures/pbrr-half-vector.svg" alt="Left: light arriving 20 degrees on one side of the normal, the eye 50 degrees on the other, and the half vector h between them at 15 degrees. Right: a jagged microsurface of small facets; the facets whose normals point along h are purple and reflect the incoming orange ray into the outgoing green ray; the others are gray. Caption: only facets whose normal is h send omega i into omega o; D(h) is the fraction of facets facing h" style="height:310px">
+
+A mirror sends `ωi` into `ωo` only if its normal **bisects** them: `h = normalize(ωi + ωo)`.
 
 
 ---
@@ -370,9 +443,18 @@ D, off its peak, does almost all the work: 1.257 against 3.537 at the mirror, an
 
 ---
 
+## Refraction first: Snell's law
+
+<img src="../../textbook/figures/pbrr-snell.svg" alt="Light in air arriving at glass of index 1.5 at 60 degrees from the normal: a dashed reflected ray leaving at 60 degrees, labeled reflected 0.089, and a refracted ray bending to 35.3 degrees inside the glass, labeled enters 0.911. Beside it: Snell's law, sin theta t equals sin 60 over 1.5 equals 0.577, theta t 35.26 degrees, cos theta t 0.8165; then Rs 0.1766, Rp 0.0018, F 0.0892" style="height:310px">
+
+The exact reflectance needs the **refracted** angle first: `sin θi = n · sin θt`.
+
+
+---
+
 ## Fresnel, exactly
 
-Schlick's `F0 + (1 − F0)(1 − cos θ)⁵` is an approximation. The exact reflectance splits by polarization:
+Schlick's `F0 + (1 − F0)(1 − cos θ)⁵` is an approximation. The exact reflectance splits by polarization, using the refracted cosine from Snell's law:
 
 ```text
    glass (n = 1.5) at 60°:   cos θt = 0.8165
@@ -517,7 +599,7 @@ The specular BRDF, drawn as a **polar lobe** around the mirror direction. **Roug
    GGX:    α = 0.4² = 0.16            lobe half-width (HWHM) ≈  6°
 ```
 
-Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full BRDF, longer tails). **Honest note:** the demo's GGX curve is the distribution's **shape** used as a lobe radius: no Fresnel, no G, no normalization. **Shape, not calibrated units.**
+Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full BRDF, longer tails). The demo's GGX curve is the distribution's **shape** used as a lobe radius: no Fresnel, no G, no normalization; its values are **not calibrated units**.
 
 
 ---

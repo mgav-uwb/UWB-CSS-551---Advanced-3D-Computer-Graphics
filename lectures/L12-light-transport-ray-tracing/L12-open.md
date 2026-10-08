@@ -2,19 +2,19 @@
   CSS 551 · Lecture 12 (Tuesday November 10, online): Light Transport, PBR, and Ray Tracing.
   The bridge week: the rendering equation as the thing every renderer, and later
   every neural model of images, approximates. Mounts, in order: L12-open.md,
-  ../../topics/pbr-rendering-equation.md (~47 min, 35 slides), ../../topics/ray-tracing.md
-  (~45 min, 26 slides), L12-discuss.md (the discussion slot is the midterm review).
+  ../../topics/pbr-rendering-equation.md (~69 min, 42 slides), ../../topics/ray-tracing.md
+  (~45 min, 26 slides), L12-discuss.md (the midterm's logistics and the wrap; the review questions moved to the
+  practice midterm, practice/midterm/index.html, on 2026-10-08, and the time to light transport).
 
   Minute plan (120 min, Tue 5:45–7:45 PM synchronous online):
     0:00  opening                                     2 min
-    0:02  light transport and PBR (topic)            47 min
-    0:49  ray tracing (topic)                        45 min
-    1:34  midterm review: logistics and eight questions spanning weeks 1–6  24 min
-    1:58  wrap                                        2 min
+    0:02  light transport and PBR (topic)            69 min
+    1:11  ray tracing (topic)                        45 min
+    1:56  the midterm: logistics, the practice midterm 3 min
+    1:59  wrap                                        1 min
     2:00  end
   Demo: brdf-lobe (roughness). Numbers: numbers.json, numbers-motion.json rt.*,
-  numbers-pipeline.json view.*, and tools/gen-lecture-figures-c.mjs (l12_q1 to
-  l12_q4) and node for review questions 5 to 8.
+  numbers-pipeline.json view.*; figures from tools/gen-lecture-figures-pbr.mjs.
 -->
 
 ## CSS 551
@@ -34,9 +34,9 @@
 
 ## Tonight
 
-- **Honest light**: solid angle, the four radiometric quantities, radiance; the rendering equation, worked as a sum; BRDF lobes, reciprocity, and why Phong is not one; microfacets, D, G and F by hand; metals and dielectrics; the furnace test; environment lighting by the split sum; importance sampling; measured and principled materials; light under the surface
+- **Light transport and PBR**: solid angle, the four radiometric quantities, radiance; the rendering equation, worked as a sum; the solid angle of a patch; bounces as a series; BRDF lobes, the BRDF's unit, reciprocity, and why Phong is not one; the half vector; microfacets, D, G and F by hand; metals and dielectrics; the furnace test; environment lighting by the split sum; importance sampling; measured and principled materials; light under the surface
 - **Ray tracing**: five dates; the ray through a pixel; sphere, triangle and box intersections; instancing; Whitted's shadows, mirrors and glass and how many rays they take; the BVH and the surface area heuristic; soft shadows, depth of field, media; what Whitted misses; rasterize or trace; hardware and denoising
-- **Midterm review**: what the exam covers, and eight questions across weeks 1–6
+- **The midterm**: what it covers, and the practice midterm
 
 Reading: [Light Transport and PBR](../../textbook/light-transport-pbr.html) and [Ray Tracing](../../textbook/ray-tracing.html).
 

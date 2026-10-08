@@ -11,7 +11,7 @@
 - **weeks 1–6**: the big picture, the interactive loop, vectors, rotation, affine transformations, scene graphs, viewing, rasterization and antialiasing, meshes, texture mapping, illumination
 - **25 multiple-choice questions**, 8 points each (200 points), on paper; bring a **pencil**; no devices
 - one **handwritten** cheat sheet allowed (one page, both sides); **everyone hands in a sheet**: the cheat sheet, or your name and "I did not use a cheat sheet"; otherwise **50 %** off
-- items are **computational**: which entry of the matrix, which pixel is inside, what N·L is after the light moves; the wrong options are the pitfalls from the text
+- items are **computational**; the wrong options are the pitfalls from the text
 - **practice**: a <a href="../../practice/midterm/index.html">practice midterm</a> in the same format, with worked answers
 
 
