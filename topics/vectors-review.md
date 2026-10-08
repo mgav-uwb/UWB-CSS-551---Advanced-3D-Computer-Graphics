@@ -107,7 +107,7 @@ Reverse the subtraction (`A - R`) and the drone flies **away** from the target.
 algebraic:  a . b = ax*bx + ay*by + az*bz          geometric:  a . b = |a| |b| cos(theta)
 ```
 
-The two are **equal**; that equality is the entire use of the dot product.
+Their equality lets **three multiplies and two adds** answer geometric questions: the angle, the shadow, in front or behind.
 
 
 ---
