@@ -56,14 +56,15 @@
 <!-- ============================================================ -->
       <h2 id="serve">1 &middot; Serving the course: one folder, one server</h2>
       <p>
-        Download the course site (its repository, as the homework pages describe: the folder that holds
-        <code>index.html</code>, <code>lib/</code> and <code>homework/</code>; this chapter calls it <code>css551/</code>)
-        and, in a terminal, start a static web server in it:
+        Clone or download the <a href="https://github.com/mgav-uwb/UWB-CSS-551-AU26-homework">homework starter repository</a>, the folder that holds
+        <code>index.html</code>, <code>lib/</code> and <code>homework/</code> (git names it
+        <code>UWB-CSS-551-AU26-homework</code>; this chapter calls it <code>css551/</code>), and, in a terminal,
+        start a static web server in it:
       </p>
       <pre>cd css551
 python3 -m http.server 8000</pre>
       <p>
-        Then open <code>http://localhost:8000/</code> for the course hub, or
+        Then open <code>http://localhost:8000/</code> for the list of released homework, or
         <code>http://localhost:8000/homework/run.html?hw=hw01</code> for the first homework. The server does
         nothing but hand files to the browser; stop it with Ctrl-C. Any port works, but every page of the course
         uses relative paths, so the server must be started in <code>css551/</code> itself, not in a subfolder,
