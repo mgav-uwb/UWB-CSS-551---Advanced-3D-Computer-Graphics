@@ -5,14 +5,14 @@
   COMPOSITION: index.html mounts L03-open.md (this file), then
   ../../topics/vectors-review.md (~30 min), then
   ../../topics/interactive-loop-tool.md (~50 min), then
-  L03-discuss.md (discussion ~20 min with the HW1 walk-through, and the wrap).
+  L03-discuss.md (the HW1 walk-through and the wrap, ~10 min).
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Title and tonight                                      ~3 min (this file)
     0:03  Vectors, a review: displacements, dot, cross           ~30 min (topic)
     0:33  The loop, MVC, interaction, the two tracks             ~50 min (topic)
-    1:23  Discussion: four questions, HW1 walk-through, wrap     ~22 min
-    1:45  HW1 setup help, both tracks; buffer                    ~15 min
+    1:23  HW1 walk-through, wrap                                 ~10 min
+    1:33  HW1 setup help, both tracks; buffer                    ~27 min
     2:00  end
   Resequenced 2026-10-05: vectors review first, then the loop; the 3D interaction (NDC,
   picking, arcball, orbit) moved to L08 and the physics topic to L10.
@@ -43,7 +43,7 @@
 2. **the loop**: why it runs until the person quits, frame budgets, per frame against per second, the two clocks, the accumulator, two time pitfalls
 3. **model, view, controller**: why split, the alternatives, one model with two views, undo as commands; events, 2D hit testing, click or drag; latency
 4. **the tool, two tracks**: Unity's editor, objects and script lifecycle; the WebGL track's demo anatomy; implement and replace
-5. discussion, the **HW1** walk-through, then setup help
+5. the **HW1** walk-through, then setup help
 
 Reading: <a href="../../textbook/vectors.html">Vectors</a>, Sections 1 to 3 and 9 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7 and 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 7 and 11.
 

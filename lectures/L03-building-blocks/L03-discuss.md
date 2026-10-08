@@ -1,17 +1,9 @@
 <!--
-  CSS 551 · L03 discussion, HW1 walk-through, and wrap (~22 min); setup help follows.
+  CSS 551 · L03 HW1 walk-through and wrap (~10 min); setup help follows.
+  CUT 2026-10-08: the four multiple-choice discussion questions (the aim, frames at 90 Hz, the two
+  clocks, damping at two rates); the freed time goes to setup help.
 
   NUMBERS, node-checked:
-    Q1  A = (2,0,1), R = (-1,0,5): R - A = (-3,0,4), length 5, unit (-0.6,0,0.8) (lib/core/xform.js
-        sub, normalize). Distractors: (0.6,0,-0.8) (A - R, reversed), (-3,0,4) (not normalized),
-        (-0.43,0,0.57) (divided by |-3| + |4| = 7).
-    Q2  2 units/s at 90 Hz: 2/90 = 0.0222 per frame; 5 units take 225 frames
-        (unity-basics Exercise 1). Distractors: 2.5 (the per-frame bug: 2 units
-        per frame), 90 (one second's worth of frames), 450 (the step halved).
-    Q3  60 Hz frames, 20 ms fixed step: 50 FixedUpdate calls per second.
-        Distractors: 60 (one per frame), 1.2 (60/50 inverted), 110 (both clocks added).
-    Q4  v *= 0.95 per frame: 0.95^30 = 0.215, 0.95^60 = 0.046, ratio 4.66.
-        Distractors: 0.21 (inverted), 1 (the per-second fix), 2 (frame-count ratio).
     HW1 (lib/skeletons/hw01.js, lib/skeletons/expected.js): advance() reaches
         (3,0,0) after one second at 60 Hz and at 20 Hz; hitTest2D: circle (200,150)
         r 12 against (208,159): 64 + 81 = 145 > 144, a miss; segment (100,100) to
@@ -26,57 +18,9 @@
   reveal.js: FLAT; notes follow "Note:"; never two "_" on one line outside a fence.
 -->
 
-### Discussion
+### HW1, and the wrap
 
-<small>(~22 min, with the HW1 walk-through) · vote · argue in pairs · vote again</small>
-
-
----
-
-## Question 1: the aim
-
-A drone at `A = (2, 0, 1)` fires at a target at `R = (-1, 0, 5)`. What is the unit aim direction?
-
-- **A.** `(-0.6, 0, 0.8)`
-- **B.** `(0.6, 0, -0.8)`
-- **C.** `(-3, 0, 4)`
-- **D.** `(-0.43, 0, 0.57)`
-
-
----
-
-## Question 2: how many frames?
-
-An `Update` moves an object with `p.x += 2f * Time.deltaTime;` on a machine that renders **90 frames per second**. How many frames until it has moved **5 units**?
-
-- **A.** 2.5
-- **B.** 90
-- **C.** 225
-- **D.** 450
-
-
----
-
-## Question 3: the two clocks
-
-A Unity game renders at a steady **60 frames per second** with the default fixed step of **20 ms**. How many times per second does `FixedUpdate` run?
-
-- **A.** 1.2
-- **B.** 50
-- **C.** 60
-- **D.** 110
-
-
----
-
-## Question 4: damping at two frame rates
-
-A game slows a sliding puck with `v *= 0.95;` once **per frame**. After **one second**, how many times more speed does the puck keep on a **30 Hz** machine than on a **60 Hz** machine?
-
-- **A.** 0.21
-- **B.** 1
-- **C.** 2
-- **D.** 4.66
+<small>(~10 min) · then setup help, both tracks</small>
 
 
 ---
