@@ -47,6 +47,9 @@
     data-run="name" adds a Run tab that executes the WebGL listing's text as written, with the
     hidden setup named in lib/code-run.js (EXAMPLES: spin, keys, accumulator, tangle, untangled,
     dirty, undo, bounce). Changing a listing means checking its runner still works.
+  TRIMMED 2026-10-08: float drift (vector-geometry's precision section has it), Unity's clocks by name
+    (unity-basics.html section 4), running the WebGL track (webgl-basics.html section 1) and checking a
+    build against the engine (implement and replace covers it).
   READING: ../../textbook/interaction.html (Sections 1 to 4, 7, 10) and
     ../../textbook/unity-basics.html (Sections 1 to 5, 7, 11).
 
@@ -358,20 +361,6 @@ Speed **3 units/s**, per-second motion, then one frame stalls for **250 ms**:
 - the object jumps **0.75** units in a single step
 - a wall **0.2** thick is skipped whenever one step is longer than 0.2 / 3 = **0.067 s** (a 15 fps frame)
 - on a fixed **10 ms** step, the largest move is **0.03**: the wall is never skipped
-
-
----
-
-## Pitfall: floats drift far from the origin
-
-Add **0.05** per frame for **3,600** frames (a minute at 60 Hz) in 32-bit floats:
-
-| start | exact end | float32 end | error |
-| --- | --- | --- | --- |
-| 0 | 180 | 180.006 | 0.006 |
-| 1000 | 1180 | 1180.146 | 0.146 |
-
-Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times wider than near 180.
 
 
 ---
@@ -832,16 +821,6 @@ At 60 Hz each step is 2 / 60 = **0.0333**; the top, 3 units up, takes **1.5 s** 
 
 ---
 
-## Unity's clocks, by name
-
-- `Time.deltaTime`: seconds since the last frame, **scaled** by `Time.timeScale`
-- `Time.fixedDeltaTime`: the fixed step, **0.02 s** by default (the 50 steps a second of the table)
-- `Time.timeScale = 0.5`: slow motion; **0** stops the scaled clock, and `FixedUpdate` stops with it
-- `Time.unscaledDeltaTime`: the real frame time, for a pause menu that must keep animating
-
-
----
-
 ## Two traps in the first hour
 
 - **the struct copy**: `transform.localPosition.x += 1;` does not compile. `Vector3` is a struct, the property returns a **copy**, and C# refuses to assign into a copy. Read into a local, modify, write back.
@@ -874,21 +853,6 @@ export function make(container, { stage, controls } = {}) {
 
 ---
 
-## WebGL track: running it
-
-- ES modules do not load from `file://`: serve the course folder with a **local static server**
-
-```text
-   python3 -m http.server 8551          (from the folder that holds lib/)
-   http://localhost:8551/lib/demo.html?demo=mvc-transform
-```
-
-- the browser's **developer console** is your Console: errors, `console.log`, and live inspection of the model
-- the math primitives are `sub`, `dot`, `cross`, `normalize` from `lib/core/xform.js`: arrays in, arrays out
-
-
----
-
 ## Implement and replace
 
 Where a homework names a helper, it is **off limits**: build it from primitives, then use the helper as the **answer key**.
@@ -899,19 +863,4 @@ Where a homework names a helper, it is **off limits**: build it from primitives,
 | angle | `Vector3.Angle` | `Vector3.angleTo` | a dot and two lengths |
 | shadow on a direction | `Vector3.Project` | `projectOnVector` | a dot and a scale |
 | face normals | `Mesh.RecalculateNormals` | `computeVertexNormals` | edge crosses |
-
-
----
-
-## Checking a build against the engine
-
-The aim of the vectors review, three ways:
-
-```text
-   by hand:     normalize(R − A) = (3, 0, −4) / 5          = (0.6, 0, −0.8)
-   Unity:       (R - A).normalized                          → (0.6, 0.0, -0.8)
-   the library: normalize(sub(R, A))                        → [ 0.6, 0, -0.8 ]
-```
-
-Three routes, one answer: that is what a homework's **run and compare** rubric checks.
 

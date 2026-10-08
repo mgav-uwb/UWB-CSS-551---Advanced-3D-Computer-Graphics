@@ -22,7 +22,11 @@
            Fallback numbers: a.b = 4, |a| = 2.24, |b| = 2.45, theta = 43.1 deg, a x b = (1, -2, 3).
   NUMBERS: textbook/figures/numbers-foundations.json (key vec) or recomputed by node against
            lib/core/xform.js, Math.fround and lib/vendor/three.module.js.
-  FIGURES: ../../textbook/figures/vec-*.svg (tools/gen-textbook-figures-foundations.mjs).
+  FIGURES: ../../textbook/figures/vec-*.svg (tools/gen-textbook-figures-foundations.mjs) and
+           vecr-*.svg (tools/gen-lecture-figures-vectors.mjs, 2026-10-08).
+  TRIMMED 2026-10-08: the zero-length pitfall folded into the unit-vector slide, the law of cosines into
+           "Two definitions", the product rules into the right-hand rule's note, 2D line intersection into
+           the perp-dot note; Newell's method moved to meshes.md.
   READING: ../../textbook/vectors.html, Sections 1 to 3 and 9.
   SOURCE:  Real C# excerpts are from Kelvin Sung's CSS 451 ClassExamples (Chap-4 to Chap-6).
 
@@ -42,25 +46,20 @@
 
 ## Points and displacements
 
-- a **position**: *where* something is, a displacement **from the origin**
-- a **displacement**: *how to get* from one place to another, an arrow with direction and length
-- from Pi to Pj: **tip minus tail**
+<img src="../../textbook/figures/vecr-points.svg" alt="Points Pi at (1, 1) and Pj at (4, 3) with dashed position arrows from the origin and a red displacement arrow from Pi to Pj labeled Pj minus Pi equals (3, 2)" style="height:300px">
 
 ```csharp
 Vector3 vectorVe = Pj.transform.localPosition - Pi.transform.localPosition;
 ```
 
-<small>EX_4_1_MyScript.cs, Chap-4-Vectors: Ve = Pj − Pi. `Pi − Pj` points the other way.</small>
+<small>EX_4_1_MyScript.cs, Chap-4-Vectors: Ve = Pj − Pi, tip minus tail. `Pi − Pj` points the other way.</small>
 
 
 ---
 
 ## Add and scale, geometrically
 
-Two operations, both with a picture:
-
-- **add**: lay arrows tip to tail; `u + v` runs from the tail of u to the tip of v
-- **scale**: `2v` is the same direction, twice as long; `-v` flips it; `0.5v` halves it
+<img src="../../textbook/figures/vecr-add-scale.svg" alt="Left: u = (3, 1) and v = (1, 2) laid tip to tail give u + v = (4, 3), with v then u giving the same sum. Right: v = (2, 0.5) with 2v, 0.5v and minus v drawn along the same line" style="height:330px">
 
 Marching along an aim each frame is **scale, then add**: `pos = pos + speed * dt * aim`.
 
@@ -69,44 +68,23 @@ Marching along an aim each frame is **scale, then add**: `pos = pos + speed * dt
 
 ## Length, and the unit vector
 
-An aim needs a **direction**, not a length. Strip the length off by dividing by it:
+<img src="../../textbook/figures/vecr-normalize.svg" alt="v = (3, 4) of length 5 drawn with its 3 and 4 legs, and the unit vector (0.6, 0.8) on a dashed unit circle; a note that (0, 0, 0) has no direction" style="height:300px">
 
 ```csharp
-Vector3 vectorVs = ScalingFactor * vectorVa;              // scale
-Vector3 unitVa   = (1.0f / vectorVa.magnitude) * vectorVa;  // normalize by hand
+Vector3 unitVa = (1.0f / vectorVa.magnitude) * vectorVa;  // normalize by hand
 // Vector3 dirVa = vectorVa.normalized;                   // the engine's way
 ```
 
-<small>EX_4_2_MyScript.cs, Chap-4-Vectors. Build the top one; check it against the bottom one.</small>
-
-- **magnitude** `|v| = sqrt(x·x + y·y + z·z)`: the arrow's length
-- **normalize** `v / |v|`: same direction, length 1 (a *unit* vector)
-
-
----
-
-## Pitfall: a zero-length vector has no direction
-
-- normalize divides by the length: **(0, 0, 0)** gives **0 / 0 = NaN** in all three components
-- in float32 a short vector can reach zero length too: (10⁻²⁰)² = 10⁻⁴⁰ survives as a denormal, **(10⁻²⁵)² = 0 exactly**
-- NaN spreads into every later computation, including the next frame's position
-- short vectors come from **differences of nearly equal points** and **cross products of nearly parallel inputs**: test the length before dividing
+Test the length before dividing: short vectors come from **nearly equal points** and **nearly parallel crosses**.
 
 
 ---
 
 ## Worked: aim and march
 
-Drone at `A = (1, 0, 2)`, target at `R = (4, 0, -2)`, speed 10, one frame of `dt = 0.016` s:
+<img src="../../textbook/figures/vecr-aim-march.svg" alt="Top view: drone A at (1, 0, 2), target R at (4, 0, -2), the red unit aim (0.6, 0, -0.8), and 31 green dots, one per frame, marching to the target" style="height:330px">
 
-```text
-aim       = R - A              = (3, 0, -4)
-|aim|     = sqrt(9 + 0 + 16)   = 5
-unit aim  = (3, 0, -4) / 5     = (0.6, 0, -0.8)
-step      = 10 * 0.016 * (0.6, 0, -0.8) = (0.096, 0, -0.128)
-```
-
-Reverse the subtraction (`A - R`) and the ball flies **away** from the target.
+Reverse the subtraction (`A - R`) and the drone flies **away** from the target.
 
 
 ---
@@ -123,35 +101,13 @@ Reverse the subtraction (`A - R`) and the ball flies **away** from the target.
 
 ## Two definitions, one number
 
-**Algebraic**: multiply matching components, add:
+<img src="../../textbook/figures/vecr-law-cosines.svg" alt="The triangle with sides a, b and a minus b, squared lengths 5, 6 and 3 and angle 43.1 degrees, beside the algebra: a dot b = 4, the law of cosines 3 = 5 + 6 - 2 times 4, so a dot b = |a||b| cos theta" style="height:300px">
 
 ```text
-a . b  =  ax*bx  +  ay*by  +  az*bz
-```
-
-**Geometric**: lengths times the cosine of the angle between:
-
-```text
-a . b  =  |a| * |b| * cos(theta)
+algebraic:  a . b = ax*bx + ay*by + az*bz          geometric:  a . b = |a| |b| cos(theta)
 ```
 
 The two are **equal**; that equality is the entire use of the dot product.
-
-
----
-
-## The law of cosines is the dot product
-
-Expand the squared length of **a − b**:
-
-```text
-   |a − b|² = (a − b)·(a − b) = a·a − 2 a·b + b·b = |a|² + |b|² − 2 |a||b| cos θ
-
-   a = (2, 1, 0), b = (1, 2, 1):  a − b = (1, −1, −1),  |a − b|² = 3
-                                  |a|² + |b|² − 2 a·b = 5 + 6 − 8 = 3
-```
-
-The geometric definition **follows** from the algebraic one: the triangle with sides a, b, a − b.
 
 
 ---
@@ -309,32 +265,12 @@ Check it is perpendicular to both; each dot must be **0**:
 
 ## Right-hand rule
 
-The cross is perpendicular to the a-b plane, but on *which* side?
+<img src="../../textbook/figures/vecr-right-hand.svg" alt="a and b spanning a shaded plane, a curl arrow from a toward b, a cross b = (1, -2, 3) on one side of the plane and b cross a = (-1, 2, -3) dashed on the other" style="height:320px">
 
-- **Right-hand rule:** fingers along `a`, curl toward `b`, thumb is `a x b`
-- swap the inputs and the thumb flips: **`b x a = -(a x b)`**
-
-```csharp [1-2]
+```csharp
 Vector3 v1xv2 = Vector3.Cross(v1, v2);
 Vector3 v2xv1 = Vector3.Cross(v2, v1);   // equals -v1xv2
 ```
-
-<small>EX_6_1_MyScript.cs, Chap-6: draws both, in opposite directions.</small>
-
-
----
-
-## The rules the two products obey
-
-```text
-   dot:    a · b = b · a                      a · (2b + c) = 2 a · b + a · c = 8
-   cross:  b × a = −(a × b)                   a × a = 0
-           a × (b × c) = (0, 0, −4)           (a × b) × c = (−2, −1, 0)          with c = (0, 0, 1)
-```
-
-- both are **linear** in each argument: scale or add inputs first or afterward, same answer
-- the dot is **symmetric**; the cross is **antisymmetric** and **not associative**: the brackets matter
-- a × a = 0 is the cross product's parallel test, the one the frame construction trips on
 
 
 ---
@@ -353,46 +289,16 @@ check:    sqrt(5) sqrt(6) sin(43.1°) = 5.477 * 0.683 ~= 3.742
 
 ## In 2D: the perp-dot product
 
-For plane vectors, keep only the cross product's **z** part: `u ⊥ v = u_x · v_y − u_y · v_x`.
+<img src="../../textbook/figures/vecr-perp-dot.svg" alt="Two panels. Left: u = (2, 1), v = (1, 2), a counterclockwise arc and u perp v = 3, a left turn. Right: the order swapped, a clockwise arc and -3, a right turn. Both shade the parallelogram of area 3" style="height:320px">
 
-```text
-   (2, 1) ⊥ (1, 2) =  2·2 − 1·1 =  3    v is counterclockwise from u: a LEFT turn
-   (1, 2) ⊥ (2, 1) =  1·1 − 2·2 = −3    clockwise: a RIGHT turn
-```
-
-- **zero**: parallel · **sign**: which side · **size**: the parallelogram's area
-- the edge functions of the rasterization lecture are this, one per triangle edge
-
-
----
-
-## Two lines in 2D, intersected
-
-Lines p + t r and q + s u. Cross both sides with u, then with r:
-
-```text
-   t = (q − p) ⊥ u / (r ⊥ u),     s = (q − p) ⊥ r / (r ⊥ u)
-
-   p = (0, 0), r = (4, 2);  q = (0, 3), u = (2, −1)
-   r ⊥ u = 4·(−1) − 2·2 = −8
-   t = ((0, 3) ⊥ (2, −1)) / −8 = (0 − 6) / −8 = 0.75     → p + 0.75 r = (3, 1.5)
-   s = ((0, 3) ⊥ (4, 2)) / −8 = (0 − 12) / −8 = 1.5      → q + 1.5 u  = (3, 1.5)
-```
-
-**r ⊥ u = 0**: parallel lines, no single answer. For segments, accept only **0 ≤ t, s ≤ 1**.
+`u ⊥ v = u_x · v_y − u_y · v_x`: **zero** parallel · **sign** which side · **size** the parallelogram's area
 
 
 ---
 
 ## The area of any polygon: sum the crosses
 
-For a polygon in the plane, twice the area is the sum over its edges of `x_i · y_next − x_next · y_i`, the z part of each edge's cross product:
-
-```text
-   pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5)
-
-   area = ½ · Σ (x_i · y_next − x_next · y_i) = 16.875
-```
+<img src="../../textbook/figures/vecr-polygon-area.svg" alt="The pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5) with a triangle from the origin to each edge, blue triangles adding and red ones subtracting, summing to 16.875" style="height:340px">
 
 The sign tells the winding: **positive** counterclockwise, **negative** clockwise.
 
@@ -401,15 +307,7 @@ The sign tells the winding: **positive** counterclockwise, **negative** clockwis
 
 ## Worked: a face normal from two edges
 
-`P0 = (0,0,0)`, `P1 = (2,0,0)`, `P2 = (0,0,-2)`:
-
-```text
-e1 = P1 - P0 = (2, 0, 0)      e2 = P2 - P0 = (0, 0, -2)
-e1 x e2 = (0*(-2) - 0*0,  0*0 - 2*(-2),  0) = (0, 4, 0)    ->  n = (0, 1, 0)
-```
-
-- the face lies in the ground plane and faces **up**; the length 4 is **twice the area** (2)
-- swap `P1` and `P2`: `n = (0, -1, 0)`, same triangle, **opposite winding**
+<img src="../../textbook/figures/vecr-face-normal.svg" alt="Left: the triangle P0 = (0,0,0), P1 = (2,0,0), P2 = (0,0,-2) with edges e1, e2, a counterclockwise winding arrow and the normal (0, 1, 0) pointing up. Right: P1 and P2 swapped, clockwise winding, normal (0, -1, 0) pointing down" style="height:320px">
 
 ```csharp
 Vector3 n = Vector3.Cross(v1, v2);
@@ -427,23 +325,6 @@ if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen si
 - **B.** down, (0, −1, 0)
 - **C.** along x, (1, 0, 0)
 - **D.** nowhere: the corners are collinear
-
-
----
-
-## Newell's method: the normal of a polygon
-
-A four-sided face whose corner is lifted, (0, 0, 0), (1, 0, 0), (1, 1, **0.2**), (0, 1, 0), is not flat. Crosses at different corners **disagree**:
-
-```text
-   cross at vertex 0:  (0, 0, 1)          cross at vertex 2:  (−0.192, −0.192, 0.962)
-
-   Newell: sum over edges (p → q) of
-      Nx += (p_y − q_y)(p_z + q_z),  Ny += (p_z − q_z)(p_x + q_x),  Nz += (p_x − q_x)(p_y + q_y)
-   = (−0.2, −0.2, 2)  →  normalized (−0.099, −0.099, 0.990)
-```
-
-One normal from every edge at once: the average orientation, robust to a bent face (Tampieri, Graphics Gems III, 1992).
 
 
 ---

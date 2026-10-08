@@ -293,6 +293,23 @@ Straight up: exactly what a flat floor's normal should be.
 
 ---
 
+## Newell's method: the normal of a polygon
+
+A four-sided face whose corner is lifted, (0, 0, 0), (1, 0, 0), (1, 1, **0.2**), (0, 1, 0), is not flat. Crosses at different corners **disagree**:
+
+```text
+   cross at vertex 0:  (0, 0, 1)          cross at vertex 2:  (−0.192, −0.192, 0.962)
+
+   Newell: sum over edges (p → q) of
+      Nx += (p_y − q_y)(p_z + q_z),  Ny += (p_z − q_z)(p_x + q_x),  Nz += (p_x − q_x)(p_y + q_y)
+   = (−0.2, −0.2, 2)  →  normalized (−0.099, −0.099, 0.990)
+```
+
+One normal from every edge at once: the average orientation, robust to a bent face (Tampieri, Graphics Gems III, 1992).
+
+
+---
+
 ## From face normals to vertex normals
 
 A face normal is per-**triangle**, but lighting samples per-**vertex**, and each interior vertex is shared by several faces. Average them: a vertex's normal is the sum of its incident face normals, then normalized.
