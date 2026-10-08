@@ -101,7 +101,7 @@ Reverse the subtraction (`A - R`) and the drone flies **away** from the target.
 
 ## Two definitions, one number
 
-<img src="../../textbook/figures/vecr-law-cosines.svg" alt="The triangle with sides a, b and a minus b, squared lengths 5, 6 and 3 and angle 43.1 degrees, beside the algebra: a dot b = 4, the law of cosines 3 = 5 + 6 - 2 times 4, so a dot b = |a||b| cos theta" style="height:300px">
+<img src="../../textbook/figures/vecr-law-cosines.svg" alt="The triangle with sides a, b and a minus b, squared lengths 5, 6 and 3 and angle 43.1 degrees, beside four steps: the third side is a minus b; the law of cosines gives its squared length from the angle; squaring a minus b component by component gives the same squared length with minus twice the dot product; so a dot b equals |a||b| cos theta" style="height:320px">
 
 ```text
 algebraic:  a . b = ax*bx + ay*by + az*bz          geometric:  a . b = |a| |b| cos(theta)
