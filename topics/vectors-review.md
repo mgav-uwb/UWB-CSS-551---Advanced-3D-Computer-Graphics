@@ -16,6 +16,8 @@
   and three.js's Vector3 with their traps.
   EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
            from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
+  REORDERED 2026-10-08: "The dot product and the cross product" introduces both before the history slide;
+           dot-product slide titles name it.
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
            direction, which way a face points) and the predict-first perpendicular pair; their numbers
            are Vectors chapter Exercises 1 and 2 and the demo's note.
@@ -87,9 +89,34 @@ Test the length before dividing: short vectors come from **nearly equal points**
 
 ## Worked: aim and march
 
-<img src="../../textbook/figures/vecr-aim-march.svg" alt="Top view: drone A at (1, 0, 2), target R at (4, 0, -2), the red unit aim (0.6, 0, -0.8), and 31 green dots, one per frame, marching to the target" style="height:330px">
+<img src="../../textbook/figures/vecr-aim-march.svg" alt="Top view: drone A at (1, 0, 2), target R at (4, 0, -2), the red unit aim (0.6, 0, -0.8), and 31 green dots, one per frame, marching to the target" style="height:265px">
 
-Reverse the subtraction (`A - R`) and the drone flies **away** from the target.
+From **A** to **R** at **10 units/s**, one frame every **0.016 s**:
+
+```text
+1. aim      R − A                = (3, 0, −4)              tip minus tail
+2. length   √(3² + 0² + 4²)      = 5                       the distance to fly
+3. unit     (3, 0, −4) / 5       = (0.6, 0, −0.8)          direction only, length 1
+4. step     10 × 0.016 × unit    = (0.096, 0, −0.128)      scale, then add each frame: length 0.16
+5. frames   5 / 0.16             = 31.25                   after 31 steps, 0.04 is left
+```
+
+Clamp the last step to the distance left, or frame 32 overshoots by 0.12. Reverse the subtraction (`A − R`) and the drone flies **away**.
+
+
+---
+
+## The dot product and the cross product
+
+Two ways to multiply two vectors; the example is **a = (2, 1, 0)**, **b = (1, 2, 1)**:
+
+| | dot product `a · b` | cross product `a × b` |
+| --- | --- | --- |
+| result | a **number** | a **vector** |
+| by components | ax·bx + ay·by + az·bz | (ay·bz − az·by, az·bx − ax·bz, ax·by − ay·bx) |
+| example | 4 | (1, −2, 3) |
+| geometrically | \|a\| \|b\| cos θ: how aligned | perpendicular to both, length \|a\| \|b\| sin θ: an area |
+| in graphics | angles, projection, N·L lighting, in front or behind | normals, areas, handedness, winding |
 
 
 ---
@@ -104,7 +131,7 @@ Reverse the subtraction (`A - R`) and the drone flies **away** from the target.
 
 ---
 
-## Two definitions, one number
+## The dot product: two definitions, one number
 
 <img src="../../textbook/figures/vecr-law-cosines.svg" alt="The triangle with sides a, b and a minus b, squared lengths 5, 6 and 3 and angle 43.1 degrees, beside four steps: the third side is a minus b; the law of cosines gives its squared length from the angle; squaring a minus b component by component gives the same squared length with minus twice the dot product; so a dot b equals |a||b| cos theta" style="height:320px">
 
@@ -117,7 +144,7 @@ Their equality lets **three multiplies and two adds** answer geometric questions
 
 ---
 
-## The angle between two vectors
+## The dot product gives the angle
 
 Solve the geometric definition for the angle (a and b nonzero):
 
@@ -217,7 +244,7 @@ Check perpendicularity: `u-perp . v` must be **0**:
 
 ---
 
-## Sign = the in-front-of test
+## The dot product's sign: in front or behind
 
 <img src="../../textbook/figures/vec-dot-sign.svg" alt="the sign of the dot product splits space into front and behind" style="height:220px">
 
