@@ -8,12 +8,12 @@
   TEACHES (condensed, as a review of high-school and first-year vectors): a point against a
   displacement, tip minus tail; add and scale; length and normalize, with the zero-length caveat;
   aim and march worked; where the two products came from (Hamilton 1843, Gibbs 1881 to 1884); the
-  dot product's two definitions and the law of cosines; the angle, worked and in code in both tracks;
-  projection (the along and across split) with two checks; the sign test; the cross product by
-  components, the right-hand rule, the algebra rules, the length as an area; the 2D perp-dot product,
-  2D line intersection and polygon area (the pentagon of the 2D hit test); a face normal and its
-  winding; Newell's polygon normal; the triple product as volume and handedness; Unity's and three.js's
-  Vector3 with their traps.
+  dot product's two definitions, derived through the law of cosines; the angle, worked and in code in
+  both tracks (code tabs); projection (the along and across split) with two checks; the sign test; the
+  cross product by components, the right-hand rule, the algebra rules (in its notes), the length as an
+  area; the 2D perp-dot product (line intersection in its notes) and polygon area (the pentagon of the
+  2D hit test); a face normal and its winding; the triple product as volume and handedness; Unity's
+  and three.js's Vector3 with their traps.
   SPLIT 2026-10-05 from vectors-dot-cross.md (archived in topics/archive/): frames, Gram-Schmidt, lines,
   planes, reflection, rays against planes, barycentric weights and the precision pitfalls moved to
   vector-geometry.md.
@@ -124,12 +124,12 @@ cos(theta) = (a . b) / (|a| |b|)     = 4 / sqrt(30) ~= 0.7303
 theta      = acos(0.7303)            ~= 43.1 degrees
 ```
 
-- **positive** dot: acute · **zero**: perpendicular · **negative**: obtuse
-
 
 ---
 
 ## Real code: dot, then angle, both tracks
+
+<div class="code-tabs">
 
 ```csharp
 float dot = Vector3.Dot(v1, v2);
@@ -140,13 +140,15 @@ if ((v1.magnitude > float.Epsilon) && (v2.magnitude > float.Epsilon))
 }
 ```
 
-<small>EX_5_1_MyScript.cs, Chap-5-DotProducts. The guard avoids dividing by a zero-length vector.</small>
-
-```js
+```javascript
 import { dot } from '../core/xform.js';
 const len = (v) => Math.hypot(...v);
 const thetaDeg = Math.acos(dot(a, b) / (len(a) * len(b))) * 180 / Math.PI;   // 43.0887
 ```
+
+</div>
+
+<small>The C# is EX_5_1_MyScript.cs, Chap-5-DotProducts; its guard avoids dividing by a zero-length vector.</small>
 
 
 ---
@@ -209,7 +211,7 @@ Split **a = (3, 4, 0)** along **c = (1, 1, 0)**. What is the along part?
 <img src="../../textbook/figures/vec-dot-sign.svg" alt="the sign of the dot product splits space into front and behind" style="height:220px">
 
 ```text
-a . b > 0  ->  b in FRONT of a      a . b = 0  ->  square on      a . b < 0  ->  b BEHIND a
+a . b > 0  ->  b in FRONT of a      a . b = 0  ->  b at 90 degrees      a . b < 0  ->  b BEHIND a
 ```
 
 Aim `a` = the way the drone faces, `b` = toward the target. Fire only when `a . b > 0`.
@@ -289,9 +291,13 @@ check:    sqrt(5) sqrt(6) sin(43.1°) = 5.477 * 0.683 ~= 3.742
 
 ## In 2D: the perp-dot product
 
-<img src="../../textbook/figures/vecr-perp-dot.svg" alt="Two panels. Left: u = (2, 1), v = (1, 2), a counterclockwise arc and u perp v = 3, a left turn. Right: the order swapped, a clockwise arc and -3, a right turn. Both shade the parallelogram of area 3" style="height:320px">
+<img src="../../textbook/figures/vecr-perp-dot.svg" alt="Two panels. Left: u = (2, 1), v = (1, 2), a counterclockwise arc and u perp v = 3, a left turn. Right: the order swapped, a clockwise arc and -3, a right turn. Both shade the parallelogram of area 3" style="height:260px">
 
-`u ⊥ v = u_x · v_y − u_y · v_x`: **zero** parallel · **sign** which side · **size** the parallelogram's area
+`u ⊥ v = ux·vy − uy·vx`:
+
+- **zero**: parallel
+- **sign**: which side, left or right turn
+- **size**: the parallelogram's area
 
 
 ---

@@ -7,19 +7,17 @@
   each track; one frame in order (Unity's player loop against the browser's); continuous versus
   on-demand loops; events against polling (held keys); the budget at 30 to 144 Hz;
   per-frame versus per-second motion (deltaTime); the two clocks and the fixed-timestep
-  accumulator, worked and in code; interpolation between steps; three time pitfalls (per-frame
-  damping, the hitch and the tunnel, float drift far from the origin); a tool without a model
-  (the tangle, predicted), MVC defined, why split this way, the alternatives (MVP, MVVM, one-way
-  data flow, immediate mode, ECS), the same tool untangled (WithoutNotify, the focused box),
-  who tells the view (continuous redraw, dirty flag, requestRender, observer); MVC with the
-  one-model-two-views demo; what MVC buys (undo two ways, retained versus immediate mode); MVC's
-  origin (Reenskaug 1979); one drag end to end; where the model lives in each track; undo as
-  commands in code; the event table with Unity's classic Input names; the device-pixel pitfall;
-  2D hit testing, target sizes and the drag state machine; click or drag, worked; latency, input to
-  photon, a missed v-sync, and in a headset; the two homework tracks side by side; Unity's editor,
-  object model, script lifecycle, clocks and the two C# traps; the Bounce script in the WebGL track;
-  the WebGL track's demo anatomy and how to run it; implement and replace; checking a build
-  against the engine (the vectors review's aim).
+  accumulator, worked and in code; interpolation between steps; two time pitfalls (per-frame
+  damping, the hitch and the tunnel); a tool without a model (the tangle, predicted), MVC defined,
+  the same tool untangled (WithoutNotify, the focused box), why split this way, MVC's origin
+  (Reenskaug 1979), the alternatives (MVP, MVVM, one-way data flow, immediate mode, ECS), who
+  tells the view (continuous redraw, dirty flag, requestRender, observer); the
+  one-model-two-views demo; one drag end to end; where the model lives in each track; undo, as
+  snapshots or as commands, in code; the event table with Unity's classic Input names; the
+  device-pixel pitfall; 2D hit testing, target sizes and the drag state machine; click or drag,
+  worked; latency, input to photon, a missed v-sync, and in a headset; the two homework tracks
+  side by side; Unity's editor and object model; the Bounce script in both tracks; the script
+  lifecycle and the two C# traps; the WebGL track's demo anatomy; implement and replace.
   RESEQUENCED 2026-10-05 (L03 "Building blocks"): nothing that needs matrices or the camera. Moved to
   interaction-3d.md (mounted after viewing): pixel to NDC, picking in 3D, dragging on the ground,
   snapping, the arcball, the orbit controller. Archived (old open/discuss snapshot and git history):
@@ -49,7 +47,8 @@
     dirty, undo, bounce). Changing a listing means checking its runner still works.
   TRIMMED 2026-10-08: float drift (vector-geometry's precision section has it), Unity's clocks by name
     (unity-basics.html section 4), running the WebGL track (webgl-basics.html section 1) and checking a
-    build against the engine (implement and replace covers it).
+    build against the engine (implement and replace covers it). Second pass the same day: "What the
+    discipline buys: undo" merged into the undo code slide; MVC's origin moved before the alternatives.
   READING: ../../textbook/interaction.html (Sections 1 to 4, 7, 10) and
     ../../textbook/unity-basics.html (Sections 1 to 5, 7, 11).
 
@@ -176,7 +175,7 @@ Events arriving mid-frame **wait** for the next trip.
 - **continuous**: render every frame whether or not anything changed; a game, where something always changes
 - **on demand**: render only when an event changed the state; the course's demos, which draw nothing while idle
 - the same structure either way: an event arrives, a handler **edits the state**, a frame is **requested**, the frame **reads the state**
-- no correct program draws inside an event handler
+- handlers **edit and request**; only the frame **draws**
 
 
 ---
@@ -481,6 +480,15 @@ Slider to 1.5, then `=`: cube, slider and box all show **3**. Three controllers,
 
 ---
 
+## Where MVC came from
+
+- **Trygve Reenskaug**, a visiting scientist at **Xerox PARC**, 1978 to 1979, working in Smalltalk
+- his note of May 12, 1979, "Thing-Model-View-Editor"; renamed in his note of December 10, 1979, "Models-Views-Controllers"
+- implemented for the Smalltalk-80 library by others at PARC; written up by Krasner and Pope (1988)
+
+
+---
+
 ## Alternatives to MVC
 
 | architecture | the idea | where you meet it |
@@ -590,24 +598,7 @@ Game code often lets the **Transform be the model**: a pose is state, and the re
 
 ---
 
-## What the discipline buys: undo
-
-- **undo** is a stack of past models: this demo's model is 3 doubles, **24 bytes**; 1,000 snapshots are 24 kB
-- a mesh editor's model is bigger: the bunny's 35,947 vertices are **431 kB** per snapshot, so store the **command** instead ("move vertex 1,204 by (0.1, 0, −0.05)", about 16 bytes, undone by its negation)
-
-
----
-
-## Where MVC came from
-
-- **Trygve Reenskaug**, a visiting scientist at **Xerox PARC**, 1978 to 1979, working in Smalltalk
-- his note of May 12, 1979, "Thing-Model-View-Editor"; renamed in his note of December 10, 1979, "Models-Views-Controllers"
-- implemented for the Smalltalk-80 library by others at PARC; written up by Krasner and Pope (1988)
-
-
----
-
-## Real code: undo as commands
+## Undo: store the edit, not the model
 
 <div class="code-tabs" data-run="undo">
 
@@ -638,7 +629,7 @@ function undo()   { const c = history.pop(); if (c) { c.undo(); requestRender();
 
 </div>
 
-About **16 bytes** of state per edit instead of **431 kB** per bunny snapshot.
+A stack of snapshots costs **24 bytes** each for this demo's model, **431 kB** for the bunny's 35,947 vertices; a command costs about **16 bytes**.
 
 
 ---
@@ -751,9 +742,13 @@ A renderer takes **25 ms** a frame on a **60 Hz** display with v-sync:
 
 ## Unity: the editor
 
-<img src="../../textbook/figures/unity-editor.svg" alt="Schematic of the Unity editor's default layout: Hierarchy at left, Scene and Game views in the center, Inspector at right, Project and Console at the bottom, the Play button at the top" style="max-height: 330px; width: auto;">
+<img src="../../textbook/figures/unity-editor.svg" alt="Schematic of the Unity editor's default layout: Hierarchy at left, Scene and Game views in the center, Inspector at right, Project and Console at the bottom, the Play button at the top" style="max-height: 280px; width: auto;">
 
-**Hierarchy** (the scene graph) · **Scene** (the editor's camera) · **Game** (the scene's camera) · **Inspector** (the selected object's components) · **Project** (`Assets/` on disk) · **Console**
+| window | shows | window | shows |
+| --- | --- | --- | --- |
+| **Hierarchy** | the scene graph | **Inspector** | the selected object's components |
+| **Scene** | the editor's camera | **Project** | `Assets/` on disk |
+| **Game** | the scene's camera | **Console** | logs, compile errors |
 
 
 ---

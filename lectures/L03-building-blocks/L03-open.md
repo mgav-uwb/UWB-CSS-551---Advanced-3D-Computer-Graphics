@@ -40,10 +40,10 @@
 ## Tonight
 
 1. **vectors, a review**: displacements, length and normalize, the dot product (angle, projection, sign), the cross product (perpendicular, area, handedness), in both tracks
-2. **the loop**: frame budgets, per frame against per second, the two clocks, the accumulator, three time pitfalls
-3. **model, view, controller**: one model, two views; undo as commands; events, 2D hit testing, click or drag; latency
-4. **the tool, two tracks**: Unity's editor, objects, scripts, clocks; the WebGL track's demo anatomy; implement and replace
+2. **the loop**: why it never returns, frame budgets, per frame against per second, the two clocks, the accumulator, two time pitfalls
+3. **model, view, controller**: why split, the alternatives, one model with two views, undo as commands; events, 2D hit testing, click or drag; latency
+4. **the tool, two tracks**: Unity's editor, objects and script lifecycle; the WebGL track's demo anatomy; implement and replace
 5. discussion, the **HW1** walk-through, then setup help
 
-Reading: <a href="../../textbook/vectors.html">Vectors</a>, Sections 1 to 3 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7 and 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5 and 11.
+Reading: <a href="../../textbook/vectors.html">Vectors</a>, Sections 1 to 3 and 9 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7 and 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 7 and 11.
 

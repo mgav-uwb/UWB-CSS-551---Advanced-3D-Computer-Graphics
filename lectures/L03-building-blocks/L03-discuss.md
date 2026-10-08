@@ -99,7 +99,7 @@ Four functions, each checked against numbers on the page:
 
 A vector is a displacement; the dot product measures alignment and casts shadows, the cross product makes perpendiculars, areas and handedness. The loop reads input, updates the state and redraws, motion written as rate times elapsed time is the same on every machine, and MVC keeps one model as the only truth.
 
-- **Read**: <a href="../../textbook/vectors.html">Vectors</a>, Sections 1 to 3 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7, 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 11
+- **Read**: <a href="../../textbook/vectors.html">Vectors</a>, Sections 1 to 3, 9 · <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7, 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 7, 11
 - **Due**: HW1, Wednesday October 14, 11:59 PM, on Canvas
 - **Quiz 1**: Thursday October 15, the first 20 minutes: tonight's lecture, Tuesday's, and HW1
 - **Now**: HW1 setup help, both tracks
