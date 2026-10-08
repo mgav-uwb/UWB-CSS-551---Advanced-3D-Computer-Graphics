@@ -44,6 +44,9 @@
   CODE TABS (2026-10-07): every example written for both tracks is a <div class="code-tabs"> with a
     csharp and a javascript fence (lib/code-tabs.js); the C# compiles against Unity API stubs, the
     JavaScript was run in a node harness (tangled: cube 3, slider 1.5; untangled: all 3, one render).
+    data-run="name" adds a Run tab that executes the WebGL listing's text as written, with the
+    hidden setup named in lib/code-run.js (EXAMPLES: spin, keys, accumulator, tangle, untangled,
+    dirty, undo, bounce). Changing a listing means checking its runner still works.
   READING: ../../textbook/interaction.html (Sections 1 to 4, 7, 10) and
     ../../textbook/unity-basics.html (Sections 1 to 5, 7, 11).
 
@@ -113,7 +116,7 @@
 
 A cube turning at **90° per second**:
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="spin">
 
 ```csharp
 using UnityEngine;
@@ -179,7 +182,7 @@ Events arriving mid-frame **wait** for the next trip.
 
 A key that is **held** is state; a key that was **pressed** is an event. Move at 4 units/s while D or A is held; Space recenters, once:
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="keys">
 
 ```csharp
 public float speed = 4f;
@@ -278,7 +281,7 @@ Nine steps of exactly 10 ms in 94 ms of wall time. Clamp a stalled frame (at 250
 
 ## Real code: the accumulator
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="accumulator">
 
 ```csharp
 public float speed = 3f;
@@ -377,7 +380,7 @@ Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times
 
 A scale slider, a number box, and the `=` key doubling the scale. Each handler updates everything it knows about:
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="tangle">
 
 ```csharp
 public Transform cube;  public Slider slider;  public InputField box;  // one number, three copies
@@ -437,7 +440,7 @@ Data flows **one way**. Two views of one model cannot disagree, because neither 
 
 ## The same tool, untangled
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="untangled">
 
 ```csharp
 public Transform cube;  public Slider slider;  public InputField box;
@@ -509,7 +512,7 @@ Every row but the first keeps MVC's core: **the state in one place, every displa
 
 Unity's loop runs every frame, so a view can simply run every frame. An on-demand loop needs a **request**. Either way, a **dirty flag** turns many edits into one redraw:
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="dirty">
 
 ```csharp
 float s = 1f;  bool dirty = true;               // the model, and "changed since drawn?"
@@ -617,7 +620,7 @@ Game code often lets the **Transform be the model**: a pose is state, and the re
 
 ## Real code: undo as commands
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="undo">
 
 ```csharp
 public interface ICommand { void Do(); void Undo(); }
@@ -779,7 +782,7 @@ A renderer takes **25 ms** a frame on a **60 Hz** display with v-sync:
 
 ## The bounce, in each track
 
-<div class="code-tabs">
+<div class="code-tabs" data-run="bounce">
 
 ```csharp
 public class Bounce : MonoBehaviour {

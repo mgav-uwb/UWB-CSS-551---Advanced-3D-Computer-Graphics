@@ -17,6 +17,7 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
     <link rel="stylesheet" href="textbook.css" />
+    <script defer src="../lib/code-run.js"></script>
     <script defer src="../lib/code-tabs.js"></script>
   </head>
   <body>
@@ -99,7 +100,7 @@
         The smallest loop in each track turns a cube at 90&deg; per second. The tabs switch between the
         tracks, here and in every listing of the course text and the slides; the choice is remembered.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="spin">
 <pre class="lang-csharp">using UnityEngine;
 
 public class Spin : MonoBehaviour {             // attach to the cube
@@ -155,7 +156,7 @@ requestAnimationFrame(frame);</pre>
         only in the frame it went down. The browser delivers only events, so the program keeps the state
         itself, a set of held keys that the handlers maintain and the frame reads.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="keys">
 <pre class="lang-csharp">public float speed = 4f;
 float x;                                              // the state
 void Update() {
@@ -224,7 +225,7 @@ function frame(now) {
         keeps the last two states and interpolates. <code>Time.time</code> minus <code>Time.fixedTime</code>
         is the carry; a <code>Rigidbody</code> set to Interpolate does the same thing internally.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="accumulator">
 <pre class="lang-csharp">public float speed = 3f;
 float prev, curr;                              // the last two fixed states
 void FixedUpdate() {                           // Unity's while loop: 0, 1 or more per frame
@@ -261,7 +262,7 @@ requestAnimationFrame(frame);</pre>
         box, and the <code>=</code> key, which doubles the scale. Each handler updates everything it can
         reach.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="tangle">
 <pre class="lang-csharp">public Transform cube;  public Slider slider;  public InputField box;  // one number, three copies
 void Start() {
     slider.onValueChanged.AddListener(v =&gt; {
@@ -313,7 +314,7 @@ addEventListener('keydown', (e) =&gt; {
       <p>
         The same tool with the state in one place:
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="untangled">
 <pre class="lang-csharp">public Transform cube;  public Slider slider;  public InputField box;
 float s = 1f;                                            // the MODEL: one copy
 void Start() {                                           // CONTROLLERS edit the model
@@ -391,7 +392,7 @@ function view() {                                            // VIEWS read the m
         <em>notification</em>: the model keeps a list of its views and tells each that it changed, the
         observer pattern.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="dirty">
 <pre class="lang-csharp">float s = 1f;  bool dirty = true;               // the model, and "changed since drawn?"
 public void SetScale(float v) { s = v; dirty = true; }   // every controller calls this
 void LateUpdate() {
@@ -453,7 +454,7 @@ function requestRender() {                 // any number of edits in one frame..
         array, which the view copies into the mesh when the dirty flag is set, since
         <a href="unity-basics.html#csharp"><code>mesh.vertices</code> returns a copy</a>.
       </p>
-      <div class="code-tabs">
+      <div class="code-tabs" data-run="undo">
 <pre class="lang-csharp">public interface ICommand { void Do(); void Undo(); }
 public class MoveVertex : ICommand {                    // one edit, and its inverse
     readonly Vector3[] verts;  readonly int i;  readonly Vector3 d;
