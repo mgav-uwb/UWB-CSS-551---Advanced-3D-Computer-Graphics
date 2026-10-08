@@ -613,7 +613,8 @@ Two edits, **one** render; no picture ever shows the new `ry` with the old `s`.
 | view | `LateUpdate` writing Transforms and UI; the engine draws the Transforms | `update()`: three.js objects and panels, then `render()` |
 | loop | continuous: views may run every frame | on demand: every edit requests a frame |
 
-Game code often lets the **Transform be the model**: a pose is state, and the renderer is its view. Keep a separate model when the state is not a pose (a typed number, a selection, an undo history) or when two views must agree.
+- **neither engine requires MVC**: the course's demos and homework use it by choice
+- game code often lets the **Transform be the model**; keep a separate one for state that is not a pose
 
 
 ---
