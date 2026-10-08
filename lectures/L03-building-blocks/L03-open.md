@@ -40,7 +40,7 @@
 ## Tonight
 
 1. **vectors, a review**: displacements, length and normalize, the dot product (angle, projection, sign), the cross product (perpendicular, area, handedness), in both tracks
-2. **the loop**: why it never returns, frame budgets, per frame against per second, the two clocks, the accumulator, two time pitfalls
+2. **the loop**: why it runs until the person quits, frame budgets, per frame against per second, the two clocks, the accumulator, two time pitfalls
 3. **model, view, controller**: why split, the alternatives, one model with two views, undo as commands; events, 2D hit testing, click or drag; latency
 4. **the tool, two tracks**: Unity's editor, objects and script lifecycle; the WebGL track's demo anatomy; implement and replace
 5. discussion, the **HW1** walk-through, then setup help

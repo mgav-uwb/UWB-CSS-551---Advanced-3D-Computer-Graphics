@@ -62,12 +62,12 @@
         The frame loop of <a href="rasterization.html#loop">the rasterization chapter</a> ran on a timer:
         read input, update, render, present, sixty times a second. Why a loop at all? A batch program, a
         compiler or an offline renderer drawing one film frame, has all its input before it starts, so it
-        computes, writes and exits. An interactive program cannot: its next input is a person&rsquo;s reaction
+        computes, writes and exits when the work is done. An interactive program cannot: its next input is a person&rsquo;s reaction
         to its last output, which does not exist until the program has drawn it. The input also arrives over
         time and from several independent sources (mouse, keys, clock, network, the window system), and the
         picture must change even when nobody acts, because animations and simulations advance with time. A
         program meeting all of this must outlive every single input: it waits, responds, redraws, and
-        repeats until the person quits.
+        repeats until the person quits. The quit is itself an input: the close button or a quit key arrives as an event, the loop reads it, cleans up and exits.
       </p>
       <p>
         There are four ways to do the waiting, and three of them fail. A <em>blocking read</em>
@@ -85,7 +85,7 @@
         The loop used to be written by hand: a Macintosh application of 1984 had its own main event loop
         around the Toolbox call <code>GetNextEvent</code>, and a Windows program still has a message loop. A
         console program&rsquo;s
-        <code>main</code> calls what it needs and returns; an interactive program never returns. It hands the
+        <code>main</code> calls what it needs and returns when it is done; an interactive program returns only when told to quit. It hands the
         loop to a framework, and the framework calls the program&rsquo;s functions: <em>inversion of
         control</em>. The two homework tracks sit at different points on that line. Unity owns the whole
         loop, its clock, its input and its rendering; a script is a set of methods, <code>Start</code> and

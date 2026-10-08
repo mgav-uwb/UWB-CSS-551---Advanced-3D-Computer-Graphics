@@ -122,9 +122,10 @@
 <!-- ============================================================ -->
       <h2 id="scripts">4 &middot; Scripts: the lifecycle and the two clocks</h2>
       <p>
-        A console program runs top to bottom and exits. An interactive program never returns: the engine
-        runs the loop of <a href="rasterization.html#loop">the rasterization chapter</a> (read input, update
-        the state, draw) forever, and a script hooks the middle of it. The hooks are methods with fixed
+        A console program runs top to bottom and exits. An interactive program exits only when the player
+        quits: until then the engine runs the loop of <a href="rasterization.html#loop">the rasterization chapter</a>
+        (read input, update the state, draw), and a script hooks the middle of it; on quit it calls
+        <code>OnApplicationQuit</code>, then <code>OnDestroy</code>. The hooks are methods with fixed
         names on a class deriving from <code>MonoBehaviour</code>.
       </p>
       <pre>using UnityEngine;

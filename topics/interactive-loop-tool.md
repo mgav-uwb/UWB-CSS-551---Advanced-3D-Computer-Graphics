@@ -2,7 +2,7 @@
   CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
-  TEACHES: why an interactive program cannot finish; four ways to wait for input (why the frame
+  TEACHES: why an interactive program runs until the person quits, not until its work is done; four ways to wait for input (why the frame
   loop); the frame loop; who owns it (inversion of control, never block); the smallest loop in
   each track; one frame in order (Unity's player loop against the browser's); continuous versus
   on-demand loops; events against polling (held keys); the budget at 30 to 144 Hz;
@@ -63,13 +63,14 @@
 
 ---
 
-## Why an interactive program cannot finish
+## Why it runs until you quit
 
 - a **batch** program has all its input at the start: read, compute, write, exit (a compiler; a film renderer drawing one frame)
 - an interactive program's next input **depends on its last output**: the person looks at the picture, then acts
 - input arrives **over time** and from **several sources at once**: mouse, keys, clock, network, the window system
 - the picture must change **without input** too: animation, simulation, a blinking cursor
-- so the program must outlive every single input: **wait, respond, redraw, repeat**, until the person quits
+- so the program must outlive every single input: **wait, respond, redraw, repeat**
+- it ends when the person **quits**: closing the window is one more input event, not the end of the work
 
 
 ---
@@ -86,14 +87,15 @@
 
 ---
 
-## A program that never returns
+## A loop that ends on quit
 
 ```text
    initialize the state                   ← Unity: Start()     WebGL: make()
-   repeat forever:
+   repeat until a quit arrives:
        read input      (mouse, keys)      ┐
        update state    (move, simulate)   ├ one frame
        redraw          (state → pixels)   ┘
+   clean up: save, release the GPU        ← Unity: OnApplicationQuit()   WebGL: pagehide
 ```
 
 - at 60 frames per second each trip gets **16.7 ms**, all of it
