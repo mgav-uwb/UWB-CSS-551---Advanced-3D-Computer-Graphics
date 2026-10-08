@@ -63,7 +63,7 @@
 
 ---
 
-## Why it runs until you quit
+## Batch or interactive
 
 - a **batch** program has all its input at the start: read, compute, write, exit (a compiler; a film renderer drawing one frame)
 - an interactive program's next input **depends on its last output**: the person looks at the picture, then acts
@@ -471,7 +471,7 @@ Slider to 1.5, then `=`: cube, slider and box all show **3**. Three controllers,
 
 ---
 
-## Why split the program this way
+## What MVC buys, and what it costs
 
 - **one truth**: n ways to edit and m displays become **n + m** pieces instead of n × m connections, and displays cannot disagree
 - the parts **change at different rates**: a transform's math is fixed; widgets, layouts and input devices change every release
