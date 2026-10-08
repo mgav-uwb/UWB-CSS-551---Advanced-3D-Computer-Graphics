@@ -45,6 +45,8 @@
     data-run="name" adds a Run tab that executes the WebGL listing's text as written, with the
     hidden setup named in lib/code-run.js (EXAMPLES: spin, keys, accumulator, tangle, untangled,
     dirty, undo, bounce). Changing a listing means checking its runner still works.
+  SPLIT 2026-10-08: "A tool without a model" became "One number, three copies" (figure loopr-tangle.svg,
+    tools/gen-lecture-figures-loop.mjs, and the answer table as a fragment) and "The tangle in code".
   TRIMMED 2026-10-08: float drift (vector-geometry's precision section has it), Unity's clocks by name
     (unity-basics.html section 4), running the WebGL track (webgl-basics.html section 1) and checking a
     build against the engine (implement and replace covers it). Second pass the same day: "What the
@@ -366,48 +368,64 @@ Speed **3 units/s**, per-second motion, then one frame stalls for **250 ms**:
 
 ---
 
-## A tool without a model
+## One number, three copies
 
-A scale slider, a number box, and the `=` key doubling the scale. Each handler updates everything it knows about:
+Three controls set one scale: a slider, a number box, and `=`, which doubles it.
+
+<img src="../../textbook/figures/loopr-tangle.svg" alt="Three handlers at the top, drag the slider, type in the box, and press equals, with arrows to the three places the scale is stored at the bottom: slider.value, box.text and the cube's scale. The slider and box handlers each write all three. The equals handler writes only the cube; its arrows to the slider and the box are dashed red, forgotten. After slider to 1.5 then equals, the slider holds 1.5 and the box 1.50, both stale, and the cube 3. Caption: 3 ways to change it times 3 places it is stored is 9 updates to keep right; the equals handler does 1." style="height:265px">
+
+Predict: slider to 1.5, press `=`, then slider to 1.6.
+
+<table class="fragment" style="font-size:0.62em">
+<tr><th>step</th><th>cube</th><th>slider</th><th>box</th></tr>
+<tr><td>slider to 1.5</td><td>1.5</td><td>1.5</td><td>1.50</td></tr>
+<tr><td>press =</td><td><b>3</b></td><td>1.5</td><td>1.50</td></tr>
+<tr><td>slider to 1.6</td><td><b>1.6</b>: the doubling is lost</td><td>1.6</td><td>1.60</td></tr>
+</table>
+
+
+---
+
+## The tangle in code
 
 <div class="code-tabs" data-run="tangle">
 
 ```csharp
-public Transform cube;  public Slider slider;  public InputField box;  // one number, three copies
+public Transform cube;  public Slider slider;  public InputField box;  // the scale lives in all three
 void Start() {
     slider.onValueChanged.AddListener(v => {
-        cube.localScale = Vector3.one * v;             // copy 1
-        box.text = v.ToString("0.00");                 // copy 3
+        cube.localScale = Vector3.one * v;             // drag: write the cube
+        box.text = v.ToString("0.00");                 //   and the box
     });
     box.onEndEdit.AddListener(t => {
         float v = float.Parse(t);
-        cube.localScale = Vector3.one * v;
-        slider.value = v;              // copy 2; fires onValueChanged: the handler above
+        cube.localScale = Vector3.one * v;             // type: write the cube
+        slider.value = v;                              //   and the slider, which runs the drag handler too
     });
 }
 void Update() {
     if (Input.GetKeyDown(KeyCode.Equals))
-        cube.localScale *= 2f;                         // slider and box keep the old value
+        cube.localScale *= 2f;                         // =: only the cube; slider and box go stale
 }
 ```
 
 ```javascript
 slider.addEventListener('input', () => {
   const v = +slider.value;
-  cube.scale.setScalar(v);  box.value = v.toFixed(2);  render();   // copies 1 and 3
+  cube.scale.setScalar(v);  box.value = v.toFixed(2);  render();   // drag: cube and box
 });
 box.addEventListener('change', () => {
   const v = parseFloat(box.value);
-  cube.scale.setScalar(v);  slider.value = v;  render();           // copies 1 and 2
+  cube.scale.setScalar(v);  slider.value = v;  render();           // type: cube and slider
 });
 addEventListener('keydown', (e) => {
-  if (e.key === '=') { cube.scale.multiplyScalar(2); render(); }  // slider, box stale
+  if (e.key === '=') { cube.scale.multiplyScalar(2); render(); }  // =: cube only
 });
 ```
 
 </div>
 
-Predict: slider to 1.5, press `=`, then nudge the slider to 1.6. What do the cube, slider and box show at each step?
+Every new control must know every copy; the next slides store the scale **once**.
 
 
 ---
