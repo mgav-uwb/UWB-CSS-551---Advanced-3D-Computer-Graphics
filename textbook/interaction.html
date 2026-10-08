@@ -17,6 +17,7 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
     <link rel="stylesheet" href="textbook.css" />
+    <script defer src="../lib/code-tabs.js"></script>
   </head>
   <body>
     <div class="page">
@@ -58,16 +59,113 @@
       <h2 id="loop">1 &middot; The event loop</h2>
       <p>
         The frame loop of <a href="rasterization.html#loop">the rasterization chapter</a> ran on a timer:
-        read input, update, render, present, sixty times a second. An interactive application has two
-        variants of it. The <em>continuous</em> loop renders every frame whether or not anything changed,
-        which a game needs because something always changes. The <em>on-demand</em> loop renders only when
-        an event has changed the state: the course&rsquo;s demos are built this way, and an idle demo draws
-        nothing and uses no GPU, which is why a page with a dozen of them stays responsive. The two agree on
-        the structure: an <em>event</em> (mouse, key, wheel, slider, timer, network) arrives, a handler edits
-        the <em>state</em>, and a render is requested. What no correct program does is draw in the event
-        handler: the handler changes state and asks for a frame, and the frame reads the state. Simulation
-        that must advance in real time runs on a fixed timestep inside the loop, as the next section
-        works out, independent of how often frames are drawn.
+        read input, update, render, present, sixty times a second. A console program&rsquo;s
+        <code>main</code> calls what it needs and returns; an interactive program never returns. It hands the
+        loop to a framework, and the framework calls the program&rsquo;s functions: <em>inversion of
+        control</em>. The two homework tracks sit at different points on that line. Unity owns the whole
+        loop, its clock, its input and its rendering; a script is a set of methods, <code>Start</code> and
+        <code>Update</code> among them, that the engine finds by name and calls. The browser owns its event
+        loop but not the frame: the program registers event handlers and asks for each frame with
+        <code>requestAnimationFrame</code>, and the frame function it passes is its own. The consequence is
+        the same in both: the program&rsquo;s code runs inside one frame&rsquo;s slice, 16.7&nbsp;ms at
+        60&nbsp;Hz, and a function that computes for two seconds freezes the window for two seconds, 120
+        missed frames. Long work is split across frames or moved to another thread.
+      </p>
+      <p>
+        The smallest loop in each track turns a cube at 90&deg; per second. The tabs switch between the
+        tracks, here and in every listing of the course text and the slides; the choice is remembered.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">using UnityEngine;
+
+public class Spin : MonoBehaviour {             // attach to the cube
+    public float degPerSec = 90f;
+    float angle;                                 // the state
+    void Update() {                              // the engine calls this once per frame
+        angle += degPerSec * Time.deltaTime;     // update: rate × seconds
+        transform.localRotation = Quaternion.Euler(0f, angle, 0f);   // show the state
+    }
+}
+// no loop in this file: the engine runs it and calls Update by name</pre>
+<pre class="lang-javascript">const degPerSec = 90;
+let angle = 0, last = performance.now();         // the state, and the clock
+function frame(now) {                            // the browser calls this once per refresh
+  const dt = (now - last) / 1000;  last = now;   // seconds since the last frame
+  angle += degPerSec * dt;                       // update: rate × seconds
+  cube.rotation.y = angle * Math.PI / 180;       // show the state (three.js wants radians)
+  renderer.render(scene, camera);                // draw
+  requestAnimationFrame(frame);                  // ask for the next frame
+}
+requestAnimationFrame(frame);</pre>
+      </div>
+      <p>
+        The programs differ only in who writes the loop. Unity&rsquo;s <code>Update</code> is the body of a
+        loop the engine runs, and <code>Time.deltaTime</code> is the frame time the engine measured; the
+        browser passes a timestamp to the frame function, which computes the elapsed time itself and must
+        request the next frame, or the animation stops after one. At 60&nbsp;Hz each frame turns the cube
+        1.5&deg;, and after one second it has turned 90&deg; at any frame rate.
+      </p>
+      <p>
+        Opened up, one frame runs in a fixed order. Unity reads the input state for the frame, runs as
+        many fixed physics steps as are due (<code>FixedUpdate</code>, the next section), calls every
+        script&rsquo;s <code>Update</code>, then every <code>LateUpdate</code>, then renders every camera and
+        waits for the display. The browser runs the handlers of the input events that arrived, then the
+        <code>requestAnimationFrame</code> callbacks, then lays out and paints the page. In both, an event
+        that arrives while a frame is being computed is queued and seen at the start of the next one,
+        which is one source of the input latency of <a href="#latency">Section 10</a>.
+      </p>
+      <p>
+        The loop has two variants. The <em>continuous</em> loop renders every frame whether or not anything
+        changed, which a game needs because something always changes; Unity runs this one. The
+        <em>on-demand</em> loop renders only when an event has changed the state: the course&rsquo;s demos are
+        built this way, and an idle demo draws nothing and uses no GPU, which is why a page with a dozen of
+        them stays responsive. The two agree on the structure: an <em>event</em> (mouse, key, wheel, slider,
+        timer, network) arrives, a handler edits the <em>state</em>, and a render is requested. What no
+        correct program does is draw in the event handler: the handler changes state and asks for a frame,
+        and the frame reads the state.
+      </p>
+      <p>
+        Input comes in two kinds. A key that is <em>held</em> is state; a key that was <em>pressed</em> is an
+        event. Continuous control, moving while a key is down, needs the state in every frame. Unity polls
+        it: <code>Input.GetKey</code> answers whether the key is down now, and <code>GetKeyDown</code> is true
+        only in the frame it went down. The browser delivers only events, so the program keeps the state
+        itself, a set of held keys that the handlers maintain and the frame reads.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">public float speed = 4f;
+float x;                                              // the state
+void Update() {
+    float dir = 0f;
+    if (Input.GetKey(KeyCode.D)) dir += 1f;           // held: polled every frame
+    if (Input.GetKey(KeyCode.A)) dir -= 1f;
+    x += dir * speed * Time.deltaTime;
+    if (Input.GetKeyDown(KeyCode.Space)) x = 0f;      // pressed this frame: once
+    transform.localPosition = new Vector3(x, 0f, 0f);
+}</pre>
+<pre class="lang-javascript">const held = new Set();                                   // keys down right now
+addEventListener('keydown', (e) =&gt; {
+  held.add(e.code);
+  if (e.code === 'Space' &amp;&amp; !e.repeat) x = 0;             // a press: handled once
+});
+addEventListener('keyup', (e) =&gt; held.delete(e.code));
+addEventListener('blur', () =&gt; held.clear());             // released in another window
+function frame(now) {
+  const dt = (now - last) / 1000;  last = now;
+  const dir = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);   // held: polled
+  x += dir * speed * dt;
+  ship.position.x = x;
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}</pre>
+      </div>
+      <p>
+        Holding D for half a second moves the ship 2 units at any frame rate. The browser version avoids two
+        traps. Moving inside the <code>keydown</code> handler would move at the operating system&rsquo;s
+        auto-repeat rate, which begins after a delay and differs between machines; the
+        <code>repeat</code> test keeps the one-shot action to one press. And a key released while the
+        window is in the background never sends <code>keyup</code>, so losing focus clears the set.
+        Simulation that must advance in real time runs on a fixed timestep inside the loop, as the next
+        section works out, independent of how often frames are drawn.
       </p>
 
 <!-- ============================================================ -->
@@ -96,11 +194,87 @@
         simulation is now deterministic: the same inputs give the same states on any machine, which is
         what replays, networked physics and reproducible bugs require.
       </div>
+      <p>
+        In code, the browser track writes the accumulator itself; in Unity the engine owns it, calls
+        <code>FixedUpdate</code> from its inner loop and <code>Update</code> once per frame, and the script
+        keeps the last two states and interpolates. <code>Time.time</code> minus <code>Time.fixedTime</code>
+        is the carry; a <code>Rigidbody</code> set to Interpolate does the same thing internally.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">public float speed = 3f;
+float prev, curr;                              // the last two fixed states
+void FixedUpdate() {                           // Unity's while loop: 0, 1 or more per frame
+    prev = curr;
+    curr += speed * Time.fixedDeltaTime;       // always exactly 0.02 s
+}
+void Update() {                                // once per frame: draw between the two
+    float alpha = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
+    float x = Mathf.Lerp(prev, curr, alpha);   // Lerp clamps alpha to [0, 1]
+    transform.localPosition = new Vector3(x, 0f, 0f);
+}</pre>
+<pre class="lang-javascript">const DT = 0.010;                          // fixed step, seconds
+let acc = 0, last = performance.now() / 1000;
+let prev = initialState(), curr = prev;
+function frame(nowMs) {
+  const now = nowMs / 1000;
+  acc += Math.min(now - last, 0.25);       // clamp a stall (the spiral of death)
+  last = now;
+  while (acc &gt;= DT) {                      // run every whole step that fits
+    prev = curr;
+    curr = step(curr, DT);
+    acc -= DT;
+  }
+  draw(lerp(prev, curr, acc / DT));        // alpha = carry / step
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);</pre>
+      </div>
 
 <!-- ============================================================ -->
       <h2 id="mvc">3 &middot; Model, view, controller, and undo</h2>
-
-<!-- ============================================================ -->
+      <p>
+        Start with a tool built without a decision about where its state lives: a scale slider, a number
+        box, and the <code>=</code> key, which doubles the scale. Each handler updates everything it can
+        reach.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">public Transform cube;  public Slider slider;  public InputField box;  // one number, three copies
+void Start() {
+    slider.onValueChanged.AddListener(v =&gt; {
+        cube.localScale = Vector3.one * v;             // copy 1
+        box.text = v.ToString("0.00");                 // copy 3
+    });
+    box.onEndEdit.AddListener(t =&gt; {
+        float v = float.Parse(t);
+        cube.localScale = Vector3.one * v;
+        slider.value = v;              // copy 2; fires onValueChanged: the handler above
+    });
+}
+void Update() {
+    if (Input.GetKeyDown(KeyCode.Equals))
+        cube.localScale *= 2f;                         // slider and box keep the old value
+}</pre>
+<pre class="lang-javascript">slider.addEventListener('input', () =&gt; {
+  const v = +slider.value;
+  cube.scale.setScalar(v);  box.value = v.toFixed(2);  render();   // copies 1 and 3
+});
+box.addEventListener('change', () =&gt; {
+  const v = parseFloat(box.value);
+  cube.scale.setScalar(v);  slider.value = v;  render();           // copies 1 and 2
+});
+addEventListener('keydown', (e) =&gt; {
+  if (e.key === '=') { cube.scale.multiplyScalar(2); render(); }  // slider, box stale
+});</pre>
+      </div>
+      <p>
+        The scale now exists in three places, the cube, the slider and the box, and every way of changing it
+        must update all three. The key handler forgets two. Move the slider to 1.5 and all three read 1.5;
+        press <code>=</code> and the cube is at 3 while the slider and the box still say 1.5; nudge the slider
+        to 1.6 and the cube jumps from 3 down to 1.6, because the slider never saw the doubling. Every handler
+        also draws, so two events in one frame draw twice, and in Unity setting <code>slider.value</code>
+        from code fires the slider&rsquo;s own listener, so the handlers call each other. With \(n\) ways to
+        change a value and \(m\) places that show it, there are \(n \times m\) updates to keep right.
+      </p>
       <div class="def">
         <span class="tag">Definition (MVC)</span>
         The <em>model</em> is the application&rsquo;s state, the only thing that changes. A <em>view</em> is
@@ -112,6 +286,81 @@
         <img src="figures/ui-mvc.svg" alt="Three boxes left to right, controller, model and views, with arrows labeled set and read, the model holding tx, ry and s, the views a cube and a matrix panel, and a dashed return arrow from the views back to the controller labeled the person sees the view and acts again." />
         <figcaption>The loop as the course&rsquo;s transform demo implements it. The model is three numbers; both views rebuild from them.</figcaption>
       </figure>
+      <p>
+        The same tool with the state in one place:
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">public Transform cube;  public Slider slider;  public InputField box;
+float s = 1f;                                            // the MODEL: one copy
+void Start() {                                           // CONTROLLERS edit the model
+    slider.onValueChanged.AddListener(v =&gt; s = v);
+    box.onEndEdit.AddListener(t =&gt; { if (float.TryParse(t, out float v)) s = v; });
+}
+void Update() { if (Input.GetKeyDown(KeyCode.Equals)) s *= 2f; }
+void LateUpdate() {                                      // VIEWS read the model
+    cube.localScale = Vector3.one * s;
+    slider.SetValueWithoutNotify(s);                     // no event back to a controller
+    if (!box.isFocused) box.SetTextWithoutNotify(s.ToString("0.00"));
+}</pre>
+<pre class="lang-javascript">const model = { s: 1 };                                      // the MODEL: one copy
+slider.addEventListener('input', () =&gt; { model.s = +slider.value; requestRender(); });
+box.addEventListener('change', () =&gt; {                       // CONTROLLERS edit the model
+  const v = parseFloat(box.value);
+  if (Number.isFinite(v)) model.s = v;
+  requestRender();
+});
+addEventListener('keydown', (e) =&gt; { if (e.key === '=') { model.s *= 2; requestRender(); } });
+function view() {                                            // VIEWS read the model
+  cube.scale.setScalar(model.s);
+  slider.value = model.s;                                    // setting .value fires no event
+  if (document.activeElement !== box) box.value = model.s.toFixed(2);
+  renderer.render(scene, camera);
+}</pre>
+      </div>
+      <p>
+        Each controller is one line that edits the model and knows nothing of the views; one view function
+        writes the model into the cube and both widgets, so after the key all three read 3. Three
+        controllers and three views are six pieces instead of nine connections. Two details carry the
+        pattern. A view that writes into a widget must not trigger that widget&rsquo;s controller, or a view
+        update becomes an edit: Unity&rsquo;s UI fires its listeners when <code>value</code> is set from
+        code, hence the <code>WithoutNotify</code> setters, while the browser fires no <code>input</code>
+        event for an assignment. And the view leaves the box alone while the person is typing in it, or
+        every frame would overwrite a half-typed number. A slider also clamps to its range; the box still
+        shows the true value, because the model is not limited by any one view.
+      </p>
+      <p>
+        A change reaches the views in one of three ways. In a continuous loop nobody has to be told: the
+        view runs every frame and reads whatever the model holds. When views are expensive, a
+        <em>dirty flag</em> skips them in frames where nothing changed. In an on-demand loop the flag is
+        the frame request itself: the first edit in a frame requests an animation frame, later edits find
+        it pending, and the frame draws once with all of them applied. The third way, Smalltalk&rsquo;s, is
+        <em>notification</em>: the model keeps a list of its views and tells each that it changed, the
+        observer pattern.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">float s = 1f;  bool dirty = true;               // the model, and "changed since drawn?"
+public void SetScale(float v) { s = v; dirty = true; }   // every controller calls this
+void LateUpdate() {
+    if (!dirty) return;                         // unchanged: skip the views
+    dirty = false;
+    cube.localScale = Vector3.one * s;
+    label.text = s.ToString("0.00");
+}</pre>
+<pre class="lang-javascript">let pending = false;
+function requestRender() {                 // any number of edits in one frame...
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(() =&gt; { pending = false; view(); });   // ...one render
+}</pre>
+      </div>
+      <p>
+        In Unity, the engine already splits the work for poses: a <code>Transform</code> holds the pose and
+        the renderer draws whatever it holds, so for a falling box the Transform is a sufficient model. A
+        separate model pays when the state is not a pose (a typed number, a selection, an undo history),
+        when several widgets edit it, or when it must be undone, saved or tested. The course&rsquo;s WebGL
+        demos keep a plain model object and switch off three.js&rsquo;s automatic matrix updates, so the
+        scene graph is only a view.
+      </p>
       <p>
         The course&rsquo;s transform demo is the pattern in its smallest form. Its model is
         \(\{t_x, r_y, s\}\), a translation, a rotation about \(y\) and a scale. Its controller is three
@@ -143,6 +392,33 @@
         vector, 16 bytes, with an inverse that is the same command negated; a million of them cost what
         forty snapshots did. The price is that every edit must be expressible as a reversible command,
         which is a constraint on the controller and no constraint on the views: they still read the model.
+      </div>
+      <p>
+        In code, each edit is an object that applies and reverses itself, and the controller runs commands
+        instead of editing the model directly. In the Unity listing the model is the tool&rsquo;s own vertex
+        array, which the view copies into the mesh when the dirty flag is set, since
+        <a href="unity-basics.html#csharp"><code>mesh.vertices</code> returns a copy</a>.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">public interface ICommand { void Do(); void Undo(); }
+public class MoveVertex : ICommand {                    // one edit, and its inverse
+    readonly Vector3[] verts;  readonly int i;  readonly Vector3 d;
+    public MoveVertex(Vector3[] verts, int i, Vector3 d) { this.verts = verts; this.i = i; this.d = d; }
+    public void Do()   { verts[i] += d; }
+    public void Undo() { verts[i] -= d; }
+}
+// in the tool's MonoBehaviour:
+readonly Stack&lt;ICommand&gt; history = new Stack&lt;ICommand&gt;();
+void Run(ICommand c) { c.Do(); history.Push(c); dirty = true; }
+void UndoLast()      { if (history.Count &gt; 0) { history.Pop().Undo(); dirty = true; } }</pre>
+<pre class="lang-javascript">class MoveVertex {                               // one edit, and its inverse
+  constructor(mesh, i, d) { Object.assign(this, { mesh, i, d }); }
+  do()   { this.mesh.move(this.i, this.d); }
+  undo() { this.mesh.move(this.i, this.d.map((x) =&gt; -x)); }
+}
+const history = [];
+function run(cmd) { cmd.do(); history.push(cmd); requestRender(); }
+function undo()   { const c = history.pop(); if (c) { c.undo(); requestRender(); } }</pre>
       </div>
       <p>
         The other axis of interface architecture is <em>retained</em> against <em>immediate</em> mode. A

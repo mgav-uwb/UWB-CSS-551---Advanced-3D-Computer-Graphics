@@ -2,12 +2,17 @@
   CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
-  TEACHES: the frame loop and its budget at 30 to 144 Hz; continuous versus on-demand loops;
+  TEACHES: the frame loop; who owns it (inversion of control, never block); the smallest loop in
+  each track; one frame in order (Unity's player loop against the browser's); continuous versus
+  on-demand loops; events against polling (held keys); the budget at 30 to 144 Hz;
   per-frame versus per-second motion (deltaTime); the two clocks and the fixed-timestep
   accumulator, worked and in code; interpolation between steps; three time pitfalls (per-frame
-  damping, the hitch and the tunnel, float drift far from the origin); MVC with the
+  damping, the hitch and the tunnel, float drift far from the origin); a tool without a model
+  (the tangle, predicted), MVC defined, the same tool untangled (WithoutNotify, the focused box),
+  who tells the view (continuous redraw, dirty flag, requestRender, observer); MVC with the
   one-model-two-views demo; what MVC buys (undo two ways, retained versus immediate mode); MVC's
-  origin (Reenskaug 1979); undo as commands in code; the event table; the device-pixel pitfall;
+  origin (Reenskaug 1979); one drag end to end; where the model lives in each track; undo as
+  commands in code; the event table with Unity's classic Input names; the device-pixel pitfall;
   2D hit testing, target sizes and the drag state machine; click or drag, worked; latency, input to
   photon, a missed v-sync, and in a headset; the two homework tracks side by side; Unity's editor,
   object model, script lifecycle, clocks and the two C# traps; the Bounce script in the WebGL track;
@@ -34,6 +39,9 @@
     - makeTRS(1.5,0,0, 0,30,0, 2,2,2) rows (the demo's panel): [1.732 0 1 1.5] [0 2 0 0] [-1 0 1.732 0] [0 0 0 1]
     - aim: normalize((4,0,-2) - (1,0,2)) = (0.6, 0, -0.8)
     - undo: 3 doubles = 24 bytes; bunny 35,947 vertices x 12 bytes = 431,364 bytes per snapshot
+  CODE TABS (2026-10-07): every example written for both tracks is a <div class="code-tabs"> with a
+    csharp and a javascript fence (lib/code-tabs.js); the C# compiles against Unity API stubs, the
+    JavaScript was run in a node harness (tangled: cube 3, slider 1.5; untangled: all 3, one render).
   READING: ../../textbook/interaction.html (Sections 1 to 4, 7, 10) and
     ../../textbook/unity-basics.html (Sections 1 to 5, 7, 11).
 
@@ -65,12 +73,121 @@
 
 ---
 
+## Who owns the loop
+
+- a console program's `main` calls everything it needs, then **returns**
+- an interactive program hands the loop to a framework, which **calls your functions**: inversion of control
+- **Unity** owns the whole loop: you write `Start` and `Update`; the engine calls them, by name
+- the **browser** owns the event loop: you register handlers, and ask for each frame with `requestAnimationFrame`
+- the rule that follows: **never block**. A 2 s computation in `Update` or in a handler freezes the window for 2 s, **120** missed frames at 60 Hz
+
+
+---
+
+## The smallest loop, in each track
+
+A cube turning at **90° per second**:
+
+<div class="code-tabs">
+
+```csharp
+using UnityEngine;
+
+public class Spin : MonoBehaviour {             // attach to the cube
+    public float degPerSec = 90f;
+    float angle;                                 // the state
+    void Update() {                              // the engine calls this once per frame
+        angle += degPerSec * Time.deltaTime;     // update: rate × seconds
+        transform.localRotation = Quaternion.Euler(0f, angle, 0f);   // show the state
+    }
+}
+// no loop in this file: the engine runs it and calls Update by name
+```
+
+```javascript
+const degPerSec = 90;
+let angle = 0, last = performance.now();         // the state, and the clock
+function frame(now) {                            // the browser calls this once per refresh
+  const dt = (now - last) / 1000;  last = now;   // seconds since the last frame
+  angle += degPerSec * dt;                       // update: rate × seconds
+  cube.rotation.y = angle * Math.PI / 180;       // show the state (three.js wants radians)
+  renderer.render(scene, camera);                // draw
+  requestAnimationFrame(frame);                  // ask for the next frame
+}
+requestAnimationFrame(frame);
+```
+
+</div>
+
+At 60 Hz each frame turns **1.5°**; after one second, **90°** at any rate.
+
+
+---
+
+## One frame, in order
+
+| | Unity, every frame | browser, every refresh |
+| --- | --- | --- |
+| 1 | input for this frame is read | input events: their **handlers** run |
+| 2 | `FixedUpdate`, 0 or more times | `requestAnimationFrame` callbacks: **your frame** |
+| 3 | `Update`, on every script | style and layout of the page |
+| 4 | `LateUpdate`, on every script | paint and composite: the GPU draws |
+| 5 | rendering: every camera draws | wait for v-sync; the picture is shown |
+| 6 | wait for v-sync; the picture is shown | |
+
+Events arriving mid-frame **wait** for the next trip.
+
+
+---
+
 ## Two kinds of loop
 
 - **continuous**: render every frame whether or not anything changed; a game, where something always changes
 - **on demand**: render only when an event changed the state; the course's demos, which draw nothing while idle
 - the same structure either way: an event arrives, a handler **edits the state**, a frame is **requested**, the frame **reads the state**
 - no correct program draws inside an event handler
+
+
+---
+
+## Events or polling
+
+A key that is **held** is state; a key that was **pressed** is an event. Move at 4 units/s while D or A is held; Space recenters, once:
+
+<div class="code-tabs">
+
+```csharp
+public float speed = 4f;
+float x;                                              // the state
+void Update() {
+    float dir = 0f;
+    if (Input.GetKey(KeyCode.D)) dir += 1f;           // held: polled every frame
+    if (Input.GetKey(KeyCode.A)) dir -= 1f;
+    x += dir * speed * Time.deltaTime;
+    if (Input.GetKeyDown(KeyCode.Space)) x = 0f;      // pressed this frame: once
+    transform.localPosition = new Vector3(x, 0f, 0f);
+}
+```
+
+```javascript
+const held = new Set();                                   // keys down right now
+addEventListener('keydown', (e) => {
+  held.add(e.code);
+  if (e.code === 'Space' && !e.repeat) x = 0;             // a press: handled once
+});
+addEventListener('keyup', (e) => held.delete(e.code));
+addEventListener('blur', () => held.clear());             // released in another window
+function frame(now) {
+  const dt = (now - last) / 1000;  last = now;
+  const dir = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);   // held: polled
+  x += dir * speed * dt;
+  ship.position.x = x;
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+```
+
+</div>
 
 
 ---
@@ -136,6 +253,22 @@ Nine steps of exactly 10 ms in 94 ms of wall time. Clamp a stalled frame (at 250
 
 ## Real code: the accumulator
 
+<div class="code-tabs">
+
+```csharp
+public float speed = 3f;
+float prev, curr;                              // the last two fixed states
+void FixedUpdate() {                           // Unity's while loop: 0, 1 or more per frame
+    prev = curr;
+    curr += speed * Time.fixedDeltaTime;       // always exactly 0.02 s
+}
+void Update() {                                // once per frame: draw between the two
+    float alpha = (Time.time - Time.fixedTime) / Time.fixedDeltaTime;
+    float x = Mathf.Lerp(prev, curr, alpha);   // Lerp clamps alpha to [0, 1]
+    transform.localPosition = new Vector3(x, 0f, 0f);
+}
+```
+
 ```javascript
 const DT = 0.010;                          // fixed step, seconds
 let acc = 0, last = performance.now() / 1000;
@@ -154,6 +287,8 @@ function frame(nowMs) {
 }
 requestAnimationFrame(frame);
 ```
+
+</div>
 
 
 ---
@@ -213,6 +348,52 @@ Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times
 
 ---
 
+## A tool without a model
+
+A scale slider, a number box, and the `=` key doubling the scale. Each handler updates everything it knows about:
+
+<div class="code-tabs">
+
+```csharp
+public Transform cube;  public Slider slider;  public InputField box;  // one number, three copies
+void Start() {
+    slider.onValueChanged.AddListener(v => {
+        cube.localScale = Vector3.one * v;             // copy 1
+        box.text = v.ToString("0.00");                 // copy 3
+    });
+    box.onEndEdit.AddListener(t => {
+        float v = float.Parse(t);
+        cube.localScale = Vector3.one * v;
+        slider.value = v;              // copy 2; fires onValueChanged: the handler above
+    });
+}
+void Update() {
+    if (Input.GetKeyDown(KeyCode.Equals))
+        cube.localScale *= 2f;                         // slider and box keep the old value
+}
+```
+
+```javascript
+slider.addEventListener('input', () => {
+  const v = +slider.value;
+  cube.scale.setScalar(v);  box.value = v.toFixed(2);  render();   // copies 1 and 3
+});
+box.addEventListener('change', () => {
+  const v = parseFloat(box.value);
+  cube.scale.setScalar(v);  slider.value = v;  render();           // copies 1 and 2
+});
+addEventListener('keydown', (e) => {
+  if (e.key === '=') { cube.scale.multiplyScalar(2); render(); }  // slider, box stale
+});
+```
+
+</div>
+
+Predict: slider to 1.5, press `=`, then nudge the slider to 1.6. What do the cube, slider and box show at each step?
+
+
+---
+
 ## Model, view, controller
 
 - the **model** is the application's state, the only thing that changes
@@ -225,6 +406,80 @@ Same steps, **23 times** the error: float32 numbers near 1000 are spaced 8 times
 ```
 
 Data flows **one way**. Two views of one model cannot disagree, because neither stores anything.
+
+
+---
+
+## The same tool, untangled
+
+<div class="code-tabs">
+
+```csharp
+public Transform cube;  public Slider slider;  public InputField box;
+float s = 1f;                                            // the MODEL: one copy
+void Start() {                                           // CONTROLLERS edit the model
+    slider.onValueChanged.AddListener(v => s = v);
+    box.onEndEdit.AddListener(t => { if (float.TryParse(t, out float v)) s = v; });
+}
+void Update() { if (Input.GetKeyDown(KeyCode.Equals)) s *= 2f; }
+void LateUpdate() {                                      // VIEWS read the model
+    cube.localScale = Vector3.one * s;
+    slider.SetValueWithoutNotify(s);                     // no event back to a controller
+    if (!box.isFocused) box.SetTextWithoutNotify(s.ToString("0.00"));
+}
+```
+
+```javascript
+const model = { s: 1 };                                      // the MODEL: one copy
+slider.addEventListener('input', () => { model.s = +slider.value; requestRender(); });
+box.addEventListener('change', () => {                       // CONTROLLERS edit the model
+  const v = parseFloat(box.value);
+  if (Number.isFinite(v)) model.s = v;
+  requestRender();
+});
+addEventListener('keydown', (e) => { if (e.key === '=') { model.s *= 2; requestRender(); } });
+function view() {                                            // VIEWS read the model
+  cube.scale.setScalar(model.s);
+  slider.value = model.s;                                    // setting .value fires no event
+  if (document.activeElement !== box) box.value = model.s.toFixed(2);
+  renderer.render(scene, camera);
+}
+```
+
+</div>
+
+Slider to 1.5, then `=`: cube, slider and box all show **3**. Three controllers, one model, one view function: **3 + 3** pieces instead of 3 × 3.
+
+
+---
+
+## Who tells the view?
+
+Unity's loop runs every frame, so a view can simply run every frame. An on-demand loop needs a **request**. Either way, a **dirty flag** turns many edits into one redraw:
+
+<div class="code-tabs">
+
+```csharp
+float s = 1f;  bool dirty = true;               // the model, and "changed since drawn?"
+public void SetScale(float v) { s = v; dirty = true; }   // every controller calls this
+void LateUpdate() {
+    if (!dirty) return;                         // unchanged: skip the views
+    dirty = false;
+    cube.localScale = Vector3.one * s;
+    label.text = s.ToString("0.00");
+}
+```
+
+```javascript
+let pending = false;
+function requestRender() {                 // any number of edits in one frame...
+  if (pending) return;
+  pending = true;
+  requestAnimationFrame(() => { pending = false; view(); });   // ...one render
+}
+```
+
+</div>
 
 
 ---
@@ -258,6 +513,39 @@ Predict: drag `ry` from 0 to 90. Which view changes? Is there any slider setting
 
 ---
 
+## One drag, end to end
+
+The demo's on-demand loop at 60 Hz (times illustrative):
+
+```text
+   0.0 ms   pointermove: the ry slider's controller sets model.ry = 30,
+            calls requestRender(): no frame pending, so one is requested
+   3.1 ms   wheel: a controller sets model.s = 2; requestRender() finds a
+            frame pending and returns
+   9.0 ms   the frame runs: update() reads the model once, makeTRS → the
+            cube's matrix and the panel's 16 numbers, then render()
+  16.7 ms   v-sync: the picture with ry = 30 and s = 2 is scanned out
+```
+
+Two edits, **one** render; no picture ever shows the new `ry` with the old `s`.
+
+
+---
+
+## Where the model lives, in each track
+
+| | Unity track | WebGL track |
+| --- | --- | --- |
+| model | a script's fields, or the Transform itself; saved in the scene, shown in the Inspector | a plain object, `{ tx, ry, s }` |
+| controller | `Update` reading `Input`; UI listeners | DOM handlers: input, pointer, key |
+| view | `LateUpdate` writing Transforms and UI; the engine draws the Transforms | `update()`: three.js objects and panels, then `render()` |
+| loop | continuous: views may run every frame | on demand: every edit requests a frame |
+
+Game code often lets the **Transform be the model**: a pose is state, and the renderer is its view. Keep a separate model when the state is not a pose (a typed number, a selection, an undo history) or when two views must agree.
+
+
+---
+
 ## What the discipline buys
 
 - **undo** is a stack of past models: this demo's model is 3 doubles, **24 bytes**; 1,000 snapshots are 24 kB
@@ -279,6 +567,22 @@ Predict: drag `ry` from 0 to 90. Which view changes? Is there any slider setting
 
 ## Real code: undo as commands
 
+<div class="code-tabs">
+
+```csharp
+public interface ICommand { void Do(); void Undo(); }
+public class MoveVertex : ICommand {                    // one edit, and its inverse
+    readonly Vector3[] verts;  readonly int i;  readonly Vector3 d;
+    public MoveVertex(Vector3[] verts, int i, Vector3 d) { this.verts = verts; this.i = i; this.d = d; }
+    public void Do()   { verts[i] += d; }
+    public void Undo() { verts[i] -= d; }
+}
+// in the tool's MonoBehaviour:
+readonly Stack<ICommand> history = new Stack<ICommand>();
+void Run(ICommand c) { c.Do(); history.Push(c); dirty = true; }
+void UndoLast()      { if (history.Count > 0) { history.Pop().Undo(); dirty = true; } }
+```
+
 ```javascript
 class MoveVertex {                               // one edit, and its inverse
   constructor(mesh, i, d) { Object.assign(this, { mesh, i, d }); }
@@ -290,6 +594,8 @@ function run(cmd) { cmd.do(); history.push(cmd); requestRender(); }
 function undo()   { const c = history.pop(); if (c) { c.undo(); requestRender(); } }
 ```
 
+</div>
+
 About **16 bytes** of state per edit instead of **431 kB** per bunny snapshot.
 
 
@@ -297,13 +603,13 @@ About **16 bytes** of state per edit instead of **431 kB** per bunny snapshot.
 
 ## What the controller hears
 
-| event | carries | used for |
-| --- | --- | --- |
-| pointerdown, pointermove, pointerup | position, button, pressure, pointer type | picking, dragging, orbiting (mouse, pen and touch in one form) |
-| wheel | delta, modifier keys | zoom, scroll |
-| keydown, keyup | key code, repeat flag | fly controls (the demos' WASD), shortcuts |
-| gamepad (polled once per frame) | axes in [−1, 1], buttons | continuous control |
-| resize, visibilitychange | the new size; hidden or shown | reallocating the framebuffer; pausing the loop |
+| event | carries | Unity (classic `Input`) | used for |
+| --- | --- | --- | --- |
+| pointerdown, pointermove, pointerup | position, button, pressure, pointer type | `GetMouseButtonDown`, `mousePosition`, `GetTouch` | picking, dragging, orbiting |
+| wheel | delta, modifier keys | `mouseScrollDelta` | zoom, scroll |
+| keydown, keyup | key code, repeat flag | `GetKeyDown`, `GetKeyUp`, `GetKey` | fly controls (WASD), shortcuts |
+| gamepad (polled once per frame) | axes in [−1, 1], buttons | `GetAxis("Horizontal")` | continuous control |
+| resize, visibilitychange | the new size; hidden or shown | `Screen.width`, `OnApplicationFocus` | reallocating the framebuffer; pausing |
 
 
 ---
@@ -421,7 +727,9 @@ A renderer takes **25 ms** a frame on a **60 Hz** display with v-sync:
 
 ---
 
-## Unity: the script lifecycle
+## The bounce, in each track
+
+<div class="code-tabs">
 
 ```csharp
 public class Bounce : MonoBehaviour {
@@ -438,13 +746,6 @@ public class Bounce : MonoBehaviour {
 }
 ```
 
-**Awake**, **Start** once · **Update** every frame · **LateUpdate** after every Update · **FixedUpdate** on the fixed clock. Unity calls them **by name**: a misspelled `update()` is never called, and nothing warns you.
-
-
----
-
-## The same bounce in the WebGL track
-
 ```javascript
 const model = { y: 0, dir: 1 };                 // the state
 const yRange = 3, speed = 2;
@@ -460,7 +761,20 @@ function frame(now) {                           // the browser calls this once p
 requestAnimationFrame(frame);
 ```
 
+</div>
+
 At 60 Hz each step is 2 / 60 = **0.0333**; the top, 3 units up, takes **1.5 s** at any rate: 90 frames at 60 Hz, 45 at 30.
+
+
+---
+
+## Unity: the script lifecycle
+
+- **Awake**, then **Start**: once, before the object's first frame
+- **FixedUpdate**: on the fixed clock, 0 or more times a frame
+- **Update**: every frame
+- **LateUpdate**: every frame, after every object's Update; a following camera reads final positions here
+- Unity calls them **by name**: a misspelled `update()` is never called, and nothing warns you
 
 
 ---
