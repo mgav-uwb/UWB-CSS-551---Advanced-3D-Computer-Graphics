@@ -59,7 +59,31 @@
       <h2 id="loop">1 &middot; The event loop</h2>
       <p>
         The frame loop of <a href="rasterization.html#loop">the rasterization chapter</a> ran on a timer:
-        read input, update, render, present, sixty times a second. A console program&rsquo;s
+        read input, update, render, present, sixty times a second. Why a loop at all? A batch program, a
+        compiler or an offline renderer drawing one film frame, has all its input before it starts, so it
+        computes, writes and exits. An interactive program cannot: its next input is a person&rsquo;s reaction
+        to its last output, which does not exist until the program has drawn it. The input also arrives over
+        time and from several independent sources (mouse, keys, clock, network, the window system), and the
+        picture must change even when nobody acts, because animations and simulations advance with time. A
+        program meeting all of this must outlive every single input: it waits, responds, redraws, and
+        repeats until the person quits.
+      </p>
+      <p>
+        There are four ways to do the waiting, and three of them fail. A <em>blocking read</em>
+        (<code>scanf</code>, <code>Console.ReadLine</code>, the browser&rsquo;s <code>prompt</code>) stops the
+        program until the next keystroke: nothing animates meanwhile, and it hears only one source, so a
+        program reading the keyboard cannot notice the mouse. <em>Callbacks alone</em> serve a form that
+        changes only when clicked, but anything that moves needs a timer event every frame, which is a loop
+        under another name. <em>A thread per source</em> hears everything but lets several threads change the
+        same state at the same moment, which brings races and locks. The <em>frame loop</em> collects every
+        source at one point in time, changes the state in one thread, in a known order, once per frame, and
+        then draws a picture of one consistent state. Its price is that an event can wait up to a frame, and
+        it matches the display, which refreshes at a fixed rate anyway.
+      </p>
+      <p>
+        The loop used to be written by hand: a Macintosh application of 1984 had its own main event loop
+        around the Toolbox call <code>GetNextEvent</code>, and a Windows program still has a message loop. A
+        console program&rsquo;s
         <code>main</code> calls what it needs and returns; an interactive program never returns. It hands the
         loop to a framework, and the framework calls the program&rsquo;s functions: <em>inversion of
         control</em>. The two homework tracks sit at different points on that line. Unity owns the whole
@@ -327,6 +351,36 @@ function view() {                                            // VIEWS read the m
         event for an assignment. And the view leaves the box alone while the person is typing in it, or
         every frame would overwrite a half-typed number. A slider also clamps to its range; the box still
         shows the true value, because the model is not limited by any one view.
+      </p>
+      <p>
+        Why split a program this way? Four forces favor it. Consistency: when every display is computed from
+        one state, agreement is automatic, and \(n\) ways to edit plus \(m\) displays make \(n + m\) pieces
+        instead of \(n \times m\) connections. Rates of change: the math at the center of a graphics tool
+        changes rarely, while widgets, layouts and input devices change with every release, and keeping them
+        apart means an interface change cannot break the math. Independence from the screen: the model can be
+        saved, replicated over a network, replayed and tested without any view, which is how this course
+        grades both homework tracks by running the model math and comparing numbers. Replaceability: the
+        Unity and WebGL tracks are two sets of views and controllers on one specification. The cost is one
+        indirection per edit and more structure than a 50-line prototype needs.
+      </p>
+      <p>
+        MVC is the oldest member of a family; the members differ mainly in who translates between the person
+        and the state.
+      </p>
+      <table>
+        <tr><th>architecture</th><th>the idea</th><th>where it is used</th></tr>
+        <tr><td>no separation</td><td>handlers edit widgets and draw</td><td>prototypes; the tool without a model above</td></tr>
+        <tr><td>model&ndash;view&ndash;presenter</td><td>a presenter holds all the logic; the view only displays and forwards, so the logic can be tested with a stand-in view</td><td>Taligent (mid-1990s); many desktop and Android applications</td></tr>
+        <tr><td>model&ndash;view&ndash;viewmodel</td><td>the view binds to a view model&rsquo;s properties, and the framework copies changes in both directions</td><td>Microsoft&rsquo;s WPF (2006), .NET MAUI</td></tr>
+        <tr><td>one-way data flow</td><td>events become messages; a pure <code>update(state, message)</code> returns the next state; the view is a function of the state</td><td>the Elm architecture; React with Redux (2015)</td></tr>
+        <tr><td>immediate mode</td><td>the interface is redrawn from the model every frame, with no widget objects</td><td>Dear ImGui; engine debug panels</td></tr>
+        <tr><td>entity&ndash;component&ndash;system</td><td>simulation state in flat arrays of components, updated by systems once per frame, chosen for cache efficiency</td><td>game simulations; Unity&rsquo;s DOTS</td></tr>
+      </table>
+      <p>
+        Every row except the first keeps MVC&rsquo;s core: the state in one place, and every display computed
+        from it. One-way data flow makes undo and replay a list of messages; immediate mode suits a program
+        that already redraws every frame; entity&ndash;component&ndash;system organizes the model itself, and
+        is compatible with any of the others for the interface.
       </p>
       <p>
         A change reaches the views in one of three ways. In a continuous loop nobody has to be told: the

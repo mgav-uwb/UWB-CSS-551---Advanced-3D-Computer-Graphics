@@ -2,13 +2,15 @@
   CSS 551 · TOPIC DECK: The interactive loop, MVC, and the tool (Unity and WebGL side by side) (~50 min).
   Mounted as <section data-markdown="../../topics/interactive-loop-tool.md">. No logistics.
 
-  TEACHES: the frame loop; who owns it (inversion of control, never block); the smallest loop in
+  TEACHES: why an interactive program cannot finish; four ways to wait for input (why the frame
+  loop); the frame loop; who owns it (inversion of control, never block); the smallest loop in
   each track; one frame in order (Unity's player loop against the browser's); continuous versus
   on-demand loops; events against polling (held keys); the budget at 30 to 144 Hz;
   per-frame versus per-second motion (deltaTime); the two clocks and the fixed-timestep
   accumulator, worked and in code; interpolation between steps; three time pitfalls (per-frame
   damping, the hitch and the tunnel, float drift far from the origin); a tool without a model
-  (the tangle, predicted), MVC defined, the same tool untangled (WithoutNotify, the focused box),
+  (the tangle, predicted), MVC defined, why split this way, the alternatives (MVP, MVVM, one-way
+  data flow, immediate mode, ECS), the same tool untangled (WithoutNotify, the focused box),
   who tells the view (continuous redraw, dirty flag, requestRender, observer); MVC with the
   one-model-two-views demo; what MVC buys (undo two ways, retained versus immediate mode); MVC's
   origin (Reenskaug 1979); one drag end to end; where the model lives in each track; undo as
@@ -52,6 +54,29 @@
 ### The interactive loop, MVC, and the tool
 
 <small>(~50 min) · reading: <a href="../../textbook/interaction.html">Interactive Systems</a>, Sections 1 to 4, 7 and 10 · <a href="../../textbook/unity-basics.html">Unity for This Course</a>, Sections 1 to 5, 7 and 11</small>
+
+
+---
+
+## Why an interactive program cannot finish
+
+- a **batch** program has all its input at the start: read, compute, write, exit (a compiler; a film renderer drawing one frame)
+- an interactive program's next input **depends on its last output**: the person looks at the picture, then acts
+- input arrives **over time** and from **several sources at once**: mouse, keys, clock, network, the window system
+- the picture must change **without input** too: animation, simulation, a blinking cursor
+- so the program must outlive every single input: **wait, respond, redraw, repeat**, until the person quits
+
+
+---
+
+## Four ways to wait for input
+
+| design | how it waits | what breaks |
+| --- | --- | --- |
+| blocking read | stops until the next keystroke: `scanf`, `Console.ReadLine`, the browser's `prompt` | nothing moves while it waits; it hears only one source |
+| callbacks only | handlers run when events arrive; nothing runs otherwise | no event, no change: animation needs a timer, a loop again |
+| a thread per source | each input source gets its own thread | threads write the same state at once: races, locks |
+| **the frame loop** | drains every source once per frame, then updates, then draws | at most a frame of input latency |
 
 
 ---
@@ -453,6 +478,33 @@ Slider to 1.5, then `=`: cube, slider and box all show **3**. Three controllers,
 
 ---
 
+## Why split the program this way
+
+- **one truth**: n ways to edit and m displays become **n + m** pieces instead of n × m connections, and displays cannot disagree
+- the parts **change at different rates**: a transform's math is fixed; widgets, layouts and input devices change every release
+- the model **runs without a screen**: saved, sent over a network, replayed, and tested; the homework is graded by running its model math and comparing numbers
+- views and controllers are **replaceable**: the Unity and WebGL tracks are two sets of views and controllers on one specification
+- the cost: one indirection per edit, and structure a 50-line prototype does not need
+
+
+---
+
+## Alternatives to MVC
+
+| architecture | the idea | where you meet it |
+| --- | --- | --- |
+| none | handlers edit widgets and draw | prototypes |
+| model–view–presenter | a presenter holds the logic; the view is passive | Taligent (1996); Android apps |
+| model–view–viewmodel | the view binds to a view model; bindings copy changes | Microsoft's WPF (2006) |
+| one-way data flow | `update(state, msg)` returns the next state; view = f(state) | Elm; Redux (2015) |
+| immediate mode | the interface is redrawn from the model every frame | Dear ImGui; debug panels |
+| entity–component–system | arrays of components; systems update them every frame | game simulation; Unity DOTS |
+
+Every row but the first keeps MVC's core: **the state in one place, every display computed from it**.
+
+
+---
+
 ## Who tells the view?
 
 Unity's loop runs every frame, so a view can simply run every frame. An on-demand loop needs a **request**. Either way, a **dirty flag** turns many edits into one redraw:
@@ -546,12 +598,10 @@ Game code often lets the **Transform be the model**: a pose is state, and the re
 
 ---
 
-## What the discipline buys
+## What the discipline buys: undo
 
 - **undo** is a stack of past models: this demo's model is 3 doubles, **24 bytes**; 1,000 snapshots are 24 kB
 - a mesh editor's model is bigger: the bunny's 35,947 vertices are **431 kB** per snapshot, so store the **command** instead ("move vertex 1,204 by (0.1, 0, −0.05)", about 16 bytes, undone by its negation)
-- **saving** is serializing the model; **networking** is replicating it; a **test** is a model and an expected view
-- **immediate mode** UI rebuilds the view from the model every frame: MVC with no widget objects at all
 
 
 ---
