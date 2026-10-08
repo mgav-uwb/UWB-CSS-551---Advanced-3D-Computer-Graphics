@@ -31,6 +31,7 @@
   Plain unicode math or fenced ```text blocks. Never two "_" on one markdown line
   outside a code fence. No <small> on math. Paths are relative to the lecture page
   that mounts this topic (lectures/LNN-slug/index.html).
+  CUT 2026-10-08: the five multiple-choice Check slides (guidance clipping, another image token, tokens at 1024, the zero copy, two FIDs); "Why" titles renamed; the zero-copy and FID-ranking points folded into the preceding notes.
 -->
 
 ### Diffusion models II: conditioning, guidance, latents, control, text to 3D
@@ -157,18 +158,6 @@ Two pixels at one step. Unconditional estimate `(0.2, 0.2)`, conditional `(0.5, 
 
 - the clamp at large `w` is where the **saturated, over-contrasted** look of heavily guided images comes from
 - the guided estimate is no longer the posterior mean of anything; the sampler's accuracy guarantees no longer hold
-
-
----
-
-## Check: when does guidance first clip?
-
-`x̂₀(∅) = (0.2, 0.2)`, `x̂₀(c) = (0.5, 0.1)`, valid range [−1, 1]. The smallest `w` at which some pixel leaves the range:
-
-- **A.** `w = 2.67`
-- **B.** `w = 3`
-- **C.** `w = 12`
-- **D.** `w = 1.67`
 
 
 ---
@@ -384,7 +373,7 @@ If the goal is an ODE from noise to data, the forward process need not be a diff
 
 ---
 
-## Why the velocity is a rescaled denoiser
+## The velocity is a rescaled denoiser
 
 ```text
    the line:          x_t = (1 − t)·x₀ + t·ε         solve for the noise:  ε = (x_t − (1 − t)·x₀) / t
@@ -692,18 +681,6 @@ The digit network's class vector becomes the caption's token vectors, read by **
 
 ---
 
-## Check: another image token asks
-
-Same caption, keys and values as the last slide (`"a"`, `"red"`, `"cube"`), `d = 2`. A token elsewhere in the image has query `q = (0, 1)`. Its update is:
-
-- **A.** `(0.490, 0.321)`
-- **B.** `(0.253, 0.512)`
-- **C.** `(0, 1)`
-- **D.** `(0.333, 0.333)`
-
-
----
-
 ## Cross-attention at Stable Diffusion scale
 
 ```text
@@ -767,18 +744,6 @@ A token's cross-attention weights say **where** in the image each word acts. Kee
 
 ---
 
-## Check: tokens at 1024
-
-A diffusion transformer on a **1024×1024** image: 8× downsampling, 4 latent channels, 2×2 patches. Scores in one self-attention layer, one head:
-
-- **A.** 1,048,576
-- **B.** 16,777,216
-- **C.** 4,194,304
-- **D.** 268,435,456
-
-
----
-
 ## ControlNet: structure from the pipeline
 
 <div class="two"><div>
@@ -829,18 +794,6 @@ The copy's features enter the frozen model through a layer whose weight starts a
 
 - training cannot damage the frozen model at the start, so a few thousand condition-image pairs suffice
 - the zero weight has a nonzero gradient because the copy's features `g` are not zero
-
-
----
-
-## Check: why the copy must not start at zero
-
-`y = F(x) + w · g(x, c)` with `w = 0` at the start and `∂L/∂y = 0.4`. Suppose the trainable copy's output `g` were **also** zero at the start. After the first backward pass:
-
-- **A.** `∂L/∂w = 0.4`, training proceeds
-- **B.** `∂L/∂w = 0`, but the copy still receives a gradient
-- **C.** `∂L/∂w = 0` and the copy receives none either: nothing ever trains
-- **D.** `∂L/∂w = 0.28`, as on the slide
 
 
 ---
@@ -935,7 +888,7 @@ Optimize a 3D scene θ (a NeRF, or Gaussians) so that **its renders score well**
 
 ---
 
-## Why the noise cancels
+## The drawn noise cancels
 
 The update's residual, `ε̂ − ε`, for a denoiser that returns `x̂₀`:
 
@@ -1104,18 +1057,6 @@ The same distribution against itself should score 0. A sampled estimate is **bia
 
 - the bias falls roughly as `1/N`; with 2,048 features it is far larger at a given `N`, so papers fix `N` (commonly 50,000) and only compare at the same `N`
 - a FID difference smaller than the estimate's own noise is not a result
-
-
----
-
-## Check: two FIDs
-
-Paper 1 reports **FID 3.1** for model A, from 10,000 samples. Paper 2 reports **FID 2.9** for model B, from 50,000 samples. Which model is closer to the data?
-
-- **A.** model A
-- **B.** model B
-- **C.** cannot tell from these numbers
-- **D.** they are equal within rounding
 
 
 ---

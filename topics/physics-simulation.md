@@ -46,6 +46,10 @@
     Chentanez MIG 2016 (XPBD); Macklin et al. SCA 2019 (small steps); Stomakhin et al.
     SIGGRAPH 2013 (Frozen snow); Brave's Taz hair solver (fxguide).
   READING: ../../textbook/animation.html, Sections 8 to 14 (stepping a spring to hair and fur).
+  EDIT 2026-10-08: the energy factor derived in three steps on its slide (retitled "Energy growth and
+    the stability limit"); "Why stacking is hard" retitled "Stacking: contact every frame"; the
+    multiple-choice predict-first slide on the spring cloth cut (its question moved to the table
+    slide's note); the viscosity prediction asked open, without lettered options.
 
   reveal.js: FLAT; notes follow "Note:"; plain text math, no KaTeX; never two
   "_" on one markdown line outside a code fence; paths relative to the lecture page.
@@ -108,11 +112,13 @@ A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **
 
 ---
 
-## Why the energy grows, and how fast
+## Energy growth and the stability limit
 
 ```text
-   explicit Euler, spring with ω = √(k/m):
-      energy after one step = energy before × (1 + (h·ω)²)
+   explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
+      1. x' = x + h·v              v' = v − h·ω²·x
+      2. v'² + ω²x'² = (1 + (h·ω)²)(v² + ω²x²)       the 2h·ω²·x·v terms cancel
+      3. so every step multiplies E by 1 + (h·ω)²
 
       h = 0.1,  ω = 10:   × 2      per step
       h = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
@@ -199,20 +205,6 @@ A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **
 ```
 
 - one material, three jobs: without shear links a square **collapses** into a rhombus; without bend links it **crumples** like paper tissue
-
-
----
-
-## Predict first
-
-On the demo's cloth, **k = 2000 N/m**, **springs**, 16 substeps:
-
-- **A.** it hangs and flutters, stretched about 1 %
-- **B.** it sags much further than on constraints, but holds
-- **C.** it explodes within a few frames
-- **D.** it freezes in place
-
-Then: how many substeps make it hold?
 
 
 ---
@@ -407,7 +399,7 @@ A ball arrives at **v = (3, −4, 0)** on a floor with normal **n = (0, 1, 0)**,
 
 ---
 
-## Why stacking is hard
+## Stacking: contact every frame
 
 - a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
 - small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
@@ -490,12 +482,7 @@ Smoothed particle hydrodynamics (Müller, Charypar and Gross, 2003):
 
 ## Predict: viscosity
 
-The dam breaks with viscosity **2.5**. Drop it to **0.2**; what changes first?
-
-- **A.** the wave reaches the far wall later
-- **B.** the front breaks into spray and single particles fly
-- **C.** the fluid compresses more
-- **D.** nothing visible; viscosity only matters for honey
+The dam breaks with viscosity **2.5**. Drop it to **0.2**: what changes first, and what does not?
 
 
 ---

@@ -13,7 +13,8 @@
   RAM frame buffer; computational geometry; level of detail; skeletons and
   skinning; reflection models; shadows; aliasing; fractal terrain;
   subdivision; ray tracing; implicit surfaces and level sets; who.
-  NUMBER LEFT FOR THE DISCUSSION: the z-buffer's 1974 cost (L01 Q4).
+  EDIT 2026-10-08: the L01 discussion questions were cut; the z-buffer's 1974 cost
+    ($167,772 for 512 x 512 x 16 bits at four cents a bit) is now on its slide.
   SOURCE: planning/history-draft/history-of-graphics.html (v0.5) Sections 4
     and 5, supplements/problems-and-solutions.html; figures/fig-timeline.svg.
   IMAGE PATHS: relative to the lecture page: ../../topics/media/history/.
@@ -162,7 +163,7 @@
 
 - **the z-buffer** (1974, **Edwin Catmull**, Utah PhD thesis): sorts nothing; a depth for every pixel, the nearest surface wins
 - found independently the same year by **Wolfgang Straßer** (Technische Universität, TU, Berlin)
-- the price is memory: a 512 × 512 buffer at 16 bits, when memory cost about **four cents a bit** (E&S sold a 256 KB frame buffer for $80,000 in 1975)
+- the price is memory: 512 × 512 × 16 bits at about **four cents a bit** is **$168,000** for the depth alone (E&S sold a 256 KB frame buffer for $80,000 in 1975)
 
 <span class="cost">**Lag:** 1974 thesis to the consumer 3D card of 1996, 22 years.</span>
 

@@ -12,8 +12,9 @@
           precision (topic)                               28 min
     0:30  Rotation: matrices, axis-angle, quaternions,
           slerp, Euler angles and gimbal lock (topic)     64 min
-    1:34  Discussion: four peer-instruction questions     21 min
-    1:55  Wrap                                             5 min
+    1:34  Wrap                                             5 min
+    1:39  HW1 help and open questions; buffer             21 min
+  CUT 2026-10-08: the four discussion questions (L04-discuss.md keeps the wrap).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.
@@ -41,7 +42,7 @@
 - **Triangles**: barycentric weights, inside or out, in both tracks
 - **Precision**: arccos near 0° and past 1, an angle that never fails, cancellation
 - **Rotation**: where the axes land; axis-angle and Rodrigues; quaternions, composition, slerp, the double cover, drift; Euler angles and gimbal lock
-- **Discussion**: four questions, vote, argue, vote again
+- **Wrap**, then HW1 help and open questions
 
 Reading: [Vectors](../../textbook/vectors.html), Sections 4 to 8 · [Rotation](../../textbook/rotation.html), Sections 1 to 8.
 

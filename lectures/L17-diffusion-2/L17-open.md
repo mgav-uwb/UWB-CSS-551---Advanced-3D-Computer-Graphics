@@ -3,17 +3,18 @@
   Plan C (planning/css551-au26-plan-c-2026-09-29.md), week 10.
 
   COMPOSITION: index.html mounts L17-open.md (title + tonight), then
-  ../../topics/diffusion-2.md (~98 min), then L17-discuss.md (discussion 18 min + wrap).
+  ../../topics/diffusion-2.md (~98 min), then L17-discuss.md (wrap).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
   never two "_" on one markdown line outside a code fence; no "next time".
 
   Plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Opening (2 slides)                             2 min
-    0:02  Diffusion models II (topic, 70 slides)        98 min
-    1:40  Discussion: six questions, peer instruction   18 min
+    0:02  Diffusion models II (topic, 65 slides)        98 min
+    1:40  Questions and buffer                          18 min
     1:58  Wrap                                           2 min
     2:00  end
+  CUT 2026-10-08: the six discussion questions; their 18 minutes are questions and buffer.
 -->
 
 ## CSS 551

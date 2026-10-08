@@ -12,6 +12,9 @@
   linear and what a depth buffer can resolve (the near-plane pitfall); the full chain for one vertex
   from object space to a pixel; frustum planes and culling; orthographic projection; camera moves
   (tumble, track, dolly) as frame edits, the dolly worked; Sung's CameraMatrices code.
+  CUT 2026-10-08: "Check: the window becomes 4:3" (its answer folded into the resize slide), the
+           arithmetic "Predict before you drag" (its answer in the frustum demo's note) and "Check yourself";
+           "Why w points back" and "Check: V's rows are a rotation" renamed; resize code in Unity/WebGL tabs.
   NEEDS:   the vector-geometry topic (a frame from two vectors), the affine topic (rigid inverse, block product),
            the scene-graphs topic (the camera as a node) helps but is not required.
   DEMOS:   data-demo="view-matrix" data-controls="az,el,dist" and data-demo="projection" data-controls="fov,near",
@@ -107,7 +110,7 @@ Each cross is **perpendicular** to its inputs, so `u`, `v`, `w` come out **ortho
 
 ---
 
-## Why w points back
+## w points back: −z is forward
 
 `w = eye − at` looks backward. Two reasons:
 
@@ -187,7 +190,7 @@ Every entry matches the panel, because the demo runs this arithmetic.
 
 ---
 
-## Check: V's rows are a rotation
+## Three checks on a view matrix
 
 ```text
    u = ( 0.8192,  0,      −0.5736)      |u| = 1
@@ -349,8 +352,16 @@ With the stale `P`, a square renders 1.78 times narrower than it is tall. Read t
 
 ## Resize: rebuild P in both tracks
 
-```js
-// three.js: the camera caches P; changing fov or aspect does nothing until updateProjectionMatrix
+<div class="code-tabs">
+
+```csharp
+// aspect follows the Game view's width / height until a script assigns it
+cam.aspect = 16f / 9f;   // now frozen: a 4:3 window renders squeezed, as on the previous slide
+cam.ResetAspect();       // back to the window's own width / height
+```
+
+```javascript
+// the camera caches P; changing fov or aspect does nothing until updateProjectionMatrix
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();          // recompute camera.projectionMatrix
@@ -358,23 +369,9 @@ window.addEventListener('resize', () => {
 });
 ```
 
-```csharp
-// Unity: aspect follows the Game view's width / height until a script assigns it
-cam.aspect = 16f / 9f;   // now frozen: a 4:3 window renders squeezed, as on the previous slide
-cam.ResetAspect();       // back to the window's own width / height
-```
+</div>
 
-
----
-
-## Check: the window becomes 4:3
-
-A 16:9 window (aspect 1.78, fov 45°, near 1, far 8) is resized to **4:3**, and `P` is rebuilt. Which entries change?
-
-- **A.** only `P[0][0]`
-- **B.** `P[0][0]` and `P[1][1]`
-- **C.** `P[0][0]` and the depth row
-- **D.** none: `P` depends on the field of view, not the window
+Only `P[0][0] = f / aspect` changes: 1.356 at 16:9, 1.811 at 4:3. `P[1][1] = f` follows the vertical field of view alone.
 
 
 ---
@@ -450,19 +447,6 @@ Near distance `n`, far distance `F`. The two conditions, multiplied out:
 ```
 
 Check at `n = 1`, `F = 8`: `A = 9/(−7) = −1.2857`, `B = 16/(−7) = −2.2857`, the numbers of the previous slide.
-
-
----
-
-## Predict before you drag
-
-In the frustum demo, widen the vertical field of view from **45° to 90°** (aspect 1.78, near 1, far 8). Predict:
-
-```text
-   P[0][0] = f / aspect :   1.358  →  ?
-   P[1][1] = f          :   2.414  →  ?
-   the depth row        :   (−1.2857, −2.2857)  →  ?
-```
 
 
 ---
@@ -871,14 +855,4 @@ Thin lens, focal length `f`, f-number `N`, aperture `A = f/N`, focused at `d_f`.
    stop down to f/16:    A = 3.125 mm  →   c = 3.5 pixels
    hyperfocal at f/2.8, c_max = 0.03 mm:   H = f² / (N c_max) + f = 29.8 m
 ```
-
-
----
-
-## Check yourself
-
-1. The eye is at `(0, 0, 10)` looking at the origin, up `+y`. Write `V`'s translation column.
-2. Near 0.5, far 100. A student sets near to 0.01. What happens to depth resolution at 50 m?
-3. A vertex has clip coordinates `(2, 1, 3, 4)`. Is it inside the frustum? Its NDC?
-4. A game's field-of-view slider says 90° **horizontal** at 16:9. What vertical fov goes into `P`?
 

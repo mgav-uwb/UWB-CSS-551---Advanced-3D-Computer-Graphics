@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L16 · Tuesday November 24, 2026 (week 9, online): Diffusion models I.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/diffusion-1.md (~100 min), L16-discuss.md (discussion + wrap).
+  tonight), ../../topics/diffusion-1.md (~100 min), L16-discuss.md (wrap).
   Thursday November 26 is Thanksgiving: no class and no homework out; Quiz 6 is on Canvas, Nov 26 to 29 (L15, HW7).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
@@ -14,9 +14,10 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Diffusion models I (topic, 73 slides)             100 min
-    1:42  Discussion: four questions                         16 min
+    0:02  Diffusion models I (topic, 69 slides)             100 min
+    1:42  Questions and buffer                               16 min
     1:58  Wrap                                                2 min
+  CUT 2026-10-08: the four discussion questions; their 16 minutes are questions and buffer.
 -->
 
 ## CSS 551

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~47 min, 37 slides).
+  CSS 551 · TOPIC DECK: Honest light, from Phong to the rendering equation and PBR (~47 min, 35 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/pbr-rendering-equation.md"> among others; it
   carries no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -28,6 +28,10 @@
   integral π and ρ/π derived; 2π/(s + 2) derived; GGX evaluated away from the mirror (f = 0.0202); F0 from the
   index (water, glass, diamond, Brewster); a metal-or-plastic highlight check; the diffuse-plus-specular energy
   pitfall (1.21 against 0.88 at 80°). Numbers from node and the chapter's hands-on code.
+
+  EDIT 2026-10-08: the two multiple-choice Check slides cut (cosine or albedo; metal or plastic), their
+  results moved into the notes of "The integral as a sum" and "Metals and dielectrics"; titles without
+  "Why" ("Radiance does not fade with distance", "Phong breaks the energy budget"). 35 slides.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no KaTeX
@@ -89,7 +93,7 @@ Radiance is per steradian because a light's effect depends on **how big it looks
 ---
 
 
-## Why a pixel measures radiance
+## Radiance does not fade with distance
 
 Radiance is **constant along a ray** in empty space. A consequence you can check with your eyes:
 
@@ -171,18 +175,6 @@ Replace the sky by **three small distant lights**, so the integral becomes a sum
 
 ---
 
-## Check: what costs more light?
-
-The three-light example (ρ = 0.6, Lo = 0.460). Which change lowers Lo more?
-
-- **A.** halve the albedo, ρ = 0.3
-- **B.** move light 1 from 20° to 70° from the normal
-- **C.** they cost about the same
-- **D.** neither: the BRDF is constant, so Lo does not change
-
-
----
-
 ## The equation refers to itself
 
 Li on the right is **some other point's Lo**. The unknown appears on **both sides**:
@@ -257,7 +249,7 @@ For light from one direction, the BRDF's value in every outgoing direction:
 
 ---
 
-## Why Phong is not a BRDF
+## Phong breaks the energy budget
 
 Light straight down the normal, Phong's specular lobe with ks = 1: how much leaves, in total?
 
@@ -435,18 +427,6 @@ The same base color means two different things:
 ```
 
 Gold's F0 is (0.967, 0.803, 0.324) head-on, rising toward white at grazing: the reflection is **gold** because the metal's reflectance is.
-
-
----
-
-## Check: a red ball, metal or plastic
-
-Base color `(1, 0, 0)`, roughness 0.3, lit by one white light. What color is the **highlight**?
-
-- **A.** red if metallic = 1; white if metallic = 0
-- **B.** white in both cases
-- **C.** red in both cases
-- **D.** white if metallic = 1; red if metallic = 0
 
 
 ---

@@ -2,6 +2,8 @@
   CSS 551 · TOPIC DECK: How a film frame is made: the production pipeline (~28 min).
   Mounted as <section data-markdown="../../topics/film-pipeline.md">. No logistics.
 
+  EDIT 2026-10-08: "Why premultiply" retitled "Premultiplied alpha and the fringe"; the over
+    operator's one-line derivation (coverage) added to its slide and notes.
   TEACHES: the departments a feature-film frame passes through; capture of motion
   (markers, performance capture), shape (photogrammetry, LiDAR time of flight worked)
   and light (the HDR light probe, exposure merging worked); layout and previs,
@@ -256,7 +258,7 @@ All three follow the rendering equation of week 7 by Monte Carlo: many random li
 
 ## Over, by hand
 
-Premultiplied pixels (r, g, b, α). A foreground F placed **over** a background B:
+Premultiplied pixels (r, g, b, α). F covers a fraction αF of the pixel; B shows through the rest, 1 − αF:
 
 ```text
    out = F + (1 − αF) · B          (every channel, alpha too)
@@ -272,7 +274,7 @@ One multiply-add per channel, the same formula for color and alpha.
 
 ---
 
-## Why premultiply: the fringe
+## Premultiplied alpha and the fringe
 
 Average two neighbors (a downsample, a blur): an **opaque red** pixel and a **fully transparent** pixel whose stored color happens to be green.
 

@@ -19,6 +19,7 @@
   throughput through the Cornell box's floor and red wall; the three Cornell
   panels (direct only, 8 and 512 samples); light sampling, BRDF sampling and MIS;
   denoisers.
+  EDIT 2026-10-08: "Why the error is 1/√N" retitled "The error falls as 1/√N" (no "Why" titles).
   NEEDS:   the pbr topic (the rendering equation, the BRDF, ρ/π); the ray-tracing
            topic (rays, shadow rays, distributed rays).
   DEMOS:   none (the Cornell box is a computed figure).
@@ -79,7 +80,7 @@ The rendering equation's integral over the hemisphere has no closed form for any
 
 ---
 
-## Why the error is 1/√N
+## The error falls as 1/√N
 
 Î is an average of N independent copies of one random variable Y = f(ω)/p(ω), so:
 

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Diffusion models I: the forward process, the denoiser, DDPM and DDIM (~100 min, 72 content slides).
+  CSS 551 · TOPIC DECK · Diffusion models I: the forward process, the denoiser, DDPM and DDIM (~100 min, 69 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-1.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -25,11 +25,10 @@
   bimodal reverse step; 2015 to 2022 milestones; the whole method on one slide.
   EXPANDED (2026-10-05, 54 to 72 content slides): check, one forward draw (0.248); the schedule in the
   library (0.7869, 5.67 dB, 0 dB at t = 0.496); the spiral-dissolving exhibit (diffusion-2d, t); the
-  exact denoiser derived by Bayes; the squared-error split (0.961 vs 1.605); check, little noise
-  (0.993); the shrinkage factor derived (s² = 0.25: 0.084); Tweedie derived; one score arrow from
+  exact denoiser derived by Bayes; the squared-error split (0.961 vs 1.605); the shrinkage factor derived (s² = 0.25: 0.084); Tweedie derived; one score arrow from
   the library ((−1.440, −0.966)); the million weights counted; one training example (0.170, 0.166);
   ε loss = SNR · x₀ loss (1,411); the loss floor (0.004 to 0.950); ten steps in dB; the reverse step
-  keeps the variance (1.0000); check, two steps beat five (0.084 vs 0.103); the memorization test in
+  keeps the variance (1.0000); the memorization test in
   numbers (nearest-other 0.490); the network in node (a printed 7; ink 94, 90, 58).
   NOT HERE (topics/diffusion-2.md, lecture 17): guidance beyond one sentence, latent diffusion, text
   conditioning at scale, ControlNet, text-to-3D, video, evaluation.
@@ -53,6 +52,7 @@
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
+  CUT 2026-10-08: the three multiple-choice Check slides (one draw by hand, the same point with little noise, two steps beat five); "Why" titles renamed; the step-count reading folded into the sampling slide's note.
 -->
 
 ### Diffusion models I: destroy, learn to undo, sample
@@ -94,7 +94,7 @@ A concept fixes a few hundred numbers of a picture; the rest (which cat, which p
 
 ---
 
-## Why not sample each pixel on its own?
+## Independent pixels are not enough
 
 The simplest generator: learn each pixel's own distribution from the data, then draw every pixel independently.
 
@@ -168,18 +168,6 @@ A pixel of value **0.8**, at t = 0.5 (ᾱ = 0.494):
 
 - the signal has shrunk by 0.703 and the noise is already larger than it: SNR ≈ 0 dB
 - every pixel of the image does this **independently**; the image is still there only as a faint bias of each pixel's mean
-
-
----
-
-## Check: one draw by hand
-
-A pixel of value **0.8** at t = 0.3 (ᾱ = 0.787, √ᾱ = 0.887, √(1 − ᾱ) = 0.462), with the noise draw **ε = −1.0**. What is x(0.3)?
-
-- **A.** 0.248
-- **B.** 0.416
-- **C.** 0.710
-- **D.** 1.172
 
 
 ---
@@ -397,7 +385,7 @@ Two training scalars, x⁽¹⁾ = −1 and x⁽²⁾ = +1; a time where ᾱ = ¼
 
 ---
 
-## Why the mean: the squared error splits
+## The squared error splits: the mean wins
 
 For any guess f, with m = E[x₀ | x_t] and the expectation over the posterior:
 
@@ -415,18 +403,6 @@ For any guess f, with m = E[x₀ | x_t] and the expectation over the posterior:
 
 - the posterior mean is the **unique** minimizer: any other guess adds its squared miss
 - a network trained with squared error is pushed toward exactly this function
-
-
----
-
-## Check: the same point, little noise
-
-Data {−1, +1}, the same observation x_t = 0.3, but now **ᾱ = 0.9** (√ᾱ = 0.949, 1 − ᾱ = 0.1). What does the exact denoiser return?
-
-- **A.** 0.197
-- **B.** 0.300
-- **C.** 0.993
-- **D.** exactly 1
 
 
 ---
@@ -897,24 +873,6 @@ The squares of the reverse step's three weights sum to one, as the forward formu
 
 - below ten steps the particles land near the center of mass; from 20, the error roughly **halves per doubling**; from 50 it reaches the floor set by the 400 points' spacing
 - stochastic and deterministic land **equally accurately**; they differ in **which** point a start reaches
-
-
----
-
-## Check: two steps beat five?
-
-The spiral, exact denoiser, DDIM, 300 particles; mean distance from a landed particle to the nearest data point:
-
-| steps | 2 | 5 | 10 | 20 |
-| ----- | - | - | -- | -- |
-| distance | 0.084 | 0.103 | 0.064 | 0.020 |
-
-Why does 2 steps score better than 5?
-
-- **A.** two large steps integrate the ODE more accurately than five
-- **B.** below ten steps all particles land near the center of mass; 0.08 to 0.10 is the spiral's gap width, not accuracy
-- **C.** the 5-step run drew unlucky noise
-- **D.** the 2-step sampler skips the high-noise steps
 
 
 ---

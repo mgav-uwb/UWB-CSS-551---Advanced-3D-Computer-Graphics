@@ -10,9 +10,9 @@
   chart; one closing slide on the machines before Sketchpad (Whirlwind,
   SAGE, DAC-1). Every machine slide carries a cost line, nominal and in 2026
   dollars (nominal x 321.943 / CPI-U of the year), or "not found".
-  NUMBERS LEFT FOR THE DISCUSSION (not on the slide faces): Sketchpad's
-    spots per 1/30 s (L01 Q1), the HMD's multiplications per second (L01 Q2),
-    a 40-hour week on a 2250 (L01 Q3).
+  EDIT 2026-10-08: the L01 discussion questions were cut, so their numbers are now on
+    the slide faces: Sketchpad's 1,667 spots per 1/30 s, the head-mounted display's
+    2.88 million multiplications a second, a 40-hour week on a 2250 at about $24,600.
   SOURCE: planning/history-draft/history-of-graphics.html (v0.5) Section 3;
     supplements/machines-1963-1972.html and supplements/earlier-machines.html;
     figures/fig-cost-then-now.svg (copy in media/ with source grades removed).
@@ -94,7 +94,7 @@
 - the TX-2 display had **no memory of its own**: Sketchpad kept a **display file** in core
 - **one spot per 36-bit word**: 20 bits of coordinates, 16 bits naming the drawing element that owns the spot
 - up to **32,000 words**; each spot takes **20 µs** to show
-- flicker needs a refresh of about **30 times a second**
+- flicker needs about **30 refreshes a second**: (1/30 s) / 20 µs ≈ **1,667** spots per pass
 - a full 32,000-spot file takes **0.64 s** per pass
 - Sutherland's two fixes, on toggle switches: **interlace** (every eighth spot per pass) and **random order**, which "resulted in a twinkling picture ... which is pleasing to the eye and avoids flicker entirely"
 
@@ -144,7 +144,7 @@
 - improved model: **$76,800** each (1966) = **$763,000** in 2026 dollars (× 9.937)
 - a complete 2250 Model III with controller: reportedly about **$280,000** (1970) = about **$2.32 million** (× 8.297)
 - running cost, about 1971: **$80 to $150 per console hour** for a refreshed graphics CRT, against **$10** for a teletype
-- at 1972 prices (× 7.702): **$616 to $1,155 an hour** in 2026 dollars; the teletype, $77
+- at 1972 prices (× 7.702): **$616 to $1,155 an hour** in 2026 dollars; the teletype, $77; a 40-hour design week at $80, about **$24,600**
 
 <span class="cost">**Today:** a 16 GB laptop holds about 2.1 million times the 2250's 8,192-byte buffer.</span>
 
@@ -203,7 +203,7 @@
 - funded by ARPA, the Office of Naval Research (ONR) and Bell Labs
 - a pipeline of special-purpose units: **matrix multiplier**, **clipping divider** (also the perspective division), **analog line generator**, two miniature CRTs, mechanical and ultrasonic head sensors
 - "3000 lines at 30 frames per second", "a little over 10 microseconds per line"
-- an endpoint transformed in about **5 µs** with **16 multiplications**; a line clipped in about 10 µs
+- an endpoint transformed in about **5 µs** with **16 multiplications**: 3,000 × 30 × 2 × 16 = **2.88 million** a second; a line clipped in about 10 µs
 - half-inch CRTs, a **40-degree** field of view, overlaid on the room by half-silvered mirrors
 - "connected in a 'pipe-line' arrangement"; hidden lines "beyond our present capability"
 

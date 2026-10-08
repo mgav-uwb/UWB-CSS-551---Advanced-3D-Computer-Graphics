@@ -20,6 +20,8 @@
   FIGURES: ../../textbook/figures/ui-{picking,arcball}.svg (tools/gen-textbook-figures-unity.mjs).
   READING: ../../textbook/interaction.html, Sections 5, 6, 8 and 9.
 
+  EDIT 2026-10-08: the picking code in Unity/WebGL code tabs.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks. Never two "_"
   on one markdown line outside a code fence. Paths are relative to the lecture page.
@@ -89,18 +91,22 @@ The clicked pixel becomes a **ray** from the eye; the nearest hit is the picked 
 
 ## Picking in both tracks
 
-```js
-// three.js: NDC from the mouse, then a ray from the camera
+<div class="code-tabs">
+
+```csharp
+// screen pixels (origin bottom left) straight to a ray
+Ray r = cam.ScreenPointToRay(Input.mousePosition);
+if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
+```
+
+```javascript
+// NDC from the mouse, then a ray from the camera
 const ndc = new THREE.Vector2((e.clientX / w) * 2 - 1, -(e.clientY / h) * 2 + 1);
 raycaster.setFromCamera(ndc, camera);
 const hits = raycaster.intersectObjects(scene.children);
 ```
 
-```csharp
-// Unity: screen pixels (origin bottom left) straight to a ray
-Ray r = cam.ScreenPointToRay(Input.mousePosition);
-if (Physics.Raycast(r, out RaycastHit hit)) Debug.Log(hit.point);
-```
+</div>
 
 
 ---

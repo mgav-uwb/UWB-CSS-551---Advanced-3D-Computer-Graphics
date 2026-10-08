@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~45 min, 30 slides).
+  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~45 min, 26 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/ray-tracing.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -24,6 +24,10 @@
   v2 (2026-10-05, L12 to ~80 slides): checks on the center ray, a triangle hit, a penumbra and BVH depth (the
   chapter's Exercises 1, 3, 6, 7); the ray that starts inside (Exercise 2); the refracted direction in vector
   form; total internal reflection (Exercise 5); one shadow ray with the light at t = 1. Numbers from node.
+
+  EDIT 2026-10-08: the four multiple-choice Check slides cut (center ray, triangle hit, BVH depth, penumbra);
+  the center ray, the BVH depth and the penumbra's dependence on light height moved into the notes of the
+  slides they check. 26 slides.
 
   reveal.js: FLAT; notes follow "Note:"; plain unicode math; never two "_" on one
   markdown line outside a code fence. Paths relative to the lecture page.
@@ -83,18 +87,6 @@ The illumination demo's camera: e = (3, 3, 6), φ = 28°, S = 150, tan 14° = 0.
 ```
 
 The projection matrix run **backward**: a pixel to the line of points that project there. No matrix, no divide.
-
-
----
-
-## Check: the center of the image
-
-The illumination demo's camera: e = (3, 3, 6) looking at the origin, 150 × 150 pixels, a sphere r = 1.2 at the origin. Where is the ray with `(sx, sy) = (0, 0)`, and where does it hit?
-
-- **A.** pixel (75, 75); `d = −w`; t = 7.348
-- **B.** the corner shared by pixels 74 and 75; `d = −w = (−0.408, −0.408, −0.816)`; t = 6.148
-- **C.** pixel (74, 74); `d = w`; t = 6.148
-- **D.** the corner shared by pixels 74 and 75; `d = −w`; t = 8.548
 
 
 ---
@@ -162,18 +154,6 @@ From (1.5, 1.5, 1): u = v = 0.75, u + v = 1.5 > 1, **outside**. The weights are 
 ```
 
 A robust tracer tests `|det| < ε`, not `det = 0`: a ray **almost** parallel gives a huge t from a tiny determinant.
-
-
----
-
-## Check: inside the triangle?
-
-The triangle A = (0, 0, 0), B = (2, 0, 0), C = (0, 2, 0). A ray from `(0.2, 1.5, 1)` straight down, `d = (0, 0, −1)`. Möller–Trumbore gives:
-
-- **A.** u = 0.1, v = 0.75, t = 1: inside, weights (0.15, 0.1, 0.75)
-- **B.** u = 0.75, v = 0.1, t = 1: inside, weights (0.15, 0.75, 0.1)
-- **C.** u = 0.1, v = 0.75, t = 1: outside, because v > 0.5
-- **D.** det = 0: the ray is parallel
 
 
 ---
@@ -368,18 +348,6 @@ Where to split a node? The probability that a random ray hitting the parent also
 
 ---
 
-## Check: how deep is the tree?
-
-A scene of **one million** triangles, a balanced BVH with **4 triangles per leaf**. Roughly how many tests does a ray that reaches one leaf make?
-
-- **A.** about 18 box tests and 4 triangle tests
-- **B.** about 36 box tests and 4 triangle tests
-- **C.** about 40 box tests and 1,000 triangle tests
-- **D.** about 1,000,000 box tests
-
-
----
-
 ## Distributed rays: soft shadows
 
 <img src="../../textbook/figures/rt-soft-shadow.png" class="media-shot" style="max-height: 230px;" alt="a sphere over a floor lit by a square area light: one shadow ray per pixel gives a hard shadow, sixteen give a soft penumbra with noise at its edge">
@@ -394,18 +362,6 @@ Cook, Porter and Carpenter, 1984: every hard edge in a Whitted image is an **int
 ```
 
 The same idea on the lens gives **depth of field**, on the shutter **motion blur**, on the lobe **glossy** reflection: N rays, noise falling as 1/√N.
-
-
----
-
-## Check: a sharper shadow
-
-The soft-shadow scene: penumbra width ≈ light size × sphere height / (light height − sphere height) = `1.2 × 0.5 / 2.5 = 0.24`. Raise the light from height 3 to **6**. The penumbra becomes:
-
-- **A.** 0.48: twice as wide
-- **B.** 0.109: about half as wide
-- **C.** 0.24: unchanged, the light is the same size
-- **D.** 0.12: exactly half
 
 
 ---

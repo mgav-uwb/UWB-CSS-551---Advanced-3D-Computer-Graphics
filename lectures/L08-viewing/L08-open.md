@@ -12,8 +12,8 @@
           the chain, camera moves, the lens (topic)       76 min
     1:18  Interaction in 3D: NDC, rays, picking,
           dragging, snapping, arcball, orbit (topic)      16 min
-    1:34  Discussion: four peer-instruction questions     21 min
-    1:55  Wrap                                             5 min
+    1:34  Wrap                                             5 min
+    1:39  Questions (HW3, the topics); buffer             21 min
     2:00  End
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -43,7 +43,6 @@
 - **The full chain**: one vertex from object space to a pixel; frustum culling
 - **Moving the camera**: dolly and zoom, off-axis and stereo frusta, the thin lens
 - **Interaction in 3D**: a pixel back to a ray; picking; dragging on the ground; snapping; the arcball; orbiting
-- **Discussion**: four questions, vote, argue, vote again
 
 Reading: [Viewing](../../textbook/viewing.html) · [Interactive Systems](../../textbook/interaction.html), Sections 5, 6, 8 and 9.
 

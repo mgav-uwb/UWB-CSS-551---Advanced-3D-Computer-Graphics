@@ -11,7 +11,10 @@
   sibling; local to world and back with the inverse, the hand from three frames; the camera as a node
   (V as the inverse of its world matrix); dirty flags, bounding volumes up the tree, reuse of one mesh;
   the inherited-shear pitfall; the Unity Transform worked; three levels in two orders; a joint
-  at an end worked; the subtree claim checked on the demo.
+  at an end worked; the subtree claim checked on the demo (dirty flags on the demo).
+  CUT 2026-10-08: the arithmetic "Predict, then check" slide and the "Check yourself" questions;
+  "Check: yaw the base to 90°" renamed "Dirty flags on the demo"; the two tracks' parent APIs in
+  Unity/WebGL code tabs.
   MOVED 2026-10-06 (re-sequence): kinematics, inverse kinematics and skinning to topics/animation.md;
   the rigid-bodies section to topics/physics-simulation.md; the recap slide removed.
   NEEDS:   the affine topic (block product, rigid inverse, pivot sandwich, column reading).
@@ -283,18 +286,6 @@ The hand traces a **circle of radius 1.4 about the joint** as the bend changes; 
 
 ---
 
-## Predict, then check
-
-Set `baseRy = 90`, `armBend = 80`. Where is the hand, in world coordinates?
-
-```text
-   hint 1: at baseRy = 0, armBend = 80 the hand is at (−1.38, 0.64, 0)
-   hint 2: the base yaw rotates that point about +y
-```
-
-
----
-
 ### Sung's SceneNode, and the matrix stack
 
 <small>(~16 min)</small>
@@ -429,8 +420,9 @@ Vector3 forward = mCombinedParentXform.GetColumn(2).normalized;   // world forwa
 
 ## Parents and children in both tracks
 
+<div class="code-tabs">
+
 ```csharp
-// Unity
 hand.transform.SetParent(arm.transform, false);   // keep the LOCAL values
 Vector3 w = hand.transform.position;               // world
 Vector3 l = hand.transform.localPosition;          // in the parent's frame
@@ -438,14 +430,15 @@ Vector3 q = hand.transform.TransformPoint(0, 0.3f, 0);          // local → wor
 Vector3 r = arm.transform.InverseTransformPoint(Vector3.up);    // world → local
 ```
 
-```js
-// three.js
+```javascript
 arm.add(hand);                                  // keep the LOCAL values
 hand.updateMatrixWorld();
 const w = hand.getWorldPosition(new THREE.Vector3());
 const q = hand.localToWorld(new THREE.Vector3(0, 0.3, 0));
 const r = arm.worldToLocal(new THREE.Vector3(0, 1, 0));
 ```
+
+</div>
 
 
 ---
@@ -552,7 +545,7 @@ The demo: hand yaw recomputes 1, the bend 2, the base yaw 3.
 
 ---
 
-## Check: yaw the base to 90°
+## Dirty flags on the demo
 
 At yaw 30°, bend 40°, the hand is at **(−0.779, 1.472, 0.450)**; in the base's frame it is **(−0.900, 1.272, 0)**, and the base sits at **(0, 0.2, 0)**.
 
@@ -690,14 +683,4 @@ Parent `S(2, 1, 1)`, child `R_z(45°)`. The child's world columns:
    (1.414, 0.707, 0) and (-1.414, 0.707, 0):  lengths 1.581, 1.581;  126.9° apart, not 90°
    read back as TRS:  rotation 26.6° (not 45°), scale (1.581, 1.581):  rebuilt entry error 0.707
 ```
-
-
----
-
-## Check yourself
-
-1. `L_base = T(0, 1, 0)`, `L_child = R_z(90)`. Where does the child's local `(1, 0, 0)` land?
-2. A node has `L = S(1, 3, 1)`; its child has `L = R_z(45)`. Can the child's world transform be stored as TRS?
-3. You call three.js `parent.add(child)` on a child already placed in the world. What happens?
-4. The world point `(1, 0, -1)` lies near the arm of the two-node chain, `W_arm = R_y(90) · T(1, 0, 0)`. What are its coordinates in the arm's frame?
 

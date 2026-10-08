@@ -28,6 +28,8 @@
   coordinate and placement stages and the fur and hair stretch; the sampling
   stage moved to texture-sampling.md, the strand simulation to the physics topic.
 
+  EDIT 2026-10-08: the "Why" title renamed ("Fur: what a flat texture cannot do").
+
   reveal.js: FLAT; notes follow "Note:"; plain unicode math; never two "_" on one
   markdown line outside a code fence. Paths relative to the lecture page.
 -->
@@ -415,7 +417,7 @@ The panel shows the live **3×3** matrix as you drag: the same numbers as our wo
 
 ---
 
-## Why a flat texture cannot make fur
+## Fur: what a flat texture cannot do
 
 - a texture changes the **color** (or the normal) of a surface point; the surface stays where it is
 - fur is **volume**: thousands of hairs standing off the surface, with gaps you see through

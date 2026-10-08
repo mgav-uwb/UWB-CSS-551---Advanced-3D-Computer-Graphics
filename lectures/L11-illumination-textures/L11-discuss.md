@@ -1,39 +1,13 @@
 <!--
-  CSS 551 · Lecture 11, discussion (10 min: two peer-instruction questions), the
-  HW5 walk-through and the wrap. Answers only in the notes. Numbers computed by node:
-    Q1  light at (3, 0, 0): L = normalize(2.307, −0.693, −0.693) = (0.920, −0.276, −0.276);
-        N·L = 0.212 (illumination chapter, exercise; gen-lecture-figures-c.mjs l11_q1).
-    Q2  1024 × 0.004 = 4.096, 1024 × 0.003 = 3.072; ρ = 4.096, λ = log₂ 4.096 = 2.034.
+  CSS 551 · Lecture 11, the HW5 walk-through and the wrap (~10 min).
+  CUT 2026-10-08: the two multiple-choice discussion questions (the light moves to
+  (3, 0, 0); which mip level); the freed time goes to midterm questions and HW5 help.
     HW5 numbers from homework/hw05/index.html (lib/skeletons/expected.js).
 -->
 
-### Discussion
+### HW5, and the wrap
 
-<small>(~20 min, with the HW5 walk-through)</small>
-
-
----
-
-## Question 1: the light moves
-
-The demo's sphere (r = 1.2) and marked point `P = (0.693, 0.693, 0.693)`, `N = (0.577, 0.577, 0.577)`. The point light moves to **azimuth 90°, elevation 0°** on its radius-3 orbit, i.e. to `(3, 0, 0)`. The diffuse term `max(0, N·L)` is now:
-
-- **A.** 0.212
-- **B.** 0.531
-- **C.** 0.577
-- **D.** 0.988
-
-
----
-
-## Question 2: which mip level?
-
-A 1024 × 1024 texture. Across one pixel, `u` changes by **0.004** in x and `v` by **0.003** in y (the other derivatives are 0). Which level does a trilinear sampler read **most** from?
-
-- **A.** level 0
-- **B.** level 2
-- **C.** level 4
-- **D.** level 10
+<small>(~10 min)</small>
 
 
 ---
@@ -69,7 +43,7 @@ Graded on the page's inputs and on a hidden set; the shader is graded by eye.
 
 A lit point is three dot products per light, `max(0, N·L)`, `max(0, R·V)^s` and a constant ambient, summed over the lights and tone-mapped for display. A texture lookup filters: bilinear when magnified, the mipmap level log₂ of the footprint when minified.
 
-- **Read**: [Local Illumination](../../textbook/illumination.html) · [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11
+- **Read**: [Local Illumination](../../textbook/illumination.html); [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11; for the Unity track, [Unity Shaders](../../textbook/unity-shaders.html)
 - **Out**: HW5, due Wednesday November 11, 11:59 PM
 - **Midterm**: Thursday November 12, the first 75 minutes: Lectures 1 to 11 and HW5
 

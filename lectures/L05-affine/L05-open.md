@@ -9,8 +9,9 @@
     0:20  Opening                                          2 min
     0:22  Affine transformations over homogeneous
           coordinates (topic)                             70 min
-    1:32  Discussion: three questions                     14 min
-    1:46  HW2 walk-through and wrap                       14 min
+    1:32  HW2 walk-through and wrap                       14 min
+    1:46  HW2 setup help, both tracks; buffer             14 min
+  CUT 2026-10-08: the three discussion questions; the affine topic's Check and predict slides.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.
@@ -48,7 +49,7 @@
 - **Homogeneous coordinates**: w = 1 points, w = 0 vectors; composition and inverse by blocks; conditioning
 - **Frames and spaces**: a matrix is a frame; storage layouts; TRS; normals and planes by the inverse transpose
 - **Pivots, and where affine ends**: the conjugation sandwich; the last row and the vanishing point
-- **Discussion**, then the **HW2 walk-through**
+- the **HW2 walk-through**, then setup help
 
 Reading: [Affine Transformations](../../textbook/affine-transforms.html) in the course text.
 

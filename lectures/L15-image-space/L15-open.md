@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L15 · Thursday November 19, 2026 (week 8, in person): The space of images.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/image-space.md (~82 min), L15-discuss.md (discussion, HW7 walk-through,
+  tonight), ../../topics/image-space.md (~82 min), L15-discuss.md (HW7 walk-through,
   wrap). Quiz 5, on paper, comes first: L12, L13, L14 and HW6.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
@@ -12,10 +12,11 @@
   Minute plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Quiz 5, on paper                                   20 min
     0:20  Title and tonight                                   2 min
-    0:22  The space of images (topic, 57 slides)             82 min
-    1:44  Discussion: three questions                         9 min
-    1:53  HW7 walk-through                                    5 min
-    1:58  Wrap                                                2 min
+    0:22  The space of images (topic, 53 slides)             82 min
+    1:44  HW7 walk-through                                    5 min
+    1:49  Wrap                                                2 min
+    1:51  Questions; buffer                                   9 min
+  CUT 2026-10-08: the three multiple-choice discussion questions and four topic Check slides.
 -->
 
 ## CSS 551

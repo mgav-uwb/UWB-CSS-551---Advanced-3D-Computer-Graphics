@@ -17,6 +17,12 @@
   the one-slide summary stays) and the recap slide.
   EXPANDED 2026-10-05 (80-slide target): checks on the block inverse, reading a frame and a stretched normal; the condition number; a row-vector matrix pasted as columns; the polar decomposition stepped (stretch, then rotation); mirror and shear detection in both tracks; why the inverse transpose; the normal matrix in both tracks' shaders; the ground plane moved; conjugation F X F^-1; where the parallels meet. Numbers from node against lib/core/xform.js; textbook Sections 2.1, 4.1, 6.1, 7, 8 and Exercises 2, 3, 4, 6, 10.
 
+  EDITED 2026-10-08: cut the three multiple-choice Check slides (invert by blocks, read a frame, a
+  stretched surface's normal), the check-yourself slide, and the arithmetic predict slide (its column-3
+  prompt is in the demo's note); "Why the inverse transpose" renamed; the mirror-and-shear, normal-matrix
+  and TRS listings in Unity/WebGL code tabs; the three.js pivot slide and Sung's pivot excerpt merged
+  into one tabbed slide (the by-hand storage block dropped; the column-major slide covers it).
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -295,20 +301,6 @@ The scale **stretches the translation** when it acts second. Same lesson as `T·
 
 ---
 
-## Predict before you drag
-
-Set the demo to `tx = 2`, `ry = 90`. Before looking, write down **column 3** of each product:
-
-```text
-   T·R :  ( ?, ?, ? )
-   R·T :  ( ?, ?, ? )
-```
-
-Then drag, and compare with the panels.
-
-
----
-
 ## Order, live
 
 One **model** `{tx, ry}` builds two cubes from the same `T` and `R`, multiplied in opposite orders: **left** is `T·R` (spins in place, slides over), **right** is `R·T` (sweeps an arc). The panels print both products; compare **column 3**.
@@ -379,18 +371,6 @@ The inverse of `T·R` has the shape of `R·T`: a rotation first, then a translat
 
 ---
 
-## Check: invert by blocks
-
-`M = T(0, 3, 0) · R_z(90°)`; `R_z(90°)` has columns `(0, 1, 0)`, `(−1, 0, 0)`, `(0, 0, 1)`. What is **column 3 of M⁻¹**?
-
-- **A.** `(−3, 0, 0)`
-- **B.** `(0, −3, 0)`
-- **C.** `(3, 0, 0)`
-- **D.** `(0, 3, 0)`
-
-
----
-
 ## Pitfall: inverting as if the matrix were TRS
 
 `M` has columns `(1.5, 0.5, 0)` and `(0.5, 1.5, 0)`: a **non-uniform scale along a diagonal**. It is affine, `det = 2`, but not `T·R·S` (its columns are not orthogonal: dot 1.5).
@@ -457,18 +437,6 @@ Feed the block matrix the basis vectors and the origin:
 ```
 
 An affine matrix **is** an affine frame: three axis vectors and an origin, stacked as columns. Read any placement matrix by eye: column 3 is the position, columns 0–2 are the object's axes in the world, and their lengths are its scale.
-
-
----
-
-## Check: read a frame
-
-A matrix has columns `(0, 2, 0)`, `(−3, 0, 0)`, `(0, 0, 1)` and `(5, 5, 5)`. Position, scale, rotation?
-
-- **A.** at `(5, 5, 5)`, scale `(2, 3, 1)`, `R_z(90°)`, right-handed
-- **B.** at `(5, 5, 5)`, scale `(2, −3, 1)`, a mirror
-- **C.** at `(0, 2, 0)`, scale `(3, 2, 1)`, `R_z(90°)`
-- **D.** at `(5, 5, 5)`, scale `(2, 3, 1)`, `R_z(−90°)`
 
 
 ---
@@ -599,7 +567,15 @@ Any affine `A` can be written as a **rotation times a symmetric stretch** (`A = 
 
 ## Real code: detect a mirror and a shear
 
-```js
+<div class="code-tabs">
+
+```csharp
+float det = m.determinant;                           // equals the 3x3 part's for an affine m
+Vector3 u0 = ((Vector3)m.GetColumn(0)).normalized, u1 = ((Vector3)m.GetColumn(1)).normalized;
+bool sheared = Mathf.Abs(Vector3.Dot(u0, u1)) > 1e-4f;   // and the other two pairs
+```
+
+```javascript
 import { normalize, dot, cross } from '../core/xform.js';
 const col = (m, j) => [m[4 * j], m[4 * j + 1], m[4 * j + 2]];
 const [c0, c1, c2] = [0, 1, 2].map((j) => col(M, j));
@@ -609,11 +585,7 @@ const shear = Math.max(Math.abs(dot(u0, u1)), Math.abs(dot(u0, u2)), Math.abs(do
 // TRS(1,2,3, 0,60,0, 2,1,0.5): det 1, shear 0      oblique scale: det 2, shear 0.6
 ```
 
-```csharp
-float det = m.determinant;                           // equals the 3x3 part's for an affine m
-Vector3 u0 = ((Vector3)m.GetColumn(0)).normalized, u1 = ((Vector3)m.GetColumn(1)).normalized;
-bool sheared = Mathf.Abs(Vector3.Dot(u0, u1)) > 1e-4f;   // and the other two pairs
-```
+</div>
 
 
 ---
@@ -634,7 +606,7 @@ A surface direction `d` transforms by `A d`. A **normal** must stay perpendicula
 
 ---
 
-## Why the inverse transpose
+## The inverse transpose, derived
 
 A normal `n` is defined by `n · d = 0` for every tangent `d`. Find `N` so that `(N n) · (A d) = 0` too:
 
@@ -650,19 +622,14 @@ A normal `n` is defined by `n · d = 0` for every tangent `d`. Find `N` so that 
 
 ---
 
-## Check: a stretched surface's normal
-
-A model is scaled by `A = diag(1, 1, 3)`. A face normal was `(0, 0.707, 0.707)`. The correct world normal, renormalized:
-
-- **A.** `(0, 0.316, 0.949)`
-- **B.** `(0, 0.949, 0.316)`
-- **C.** `(0, 0.707, 0.707)`
-- **D.** `(0, 0.707, 2.121)`
-
-
----
-
 ## Real code: the normal matrix in both tracks' shaders
+
+<div class="code-tabs">
+
+<pre data-track="unity" data-label="Unity · HLSL"><code class="language-cpp">// Unity built-in pipeline (UnityCG.cginc)
+float3 n = UnityObjectToWorldNormal(v.normal);
+// = normalize(mul(v.normal, (float3x3)unity_WorldToObject)): normal times the INVERSE,
+//   which as a row vector is the inverse transpose</code></pre>
 
 ```glsl
 // three.js ShaderMaterial: normalMatrix is supplied per object
@@ -675,12 +642,7 @@ void main() {
 }
 ```
 
-```hlsl
-// Unity built-in pipeline (UnityCG.cginc)
-float3 n = UnityObjectToWorldNormal(v.normal);
-// = normalize(mul(v.normal, (float3x3)unity_WorldToObject)): normal times the INVERSE,
-//   which as a row vector is the inverse transpose
-```
+</div>
 
 
 ---
@@ -784,9 +746,18 @@ The oblique scale of the inverse pitfall is exactly this sandwich: a symmetric m
 
 ---
 
-## The pivot sandwich in three.js
+## Real code: the pivot sandwich
 
-```js
+<div class="code-tabs">
+
+```csharp
+Matrix4x4 m   = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
+Matrix4x4 ipm = Matrix4x4.Translate(-PivotPosition);   // T(-p)
+Matrix4x4 pm  = Matrix4x4.Translate( PivotPosition);   // T(p)
+m = pm * m * ipm;                                      // T(p) · M · T(-p), right to left
+```
+
+```javascript
 const p = new THREE.Vector3(2, 0, 0);
 const M = new THREE.Matrix4()
   .makeTranslation(p.x, p.y, p.z)                                   // T(p)
@@ -795,27 +766,9 @@ const M = new THREE.Matrix4()
 // M.elements[12], [13], [14] = 2, 0, 2       (the column (I − R) p)
 ```
 
-`multiply` appends on the right, so the chain reads left to right as written and acts right to left, as in the Unity code: same matrix, same column `(2, 0, 2)`.
+</div>
 
-
----
-
-## Real code: the pivot sandwich, and a matrix by hand
-
-```csharp [1-4]
-Matrix4x4 m   = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
-Matrix4x4 ipm = Matrix4x4.Translate(-PivotPosition);   // T(-p)
-Matrix4x4 pm  = Matrix4x4.Translate( PivotPosition);   // T(p)
-m = pm * m * ipm;                                      // T(p) · M · T(-p), right to left
-```
-
-```csharp [1-3]
-Matrix4x4 m = Matrix4x4.identity;            // column-major, 16 floats
-m[12] = p.x; m[13] = p.y; m[14] = p.z;       // column 3 = the translation
-m[0]  = s.x; m[5]  = s.y; m[10] = s.z;       // the diagonal = the scale factors
-```
-
-<small>XformLoader.cs, 4.7.PivotedScaleRotate and 4.4.CPU-TRS. Both upload the matrix to the shader as `MyXformMat`; TSvsST and InverseTransform toggle order and the inverse chain the same way.</small>
+<small>The C# is XformLoader.cs, 4.7.PivotedScaleRotate; it uploads the matrix to the shader as `MyXformMat`. three.js's `multiply` appends on the right, so the chain reads as written and acts right to left.</small>
 
 
 ---
@@ -887,6 +840,8 @@ o.vertex = mul(UNITY_MATRIX_VP, o.vertex);  // world → view → clip (view: af
 
 ## Real code: a matrix from TRS, in both tracks
 
+<div class="code-tabs">
+
 ```csharp
 Matrix4x4 m = Matrix4x4.TRS(new Vector3(1, 2, 3),
                             Quaternion.Euler(0, 60, 0),
@@ -894,22 +849,14 @@ Matrix4x4 m = Matrix4x4.TRS(new Vector3(1, 2, 3),
 Vector3 q = m.MultiplyPoint3x4(new Vector3(1, 1, 1));   // (2.433, 3, 1.518)
 ```
 
-```js
+```javascript
 const m = new THREE.Matrix4().compose(new THREE.Vector3(1, 2, 3),
   new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 3, 0)),
   new THREE.Vector3(2, 1, 0.5));
 const q = new THREE.Vector3(1, 1, 1).applyMatrix4(m);   // (2.433, 3, 1.518)
 ```
 
+</div>
+
 Both build `T·R·S`; `m.decompose(pos, quat, scale)` in three.js reads it back.
-
-
----
-
-## Check yourself
-
-1. `M` has column 3 = `(4, 0, 0)` and columns 0 to 2 = `R_y(90)`. Is `M = T·R` or `R·T` for `t = (4, 0, 0)`?
-2. A model matrix has `det = −2`. What happens to its triangles, and what should the renderer do?
-3. `M = T(p)·R·T(−p)` with `p = (0, 0, 3)`, `R = R_y(180)`. Column 3?
-4. A normal `(0, 1, 0)` under `A = diag(1, 4, 1)`: transform it.
 

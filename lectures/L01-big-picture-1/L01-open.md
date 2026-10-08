@@ -7,7 +7,7 @@
   brief, tonight), ../../topics/history-what-is-cg.md,
   ../../topics/history-machines.md,
   ../../topics/history-problems-1.md, then L01-discuss.md
-  (discussion, the setup slide for next Thursday, the wrap). Week 1 has no quiz
+  (the setup slide for next Thursday and the wrap; the discussion questions were cut 2026-10-08). Week 1 has no quiz
   and no homework out.
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
@@ -15,12 +15,10 @@
     0:12  What computer graphics is, where it is used     ~13 min (13 slides)
     0:25  The early machines, 1958 to 1972                ~18 min (16 slides)
     0:43  Problems and solutions, 1959 to about 1982      ~50 min (26 slides)
-    1:33  Discussion: four questions                      ~20 min (5 slides)
-    1:53  Before next Thursday, wrap                       ~3 min (2 slides)
-    1:56  buffer                                           ~4 min
+    1:33  Before next Thursday, wrap                       ~5 min (3 slides)
+    1:38  buffer, questions from the room                 ~22 min
     2:00  end
-  69 slides. If the problems deck runs long, the buffer absorbs it; the
-  discussion keeps its 20 minutes.
+  65 slides. If the problems deck runs long, the buffer absorbs it.
 
   Facts on these slides come from the syllabus and Plan C
   (planning/css551-au26-plan-c-2026-09-29.md): 1000 points (homework 200, quizzes best 6 of 8 at 40 = 240, midterm 200,
@@ -112,7 +110,6 @@ The field's history, organized by problem:
 1. **what computer graphics is**, among its neighbors, and where it is used
 2. **the early machines**, 1958 to 1972: Sketchpad on the TX-2 first, each machine with its price
 3. **problems and solutions**, 1959 to about 1982: the problem, the named solutions, the people and organizations
-4. **discussion**: four questions on tonight's numbers
 
 Reading: <a href="../../textbook/history-of-graphics.html">A History of Computer Graphics</a>, Sections 1 to 5.
 

@@ -5,7 +5,7 @@
   The previous review deck is archived at lectures/archive/L20-synthesis-review-v1/ and topics/archive/synthesis-review.md.
 
   COMPOSITION: index.html mounts L20-open.md (title, quiz, tonight), then
-  ../../topics/inverse-rendering.md (~80 min), then L20-discuss.md (three questions, wrap).
+  ../../topics/inverse-rendering.md (~80 min), then L20-discuss.md (wrap).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
   never two "_" on one markdown line outside a code fence; no "next time".
@@ -13,10 +13,11 @@
   Plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  Quiz 8, on paper (L18, L19, HW8)                       20 min
     0:20  Opening                                                 2 min
-    0:22  Inverse and differentiable rendering (topic, 60 slides) 80 min
-    1:42  Discussion: three questions                            15 min
+    0:22  Inverse and differentiable rendering (topic, 59 slides) 80 min
+    1:42  Questions and buffer                                   15 min
     1:57  Wrap                                                    3 min
     2:00  end
+  CUT 2026-10-08: the three discussion questions; their 15 minutes are questions and buffer.
 -->
 
 ## CSS 551

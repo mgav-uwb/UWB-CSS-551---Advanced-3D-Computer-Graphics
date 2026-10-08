@@ -16,6 +16,9 @@
   "is it a basis" (Exercise 7), "dots need an orthonormal frame" (Section 1.1), ray against sphere
   (the ray-tracing topic), interpolating attributes with the weights (the rasterization topic), and
   testing with == (Section 8).
+  EDITED 2026-10-08: the three two-track listings (point to segment, barycentric weights, the atan2
+  angle) put in Unity/WebGL code tabs; notes that pointed at a HW1 which-side exercise now point at
+  HW2's signedDistance (EX3) and shadowOnPlane (EX4).
   NEEDS:   the vectors-review topic (the projection split, the cross product, the triple product).
   DEMOS:   none (figures).
   NUMBERS: textbook/figures/numbers-foundations.json (keys vec, line, plane) or recomputed by node
@@ -134,6 +137,8 @@ Segment `P0 = (0,0)` to `P1 = (4,2)`: `|v| = 4.472`, unit `v = (0.894, 0.447)`.
 
 ## Real code: point to segment, both tracks
 
+<div class="code-tabs">
+
 ```csharp
 Vector3 vt  = Pt.transform.localPosition - P0.transform.localPosition;
 Vector3 v1n = v1.normalized;                       // unit direction
@@ -142,13 +147,15 @@ Pon.transform.localPosition = P0.transform.localPosition + d * v1n;  // foot
 bool inside = (d >= 0) && (d <= v1.magnitude);     // the segment range test
 ```
 
-<small>EX_5_3_MyScript.cs, Chap-5-DotProducts.</small>
-
-```js
+```javascript
 const v1n = normalize(sub(P1, P0)), d = dot(sub(Pt, P0), v1n);   // xform.js
 const inside = d >= 0 && d <= Math.hypot(...sub(P1, P0));
 // P0 = (0,0,0), P1 = (4,2,0), Pt = (6,4,0):  d = 7.155, inside = false
 ```
+
+</div>
+
+<small>The C# is EX_5_3_MyScript.cs, Chap-5-DotProducts.</small>
 
 
 ---
@@ -224,7 +231,7 @@ n . P - D  =  0   ->  P is ON the plane
 n . P - D  <  0   ->  P is BEHIND
 ```
 
-One dot, one subtraction, one comparison: frustum culling, clipping, and the homework's green-or-red point.
+One dot, one subtraction, one comparison: frustum culling, clipping, and HW2's `signedDistance`.
 
 
 ---
@@ -323,6 +330,8 @@ First row by hand: `(P1 - X) x (P2 - X) = (1.5,0,0.5) x (-0.5,0,-1.5) = (0, 2, 0
 
 ## Real code: barycentric weights, both tracks
 
+<div class="code-tabs">
+
 ```csharp
 Vector3 n  = Vector3.Cross(P1 - P0, P2 - P0);
 float   nn = Vector3.Dot(n, n);
@@ -332,12 +341,14 @@ float   w2 = 1f - w0 - w1;                       // the weights sum to 1
 bool inside = w0 >= 0f && w1 >= 0f && w2 >= 0f;
 ```
 
-```js
+```javascript
 const n = cross(sub(P1, P0), sub(P2, P0)), nn = dot(n, n);
 const w0 = dot(cross(sub(P1, X), sub(P2, X)), n) / nn;
 const w1 = dot(cross(sub(P2, X), sub(P0, X)), n) / nn;
 const w2 = 1 - w0 - w1;      // X = (1, 0, -0.5): [0.25, 0.5, 0.25], inside
 ```
+
+</div>
 
 
 ---
@@ -360,6 +371,8 @@ Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, every operation in float32:
 
 ## Real code: an angle that never fails
 
+<div class="code-tabs">
+
 ```csharp
 // Unity: degrees between two directions; no normalize, no clamp needed
 float AngleDeg(Vector3 a, Vector3 b) {
@@ -367,11 +380,13 @@ float AngleDeg(Vector3 a, Vector3 b) {
 }
 ```
 
-```js
+```javascript
 // WebGL track, with lib/core/xform.js
 const angleDeg = (a, b) => Math.atan2(Math.hypot(...cross(a, b)), dot(a, b)) * 180 / Math.PI;
 angleDeg([2, 1, 0], [1, 2, 1]);   // 43.0887
 ```
+
+</div>
 
 - |a × b| = |a||b| sin θ and a · b = |a||b| cos θ: atan2 of the pair cancels **both lengths**
 - full precision near 0° and near 180°; no domain to leave

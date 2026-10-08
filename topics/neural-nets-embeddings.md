@@ -24,6 +24,8 @@
   2026-10-05: paced to ~66 min so that topics/coordinate-networks.md (mounted after it in L14) fits;
   the "what a network is not" summary table was cut; positional encoding of coordinates, spectral
   bias, Fourier features and SIREN live in that topic.
+  EDIT 2026-10-08: titles without "Why" ("The nonlinearity: without it, one matrix", "Shared weights:
+           the parameter count").
   NEEDS:   vectors and dot products (the vectors topic). Nothing about images or diffusion.
            Companion of topics/image-space.md and topics/diffusion-1.md (the lectures after it); this
            deck names "the approximator exhibit" and "the embedding exhibit", and diffusion-1 refers
@@ -135,7 +137,7 @@ Stack the hidden units into vectors and the pass is three lines:
 
 ---
 
-## Why the nonlinearity
+## The nonlinearity: without it, one matrix
 
 A composition of linear maps is linear, so without the squash a network of any depth is **one matrix**.
 
@@ -620,7 +622,7 @@ A **convolutional layer** slides one small kernel K over the image: `y_ij = σ(b
 
 ---
 
-## Why share weights: the parameter count
+## Shared weights: the parameter count
 
 ```text
    a fully connected unit on a 512 × 512 RGB image         786,432 weights, for ONE output

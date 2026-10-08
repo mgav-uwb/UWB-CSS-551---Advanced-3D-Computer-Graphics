@@ -1,18 +1,19 @@
 <!--
   CSS 551 · Lecture 10 (Tuesday November 3, week 6, online): Animation and Physics.
   Mounts, in order: L10-open.md, ../../topics/animation.md (~46 min, 35 slides),
-  ../../topics/physics-simulation.md (~44 min, 36 slides), L10-discuss.md (discussion and wrap).
+  ../../topics/physics-simulation.md (~44 min, 36 slides), L10-discuss.md (the wrap).
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  opening                                     2 min
     0:02  animation (topic)                          46 min
     0:48  physics inside the frame loop (topic)      44 min
-    1:32  discussion: four questions                 24 min
-    1:56  wrap                                        4 min
+    1:32  wrap                                        4 min
+    1:36  questions, HW4 help; buffer                24 min
     2:00  end
+  CUT 2026-10-08: the four discussion questions (L10-discuss.md); the predict-first slide
+  on the spring cloth (physics-simulation.md).
   Demos: keyframe (t,ease), cloth (stiffness,substeps), fluid (viscosity,sound).
-  Numbers: numbers-motion.json anim.*, lib/core/sim-cloth.js and sim-fluid.js, and node
-  for the discussion answers (in L10-discuss.md).
+  Numbers: numbers-motion.json anim.*, lib/core/sim-cloth.js and sim-fluid.js.
 
   reveal.js: FLAT; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.
@@ -40,7 +41,6 @@
 - **Skeletons**: forward and inverse kinematics, skinning and the candy wrapper, blend shapes, motion capture, blend trees
 - **Physics in the loop**: one spring three ways, Verlet, substeps, cloth by springs and by constraints (live)
 - **Contacts, rigid bodies, hair, fluids**: one bounce, broad and narrow phase, stacking, strands, smoothed particles (live)
-- **Discussion**: four questions
 
 Reading: [Animation and Interpolation](../../textbook/animation.html).
 

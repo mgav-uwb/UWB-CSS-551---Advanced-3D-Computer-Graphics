@@ -1,49 +1,12 @@
 <!--
-  CSS 551 · L07 discussion, HW3 walk-through and wrap (~32 min), the end of class.
-  Three peer-instruction questions; answers ONLY in the notes; numbers computed by node against
-  lib/core/xform.js (makeTRS, axisAngleMatrix, matMul, applyMat4) and from
-  textbook/figures/numbers-foundations.json (aff) and numbers-pipeline.json (sg).
+  CSS 551 · L07 HW3 walk-through and wrap (~14 min); HW3 setup help follows.
+  CUT 2026-10-08: the three multiple-choice discussion questions (where is the child,
+  inherited shear, into the hand's frame); the freed time goes to setup help.
 -->
 
-### Discussion
+### HW3, and the wrap
 
-<small>(~32 min, with the HW3 walk-through)</small>
-
-
----
-
-## Question 1: where is the child?
-
-`L_base = T(0, 1, 0) · R_y(90°)` and `L_arm = T(0, 0, 2)`. Where is the arm's origin in the world?
-
-- **A.** `(2, 1, 0)`
-- **B.** `(0, 1, 2)`
-- **C.** `(-2, 1, 0)`
-- **D.** `(2, 0, 0)`
-
-
----
-
-## Question 2: inherited shear
-
-Parent `S(1, 2, 1)`, child `R_z(45°)`. What angle do the child's world x and y axes make?
-
-- **A.** 90°
-- **B.** 53.1°
-- **C.** 45°
-- **D.** 126.9°
-
-
----
-
-## Question 3: into the hand's frame
-
-At the default pose the hand's world matrix is `W_hand` (origin `(-0.78, 1.47, 0.45)`). A world point lies exactly at the hand's origin. What are its coordinates in the **arm's** frame, whose origin is `(-0.39, 0.94, 0.22)` and whose local places the hand at `T(0, 0.7, 0)`?
-
-- **A.** `(0, 0.7, 0)`
-- **B.** `(-0.39, 0.53, 0.23)`
-- **C.** `(0, 0, 0)`
-- **D.** `(0, -0.7, 0)`
+<small>(~14 min) · then setup help, both tracks</small>
 
 
 ---

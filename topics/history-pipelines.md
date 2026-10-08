@@ -12,8 +12,10 @@
   programmable stages; unified shaders; ray-tracing and tensor cores); the
   price-performance chart; the lag chart (median 21 years) and the two budgets.
   The then-and-now chart of the early machines is in history-machines.md (L01).
-  NUMBER LEFT FOR THE DISCUSSION: triangles per dollar per year (L02 Q3); the
-    copy of fig-price-perf.svg in media/ has its "x3.0 a year" subtitle removed.
+  EDIT 2026-10-08: the L02 discussion questions were cut; the triangle series' yearly
+    factor (about 3.0) is now in the "Price and performance" caption, and the two budgets'
+    ratio (864,000) in "Ideas wait for hardware". The copy of fig-price-perf.svg in media/
+    still has its "x3.0 a year" subtitle removed.
   SOURCE: planning/history-draft/history-of-graphics.html (v0.5) Sections 7, 8
     and 12; figures/fig-pipe-*.svg, fig-price-perf.svg, fig-lag.svg.
   IMAGE PATHS: relative to the lecture page: ../../topics/media/history/.
@@ -196,7 +198,7 @@
 
 <div class="figslide"><img src="../../topics/media/history/fig-price-perf.svg" alt="Two log charts in 2026 dollars: triangles per second per dollar from 0.133 (1988 Personal IRIS) to 22,200 (1999 GeForce 256); peak GFLOPS per dollar from 0.074 (1999) to 52.4 (2025, RTX 5090)" style="width: 900px; max-height: 450px;"></div>
 
-<small>Triangles per second per 2026 dollar: **0.133** in 1988, 4.94 and 4.49 in 1993, 570 in 1996 (card only), **22,178** in 1999. The series stops at 1999: no vendor triangle rates after.</small>
+<small>Triangles per second per 2026 dollar: **0.133** in 1988, 4.94 and 4.49 in 1993, 570 in 1996 (card only), **22,178** in 1999. Over 11 years that is (22,178 / 0.133)^(1/11) ≈ **3.0×** a year. The series stops at 1999: no vendor triangle rates after.</small>
 
 
 ---
@@ -205,5 +207,5 @@
 
 <div class="figslide"><img src="../../topics/media/history/fig-lag.svg" alt="Ten bars from the year of publication to the year of wide use: head-mounted display 48 years, z-buffer 22, texture mapping 22, bump mapping 26, Catmull-Clark 19, ray tracing 38, mipmaps 13, path tracing 20, programmable shading 17, radiance fields 3" style="width: 760px; max-height: 380px;"></div>
 
-<small>Median **21 years** from paper to routine use. A 60 Hz game frame: **16.7 ms**. A film frame: minutes to hours on a farm, played back later.</small>
+<small>Median **21 years** from paper to routine use. A 60 Hz game frame: **16.7 ms**. A film frame: minutes to hours on a farm, played back later; 4 hours is **864,000** game frames.</small>
 

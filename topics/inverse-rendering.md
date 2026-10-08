@@ -30,6 +30,7 @@
   KaTeX plugin). Never two "_" on one markdown line outside a code fence.
   No <small> on math. Paths are relative to the lecture page that mounts this
   topic (lectures/LNN-slug/index.html).
+  CUT 2026-10-08: "Why Adam" renamed.
 -->
 
 ### Inverse and differentiable rendering
@@ -187,7 +188,7 @@ Inverse rendering fails uniqueness routinely and continuity often.
 
 ---
 
-## Why Adam
+## Per-parameter steps: Adam
 
 - the parameters have **different units**: albedo in [0, 1], angles in radians, a radius in image units
 - one learning rate for all is too large for some and too small for others

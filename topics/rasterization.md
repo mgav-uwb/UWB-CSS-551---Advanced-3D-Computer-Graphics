@@ -18,6 +18,8 @@
   DEMOS:   data-demo="raster" data-controls="res,angle" (under the page's crop).
   FIGURES: ../../textbook/figures/ras-*.svg (tools/gen-textbook-figures-pipeline.mjs).
   NUMBERS: textbook/figures/numbers-pipeline.json (ras.*).
+  EDIT 2026-10-08: the perspective-correct slide's note derives why a/w and 1/w are linear on
+           the screen. (L09's discussion questions were cut.)
 
   reveal.js: FLAT; notes follow "Note:"; plain unicode math, no KaTeX; never two
   "_" on one markdown line outside a code fence (edge functions are written E12,

@@ -38,6 +38,7 @@
   Plain unicode math or fenced ```text blocks. Never two "_" on one markdown line
   outside a code fence. No <small> on math. Paths are relative to the lecture page
   that mounts this topic (lectures/LNN-slug/index.html).
+  CUT 2026-10-08: the two multiple-choice Check slides (more views same ratio, a close object); "Why" titles renamed; the view-count point folded into the unknowns slide's note.
 -->
 
 ### Generative 3D and video
@@ -194,18 +195,6 @@ A one-pass reconstructor that places one Gaussian per pixel of four 256×256 vie
 
 - the problem is **under-determined** almost five times over; the answer comes from what the network learned about **objects in general**
 - that is why these networks train on about a million objects: the prior does most of the work
-
-
----
-
-## Check: more views, same ratio
-
-The same one-pass design (one Gaussian of 14 numbers per pixel) is given **six** views of **512×512** instead of four of 256×256. Unknowns per measurement:
-
-- **A.** 4.67, unchanged
-- **B.** 1.17, four times fewer
-- **C.** 18.7, four times more
-- **D.** 3.11, six views against four
 
 
 ---
@@ -404,7 +393,7 @@ Give the model the first frame and ask for the rest:
 
 ---
 
-## Why generated frames flicker
+## Flicker in generated frames
 
 - each frame's fine texture is decided by the **noise** it started from; independent noises give independent textures
 - temporal attention ties frames together only as far as training taught it; small details (hair, foliage, text) slip
@@ -500,7 +489,7 @@ A **world model** predicts the next frame from the previous frames and a control
 
 ---
 
-## Why the error compounds
+## Compounding error
 
 Write the per-frame step `d` (height change between frames) for both:
 
@@ -960,18 +949,6 @@ The eyes **converge** on a virtual object's depth, but **focus** at the display'
 
 - in the real world the two always agree; in a headset they conflict for near objects, a cause of eye strain
 - varifocal and light-field displays try to put focus back; neither is in mainstream headsets
-
-
----
-
-## Check: a close object
-
-The same headset focuses at 1.5 m. A virtual object is held at **0.25 m**. The vergence-accommodation mismatch is:
-
-- **A.** 4.00 diopters
-- **B.** 3.33 diopters
-- **C.** 1.25 diopters
-- **D.** 1.33 diopters
 
 
 ---

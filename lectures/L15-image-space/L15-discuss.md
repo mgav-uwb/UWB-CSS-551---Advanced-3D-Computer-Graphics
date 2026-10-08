@@ -1,52 +1,16 @@
 <!--
-  CSS 551 · L15 discussion, HW7 walk-through and wrap (~16 min). Mounted AFTER the topic.
-  Three peer-instruction questions (vote, argue in pairs, vote again, then work it); answers
-  ONLY in the Note: blocks. Numbers from tools/gen-lecture-figures-d1.mjs
-  (lectures/L16-diffusion-1/analysis/numbers-d1.json keys alias, psnrQ, tiny, fit, dctPsnr) and
-  textbook/image-space.html Section 3. The HW7 slide quotes the plan's HW7 content
+  CSS 551 · L15 HW7 walk-through and wrap (~7 min). Mounted AFTER the topic.
+  CUT 2026-10-08: the three multiple-choice discussion questions (stripes above the limit, two errors
+  with one PSNR, averaging in linear light); the freed time is buffer after a long topic.
+  HW7 numbers from tools/gen-lecture-figures-d1.mjs (lectures/L16-diffusion-1/analysis/numbers-d1.json
+  keys tiny, fit, dctPsnr). The HW7 slide quotes the plan's HW7 content
   (planning/css551-au26-plan-c-2026-09-29.md, Section 4); ../../homework/hw07/index.html is the
   specification and governs if the two differ.
 -->
 
-### Discussion
+### HW7, and the wrap
 
-<small>(~16 min)</small>
-
-
----
-
-## Question 1: stripes above the limit
-
-Vertical stripes f(u) = ½ + ½cos(2π·6·u), **six periods** across, sampled at 8 pixel centers u = (i − ½)/8. What does the raster show?
-
-- **A.** six periods of stripes
-- **B.** two periods of stripes
-- **C.** uniform gray
-- **D.** four periods of stripes
-
-
----
-
-## Question 2: two errors, one number
-
-Render A differs from the reference by a **uniform offset of 0.05** in every pixel. Render B matches exactly except that **one pixel in a hundred** is off by **0.5**. Values in [0, 1]. Their PSNRs:
-
-- **A.** A 26.0 dB, B 26.0 dB
-- **B.** A 26.0 dB, B 46.0 dB
-- **C.** A 13.0 dB, B 26.0 dB
-- **D.** A 26.0 dB, B 6.0 dB
-
-
----
-
-## Question 3: average in the right space
-
-A white pixel (code 1) and a black pixel (code 0) are averaged to shrink an image by two. Pixel values are sRGB codes. Which **code** should the result have so that it emits half of white's light?
-
-- **A.** 0.500
-- **B.** 0.735
-- **C.** 0.214
-- **D.** 0.250
+<small>(~7 min)</small>
 
 
 ---
@@ -86,7 +50,7 @@ Specification and skeletons: [HW7](../../homework/hw07/index.html)
 - an image is a point of ℝ³ᵐⁿ; the meaningful ones form a **thin, structured sheet** with neighbors at 10 in a cube where static sits at 23
 - a concept is **many-to-one**; its inverse is a distribution, and a generator must supply the missing choices
 
-**Read:** [The Space of Images](../../textbook/image-space.html), all sections
-
-**Due:** HW7, Wednesday November 25, 11:59 PM · **Quiz 6**: on Canvas, Thursday November 26, 12:00 AM to Sunday November 29, 11:59 PM; 20 minutes, alone, no notes; on tonight's lecture and HW7
+- **Read:** [The Space of Images](../../textbook/image-space.html), all sections
+- **Due:** HW7, Wednesday November 25, 11:59 PM
+- **Quiz 6**: on Canvas, Thursday November 26, 12:00 AM to Sunday November 29, 11:59 PM; 20 minutes, alone, no notes; on tonight's lecture and HW7
 

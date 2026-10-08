@@ -8,7 +8,7 @@
   ../../topics/history-pipelines.md,
   ../../topics/history-studios-films.md,
   ../../topics/film-pipeline.md (the film-pipeline topic), ../../topics/history-frontier.md, then L02-discuss.md
-  (discussion and the wrap).
+  (the wrap; the discussion questions were cut 2026-10-08).
 
   Plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                               ~3 min (this file, 2 slides)
@@ -17,11 +17,10 @@
     0:52  CGI studios and films                            ~9 min (9 slides)
     1:01  How a film frame is made (live topic)           ~25 min (29 slides; planned at 28 min in the topic, taken in 25)
     1:26  The new frontier                                 ~5 min (5 slides)
-    1:31  Discussion: four questions                      ~20 min (5 slides)
-    1:51  Wrap                                             ~2 min (1 slide)
-    1:53  buffer                                           ~7 min
+    1:31  Wrap                                             ~2 min (1 slide)
+    1:33  buffer, questions from the room                 ~27 min
     2:00  end
-  90 slides.
+  85 slides.
 
   reveal.js: FLAT; notes follow "Note:"; no math; never two "_" on one line
   outside a code fence.
@@ -49,7 +48,6 @@
 3. **studios and films** of computer-generated imagery (CGI): who made the frames, and fifteen films with their firsts
 4. **how a film frame is made**: capture, rendering farms, compositing by hand, color
 5. **the new frontier**: learned scenes, learned images, learned pixels
-6. **discussion**: four questions on tonight's numbers
 
 Reading: <a href="../../textbook/history-of-graphics.html#problems-2">A History of Computer Graphics</a>, Sections 6 to 12.
 

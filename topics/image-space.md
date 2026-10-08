@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~82 min, 57 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~82 min, 53 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -23,6 +23,8 @@
   EXPANDED (2026-10-05): four checks (midpoint 9.25, checkerboard spectrum, equalizing two values,
   the 2× null space 49,152); two 3-tap blurs' responses (box −0.333 at π); the median filter; a 1D
   Laplacian pyramid; one JPEG coefficient quantized (−50.9 → −2 → −48); a nearest neighbor measured.
+  EDIT 2026-10-08: the four multiple-choice Check slides cut (midpoint distance, checkerboard spectrum,
+  equalizing two values, the 2× null space); each result moved into the note of the slide it checked.
   NEEDS:   vectors and dot products; the neural-nets-embeddings topic for "encoder" and "embedding";
            the antialiasing lecture for the sampling slide (named, not required).
            Companion of topics/diffusion-1.md, which picks up "noise is the missing choice".
@@ -141,18 +143,6 @@ A 3 and an 8 as vectors in [−1, 1]⁴⁰⁰: ‖a − b‖ = **18.5**, 0.925 p
 - the midpoint is a **double exposure**, not a digit anyone would write
 - its nearest neighbor in the dataset (a 3) is **0.46** per pixel away; a real digit's nearest neighbor is **0.49** away on average
 - as close to the data as a real digit is, and still **not** one: the set of meaningful images is **curved**, not a subspace
-
-
----
-
-## Check: how far is the midpoint?
-
-The 3 and the 8 are ‖a − b‖ = 18.5 apart. How far is the midpoint ½(a + b) from the 3?
-
-- **A.** 18.5
-- **B.** 9.25
-- **C.** 13.1
-- **D.** 0, since it contains the 3
 
 
 ---
@@ -367,18 +357,6 @@ For an m × n image, the coefficient at horizontal frequency u and vertical freq
 
 ---
 
-## Check: the spectrum of a checkerboard
-
-The 4 × 4 checkerboard x_ij = ½ + ½(−1)^(i+j). Which coefficients of its Fourier transform are nonzero?
-
-- **A.** only X₀₀ = 8
-- **B.** X₀₀ = 8 and X₂₂ = 8
-- **C.** X₀₀ = 8, X₁₁ = 4 and X₃₃ = 4
-- **D.** all sixteen, since the pattern has sharp edges
-
-
----
-
 ## The convolution theorem
 
 Convolution in space is **multiplication** in frequency:
@@ -581,18 +559,6 @@ The **histogram** counts pixels by value: nothing about content, a great deal ab
 - **equalization**: map each value v to C(v), the fraction of pixels at or below v; monotone, so brighter stays brighter
 - worked, from the render's cumulative distribution: 0.1 ↦ 0.28, 0.3 ↦ 0.29, 0.5 ↦ 0.71, 0.8 ↦ 0.96; the mean rises from 0.404 to 0.555
 - the black spike cannot be spread: equalization maps **values**, not pixels
-
-
----
-
-## Check: equalizing a two-valued image
-
-Half the pixels are 0.2 and half are 0.8. After histogram equalization the two values are:
-
-- **A.** 0 and 1
-- **B.** 0.5 and 1.0
-- **C.** 0.2 and 0.8, unchanged
-- **D.** 0.25 and 0.75
 
 
 ---
@@ -873,18 +839,6 @@ Downsampling by 4 in each direction, by averaging 4 × 4 blocks:
 
 - add any of those patterns to an image and its downsampled version **does not change**
 - a super-resolution method must choose **one** of the images that downsample to the observation: interpolation picks the smoothest; a learned prior picks one that **looks like a photograph**
-
-
----
-
-## Check: the null space of a 2 × halving
-
-A 256 × 256 **gray** image is halved by averaging each 2 × 2 block. How many dimensions does the observation lose?
-
-- **A.** 16,384
-- **B.** 49,152
-- **C.** 65,536
-- **D.** 196,608
 
 
 ---

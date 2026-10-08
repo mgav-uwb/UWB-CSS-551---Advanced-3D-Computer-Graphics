@@ -1,37 +1,13 @@
 <!--
-  CSS 551 · Lecture 9, discussion (20 min: two peer-instruction questions, the
-  HW4 walk-through) and the wrap. Answers only in the notes. Every number is
-  computed by tools/gen-lecture-figures-c.mjs (l09_q1, l09_q2) or quoted from
-  numbers-pipeline.json.
+  CSS 551 · Lecture 9, the HW4 walk-through and the wrap (~8 min). HW4 numbers are
+  quoted from numbers-pipeline.json and homework/hw04/index.html.
+  CUT 2026-10-08: the two multiple-choice discussion questions (which value is
+  interpolated, perspective-correct u); the freed time goes to the buffer.
 -->
 
-### Discussion
+### HW4, and the wrap
 
-<small>(~20 min)</small>
-
-
----
-
-## Question 1: which value is interpolated?
-
-A counter-clockwise triangle `v0 = (0, 0)`, `v1 = (4, 0)`, `v2 = (0, 4)`. The pixel center `p = (1.5, 0.5)`. A texture coordinate `u` is 0 at v0, **1 at v1**, 0 at v2. What `u` does the rasterizer give this pixel?
-
-- **A.** 0.125
-- **B.** 0.375
-- **C.** 0.500
-- **D.** 1.500
-
-
----
-
-## Question 2: perspective-correct
-
-An edge on the screen runs from A, at depth `w = 2` with `u = 0`, to B, at depth `w = 6` with `u = 1`. At the **screen** midpoint of the edge, what `u` does a correct rasterizer use?
-
-- **A.** 0.250
-- **B.** 0.333
-- **C.** 0.500
-- **D.** 0.750
+<small>(~8 min)</small>
 
 
 ---
@@ -54,5 +30,6 @@ The full specification and the rubric numbers: [HW4](../../homework/hw04/index.h
 
 - Inside is **three edge functions ≥ 0**; the same three numbers, divided by the twice-area, are the **barycentric weights**; attributes are interpolated in **1/w**
 - One sample per pixel **aliases**: a frequency above Nyquist returns as `|f − k·fs|`. Supersample, prefilter, or accumulate over time
+- **Read**: [Rasterization](../../textbook/rasterization.html) and [Sampling and Antialiasing](../../textbook/antialiasing.html)
 - **Due**: HW3 was due yesterday. **Out**: HW4, due Wednesday November 4
 

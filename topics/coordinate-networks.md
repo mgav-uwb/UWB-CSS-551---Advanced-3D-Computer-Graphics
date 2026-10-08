@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Coordinate networks (~27 min, 20 content slides).
+  CSS 551 · TOPIC DECK · Coordinate networks (~27 min, 18 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/coordinate-networks.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -31,6 +31,9 @@
            Rahaman et al., arXiv:1806.08734 (ICML 2019); Mildenhall et al., arXiv:2003.08934;
            Tancik et al., arXiv:2006.10739; Sitzmann et al., arXiv:2006.09661;
            Müller et al., arXiv:2201.05989, DOI 10.1145/3528223.3530127 (ACM TOG 41(4), 102).
+
+  EDIT 2026-10-08: the two multiple-choice Check slides cut (region ranking, the blobs picture); the region
+  table and the exhibit already carry their numbers, and the exhibit's note gains the Fourier-on-blobs point.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -126,18 +129,6 @@ A network trained by gradient descent fits the **low frequencies** of its target
 - a ReLU network is **continuous and piecewise linear** in (x, y): its pieces are large and its derivatives piecewise constant; a 4-pixel checkerboard needs a fold every 4 pixels in both directions
 - in the neural tangent kernel (NTK) analysis, gradient descent shrinks each frequency component of the error at a rate that falls with frequency (Tancik et al. 2020)
 - the same bias is useful elsewhere: it is why networks interpolate smoothly between training examples
-
-
----
-
-## Check: which region does the plain network fit best?
-
-The ReLU network on raw (x, y), 2000 steps on the test card. Rank the regions from best to worst fit.
-
-- **A.** checkerboard, stripes, disc edge, backdrop
-- **B.** backdrop, disc edge, stripes, checkerboard
-- **C.** disc edge, backdrop, checkerboard, stripes
-- **D.** all four within 2 dB of each other
 
 
 ---
@@ -292,18 +283,6 @@ A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv
   PSNR at step 2000 (pauses there): ReLU 11.82, Fourier (σ = 6) 21.21, SIREN (ω₀ = 30) 18.89 dB
   σ = 1: blurred (14.79);  σ = 48: speckled (15.11);  ω₀ = 1: blurred (11.05)
   picture "blobs" (low frequencies only): ReLU 41.54, Fourier 37.83, SIREN 52.30 dB</pre></div>
-
-
----
-
-## Check: the low-frequency picture
-
-The "blobs" picture holds only soft Gaussians over a gradient. After 2000 steps, what does the plain ReLU network on raw (x, y) reach?
-
-- **A.** about 12 dB, as on the test card
-- **B.** about 41 dB, close to the other two
-- **C.** about 21 dB, the Fourier network's test-card score
-- **D.** below 10 dB: ReLU networks cannot fit images
 
 
 ---

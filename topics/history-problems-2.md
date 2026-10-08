@@ -15,8 +15,9 @@
   Reyes; motion capture; physically based animation; volumes; 3D scanning;
   hair and fur; NPR; captured light; consumer hardware; GPU computing;
   physically based materials; path-traced films; real-time rays; who.
-  NUMBERS LEFT FOR THE DISCUSSION (not on the slide faces): the halvings of
-    display-memory price (L02 Q1), the price of one pixel then and now (L02 Q2).
+  EDIT 2026-10-08: the L02 discussion questions were cut; the halvings of display-memory
+    price (about 25 in 50 years) and one pixel then and now (7.9 million times cheaper)
+    are now on the "Display memory" slide.
   SOURCE: planning/history-draft/history-of-graphics.html (v0.5) Sections 4 to
     6, supplements/problems-and-solutions.html; figures/fig-fb-cost.svg.
   IMAGE PATHS: relative to the lecture page: ../../topics/media/history/.
@@ -62,7 +63,7 @@
 
 <div class="figslide"><img src="../../topics/media/history/fig-fb-cost.svg" alt="Frame-buffer memory in 2026 dollars per megabyte on a log scale from 1975 to 2025, red points from the E&S frame buffer at 1.9 million down to the RTX 5090 at 0.061, ordinary DRAM in gray below" style="width: 690px; max-height: 465px;"></div>
 
-<small>In 2026 dollars: the Evans & Sutherland (E&S) frame buffer of 1975 cost **$1.83 a pixel**, $1,914,903 per MB; the RTX 5090 of 2025, 32 GB for $1,999, costs **$0.061 per MB** with its processor.</small>
+<small>In 2026 dollars: the Evans & Sutherland (E&S) frame buffer of 1975 cost **$1.83 a pixel**, $1,914,903 per MB; the RTX 5090 of 2025, 32 GB for $1,999, costs **$0.061 per MB** with its processor: log₂(1,914,903 / 0.061) ≈ **25** halvings in 50 years, one every 2 years; a pixel, 4 bytes now against 1 then, is about **7.9 million** times cheaper.</small>
 
 
 ---

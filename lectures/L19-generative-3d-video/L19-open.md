@@ -4,18 +4,19 @@
 
   COMPOSITION: index.html mounts L19-open.md (title + tonight), then
   ../../topics/generative-3d-video.md (~84 min), then ../../topics/graphics-meets-generative.md
-  (~14 min), then L19-discuss.md (discussion 18 min + wrap).
+  (~14 min), then L19-discuss.md (wrap).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
   never two "_" on one markdown line outside a code fence; no "next time".
 
-  Plan (120 min, Tue 5:45-7:45 PM synchronous online; 80 slides):
+  Plan (120 min, Tue 5:45-7:45 PM synchronous online; 71 slides):
     0:00  Opening                                          2 min
-    0:02  Generative 3D and video, networks, VR (topic, 62 slides)   84 min
+    0:02  Generative 3D and video, networks, VR (topic, 60 slides)   84 min
     1:26  Graphics meets generative models (topic, 8 slides)         14 min
-    1:40  Discussion: six questions                                  18 min
+    1:40  Questions and buffer                                       18 min
     1:58  Wrap                                                        2 min
     2:00  end
+  CUT 2026-10-08: the six discussion questions; their 18 minutes are questions and buffer.
 -->
 
 ## CSS 551

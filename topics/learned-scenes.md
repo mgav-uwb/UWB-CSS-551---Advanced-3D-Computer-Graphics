@@ -27,6 +27,7 @@
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Image and reading paths are relative to the LECTURE page that mounts this
   topic (lectures/LNN-slug/index.html): ../../media/..., ../../textbook/...
+  CUT 2026-10-08: the three multiple-choice Check slides (a jittered coarse sampler, the splat from the side, a PSNR gap); "Why" title renamed.
 -->
 
 ### Learned scenes: NeRF and 3DGS
@@ -121,7 +122,7 @@ The original NeRF network (`run_nerf_helpers.py`), inputs after positional encod
 
 ---
 
-## Why the direction enters late
+## The view direction enters late
 
 ```text
    σ = density(γ(p))                   depends on position only
@@ -358,18 +359,6 @@ A leaf of density 50, 0.02 thick, at `s = 0.61`. Its true opacity is `1 − e^(�
 <img src="../../textbook/figures/ls-thin-surface.svg" class="media-shot" style="max-height: 200px;" alt="the thin slab along the ray with three samplings; both coarse samplings miss it, and the shifted one that hits it overshoots to full opacity">
 
 - coarse sampling does not blur a thin surface: it **misses it or overstates it**, and which depends on where the samples fall, so it **flickers** from ray to ray
-
-
----
-
-## Check: a jittered coarse sampler
-
-The same leaf (density 50, 0.02 thick, at `s = 0.61`). Samples every 0.2 from a random offset in `[0, 0.2)`, drawn anew for every ray. What does the renderer show over many rays?
-
-- **A.** opacity 0.632 on every ray
-- **B.** opacity 0 on nine rays in ten, 1.000 on the tenth
-- **C.** opacity 0.632 on one ray in ten, 0 otherwise
-- **D.** opacity 0.063 on every ray
 
 
 ---
@@ -722,18 +711,6 @@ A leaf looks different from different sides. Each splat stores its color in the 
 
 ---
 
-## Check: the splat from the side
-
-The worked splat's red coefficients are `(2.5, 0, 0.6, −0.4)` on the basis `(0.2821, 0.4886·y, 0.4886·z, 0.4886·x)`. What red value does it show from the side, `d = (1, 0, 0)`?
-
-- **A.** 0.510
-- **B.** 0.901
-- **C.** 0.998
-- **D.** 0.705
-
-
----
-
 ## Training a splat scene
 
 | ingredient | what the paper does |
@@ -943,18 +920,6 @@ Hold out some photographs, render their views, compare:
 ```
 
 - 0.5 dB is a small difference; the benchmark table's gap in **speed** (0.06 against 134 frames per second) is not
-
-
----
-
-## Check: reading a PSNR gap
-
-The same benchmark table (Kerbl et al. 2023) reports Instant-NGP at **25.30 dB** and 3DGS at **27.21 dB**. How much more mean squared error does Instant-NGP have?
-
-- **A.** 1.55 times
-- **B.** 1.91 times
-- **C.** 1.08 times
-- **D.** 1.25 times
 
 
 ---

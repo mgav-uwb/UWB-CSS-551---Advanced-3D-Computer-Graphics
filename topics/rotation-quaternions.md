@@ -12,7 +12,11 @@
   angle, the sandwich verified on one point, quaternion to matrix, the product as composition worked
   against matrices, slerp worked, the double cover and the long way round, drift measured, what Unity
   stores); Euler angles (three conventions give three poses, gimbal lock by the inner axis, extraction
-  at the lock), and why quaternions dodge it.
+  at the lock), and why quaternions have no lock.
+  EDITED 2026-10-08: the check-yourself slide and the duplicate "Six orders, six different rotations" table
+  cut (its note folded into "Euler angles: three turns in a row"); "Why" titles renamed; the two-API slide in
+  Unity/WebGL code tabs; the composed-rotation slide labelled R_x(30)·R_y(30) and qx qy, as on the
+  composition slide; notes no longer cite a homework slerp or shortest-arc exercise (HW2 has neither).
   NEEDS:   the vectors-review topic (projection split, the cross) and the vector-geometry topic ("two vectors, a whole frame"); mount it after them.
   RESEQUENCED 2026-10-05 (L04, after vector-geometry): history table, squad, the matrix-lerp failure and the recap slide removed (squad and the matrix lerp moved to the animation topic; both are in the animation chapter, Sections 4 and 5).
   DEMOS:   data-demo="axis-angle" data-controls="angle" (under the lecture page's 200px crop).
@@ -327,7 +331,7 @@ The step that does not drift: turn by the **quaternion of `ωΔt`** each frame, 
 
 ---
 
-## Why not just store the matrix?
+## The trouble with storing the matrix
 
 Nine numbers, six hidden constraints, where **four** would do. Three problems:
 
@@ -488,7 +492,7 @@ The trace of `R` is `1 + 2 cos θ`, and `w = cos(θ/2)`, so `w` falls out of the
 
 ## Worked: the composed rotation back to four numbers
 
-The product `R_y(30)·R_x(30)` from the composition slide:
+The product `R_x(30)·R_y(30)` from the composition slide (y first, then x):
 
 ```text
    R = [ 0.866   0      0.5   ]      trace = 0.866 + 0.866 + 0.75 = 2.4821
@@ -498,7 +502,7 @@ The product `R_y(30)·R_x(30)` from the composition slide:
                                      z = (0.25 − 0) / 3.7321       = 0.067
 ```
 
-`(0.25, 0.25, 0.067, 0.933)`: the **same** four numbers as the quaternion product `q_y q_x`. Angle `2 acos 0.933 = 42.18°`.
+`(0.25, 0.25, 0.067, 0.933)`: the **same** four numbers as the quaternion product `qx qy`. Angle `2 acos 0.933 = 42.18°`.
 
 
 ---
@@ -603,17 +607,21 @@ You *read* Euler angles in the Inspector, but the engine *stores* a quaternion.
 
 ## The same rotation in two APIs
 
-```js
-// three.js: radians; q1.multiply(q2) is q1·q2 (q2 acts first)
-const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 6);
-const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.5)
-```
+<div class="code-tabs">
 
 ```csharp
 // Unity: degrees; q1 * q2 applies q2 first; q * v rotates a vector
 Quaternion q = Quaternion.AngleAxis(30f, Vector3.up);
 Vector3 p = q * new Vector3(1, 0, 0);                         // (0.866, 0, −0.5)
 ```
+
+```javascript
+// three.js: radians; q1.multiply(q2) is q1·q2 (q2 acts first)
+const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI / 6);
+const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.5)
+```
+
+</div>
 
 Same four numbers `(0, 0.259, 0, 0.966)`, same image of `+x`; **units differ**: radians in three.js, degrees in Unity.
 
@@ -687,21 +695,6 @@ At the lock, `(90°, 45°, 10°)` and `(90°, 60°, 25°)` are the **same orient
 
 ---
 
-## Six orders, six different rotations
-
-The triple `(x, y, z) = (20°, 45°, 10°)`, read in three conventions:
-
-| convention | product | where `+x` lands |
-| --- | --- | --- |
-| Unity (`Z`, then `X`, then `Y`) | `R_y R_x R_z` | (0.738, 0.163, −0.654) |
-| three.js default `XYZ` | `R_x R_y R_z` | (0.696, 0.401, −0.595) |
-| extrinsic `X`, `Y`, `Z` | `R_z R_y R_x` | (0.696, 0.123, −0.707) |
-
-Unity's and three.js's results differ by **15.2°**. An Euler triple means nothing without its order.
-
-
----
-
 ## Two triples, one rotation
 
 ```text
@@ -728,21 +721,11 @@ Three gimbals are three Euler angles in hardware; the fourth gimbal Collins aske
 
 ---
 
-## Why quaternions dodge it
+## Quaternions have no lock
 
 Gimbal lock is a disease of the **representation**, not of rotation itself:
 
 - three sequential angles have singular configurations: the 90° collapse
 - a **quaternion** names axis and angle **directly**: no gimbals to align
 - engines **store** quaternions and only **show** Euler angles for editing
-
-
----
-
-## Check yourself
-
-1. `R` has columns `(0, 1, 0)`, `(−1, 0, 0)`, `(0, 0, 1)`. About which axis, by how much?
-2. `q = (0, 0, 0.707, 0.707)`. Where does `(1, 0, 0)` go?
-3. You slerp from `q` to `−q'`, where `q · q' = 0.5`. How far does the object turn?
-4. Unity reads `transform.eulerAngles = (90, 45, 10)`. Which single number can you change without effect if you also change another?
 

@@ -1,16 +1,21 @@
 <!--
-  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~48 min, 35 slides).
+  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~48 min, 36 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/meshes.md"> among others; no lecture
   logistics, no "Part N" numbering.
 
-  TEACHES: why triangles; a mesh is a vertex array plus an index array; winding
-  picks the front face; the 2×2 grid built by hand (row-major index, the split,
-  all eight triangles); the counts (n+1)², 2n², 6n²; face normals as cross
-  products (flat (0, 2.25, 0), lifted (−0.6, 2.25, −0.6)); averaged vertex normals;
-  flat, Gouraud and Phong shading; editing moves vertices; a surface of
-  revolution as a profile crossed with rotations; degenerate poles; the other
-  diagonal; hard edges split vertices (a cube has 24); OBJ and glTF files.
+  TEACHES: triangles (planar, convex); a mesh is a vertex array plus an index array;
+  winding picks the front face; the 2×2 grid built by hand (row-major index, the
+  split, all eight triangles); the other diagonal; the counts (n+1)², 2n², 6n²; the
+  half-edge structure; Euler's formula as a validator; valence 6; face normals as
+  cross products (flat (0, 2.25, 0), lifted (−0.6, 2.25, −0.6)); Newell's polygon
+  normal; averaged vertex normals; flat, Gouraud and Phong shading; hard edges split
+  vertices (a cube has 24); editing moves vertices; a surface of revolution as a
+  profile crossed with rotations; degenerate poles; edge collapse and the quadric
+  error; a level-of-detail ladder; vertex-cache order; Laplacian and Taubin
+  smoothing; marching cubes; OBJ and glTF files.
+  EDIT 2026-10-08: "Why" titles renamed; notes no longer point at slides that moved
+  or at the retired Plan B studio and machine problems.
   NEEDS:   the vectors topic (cross product); the rotation topic (R_y).
   DEMOS:   data-demo="mesh-grid" data-controls="n,lift" (under the page's crop).
   FIGURES: ../../textbook/figures/mesh-shading-modes.png, mesh-sweep.svg
@@ -33,7 +38,7 @@
 
 ---
 
-## Why triangles
+## Triangles: always planar, always convex
 
 Every real-time surface, a character, a terrain, a car, is a **triangle mesh**. Not squares, not curves: triangles. Two reasons the hardware insists:
 
@@ -261,7 +266,7 @@ The panel prints the three counts and the first two triangles' index triples: th
 
 ---
 
-## Why a mesh needs normals
+## Normals: which way the surface faces
 
 Positions give a surface its **shape**; they say nothing about which way it **faces**. Lighting needs the facing direction, the **normal**, at every point:
 

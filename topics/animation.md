@@ -11,7 +11,7 @@
   wrap pitfall, squad through several keys; interpolating TRS parts and rebuilding;
   skeletons as scene graphs, forward kinematics, two-link inverse kinematics (both
   branches, unreachable targets), iterative IK; the bind pose and linear blend skinning,
-  one vertex worked, the candy wrapper, skinning on the GPU in both tracks, blend shapes;
+  one vertex worked, the candy wrapper, skinning on the GPU (GLSL, with each engine's names), blend shapes;
   motion capture, retargeting, blend trees.
   NEEDS:   the rotation topic (quaternions, slerp, the q and -q sign check), the affine
     topic (TRS, the rigid inverse), the scene-graph topic (the composite rule).
@@ -34,6 +34,7 @@
       against 0.18 m forward; copying positions stretches the thigh by 25 %
     - motion capture: 60 joints x 3 rotation channels x 120 frames per second = 21,600 keys per second
   READING: ../../textbook/animation.html, Sections 1 to 7 and 11.
+  EDIT 2026-10-08: the easing code slide in Unity/WebGL code tabs.
 
   reveal.js: FLAT; notes follow "Note:"; plain text math, no KaTeX; never two
   "_" on one markdown line outside a code fence; paths relative to the lecture page.
@@ -210,21 +211,23 @@ An **easing function** s(t) maps normalized time to normalized progress; the pos
 
 ## Real code: easing and keys, both tracks
 
+<div class="code-tabs">
+
 ```csharp
-// Unity
 float s = Mathf.SmoothStep(0f, 1f, 0.35f);                         // 0.28175
 var curve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);               // flat tangents
 float s2 = curve.Evaluate(0.35f);                                   // 0.28175
 transform.rotation = Quaternion.Slerp(qa, qb, s);                   // eased slerp
 ```
 
-```js
-// three.js
+```javascript
 const s = THREE.MathUtils.smoothstep(0.35, 0, 1);                   // 0.28175
 const track = new THREE.VectorKeyframeTrack('.position', [0, 0.5, 1],
   [-2.2, 0.5, 0,  0, 1.9, -0.6,  2.2, 0.7, 0]);                     // linear by default
 mesh.quaternion.slerpQuaternions(qa, qb, s);
 ```
+
+</div>
 
 
 ---

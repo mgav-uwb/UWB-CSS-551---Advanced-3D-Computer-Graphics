@@ -20,6 +20,8 @@
   figures, the normal transform (taught in the affine topic), the shininess table,
   four models in eleven years, the nine-number sky, the uniform sky, the light-types
   figure, the second light, tone mapping a real scene).
+  EDIT 2026-10-08: slide titles and text without editorializing ("honest scope", "confession
+  term", "sanity check", "a point is a lie") and without a title starting "why".
   Derived from the Plan B single-file deck sessions/S09-illumination (retired);
   the studio logistics, the light-to-shader globals slide and the CDP plan are gone.
 
@@ -69,14 +71,14 @@ Shading is a function of the **angles** between these three: the whole geometry 
 
 ---
 
-## Local illumination: honest scope
+## Local illumination: what it covers
 
 This model shades each point using **only** the lights, the normal, and the eye: **never** the other surfaces in the scene. That buys enormous speed, and it costs realism:
 
 - **captured**: direct light on a point: matte shading, highlights, per-light falloff
 - **ignored**: light **bouncing** between surfaces: color bleeding, soft shadows, mirror reflections of the room, a surface lighting its neighbor
 
-A red wall next to a white one does not tint the white one here: that needs light **bounces**, a far larger computation and **its own subject**. This topic buys speed with the local assumption, and it is enough for a huge amount of convincing shading.
+A red wall next to a white one does not tint the white one here: that needs light **bounces**, a far larger computation and **its own subject**. The local assumption trades bounced light for speed, and covers most real-time shading.
 
 
 ---
@@ -90,7 +92,7 @@ The **Phong** model sums **three** terms at each point, built one at a time belo
               (constant)      (matte, on N·L)      (glint, on R·V)
 ```
 
-- **ambient**: a constant fill so shadows are not pure black (the confession term)
+- **ambient**: a constant fill so shadows are not pure black
 - **diffuse**: matte: bright facing the light, dark facing away (next)
 - **specular**: the sharp highlight where the surface mirrors the light to your eye (after that)
 
@@ -259,7 +261,7 @@ The panel reads **`N·L`**, **`R·V`**, **`diffuse`**, and **`specular`**: all c
 
 ---
 
-## Sanity check: light behind → dark
+## Light behind: the clamp gives 0
 
 Swing the light to the **far** side, azimuth 225°, elevation −30°, and the marked point now faces **away** from it:
 
@@ -269,7 +271,7 @@ Swing the light to the **far** side, azimuth 225°, elevation −30°, and the m
    diffuse  = max(0, −0.998) = 0.000
 ```
 
-The clamp earns its keep: `N·L` is almost `−1` (the point faces directly **away**), so the diffuse term is exactly **0**, the marked point is in **shadow-from-facing**, and the sphere's near side goes dark. This is the honest behavior of `max(0, N·L)`, and the demo shows it the instant the light passes behind.
+`N·L` is almost `−1` (the point faces directly **away**), so the clamp makes the diffuse term exactly **0**: the marked point is unlit, and the sphere's near side goes dark the instant the light passes behind it in the demo.
 
 
 ---
@@ -348,7 +350,7 @@ A raw cosine `R·V` gives a highlight **too broad** for a shiny surface. Raise i
 
 ---
 
-## Honest note: the demo renders Blinn, not Phong
+## The demo renders Blinn, not Phong
 
 The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial` shades with **Blinn's** variant: the **half-vector** `H = normalize(L + V)`, dotted with the **normal**:
 
@@ -359,7 +361,7 @@ The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial
 ```
 
 - `H·N = 1` exactly when `R·V = 1`, so the highlight sits in the **same place**
-- not numerically equal (Blinn needs a **larger** exponent), but they **peak together**: qualitative agreement is the point, stated honestly on the demo
+- not numerically equal (Blinn needs a **larger** exponent), but they **peak together**: the highlight agrees in place, not in value
 
 
 ---
@@ -407,9 +409,9 @@ Per pixel costs **7 times** more here and is universal now. Per-vertex lighting 
 
 ---
 
-## Ambient: the confession term
+## Ambient: a constant for bounced light
 
-Diffuse and specular go to **0** where no light directly reaches: but real shadows are never **pure black**, because bounced light fills them. The local model **confesses** with a single constant:
+Diffuse and specular go to **0** where no light directly reaches: but real shadows are never **pure black**, because bounced light fills them. The local model stands in for it with a single constant:
 
 ```text
    ambient  =  k_a · ambientColor            (same everywhere, no direction)
@@ -419,7 +421,7 @@ Diffuse and specular go to **0** where no light directly reaches: but real shado
 ```
 
 - a **constant** floor on every point, lit or not: so shadows read as **dark**, not **void**
-- a **fudge**: a stand-in for the bounced light this model will not trace (too high → flat; too low → inky)
+- a **stand-in** for the bounced light this model will not trace (too high → flat; too low → inky)
 
 That is the whole **Phong sum**: three terms, added up.
 
@@ -478,7 +480,7 @@ A point or spot light gets **dimmer** with distance. Light spreads over a sphere
    practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadratic)
 ```
 
-- **inverse-square** is the honest physics: double the distance, **quarter** the brightness
+- **inverse-square** is the physical law: double the distance, **quarter** the brightness
 - the **polynomial** form tunes the falloff; `kc` avoids a divide-by-zero at `d = 0`; a hard **cutoff** radius (Sung's `Near`/`Far`) makes distant lights free
 
 Multiply the light's intensity by the attenuation before the Phong sum.
@@ -551,7 +553,7 @@ One surface, several lights? The reflection model is **linear** in the lights, s
 
 - each light `i` contributes its **own** `diffuse_i` (its `N·L_i`) and `specular_i` (its `R_i·V`), with its own color and attenuation
 - **ambient** is added **once** (it is the scene fill, not per-light)
-- more lights ⇒ more terms ⇒ more cost: the honest reason real-time budgets **cap** the light count per object
+- more lights ⇒ more terms ⇒ more cost: the reason real-time budgets **cap** the light count per object
 
 Three dot products per light, summed. That is the entire local lighting model, end to end.
 
@@ -574,7 +576,7 @@ A 1080p frame, overdraw 3, 32 lights:
 ---
 
 
-## Area lights: a point is a lie up close
+## Area lights: a point fails up close
 
 <img src="../../textbook/figures/ill-area-light.svg" class="media-shot" style="max-height: 200px;" alt="irradiance under a disc light of radius 0.5 as a function of height, compared with a point light of the same power">
 
@@ -656,7 +658,7 @@ Only the linear blend matches what the eye averages.
 ---
 
 
-## The sRGB curve: why codes are not light
+## The sRGB curve: codes are not light
 
 <img src="../../textbook/figures/col-transfer.svg" class="media-shot" style="max-height: 210px;" alt="the sRGB transfer function mapping code values to linear light, with code 128 marked at 0.216">
 
