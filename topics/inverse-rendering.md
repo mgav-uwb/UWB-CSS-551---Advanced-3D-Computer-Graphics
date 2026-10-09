@@ -236,7 +236,7 @@ Inverse rendering fails uniqueness routinely and continuity often.
 
 ---
 
-<!-- .slide: class="demo-full" -->
+<!-- .slide: class="demo-full demo-rail-2col" -->
 
 ## Inverse rendering, live
 

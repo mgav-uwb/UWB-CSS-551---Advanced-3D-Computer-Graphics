@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 370 210" width="370" height="210" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="14" fill="#2d2640">
+<polygon points="40,170 330,170 215,35" fill="#eef8ff" stroke="#2d2640" stroke-width="2"/>
+<path d="M70 170 A30 30 0 0 0 63.75 151.68" fill="none" stroke="#c2457e" stroke-width="2"/>
+<text x="81.65" y="160.8" text-anchor="middle" fill="#c2457e" font-weight="700" font-size="16">α</text>
+<path d="M310.55 147.16 A30 30 0 0 0 300 170" fill="none" stroke="#c2457e" stroke-width="2"/>
+<text x="290.05" y="156.55" text-anchor="middle" fill="#c2457e" font-weight="700" font-size="16">β</text>
+<path d="M196 49.66 A24 24 0 0 0 230.56 53.27" fill="none" stroke="#c2457e" stroke-width="2"/>
+<text x="211.05" y="77.79" text-anchor="middle" fill="#c2457e" font-weight="700" font-size="16">γ</text>
+<text x="288.5" y="102.5" text-anchor="middle" fill="#23699a" font-weight="700" font-style="italic" font-size="17">a</text>
+<text x="113.5" y="96.5" text-anchor="middle" fill="#23699a" font-weight="700" font-style="italic" font-size="17">b</text>
+<text x="185" y="194" text-anchor="middle" fill="#23699a" font-weight="700" font-style="italic" font-size="17">c</text>
+<text x="26" y="176" text-anchor="end" fill="#6c6584">A</text>
+<text x="340" y="176" fill="#6c6584">B</text>
+<text x="215" y="25" text-anchor="middle" fill="#6c6584">C</text>
+</svg>

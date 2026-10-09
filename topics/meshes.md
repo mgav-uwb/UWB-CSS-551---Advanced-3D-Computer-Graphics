@@ -247,6 +247,8 @@ The panel prints the three counts and the first two triangles' index triples: th
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## The mesh, live
 
 <div class="cockpit" data-demo="mesh-grid" data-controls="n,lift"><pre class="viz-fallback">  model {n, lift} → (n+1)² verts + 6n² indices built BY HAND → GPU

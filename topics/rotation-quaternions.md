@@ -231,9 +231,9 @@ R = [ 0 0 1 ]      x -> y,   y -> z,   z -> x         R (1,1,1) = (1,1,1): the a
 
 ---
 
-## Axis-angle, live
+<!-- .slide: class="demo-full" -->
 
-One **model** `{axX, axY, axZ, angle}` drives the spun cube and the `R`/`q` panel; with the **angle** slider the axis stays at `(0, 1, 0)`, pure `R_y`.
+## Axis-angle, live
 
 <div class="cockpit" data-demo="axis-angle" data-controls="angle"><pre class="viz-fallback">  model {axX,axY,axZ, angle} -> spun cube + R/q panel, one model
   -- default: axis (0,1,0), angle 30 deg ------------------

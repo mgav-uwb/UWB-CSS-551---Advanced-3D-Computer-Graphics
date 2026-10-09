@@ -210,6 +210,8 @@ One pass, fixed cost, works with deferred shading. It cannot recover what was ne
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## Supersampling, live
 
 <div class="cockpit" data-demo="raster" data-controls="aa,angle"><pre class="viz-fallback">  the same triangle at res = 12; aa = samples per pixel axis

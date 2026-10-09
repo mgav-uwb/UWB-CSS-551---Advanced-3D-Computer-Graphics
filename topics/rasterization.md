@@ -210,6 +210,8 @@ Join p to the three corners: three small triangles. Each weight is the area of t
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## The triangle, live
 
 <div class="cockpit" data-demo="raster" data-controls="res,angle"><pre class="viz-fallback">  one triangle (red, green, blue corners) over a res × res framebuffer;

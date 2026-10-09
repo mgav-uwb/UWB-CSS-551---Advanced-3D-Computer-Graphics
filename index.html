@@ -287,10 +287,14 @@ const QUICKLINKS = [
   { href:"#demos", emo:"🎛️", title:"Demos", desc:"every interactive demo" },
   { href:"glossary/index.html", emo:"🔤", title:"Glossary", desc:"244 terms, linked to the text and lectures" },
   { href:"people/index.html", emo:"🧑‍🔬", title:"People", desc:"212 people and 115 organizations of graphics history" },
+  { href:"reference/trig-cheat-sheet.html", emo:"📐", title:"Trig cheat sheet", desc:"identities, inverse functions, triangle laws, unit circle" },
 ];
 
 // ───────── course-wide handouts & references (keyed; attach per session) ─────────
 const HANDOUTS = {
+  trig:     { href:"reference/trig-cheat-sheet.html",
+              title:"Reference · Trigonometry Cheat Sheet",
+              desc:"definitions; identities; inverse functions and atan2; laws of sines, cosines, tangents; graphics uses; the unit circle" },
   vectors:  { href:"textbook/vectors.html",
               title:"Text · Vectors",
               desc:"dot and cross products worked on one pair; lines, segments, planes and signed distance" },
@@ -464,9 +468,9 @@ const WEEKS = [
   { id:"W1",  title:"The Big Picture", tue:null, thu:"L01", hw:null, quiz:null,
     handouts:["history","unity","webgl"], demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map"] },
   { id:"W2",  title:"The Big Picture; building blocks: vectors, MVC, the loop", tue:"L02", thu:"L03", hw:HW(1), quiz:null,
-    handouts:["history","vectors","interaction","unity","webgl"], demos:["dot-cross","mvc-transform"] },
+    handouts:["history","vectors","trig","interaction","unity","webgl"], demos:["dot-cross","mvc-transform"] },
   { id:"W3",  title:"Rotation and affine transformations", tue:"L04", thu:"L05", hw:HW(2), quiz:"Q1",
-    handouts:["vectors","rotation","affine"], demos:["axis-angle","trs-order"] },
+    handouts:["vectors","rotation","affine","trig"], demos:["axis-angle","trs-order"] },
   { id:"W4",  title:"Meshes and scene graphs", tue:"L06", thu:"L07", hw:HW(3), quiz:"Q2",
     handouts:["meshes","textures","scenegraphs"], demos:["mesh-grid","uv-placement","fur","simplify-compare","scene-graph"] },
   { id:"W5",  title:"Viewing, rasterization, antialiasing", tue:"L08", thu:"L09", hw:HW(4), quiz:"Q3",

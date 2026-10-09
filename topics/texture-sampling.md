@@ -186,6 +186,8 @@ A texture can store not a color but a **height** `h(u, v)`. Its slope tilts the 
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## Bump mapping, live
 
 <div class="cockpit" data-demo="bump-map" data-controls="bump,lightAz"><pre class="viz-fallback">  a flat brick wall: one quad, two triangles, one orbiting point light

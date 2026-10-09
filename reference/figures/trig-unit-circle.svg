@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 600" width="640" height="600" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="14" fill="#2d2640">
+<rect width="640" height="600" fill="none"/>
+<line x1="105" y1="300" x2="535" y2="300" stroke="#6c6584" stroke-width="1.2" />
+<line x1="320" y1="85" x2="320" y2="515" stroke="#6c6584" stroke-width="1.2" />
+<text x="539" y="305" fill="#6c6584" font-style="italic">x</text>
+<text x="326" y="83" fill="#6c6584" font-style="italic">y</text>
+<circle cx="320" cy="300" r="175" fill="none" stroke="#7a58d6" stroke-width="2.2"/>
+<line x1="320" y1="300" x2="495" y2="300" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="495" cy="300" r="4" fill="#7a58d6"/>
+<text x="507" y="294" text-anchor="start" font-size="13.5">(1, 0)</text>
+<text x="465" y="305" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">0</text>
+<text x="433" y="304" text-anchor="middle" fill="#23699a" font-size="12">0°</text>
+<line x1="320" y1="300" x2="471.55" y2="212.5" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="471.55" cy="212.5" r="4" fill="#7a58d6"/>
+<text x="481.95" y="204.5" text-anchor="start" font-size="13.5">(√3/2, 1/2)</text>
+<text x="445.57" y="232.5" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">π/6</text>
+<text x="417.86" y="247.5" text-anchor="middle" fill="#23699a" font-size="12">30°</text>
+<line x1="320" y1="300" x2="443.74" y2="176.26" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="443.74" cy="176.26" r="4" fill="#7a58d6"/>
+<text x="452.23" y="165.77" text-anchor="start" font-size="13.5">(√2/2, √2/2)</text>
+<text x="422.53" y="202.47" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">π/4</text>
+<text x="399.9" y="224.1" text-anchor="middle" fill="#23699a" font-size="12">45°</text>
+<line x1="320" y1="300" x2="407.5" y2="148.45" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="407.5" cy="148.45" r="4" fill="#7a58d6"/>
+<text x="413.5" y="136.05" text-anchor="start" font-size="13.5">(1/2, √3/2)</text>
+<text x="392.5" y="179.43" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">π/3</text>
+<text x="376.5" y="206.14" text-anchor="middle" fill="#23699a" font-size="12">60°</text>
+<line x1="320" y1="300" x2="320" y2="125" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="320" cy="125" r="4" fill="#7a58d6"/>
+<text x="328" y="105" text-anchor="start" font-size="13.5">(0, 1)</text>
+<text x="320" y="160" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">π/2</text>
+<text x="320" y="191" text-anchor="middle" fill="#23699a" font-size="12">90°</text>
+<line x1="320" y1="300" x2="232.5" y2="148.45" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="232.5" cy="148.45" r="4" fill="#7a58d6"/>
+<text x="226.5" y="136.05" text-anchor="end" font-size="13.5">(−1/2, √3/2)</text>
+<text x="247.5" y="179.43" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">2π/3</text>
+<text x="263.5" y="206.14" text-anchor="middle" fill="#23699a" font-size="12">120°</text>
+<line x1="320" y1="300" x2="196.26" y2="176.26" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="196.26" cy="176.26" r="4" fill="#7a58d6"/>
+<text x="187.77" y="165.77" text-anchor="end" font-size="13.5">(−√2/2, √2/2)</text>
+<text x="217.47" y="202.47" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">3π/4</text>
+<text x="240.1" y="224.1" text-anchor="middle" fill="#23699a" font-size="12">135°</text>
+<line x1="320" y1="300" x2="168.45" y2="212.5" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="168.45" cy="212.5" r="4" fill="#7a58d6"/>
+<text x="158.05" y="204.5" text-anchor="end" font-size="13.5">(−√3/2, 1/2)</text>
+<text x="194.43" y="232.5" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">5π/6</text>
+<text x="222.14" y="247.5" text-anchor="middle" fill="#23699a" font-size="12">150°</text>
+<line x1="320" y1="300" x2="145" y2="300" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="145" cy="300" r="4" fill="#7a58d6"/>
+<text x="133" y="294" text-anchor="end" font-size="13.5">(−1, 0)</text>
+<text x="175" y="305" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">π</text>
+<text x="207" y="304" text-anchor="middle" fill="#23699a" font-size="12">180°</text>
+<line x1="320" y1="300" x2="168.45" y2="387.5" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="168.45" cy="387.5" r="4" fill="#7a58d6"/>
+<text x="158.05" y="407.5" text-anchor="end" font-size="13.5">(−√3/2, −1/2)</text>
+<text x="194.43" y="377.5" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">7π/6</text>
+<text x="222.14" y="360.5" text-anchor="middle" fill="#23699a" font-size="12">210°</text>
+<line x1="320" y1="300" x2="196.26" y2="423.74" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="196.26" cy="423.74" r="4" fill="#7a58d6"/>
+<text x="187.77" y="446.23" text-anchor="end" font-size="13.5">(−√2/2, −√2/2)</text>
+<text x="217.47" y="407.53" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">5π/4</text>
+<text x="240.1" y="383.9" text-anchor="middle" fill="#23699a" font-size="12">225°</text>
+<line x1="320" y1="300" x2="232.5" y2="451.55" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="232.5" cy="451.55" r="4" fill="#7a58d6"/>
+<text x="226.5" y="475.95" text-anchor="end" font-size="13.5">(−1/2, −√3/2)</text>
+<text x="247.5" y="430.57" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">4π/3</text>
+<text x="263.5" y="401.86" text-anchor="middle" fill="#23699a" font-size="12">240°</text>
+<line x1="320" y1="300" x2="320" y2="475" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="320" cy="475" r="4" fill="#7a58d6"/>
+<text x="328" y="507" text-anchor="start" font-size="13.5">(0, −1)</text>
+<text x="320" y="450" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">3π/2</text>
+<text x="320" y="417" text-anchor="middle" fill="#23699a" font-size="12">270°</text>
+<line x1="320" y1="300" x2="407.5" y2="451.55" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="407.5" cy="451.55" r="4" fill="#7a58d6"/>
+<text x="413.5" y="475.95" text-anchor="start" font-size="13.5">(1/2, −√3/2)</text>
+<text x="392.5" y="430.57" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">5π/3</text>
+<text x="376.5" y="401.86" text-anchor="middle" fill="#23699a" font-size="12">300°</text>
+<line x1="320" y1="300" x2="443.74" y2="423.74" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="443.74" cy="423.74" r="4" fill="#7a58d6"/>
+<text x="452.23" y="446.23" text-anchor="start" font-size="13.5">(√2/2, −√2/2)</text>
+<text x="422.53" y="407.53" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">7π/4</text>
+<text x="399.9" y="383.9" text-anchor="middle" fill="#23699a" font-size="12">315°</text>
+<line x1="320" y1="300" x2="471.55" y2="387.5" stroke="#d9cdf3" stroke-width="1" />
+<circle cx="471.55" cy="387.5" r="4" fill="#7a58d6"/>
+<text x="481.95" y="407.5" text-anchor="start" font-size="13.5">(√3/2, −1/2)</text>
+<text x="445.57" y="377.5" text-anchor="middle" fill="#c2457e" font-weight="600" font-size="13.5">11π/6</text>
+<text x="417.86" y="360.5" text-anchor="middle" fill="#23699a" font-size="12">330°</text>
+</svg>

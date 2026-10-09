@@ -247,6 +247,8 @@ A box spans `y ∈ [−1, 1]` about its origin. Hinge it by **30°** about its *
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## Base-arm-hand, live
 
 <div class="cockpit" data-demo="scene-graph" data-controls="baseRy,armBend"><pre class="viz-fallback">  model {baseRy, armBend} -> W_base, W_arm, W_hand through the chain

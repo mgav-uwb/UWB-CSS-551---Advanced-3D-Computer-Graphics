@@ -301,9 +301,9 @@ The scale **stretches the translation** when it acts second. Same lesson as `T·
 
 ---
 
-## Order, live
+<!-- .slide: class="demo-full demo-rail-2col" -->
 
-One **model** `{tx, ry}` builds two cubes from the same `T` and `R`, multiplied in opposite orders: **left** is `T·R` (spins in place, slides over), **right** is `R·T` (sweeps an arc). The panels print both products; compare **column 3**.
+## Order, live
 
 <div class="cockpit" data-demo="trs-order" data-controls="tx,ry"><pre class="viz-fallback">  model {tx, ry} -> two cubes: left T·R, right R·T (same factors, opposite order)
   -- default: tx = 1.5, ry = 60 deg -----------------------

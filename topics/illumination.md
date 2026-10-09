@@ -248,6 +248,8 @@ The panel reads **`N·L`**, **`R·V`**, **`diffuse`**, and **`specular`**: all c
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## The lighting, live
 
 <div class="cockpit" data-demo="illumination" data-controls="lightAz,shine"><pre class="viz-fallback">  one sphere (r = 1.2), one orbiting point light, one marked point n = normalize(1,1,1)

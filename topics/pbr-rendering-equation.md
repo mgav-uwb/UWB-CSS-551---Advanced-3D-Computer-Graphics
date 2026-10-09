@@ -604,6 +604,8 @@ Same roughness, **different** lobe: GGX has a **narrower core** (and, in a full 
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## The lobe, live
 
 <div class="cockpit" data-demo="brdf-lobe" data-controls="roughness"><pre class="viz-fallback">  our Cornell scene, wearing ONE BRDF: gold metal teapot + aluminum box,

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 370 200" width="370" height="200" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" font-size="14" fill="#2d2640">
+<polygon points="30,160 260,160 260,30" fill="#f3eeff" stroke="#2d2640" stroke-width="2"/>
+<polyline points="246,160 246,146 260,146" fill="none" stroke="#2d2640" stroke-width="1.4"/>
+<path d="M74 160 A44 44 0 0 0 68.3 138.35" fill="none" stroke="#c2457e" stroke-width="2"/>
+<text x="82" y="151" fill="#c2457e" font-weight="700" font-size="16">θ</text>
+<text x="145" y="182" text-anchor="middle" fill="#1c8766" font-weight="600">adjacent</text>
+<text x="268" y="100" fill="#23699a" font-weight="600">opposite</text>
+<text x="131" y="85" text-anchor="middle" fill="#7a58d6" font-weight="600" transform="rotate(-29.48 131 85)">hypotenuse</text>
+</svg>

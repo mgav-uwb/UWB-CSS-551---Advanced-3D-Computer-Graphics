@@ -120,9 +120,9 @@ Each cross is **perpendicular** to its inputs, so `u`, `v`, `w` come out **ortho
 
 ---
 
-## The camera, live
+<!-- .slide: class="demo-full" -->
 
-The `view-matrix` demo: the model `{az, el, dist}` places the eye on a sphere around `at = (0, 0.5, 0)` and rebuilds `w`, `u`, `v`; the panel prints `V`.
+## The camera, live
 
 <div class="cockpit" data-demo="view-matrix" data-controls="az,el,dist"><pre class="viz-fallback">  model {az, el, dist} → eye on a sphere → w,u,v via cross products → V
   -- default: az = 35°, el = 20°, dist = 7  (at = (0, 0.5, 0), up = (0,1,0)) --
@@ -450,6 +450,8 @@ Check at `n = 1`, `F = 8`: `A = 9/(−7) = −1.2857`, `B = 16/(−7) = −2.285
 
 
 ---
+
+<!-- .slide: class="demo-full" -->
 
 ## The frustum, live
 
