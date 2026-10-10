@@ -11,15 +11,16 @@
   dot product's two definitions, derived through the law of cosines; the angle, worked and in code in
   both tracks (code tabs); projection (the along and across split) with two checks; the sign test; the
   cross product by components, the right-hand rule, the algebra rules (in its notes), the length as an
-  area; the 2D perp-dot product (line intersection in its notes) and polygon area (the pentagon of the
-  2D hit test); a face normal and its winding; the triple product as volume and handedness; Unity's
+  area; the 2D perp-dot product (line intersection in its notes); a face normal and its winding;
+  polygon area on a 3 by 2 rectangle (q inside, q outside, then 3D with a pyramid); the triple product as volume and handedness; Unity's
   and three.js's Vector3 with their traps.
   EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
            from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
   REORDERED 2026-10-10: the face normal comes before polygon area; the 2D area slide (half the sum of the
   perp-dots) is followed by a 3D one (vecr-polygon-area-3d.svg: the summed crosses are 2·Area times the
-  normal, the same from an off-plane reference point; Newell's normal in its notes); 3D slide rebuilt
-  the same day: a fresh planar pentagon, a point off its plane, the crosses tip to tail, the sum dotted with n.
+  normal, the same from an off-plane reference point; Newell's normal in its notes); rebuilt the same
+  day on a 3 by 2 rectangle: q inside (vecr-rect-area-in.svg), q outside with a negative cross
+  (vecr-rect-area-out.svg), and the pyramid on the rectangle lifted to z = 2 (vecr-polygon-area-3d.svg).
   REORDERED 2026-10-08: "The dot product and the cross product" introduces both before the history slide;
            dot-product slide titles name it.
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
@@ -373,24 +374,34 @@ if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen si
 
 ---
 
-## The area of a 2D polygon: half the sum of the crosses
+## The area of a 2D polygon: sum the crosses
 
-<img src="../../textbook/figures/vecr-polygon-area.svg" alt="The pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5) with a triangle from the origin to each edge, blue triangles adding and red ones subtracting, summing to 16.875" style="height:310px">
+<img src="../../textbook/figures/vecr-rect-area-in.svg" alt="The 3 by 2 rectangle with thick edges and a point q = (1, 1) inside. For each edge, thin solid lines from q to the edge's two corners and dotted lines completing the parallelogram outside the edge. The four parallelograms have areas +3, +4, +3, +2, summing to 12, twice the area 6" style="height:330px">
 
-`2·Area = Σ p_i ⊥ p_next`: each cross is twice its triangle, so the figure halves each term
+- for each edge: `(p_i − q) ⊥ (p_next − q)` is the parallelogram on q and that edge
+- `Σ (p_i − q) ⊥ (p_next − q) = 2 · Area`, here 12
 
-The sign tells the winding: **positive** counterclockwise, **negative** clockwise.
+
+---
+
+## Outside, some crosses are negative
+
+<img src="../../textbook/figures/vecr-rect-area-out.svg" alt="The same rectangle with q = (4, 1) outside it, to the right. The parallelograms for the bottom, top and left edges are positive, +3, +3, +8; the right edge's is negative, -2, shaded red; the sum is still 12" style="height:300px">
+
+- q on the outer side of an edge: the corners turn clockwise, the cross is **negative**
+- the negative parts cancel what the positive ones cover outside the polygon
+- the sum is 12 for **any** q
 
 
 ---
 
 ## The area of a 3D polygon
 
-<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="Left: a planar pentagon in 3D, a point o off its plane joined to every edge by a tilted triangle, and each triangle's cross product drawn as an arrow normal to it. Middle: the five crosses added tip to tail; the sum lands on the polygon's normal line. Right: the five crosses (3, -3, 6), (7, -4, 5), (3, 6, -3), (-1, 7, -2), (-6, 6, 6) with dot products 3, 3, 3, 3, 6 with the unit normal; the sum (6, 12, 12) dotted with n is 18, twice the area 9" style="height:335px">
+<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="Left: the 3 by 2 rectangle at z = 2 and the pyramid it forms with P = (1, 1, 5), each side face's cross product drawn as an arrow normal to the face. Middle: the side faces projected onto the rectangle, triangles from P's foot (1, 1, 2) with areas 1.5, 2, 1.5, 1. Right: the crosses (0, -9, 3), (6, 0, 4), (0, 9, 3), (-6, 0, 2), their lengths, and their dot products with n = (0, 0, 1): 3, 4, 3, 2; the sum (0, 0, 12) dotted with n is 12, twice the area 6" style="height:335px">
 
-- polygon planar, unit normal **n**; o any point, here off the plane
-- each cross `(p_i − o) × (p_next − o)` is normal to its own triangle
-- `(Σ crosses) · n = 2 · Area`
+- each cross `(p_i − P) × (p_next − P)` is twice a side face, normal to it
+- `· n` projects the face onto the rectangle: twice its shadow
+- `(Σ crosses) · n = 2 · Area = 12`
 
 
 ---
