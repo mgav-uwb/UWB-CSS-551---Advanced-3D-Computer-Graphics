@@ -6,7 +6,8 @@
   loop); the frame loop; who owns it (inversion of control, never block); the smallest loop in
   each track; one frame in order (Unity's player loop against the browser's); continuous versus
   on-demand loops; events against polling (held keys); the budget at 30 to 144 Hz;
-  per-frame versus per-second motion (deltaTime); the two clocks and the fixed-timestep
+  per-frame versus per-second motion (deltaTime); what the accumulator is for (stability, determinism; Unity
+  runs it, WebGL writes it); the two clocks and the fixed-timestep
   accumulator, worked and in code; interpolation between steps; two time pitfalls (per-frame
   damping, the hitch and the tunnel); a tool without a model (the tangle, predicted), MVC defined,
   the same tool untangled (WithoutNotify, the focused box), why split this way, MVC's origin
@@ -246,6 +247,20 @@ Everything, input, simulation, drawing and the operating system, shares one row.
 <img src="../../textbook/figures/unity-deltatime.svg" alt="Distance moved after one second at 60, 30 and 144 frames per second: the per-frame form moves 60, 30 and 144 units; the per-second form moves 3 units at every rate" style="max-height: 300px; width: auto;">
 
 `p.x += 1` moves **60, 30 or 144** units in a second, depending on the machine. `p.x += 3 * dt` moves 0.05, 0.1 or 0.0208 per frame and **3 units** after one second on all three.
+
+
+---
+
+## A fixed step from uneven frames: the accumulator
+
+A **simulation** needs every step the same size:
+
+- **stability**: an integrator blows up past a step limit, and a slow frame passes it
+- **determinism**: same inputs, same states, on every machine and every run
+
+The **accumulator** holds the real time not yet simulated. Each frame adds its duration, runs every whole fixed step that fits, and carries the rest.
+
+Unity runs it in the engine and calls **FixedUpdate** once per step; a WebGL page writes it itself.
 
 
 ---
