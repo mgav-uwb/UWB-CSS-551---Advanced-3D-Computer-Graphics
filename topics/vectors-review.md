@@ -18,7 +18,8 @@
            from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
   REORDERED 2026-10-10: the face normal comes before polygon area; the 2D area slide (half the sum of the
   perp-dots) is followed by a 3D one (vecr-polygon-area-3d.svg: the summed crosses are 2·Area times the
-  normal, the same from an off-plane reference point; Newell's normal in its notes).
+  normal, the same from an off-plane reference point; Newell's normal in its notes); 3D slide rebuilt
+  the same day: a fresh planar pentagon, a point off its plane, the crosses tip to tail, the sum dotted with n.
   REORDERED 2026-10-08: "The dot product and the cross product" introduces both before the history slide;
            dot-product slide titles name it.
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
@@ -383,15 +384,13 @@ The sign tells the winding: **positive** counterclockwise, **negative** clockwis
 
 ---
 
-## The area of a 3D polygon: the same sum, a vector
+## The area of a 3D polygon
 
-<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="The pentagon of the previous slide rotated about the x axis into a tilted plane, with dashed triangles from a reference point o 6.2 units off the plane, and the unit normal (0, 0.8, 0.6). The summed crosses from the origin and from o are both (0, 27, 20.25), length 33.75, so the area is 16.875" style="height:280px">
+<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="Left: a planar pentagon in 3D, a point o off its plane joined to every edge by a tilted triangle, and each triangle's cross product drawn as an arrow normal to it. Middle: the five crosses added tip to tail; the sum lands on the polygon's normal line. Right: the five crosses (3, -3, 6), (7, -4, 5), (3, 6, -3), (-1, 7, -2), (-6, 6, 6) with dot products 3, 3, 3, 3, 6 with the unit normal; the sum (6, 12, 12) dotted with n is 18, twice the area 9" style="height:335px">
 
-`Σ (p_i − o) × (p_next − o) = 2·Area · n`
-
-- the **vertices** must be coplanar
-- the **reference point** o need not be
-- the length gives the area, the direction the normal
+- polygon planar, unit normal **n**; o any point, here off the plane
+- each cross `(p_i − o) × (p_next − o)` is normal to its own triangle
+- `(Σ crosses) · n = 2 · Area`
 
 
 ---
