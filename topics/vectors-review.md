@@ -357,9 +357,11 @@ Floats: `|a x b| <= eps |a| |b|`, never `== 0`.
 
 ---
 
-## The area of any polygon: sum the crosses
+## The area of any polygon: half the sum of the crosses
 
-<img src="../../textbook/figures/vecr-polygon-area.svg" alt="The pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5) with a triangle from the origin to each edge, blue triangles adding and red ones subtracting, summing to 16.875" style="height:340px">
+<img src="../../textbook/figures/vecr-polygon-area.svg" alt="The pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5) with a triangle from the origin to each edge, blue triangles adding and red ones subtracting, summing to 16.875" style="height:310px">
+
+`2·Area = Σ p_i ⊥ p_next`: each cross is twice its triangle, so the figure halves each term
 
 The sign tells the winding: **positive** counterclockwise, **negative** clockwise.
 
