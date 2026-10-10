@@ -17,10 +17,10 @@
   EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
            from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
   REORDERED 2026-10-10: the face normal comes before polygon area; the 2D area slide (half the sum of the
-  perp-dots) is followed by a 3D one (vecr-polygon-area-3d.svg: the summed crosses are 2·Area times the
+  perp-dots) is followed by a 3D one (vecr-rect-area-3d.svg: the summed crosses are 2·Area times the
   normal, the same from an off-plane reference point; Newell's normal in its notes); rebuilt the same
   day on a 3 by 2 rectangle: q inside (vecr-rect-area-in.svg), q outside with a negative cross
-  (vecr-rect-area-out.svg), and the pyramid on the rectangle lifted to z = 2 (vecr-polygon-area-3d.svg).
+  (vecr-rect-area-out.svg), and the pyramid on the rectangle lifted to z = 2 (vecr-rect-area-3d.svg).
   REORDERED 2026-10-08: "The dot product and the cross product" introduces both before the history slide;
            dot-product slide titles name it.
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
@@ -397,7 +397,7 @@ if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen si
 
 ## The area of a 3D polygon
 
-<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="Left: the 3 by 2 rectangle at z = 2 and the pyramid it forms with P = (1, 1, 5), each side face's cross product drawn as an arrow normal to the face. Middle: the side faces projected onto the rectangle, triangles from P's foot (1, 1, 2) with areas 1.5, 2, 1.5, 1. Right: the crosses (0, -9, 3), (6, 0, 4), (0, 9, 3), (-6, 0, 2), their lengths, and their dot products with n = (0, 0, 1): 3, 4, 3, 2; the sum (0, 0, 12) dotted with n is 12, twice the area 6" style="height:335px">
+<img src="../../textbook/figures/vecr-rect-area-3d.svg" alt="Left: the 3 by 2 rectangle at z = 2 and the pyramid it forms with P = (1, 1, 5), each side face's cross product drawn as an arrow normal to the face. Middle: the side faces projected onto the rectangle, triangles from P's foot (1, 1, 2) with areas 1.5, 2, 1.5, 1. Right: the crosses (0, -9, 3), (6, 0, 4), (0, 9, 3), (-6, 0, 2), their lengths, and their dot products with n = (0, 0, 1): 3, 4, 3, 2; the sum (0, 0, 12) dotted with n is 12, twice the area 6" style="height:335px">
 
 - each cross `(p_i − P) × (p_next − P)` is twice a side face, normal to it
 - `· n` projects the face onto the rectangle: twice its shadow
