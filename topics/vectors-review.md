@@ -16,6 +16,9 @@
   and three.js's Vector3 with their traps.
   EXPANDED 2026-10-08: the angle formula derived from the definition, the perpendicularity test derived
            from it, the parallel and collinear tests (cross, dot, three points, 2D), and the projection derived in four steps (vecr-projection.svg).
+  REORDERED 2026-10-10: the face normal comes before polygon area; the 2D area slide (half the sum of the
+  perp-dots) is followed by a 3D one (vecr-polygon-area-3d.svg: the summed crosses are 2·Area times the
+  normal, the same from an off-plane reference point; Newell's normal in its notes).
   REORDERED 2026-10-08: "The dot product and the cross product" introduces both before the history slide;
            dot-product slide titles name it.
   CUT 2026-10-08: the three multiple-choice Check slides (an angle by hand, a shadow on a non-unit
@@ -357,7 +360,19 @@ Floats: `|a x b| <= eps |a| |b|`, never `== 0`.
 
 ---
 
-## The area of any polygon: half the sum of the crosses
+## Worked: a face normal from two edges
+
+<img src="../../textbook/figures/vecr-face-normal.svg" alt="Left: the triangle P0 = (0,0,0), P1 = (2,0,0), P2 = (0,0,-2) with edges e1, e2, a counterclockwise winding arrow and the normal (0, 1, 0) pointing up. Right: P1 and P2 swapped, clockwise winding, normal (0, -1, 0) pointing down" style="height:320px">
+
+```csharp
+Vector3 n = Vector3.Cross(v1, v2);
+if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen side
+```
+
+
+---
+
+## The area of a 2D polygon: half the sum of the crosses
 
 <img src="../../textbook/figures/vecr-polygon-area.svg" alt="The pentagon (1, 1), (5, 0.5), (6, 3), (3.5, 5), (0.5, 3.5) with a triangle from the origin to each edge, blue triangles adding and red ones subtracting, summing to 16.875" style="height:310px">
 
@@ -368,14 +383,15 @@ The sign tells the winding: **positive** counterclockwise, **negative** clockwis
 
 ---
 
-## Worked: a face normal from two edges
+## The area of a 3D polygon: the same sum, a vector
 
-<img src="../../textbook/figures/vecr-face-normal.svg" alt="Left: the triangle P0 = (0,0,0), P1 = (2,0,0), P2 = (0,0,-2) with edges e1, e2, a counterclockwise winding arrow and the normal (0, 1, 0) pointing up. Right: P1 and P2 swapped, clockwise winding, normal (0, -1, 0) pointing down" style="height:320px">
+<img src="../../textbook/figures/vecr-polygon-area-3d.svg" alt="The pentagon of the previous slide rotated about the x axis into a tilted plane, with dashed triangles from a reference point o 6.2 units off the plane, and the unit normal (0, 0.8, 0.6). The summed crosses from the origin and from o are both (0, 27, 20.25), length 33.75, so the area is 16.875" style="height:280px">
 
-```csharp
-Vector3 n = Vector3.Cross(v1, v2);
-if (Vector3.Dot(n, Vector3.forward) > 0) n = -n;   // flip to face the chosen side
-```
+`Σ (p_i − o) × (p_next − o) = 2·Area · n`
+
+- the **vertices** must be coplanar
+- the **reference point** o need not be
+- the length gives the area, the direction the normal
 
 
 ---
