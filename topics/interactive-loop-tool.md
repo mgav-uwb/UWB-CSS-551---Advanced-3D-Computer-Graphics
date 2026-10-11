@@ -408,15 +408,17 @@ Predict: slider to 1.5, press `=`, then slider to 1.6.
 ```csharp
 public Transform cube;  public Slider slider;  public InputField box;  // the scale lives in all three
 void Start() {
-    slider.onValueChanged.AddListener(v => {
-        cube.localScale = Vector3.one * v;             // drag: write the cube
-        box.text = v.ToString("0.00");                 //   and the box
-    });
-    box.onEndEdit.AddListener(t => {
-        float v = float.Parse(t);
-        cube.localScale = Vector3.one * v;             // type: write the cube
-        slider.value = v;                              //   and the slider, which runs the drag handler too
-    });
+    slider.onValueChanged.AddListener(OnSlider);
+    box.onEndEdit.AddListener(OnBox);
+}
+void OnSlider(float v) {
+    cube.localScale = Vector3.one * v;                 // drag: write the cube
+    box.text = v.ToString("0.00");                     //   and the box
+}
+void OnBox(string t) {
+    float v = float.Parse(t);
+    cube.localScale = Vector3.one * v;                 // type: write the cube
+    slider.value = v;                                  //   and the slider, which runs OnSlider too
 }
 void Update() {
     if (Input.GetKeyDown(KeyCode.Equals))
@@ -425,17 +427,20 @@ void Update() {
 ```
 
 ```javascript
-slider.addEventListener('input', () => {
+slider.addEventListener('input', onSlider);
+box.addEventListener('change', onBox);
+addEventListener('keydown', onKey);
+function onSlider() {
   const v = +slider.value;
   cube.scale.setScalar(v);  box.value = v.toFixed(2);  render();   // drag: cube and box
-});
-box.addEventListener('change', () => {
+}
+function onBox() {
   const v = parseFloat(box.value);
   cube.scale.setScalar(v);  slider.value = v;  render();           // type: cube and slider
-});
-addEventListener('keydown', (e) => {
+}
+function onKey(e) {
   if (e.key === '=') { cube.scale.multiplyScalar(2); render(); }  // =: cube only
-});
+}
 ```
 
 </div>
@@ -468,10 +473,12 @@ Data flows **one way**. Two views of one model cannot disagree, because neither 
 ```csharp
 public Transform cube;  public Slider slider;  public InputField box;
 float s = 1f;                                            // the MODEL: one copy
-void Start() {                                           // CONTROLLERS edit the model
-    slider.onValueChanged.AddListener(v => s = v);
-    box.onEndEdit.AddListener(t => { if (float.TryParse(t, out float v)) s = v; });
+void Start() {
+    slider.onValueChanged.AddListener(OnSlider);
+    box.onEndEdit.AddListener(OnBox);
 }
+void OnSlider(float v) { s = v; }                        // CONTROLLERS edit the model
+void OnBox(string t) { if (float.TryParse(t, out float v)) s = v; }
 void Update() { if (Input.GetKeyDown(KeyCode.Equals)) s *= 2f; }
 void LateUpdate() {                                      // VIEWS read the model
     cube.localScale = Vector3.one * s;
@@ -482,13 +489,16 @@ void LateUpdate() {                                      // VIEWS read the model
 
 ```javascript
 const model = { s: 1 };                                      // the MODEL: one copy
-slider.addEventListener('input', () => { model.s = +slider.value; requestRender(); });
-box.addEventListener('change', () => {                       // CONTROLLERS edit the model
+slider.addEventListener('input', onSlider);
+box.addEventListener('change', onBox);
+addEventListener('keydown', onKey);
+function onSlider() { model.s = +slider.value; requestRender(); }   // CONTROLLERS edit the model
+function onBox() {
   const v = parseFloat(box.value);
   if (Number.isFinite(v)) model.s = v;
   requestRender();
-});
-addEventListener('keydown', (e) => { if (e.key === '=') { model.s *= 2; requestRender(); } });
+}
+function onKey(e) { if (e.key === '=') { model.s *= 2; requestRender(); } }
 function view() {                                            // VIEWS read the model
   cube.scale.setScalar(model.s);
   slider.value = model.s;                                    // setting .value fires no event
