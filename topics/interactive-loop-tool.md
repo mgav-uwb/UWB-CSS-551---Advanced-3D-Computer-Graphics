@@ -206,12 +206,15 @@ void Update() {
 
 ```javascript
 const held = new Set();                                   // keys down right now
-addEventListener('keydown', (e) => {
+addEventListener('keydown', onKeyDown);
+addEventListener('keyup', onKeyUp);
+addEventListener('blur', onBlur);                         // released in another window
+function onKeyDown(e) {
   held.add(e.code);
   if (e.code === 'Space' && !e.repeat) x = 0;             // a press: handled once
-});
-addEventListener('keyup', (e) => held.delete(e.code));
-addEventListener('blur', () => held.clear());             // released in another window
+}
+function onKeyUp(e) { held.delete(e.code); }
+function onBlur() { held.clear(); }
 function frame(now) {
   const dt = (now - last) / 1000;  last = now;
   const dir = (held.has('KeyD') ? 1 : 0) - (held.has('KeyA') ? 1 : 0);   // held: polled
@@ -572,7 +575,11 @@ let pending = false;
 function requestRender() {                 // any number of edits in one frame...
   if (pending) return;
   pending = true;
-  requestAnimationFrame(() => { pending = false; view(); });   // ...one render
+  requestAnimationFrame(renderNow);        // ...one render
+}
+function renderNow() {
+  pending = false;
+  view();
 }
 ```
 
@@ -664,9 +671,9 @@ void UndoLast()      { if (history.Count > 0) { history.Pop().Undo(); dirty = tr
 
 ```javascript
 class MoveVertex {                               // one edit, and its inverse
-  constructor(mesh, i, d) { Object.assign(this, { mesh, i, d }); }
+  constructor(mesh, i, d) { this.mesh = mesh;  this.i = i;  this.d = d; }
   do()   { this.mesh.move(this.i, this.d); }
-  undo() { this.mesh.move(this.i, this.d.map((x) => -x)); }
+  undo() { this.mesh.move(this.i, [-this.d[0], -this.d[1], -this.d[2]]); }
 }
 const history = [];
 function run(cmd) { cmd.do(); history.push(cmd); requestRender(); }
@@ -887,7 +894,11 @@ export function make(container, { stage, controls } = {}) {
     panel.update(M);
     sc.render();                                         // request a frame
   }
-  slider.onInput((v) => { model.tx = v; update(); });    // the CONTROLLER
+  function onSlider(v) {                                 // the CONTROLLER
+    model.tx = v;
+    update();
+  }
+  slider.onInput(onSlider);
 }
 ```
 
