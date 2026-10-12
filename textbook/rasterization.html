@@ -198,8 +198,10 @@
         express \(\mathbf{p}\) as a blend of the corners:
       </p>
       \[
-        w_0 = \frac{E_{12}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \quad w_1 = \frac{E_{20}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \quad w_2 = \frac{E_{01}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \qquad
-        w_0 + w_1 + w_2 = 1, \quad \mathbf{p} = w_0\mathbf{v}_0 + w_1\mathbf{v}_1 + w_2\mathbf{v}_2 .
+        \begin{gathered}
+        w_0 = \frac{E_{12}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \quad w_1 = \frac{E_{20}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \quad w_2 = \frac{E_{01}(\mathbf{p})}{E_{01}(\mathbf{v}_2)}, \\[4pt]
+        w_0 + w_1 + w_2 = 1, \qquad \mathbf{p} = w_0\mathbf{v}_0 + w_1\mathbf{v}_1 + w_2\mathbf{v}_2 .
+        \end{gathered}
       \]
       <figure>
         <img src="figures/ras-barycentric.svg" alt="The triangle with the point P inside, split into three sub-triangles colored red, green and blue; each sub-triangle's area over the whole area is the weight of the opposite vertex." />
@@ -213,7 +215,10 @@
         \(1.000\). With corner colors red \((0.92, 0.25, 0.20)\), green \((0.20, 0.75, 0.35)\) and
         blue \((0.20, 0.45, 0.95)\):
         \[
-          \text{color} = 0.305\,(0.92, 0.25, 0.20) + 0.259\,(0.20, 0.75, 0.35) + 0.436\,(0.20, 0.45, 0.95) = (0.420, 0.467, 0.566),
+          \begin{aligned}
+          \text{color} &= 0.305\,(0.92, 0.25, 0.20) + 0.259\,(0.20, 0.75, 0.35) + 0.436\,(0.20, 0.45, 0.95) \\
+          &= (0.420, 0.467, 0.566),
+          \end{aligned}
         \]
         a grayish blue, nearest the blue corner because \(w_2\) is largest. Any per-vertex
         attribute is interpolated the same way: colors, normals, texture coordinates, depth.

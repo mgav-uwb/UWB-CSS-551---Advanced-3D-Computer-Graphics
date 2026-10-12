@@ -365,9 +365,11 @@ console.log((2*Math.PI*s).toFixed(4),'vs',(2*Math.PI/34).toFixed(4));</pre>
         <a href="ray-tracing.html#whitted">the ray-tracing chapter</a>) and reflects
         a fraction that depends on the polarization:
         \[
+          \begin{gathered}
           R_s = \left(\frac{n_1\cos\theta_i - n_2\cos\theta_t}{n_1\cos\theta_i + n_2\cos\theta_t}\right)^{2}, \qquad
-          R_p = \left(\frac{n_1\cos\theta_t - n_2\cos\theta_i}{n_1\cos\theta_t + n_2\cos\theta_i}\right)^{2}, \qquad
+          R_p = \left(\frac{n_1\cos\theta_t - n_2\cos\theta_i}{n_1\cos\theta_t + n_2\cos\theta_i}\right)^{2}, \\[4pt]
           F = \tfrac12 (R_s + R_p)
+          \end{gathered}
         \]
         for unpolarized light. At normal incidence both reduce to
         \(F_0 = \big((n_1 - n_2)/(n_1 + n_2)\big)^2\). A <em>conductor</em> has a

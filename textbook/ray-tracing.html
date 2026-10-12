@@ -97,8 +97,10 @@
         A sphere of center \(\mathbf{c}\) and radius \(r\): substitute the ray into \(|\mathbf{p} - \mathbf{c}|^2 = r^2\).
         With \(\mathbf{m} = \mathbf{o} - \mathbf{c}\) and unit \(\mathbf{d}\),
         \[
-          t^2 + 2(\mathbf{m}\cdot\mathbf{d})\,t + (\mathbf{m}\cdot\mathbf{m} - r^2) = 0, \qquad
-          t = -b \pm \sqrt{b^2 - c}, \quad b = \mathbf{m}\cdot\mathbf{d},\; c = \mathbf{m}\cdot\mathbf{m} - r^2.
+          \begin{gathered}
+          t^2 + 2(\mathbf{m}\cdot\mathbf{d})\,t + (\mathbf{m}\cdot\mathbf{m} - r^2) = 0, \\
+          t = -b \pm \sqrt{b^2 - c}, \qquad b = \mathbf{m}\cdot\mathbf{d},\; c = \mathbf{m}\cdot\mathbf{m} - r^2.
+          \end{gathered}
         \]
         A negative discriminant is a miss; otherwise the smaller positive root is the entry point and the
         larger the exit. The normal at a hit \(\mathbf{p}\) is \((\mathbf{p} - \mathbf{c})/r\).

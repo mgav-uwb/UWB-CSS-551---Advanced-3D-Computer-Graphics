@@ -143,11 +143,13 @@
         For the perceptron the four derivatives are short enough to write down:
       </p>
       \[
-        \frac{\partial \mathcal{L}}{\partial b_2} = \delta, \quad
-        \frac{\partial \mathcal{L}}{\partial w^{(2)}_h} = \delta\, a_h, \quad
-        \frac{\partial \mathcal{L}}{\partial w^{(1)}_h} = \delta\, w^{(2)}_h (1 - a_h^2)\, x, \quad
-        \frac{\partial \mathcal{L}}{\partial b^{(1)}_h} = \delta\, w^{(2)}_h (1 - a_h^2),
-        \qquad \delta = 2\,(f - y),
+        \begin{gathered}
+          \frac{\partial \mathcal{L}}{\partial b_2} = \delta, \qquad
+          \frac{\partial \mathcal{L}}{\partial w^{(2)}_h} = \delta\, a_h, \qquad
+          \delta = 2\,(f - y), \\[4pt]
+          \frac{\partial \mathcal{L}}{\partial w^{(1)}_h} = \delta\, w^{(2)}_h (1 - a_h^2)\, x, \qquad
+          \frac{\partial \mathcal{L}}{\partial b^{(1)}_h} = \delta\, w^{(2)}_h (1 - a_h^2),
+          \end{gathered}
       \]
       <p>
         for a single example (average over the batch for more), using

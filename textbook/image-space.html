@@ -143,8 +143,11 @@
         Let \(f\) be uniform mid-gray, \(f(u,v) = (\tfrac12,\tfrac12,\tfrac12)\),
         and \(g\) a horizontal black-to-white ramp, \(g(u,v) = (u,u,u)\). Then
         \[
-          \|f - g\|^2 = 3\int_0^1\!\!\int_0^1 (\tfrac12 - u)^2\, du\, dv
-          = 3\int_0^1 (\tfrac14 - u + u^2)\, du = 3\,\big(\tfrac14 - \tfrac12 + \tfrac13\big) = 3\cdot\tfrac{1}{12} = \tfrac14,
+          \begin{aligned}
+          \|f - g\|^2 &= 3\int_0^1\!\!\int_0^1 (\tfrac12 - u)^2\, du\, dv
+          = 3\int_0^1 (\tfrac14 - u + u^2)\, du \\
+          &= 3\,\big(\tfrac14 - \tfrac12 + \tfrac13\big) = 3\cdot\tfrac{1}{12} = \tfrac14,
+          \end{aligned}
         \]
         so \(\|f-g\| = \tfrac12\). Sample both on an \(m\times n\) grid and the
         per-pixel mean squared error of the rasters converges to the same

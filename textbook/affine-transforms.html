@@ -169,8 +169,10 @@
         <span class="tag">Worked example (move a point, not a vector)</span>
         \(T\) = translate by \((2, 0, 0)\), whose fourth column is \((2, 0, 0, 1)\).
         \[
-          T\,(0, 0, 0, 1)^{\mathsf T} = (2, 0, 0, 1)^{\mathsf T} \;\text{(the origin moved)}, \qquad
+          \begin{gathered}
+          T\,(0, 0, 0, 1)^{\mathsf T} = (2, 0, 0, 1)^{\mathsf T} \;\text{(the origin moved)}, \\
           T\,(1, 0, 0, 0)^{\mathsf T} = (1, 0, 0, 0)^{\mathsf T} \;\text{(the direction did not)}.
+          \end{gathered}
         \]
         One line of arithmetic proves the convention: the zero in \(w\) killed the translation column.
       </div>
@@ -336,10 +338,10 @@
       <h2 id="frames">5 &middot; A matrix is a frame; object and world space</h2>
       <p>Feed the matrix the basis vectors and the origin, in homogeneous form:</p>
       \[
-        M\,(1,0,0,0)^{\mathsf T} = \text{column 0}, \quad
-        M\,(0,1,0,0)^{\mathsf T} = \text{column 1}, \quad
-        M\,(0,0,1,0)^{\mathsf T} = \text{column 2}, \quad
-        M\,(0,0,0,1)^{\mathsf T} = \text{column 3}.
+        \begin{aligned}
+        M\,(1,0,0,0)^{\mathsf T} &= \text{column 0}, & M\,(0,1,0,0)^{\mathsf T} &= \text{column 1}, \\
+        M\,(0,0,1,0)^{\mathsf T} &= \text{column 2}, & M\,(0,0,0,1)^{\mathsf T} &= \text{column 3}.
+        \end{aligned}
       \]
       <div class="thm">
         <span class="tag">A matrix is an affine frame</span>
@@ -394,7 +396,10 @@
         decomposition, Section 6.1). Engines store the special case in which the stretch is axis-aligned:
       </p>
       \[
-        M = T\cdot R\cdot S, \qquad \text{columns 0 to 2} = \text{the rotated axes, each scaled by its factor}, \quad \text{column 3} = \mathbf{t}.
+        \begin{gathered}
+        M = T\cdot R\cdot S, \\
+        \text{columns 0 to 2} = \text{the rotated axes, each scaled by its factor}, \qquad \text{column 3} = \mathbf{t}.
+        \end{gathered}
       \]
       <div class="ex">
         <span class="tag">Worked example (read a TRS matrix back)</span>
@@ -546,7 +551,9 @@
         \(R\mathbf{p} = 2\cdot\text{column 0 of } R_y(90^\circ) = (0, 0, -2)\), so \((I - R)\mathbf{p} = (2,0,0) - (0,0,-2) = (2, 0, 2)\):
         \[
           M = \begin{pmatrix} 0 & 0 & 1 & 2 \\ 0 & 1 & 0 & 0 \\ -1 & 0 & 0 & 2 \\ 0 & 0 & 0 & 1 \end{pmatrix}, \qquad
-          M(2,0,0) = (2, 0, 0),\;\; M(3,0,0) = (2, 0, -1),\;\; M(2,0,1) = (3, 0, 0).
+          \begin{aligned}
+          M(2,0,0) &= (2, 0, 0), \\ M(3,0,0) &= (2, 0, -1), \\ M(2,0,1) &= (3, 0, 0).
+          \end{aligned}
         \]
         The pivot stays; a neighbor one unit in \(+x\) swings to \(-z\); one unit in \(+z\) swings to \(+x\).
       </div>

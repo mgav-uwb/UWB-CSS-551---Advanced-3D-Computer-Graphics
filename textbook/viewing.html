@@ -131,9 +131,11 @@
         <span class="tag">Worked example (\(V\) at the demo&rsquo;s defaults)</span>
         Rows are the basis; the translation column is each axis dotted with the eye, negated:
         \[
-          -\mathbf{u}\cdot\mathbf{eye} = -(0.819\cdot3.773 + 0 - 0.574\cdot5.388) = 0.00, \quad
-          -\mathbf{v}\cdot\mathbf{eye} = -(-0.196\cdot3.773 + 0.940\cdot2.894 - 0.280\cdot5.388) = -0.47, \quad
-          -\mathbf{w}\cdot\mathbf{eye} = -(0.539\cdot3.773 + 0.342\cdot2.894 + 0.770\cdot5.388) = -7.17 .
+          \begin{aligned}
+          -\mathbf{u}\cdot\mathbf{eye} &= -(0.819\cdot3.773 + 0 - 0.574\cdot5.388) = 0.00, \\
+          -\mathbf{v}\cdot\mathbf{eye} &= -(-0.196\cdot3.773 + 0.940\cdot2.894 - 0.280\cdot5.388) = -0.47, \\
+          -\mathbf{w}\cdot\mathbf{eye} &= -(0.539\cdot3.773 + 0.342\cdot2.894 + 0.770\cdot5.388) = -7.17 .
+          \end{aligned}
         \]
         \[
           V = \begin{pmatrix} 0.82 & 0.00 & -0.57 & 0.00 \\ -0.20 & 0.94 & -0.28 & -0.47 \\ 0.54 & 0.34 & 0.77 & -7.17 \\ 0 & 0 & 0 & 1 \end{pmatrix},
@@ -391,9 +393,10 @@
         With \(\mathbf{r}_i\) the rows of \(M_{PV}\), the six planes in world space, as \((a, b, c, d)\)
         with the inside on the positive side, are
         \[
-          \text{left} = \mathbf{r}_3 + \mathbf{r}_0,\quad \text{right} = \mathbf{r}_3 - \mathbf{r}_0,\quad
-          \text{bottom} = \mathbf{r}_3 + \mathbf{r}_1,\quad \text{top} = \mathbf{r}_3 - \mathbf{r}_1,\quad
-          \text{near} = \mathbf{r}_3 + \mathbf{r}_2,\quad \text{far} = \mathbf{r}_3 - \mathbf{r}_2,
+          \begin{aligned}
+          \text{left} &= \mathbf{r}_3 + \mathbf{r}_0, & \text{bottom} &= \mathbf{r}_3 + \mathbf{r}_1, & \text{near} &= \mathbf{r}_3 + \mathbf{r}_2, \\
+          \text{right} &= \mathbf{r}_3 - \mathbf{r}_0, & \text{top} &= \mathbf{r}_3 - \mathbf{r}_1, & \text{far} &= \mathbf{r}_3 - \mathbf{r}_2,
+          \end{aligned}
         \]
         each divided by the length of its \((a, b, c)\) so that \(a x + b y + c z + d\) is a signed
         distance. An axis-aligned box is outside if, for any plane, its corner farthest along the
@@ -468,9 +471,12 @@
         offsetting each axis linearly, with \(w' = 1\) and no divide:
       </p>
       \[
+        \begin{gathered}
         P_{\text{ortho}} = \begin{pmatrix} \frac{2}{r - l} & 0 & 0 & -\frac{r + l}{r - l} \\ 0 & \frac{2}{t - b} & 0 & -\frac{t + b}{t - b} \\ 0 & 0 & \frac{-2}{f_{\!ar} - n} & -\frac{f_{\!ar} + n}{f_{\!ar} - n} \\ 0 & 0 & 0 & 1 \end{pmatrix},
-        \qquad \text{for } [-4, 4]\times[-2.25, 2.25]\times[1, 8]:\;
+        \\[8pt]
+        \text{for } [-4, 4]\times[-2.25, 2.25]\times[1, 8]:\quad
         \begin{pmatrix} 0.25 & 0 & 0 & 0 \\ 0 & 0.444 & 0 & 0 \\ 0 & 0 & -0.286 & -1.286 \\ 0 & 0 & 0 & 1 \end{pmatrix}.
+        \end{gathered}
       \]
       <figure>
         <img src="figures/view-ortho-persp.svg" alt="Two renderings of a 3 by 3 by 3 lattice from the same camera: orthographic on the left with all parallel edges parallel, perspective on the right with the far face smaller and the edges converging." />

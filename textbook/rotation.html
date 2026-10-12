@@ -187,8 +187,11 @@
         \(\hat{\mathbf{n}} = (0,1,0)\), \(\theta = 30^\circ\), \(\mathbf{v} = (1, 0.6, 0.3)\), so \(\mathbf{v}\cdot\hat{\mathbf{n}} = 0.6\) and
         \(\hat{\mathbf{n}}\times\mathbf{v} = (1\cdot0.3 - 0\cdot0.6,\; 0\cdot1 - 0\cdot0.3,\; 0\cdot0.6 - 1\cdot1) = (0.3, 0, -1)\).
         \[
-          \mathbf{v}' = 0.866\,(1, 0.6, 0.3) + 0.134\cdot0.6\,(0,1,0) + 0.5\,(0.3, 0, -1)
-          = (0.866 + 0.15,\; 0.520 + 0.080,\; 0.260 - 0.5) = (1.016, 0.6, -0.240).
+          \begin{aligned}
+          \mathbf{v}' &= 0.866\,(1, 0.6, 0.3) + 0.134\cdot0.6\,(0,1,0) + 0.5\,(0.3, 0, -1) \\
+          &= (0.866 + 0.15,\; 0.520 + 0.080,\; 0.260 - 0.5) \\
+          &= (1.016, 0.6, -0.240).
+          \end{aligned}
         \]
         The library&rsquo;s matrix \(R_y(30^\circ)\) applied to the same \(\mathbf{v}\) gives
         \((1.016, 0.6, -0.240)\): the formula and the matrix are one object reached two ways.
@@ -404,10 +407,12 @@
         applied first, the same right-to-left reading as matrices. The product is
       </p>
       \[
-        (q_1 q_2)_x = x_1 w_2 + y_1 z_2 - z_1 y_2 + w_1 x_2,\quad
-        (q_1 q_2)_y = -x_1 z_2 + y_1 w_2 + z_1 x_2 + w_1 y_2,\quad
-        (q_1 q_2)_z = x_1 y_2 - y_1 x_2 + z_1 w_2 + w_1 z_2,\quad
-        (q_1 q_2)_w = -x_1 x_2 - y_1 y_2 - z_1 z_2 + w_1 w_2,
+        \begin{aligned}
+        (q_1 q_2)_x &= \phantom{-}x_1 w_2 + y_1 z_2 - z_1 y_2 + w_1 x_2, \\
+        (q_1 q_2)_y &= -x_1 z_2 + y_1 w_2 + z_1 x_2 + w_1 y_2, \\
+        (q_1 q_2)_z &= \phantom{-}x_1 y_2 - y_1 x_2 + z_1 w_2 + w_1 z_2, \\
+        (q_1 q_2)_w &= -x_1 x_2 - y_1 y_2 - z_1 z_2 + w_1 w_2,
+        \end{aligned}
       \]
       <p>
         sixteen multiplies against a 3&times;3 product&rsquo;s twenty-seven, and the result stays a

@@ -65,10 +65,12 @@
         <span class="tag">Definition (the vector operations)</span>
         For \(\mathbf{u}, \mathbf{v} \in \mathbb{R}^3\) and a scalar \(s\):
         \[
-          \mathbf{u} + \mathbf{v} = (u_x + v_x,\; u_y + v_y,\; u_z + v_z), \qquad
-          s\,\mathbf{v} = (s v_x,\; s v_y,\; s v_z), \qquad
-          \|\mathbf{v}\| = \sqrt{v_x^2 + v_y^2 + v_z^2}, \qquad
-          \hat{\mathbf{v}} = \mathbf{v} / \|\mathbf{v}\| .
+          \begin{aligned}
+          \mathbf{u} + \mathbf{v} &= (u_x + v_x,\; u_y + v_y,\; u_z + v_z), &
+          \|\mathbf{v}\| &= \sqrt{v_x^2 + v_y^2 + v_z^2}, \\
+          s\,\mathbf{v} &= (s v_x,\; s v_y,\; s v_z), &
+          \hat{\mathbf{v}} &= \mathbf{v} / \|\mathbf{v}\| .
+          \end{aligned}
         \]
         The displacement from a point \(P_i\) to a point \(P_j\) is <em>tip minus tail</em>,
         \(P_j - P_i\). A <strong>unit vector</strong> \(\hat{\mathbf{v}}\) has length 1 and is the honest
@@ -171,8 +173,10 @@
         <span class="tag">Worked example (the split, and the check)</span>
         \(\mathbf{a}\cdot\mathbf{b} = 4\) and \(\mathbf{b}\cdot\mathbf{b} = 6\), so the scalar is \(2/3\).
         \[
-          \mathbf{a}_{\parallel} = \tfrac23 (1, 2, 1) = (0.667, 1.333, 0.667), \qquad
-          \mathbf{a}_{\perp} = (2, 1, 0) - (0.667, 1.333, 0.667) = (1.333, -0.333, -0.667).
+          \begin{aligned}
+          \mathbf{a}_{\parallel} &= \tfrac23 (1, 2, 1) = (0.667, 1.333, 0.667), \\
+          \mathbf{a}_{\perp} &= (2, 1, 0) - (0.667, 1.333, 0.667) = (1.333, -0.333, -0.667).
+          \end{aligned}
         \]
         Check that the remainder is perpendicular to \(\mathbf{b}\), in exact thirds:
         \(\mathbf{a}_{\perp}\cdot\mathbf{b} = \tfrac43\cdot1 - \tfrac13\cdot2 - \tfrac23\cdot1 = \tfrac{4 - 2 - 2}{3} = 0\).
@@ -475,9 +479,11 @@
         <span class="tag">Barycentric coordinates from cross products</span>
         With \(\mathbf{n} = (P_1 - P_0)\times(P_2 - P_0)\),
         \[
-          w_0 = \frac{\big((P_1 - X)\times(P_2 - X)\big)\cdot\mathbf{n}}{\mathbf{n}\cdot\mathbf{n}}, \quad
-          w_1 = \frac{\big((P_2 - X)\times(P_0 - X)\big)\cdot\mathbf{n}}{\mathbf{n}\cdot\mathbf{n}}, \quad
+          \begin{gathered}
+          w_0 = \frac{\big((P_1 - X)\times(P_2 - X)\big)\cdot\mathbf{n}}{\mathbf{n}\cdot\mathbf{n}}, \qquad
+          w_1 = \frac{\big((P_2 - X)\times(P_0 - X)\big)\cdot\mathbf{n}}{\mathbf{n}\cdot\mathbf{n}}, \\[4pt]
           w_2 = \frac{\big((P_0 - X)\times(P_1 - X)\big)\cdot\mathbf{n}}{\mathbf{n}\cdot\mathbf{n}} .
+          \end{gathered}
         \]
         Each numerator is twice the signed area of the sub-triangle opposite one corner, projected
         onto the face normal; the denominator is twice the whole area, squared. \(X\) is inside the

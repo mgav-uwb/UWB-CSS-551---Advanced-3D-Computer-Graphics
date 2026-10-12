@@ -184,9 +184,11 @@
         <span class="tag">Definition (the sRGB transfer function)</span>
         Encoded \(c\) from linear \(v\), both in \([0, 1]\):
         \[
+          \begin{gathered}
           c = \begin{cases} 12.92\,v & v \le 0.0031308 \\ 1.055\,v^{1/2.4} - 0.055 & \text{otherwise,} \end{cases}
-          \qquad
+          \\[6pt]
           v = \begin{cases} c / 12.92 & c \le 0.04045 \\ \bigl((c + 0.055)/1.055\bigr)^{2.4} & \text{otherwise.} \end{cases}
+          \end{gathered}
         \]
         The linear toe near black avoids the infinite slope of a pure power. Over most of the range the
         curve is within a percent of \(v = c^{2.2}\), which is why &ldquo;gamma 2.2&rdquo; is the usual shorthand.
@@ -298,7 +300,9 @@ console.log('code average', codeAvg.join(','), ' linear average', linAvg.join(',
         For tristimulus \((X, Y, Z)\) and a reference white \((X_n, Y_n, Z_n)\), with
         \(f(t) = t^{1/3}\) for \(t > (6/29)^3\) and a linear toe below,
         \[
-          L^* = 116\,f(Y/Y_n) - 16, \qquad a^* = 500\,[f(X/X_n) - f(Y/Y_n)], \qquad b^* = 200\,[f(Y/Y_n) - f(Z/Z_n)].
+          \begin{aligned}
+          L^* &= 116\,f(Y/Y_n) - 16, \\ a^* &= 500\,[f(X/X_n) - f(Y/Y_n)], \\ b^* &= 200\,[f(Y/Y_n) - f(Z/Z_n)].
+          \end{aligned}
         \]
         \(L^*\) is lightness from 0 (black) to 100 (the reference white); \(a^*\) runs green to red and
         \(b^*\) blue to yellow, the opponent axes; chroma is \(\sqrt{a^{*2} + b^{*2}}\) and hue is the angle of
