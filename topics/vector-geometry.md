@@ -101,15 +101,19 @@ rebuild:         1.789 w - 1.673 t = (1, 2, 1)             1.789² + 1.673² = 6
 
 ## Gram-Schmidt: another recipe
 
-<img src="../../textbook/figures/vec-gram-schmidt.svg" alt="b split into its shadow along e1 and a perpendicular remainder, which normalizes to e2" style="height:230px">
+Make three vectors an orthonormal frame, one at a time: from each, subtract its shadow on the axes already built, then normalize.
 
-Orthonormalize `a`, `b`, `c = (0, 0, 1)` in order: subtract what each vector has along the axes already built, then normalize.
-
-```text
-e1 = a / |a|                                     = (0.894, 0.447, 0)
-b - (b.e1) e1 = (1,2,1) - 1.789 e1 = (-0.6, 1.2, 1)   ->  e2 = (-0.359, 0.717, 0.598)
-c - (c.e1) e1 - (c.e2) e2 = (0.214, -0.429, 0.643)    ->  e3 = (0.267, -0.535, 0.802)
-```
+<div style="display:flex; gap:24px; align-items:center; justify-content:center;">
+<img src="../../textbook/figures/vec-gram-schmidt.svg" alt="b split into its shadow along e1 and a perpendicular remainder, which normalizes to e2" style="height:330px; margin:0;">
+<pre style="width:auto; margin:0;"><code class="text">a = (2, 1, 0)  b = (1, 2, 1)  c = (0, 0, 1)&#10;
+e1 = a / |a|   = (0.894, 0.447, 0)&#10;
+r2 = b - (b.e1) e1
+   = (1,2,1) - 1.789 e1 = (-0.6, 1.2, 1)
+e2 = r2 / |r2| = (-0.359, 0.717, 0.598)&#10;
+r3 = c - (c.e1) e1 - (c.e2) e2
+   = c - 0 e1 - 0.598 e2 = (0.214, -0.429, 0.643)
+e3 = r3 / |r3| = (0.267, -0.535, 0.802)</code></pre>
+</div>
 
 `e3 = u` and `e2 = -t`: the two recipes build the same frame up to order and sign; `e1 x e2 = e3`, so it is right-handed.
 
