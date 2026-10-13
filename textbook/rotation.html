@@ -687,9 +687,9 @@
       </p>
       <table>
         <tr><th>system</th><th>order name</th><th>matrix on a column vector</th><th>reads as</th></tr>
-        <tr><td>Unity</td><td>ZXY</td><td>\(R_y\,R_x\,R_z\)</td><td>\(Z\) first about the body, then \(X\), then \(Y\)</td></tr>
-        <tr><td>three.js default, and the library&rsquo;s <code>makeTRS</code></td><td>XYZ</td><td>\(R_x\,R_y\,R_z\)</td><td>\(Z\) first, then \(Y\), then \(X\)</td></tr>
-        <tr><td>aerospace (yaw, pitch, roll)</td><td>ZYX</td><td>\(R_z\,R_y\,R_x\)</td><td>roll about \(x\) first, pitch, then yaw</td></tr>
+        <tr><td>Unity</td><td>ZXY</td><td>\(R_y\,R_x\,R_z\)</td><td>\(Z\) first about the world axes, then \(X\), then \(Y\) (about the body: \(Y\), \(X\), \(Z\))</td></tr>
+        <tr><td>three.js default, and the library&rsquo;s <code>makeTRS</code></td><td>XYZ</td><td>\(R_x\,R_y\,R_z\)</td><td>\(Z\) first about the world axes, then \(Y\), then \(X\) (about the body: \(X\), \(Y\), \(Z\))</td></tr>
+        <tr><td>aerospace (yaw, pitch, roll)</td><td>ZYX</td><td>\(R_z\,R_y\,R_x\)</td><td>roll about world \(x\) first, then pitch, then yaw</td></tr>
       </table>
       <div class="ex">
         <span class="tag">Worked example (one triple, three matrices)</span>

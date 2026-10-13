@@ -15,6 +15,11 @@
   measured, what Unity stores); Euler angles (yaw, pitch, roll; three conventions give three poses;
   gimbals; gimbal lock by the inner axis; extraction at the lock), and why quaternions have no lock; one
   rotation, five definitions.
+  EDITED 2026-10-13 (consistency pass): nothing used before it is defined (the sandwich and the product
+  slides moved ahead of "why the half angle", no q on the angular-velocity slide, the axes demo after the
+  mirror slide); Rij, x-hat, the right-hand rule, the identity quaternion, nlerp and lerp defined; the
+  substitution in Rodrigues shown; Euler order names (three.js XYZ = R_x R_y R_z, Unity ZXY = R_y R_x R_z)
+  explained; three.js setFromRotationMatrix described correctly; QMultiplication in both tracks.
   EDITED 2026-10-13 (improvement pass: no unexplained terms, an intuitive picture for every concept, a
   demo for every main concept): terms defined where they first appear (degrees of freedom, transpose,
   determinant as the triple product of the columns, diag, trace, the antisymmetric part, first order,
@@ -56,7 +61,7 @@
 
 ---
 
-### Rotation about an axis
+### Rotation matrices: where the axes land
 
 <small>(~17 min)</small>
 
@@ -71,7 +76,7 @@ A rotation is a transform that keeps a rigid body rigid:
 - the **origin** stays put (it is a rotation, not a move)
 - **handedness** stays the same: a right hand stays a right hand
 
-So a rotation just says **where the three axes go**. Find that, and you have the whole matrix.
+Every `v = x x̂ + y ŷ + z ẑ` (`x̂, ŷ, ẑ`: the unit axes) lands at `x (where x̂ goes) + y (where ŷ goes) + z (where ẑ goes)`: a rotation is fixed by **where the three axes go**.
 
 
 ---
@@ -80,12 +85,14 @@ So a rotation just says **where the three axes go**. Find that, and you have the
 
 <img src="../../textbook/figures/rot-2d.svg" alt="a point rotated by theta about the origin in 2D" style="height:220px">
 
+A point at radius r and angle φ is `(r cos φ, r sin φ)`; turning adds θ; expand `cos(φ + θ)` and `sin(φ + θ)`:
+
 ```text
 x' = x cos θ - y sin θ          [ x' ]   [ cos θ   -sin θ ] [ x ]
 y' = x sin θ + y cos θ          [ y' ] = [ sin θ    cos θ ] [ y ]
 ```
 
-Worked: `(2, 1)` by 30° lands at `(1.232, 1.866)`.
+Positive θ turns counter-clockwise (x toward y). Worked: `(2, 1)` by 30° lands at `(1.232, 1.866)`.
 
 
 ---
@@ -93,6 +100,8 @@ Worked: `(2, 1)` by 30° lands at `(1.232, 1.866)`.
 ## The columns are where the axes go
 
 <img src="../../textbook/figures/rot-columns.svg" alt="the columns of a rotation matrix are the images of the basis vectors" style="height:220px">
+
+<small>Figure: the same reading in 3D, for the next slide's R_y(30°).</small>
 
 A matrix times a vector is a **mix of the matrix's columns**: `M (x, y) = x · column 0 + y · column 1`.
 
@@ -117,8 +126,42 @@ Rotating about the **y axis** leaves `y` alone and spins the `x`-`z` plane:
 ```
 
 - the **middle row and column** are `(0, 1, 0)`: `y` is untouched
-- the corners carry the 2D spin, now in z and x
+- the corners are the 2D rotation of the z-x plane, turning z toward x (the cyclic order x → y → z → x), so `+sin θ` sits top right: the 2D pattern mirrored
 - at θ = 90°: column 0 is `(0, 0, -1)`: the old x axis now points along `-z`
+- the same pattern for the others: `R_x(θ)` turns y toward z, `R_z(θ)` turns x toward y (the 2D matrix, plus a 1 for z)
+
+
+---
+
+## Orthonormal columns, determinant +1
+
+`R_y(30°)` has columns `(0.866, 0, -0.5)`, `(0, 1, 0)`, `(0.5, 0, 0.866)`:
+
+```text
+col0 · col0 = 0.866² + 0.5² = 0.75 + 0.25 = 1         every column has length 1
+col0 · col2 = 0.866(0.5) + 0 + (-0.5)(0.866) = 0      every pair is perpendicular
+det R = col0 · (col1 × col2) = 1                       the triple product: volume +1, right-handed
+Rᵀ (0.866, 0, -0.5) = (col0 · col0, col1 · col0, col2 · col0) = (1, 0, 0)    R⁻¹ = Rᵀ
+```
+
+- **orthonormal**: unit length and mutually perpendicular; **Rᵀ** (transpose): rows written as columns
+- entry (i, j) of `RᵀR` is `col i · col j`, so orthonormal columns say exactly `RᵀR = I`
+- nine numbers, **six constraints**, **three degrees of freedom** (three numbers you can still choose)
+
+
+---
+
+## A mirror is not a rotation
+
+<img src="../../textbook/figures/rot-reflection.svg" alt="a mirror flips handedness; two mirrors make a rotation" style="height:200px">
+
+`diag(s0, s1, s2)` is the matrix with `s0, s1, s2` on the diagonal and zeros elsewhere: it scales each axis.
+
+```text
+M_x = diag(-1, 1, 1): flips x (a mirror in the y-z plane); orthonormal columns, det = -1
+(M_x x̂) × (M_x ŷ) = (-x̂) × ŷ = -ẑ,   but M_x ẑ = +ẑ           handedness flipped
+M_y = diag(1, -1, 1):  M_y M_x = diag(-1, -1, 1) = R_z(180°), det = +1      two mirrors: a rotation
+```
 
 
 ---
@@ -136,39 +179,6 @@ Rotating about the **y axis** leaves `y` alone and spins the `x`-`z` plane:
 
 ---
 
-## Orthonormal columns, determinant +1
-
-`R_y(30°)` has columns `(0.866, 0, -0.5)`, `(0, 1, 0)`, `(0.5, 0, 0.866)`:
-
-```text
-col0 . col0 = 0.866² + 0.5² = 0.75 + 0.25 = 1         every column has length 1
-col0 . col2 = 0.866(0.5) + 0 + (-0.5)(0.866) = 0      every pair is perpendicular
-det R = col0 . (col1 × col2) = 1                       the triple product: volume +1, right-handed
-Rᵀ (1.016, 0.6, -0.24) = (1, 0.6, 0.3)                 the transpose undoes it: R⁻¹ = Rᵀ
-```
-
-- **orthonormal**: unit length and mutually perpendicular; **Rᵀ** (transpose): rows written as columns
-- entry (i, j) of `RᵀR` is `col i · col j`, so orthonormal columns say exactly `RᵀR = I`
-- nine numbers, **six constraints**, **three degrees of freedom** (three numbers you can still choose)
-
-
----
-
-## A mirror is not a rotation
-
-<img src="../../textbook/figures/rot-reflection.svg" alt="a mirror flips handedness; two mirrors make a rotation" style="height:200px">
-
-`diag(a, b, c)` is the matrix with `a, b, c` on the diagonal and zeros elsewhere: it scales each axis.
-
-```text
-M_x = diag(-1, 1, 1):   orthonormal columns, det = -1
-(M_x x) × (M_x y) = (-x) × y = -z,   but M_x z = +z          handedness flipped
-M_y M_x = diag(-1, -1, 1) = R_z(180°),   det = +1              two mirrors: a rotation
-```
-
-
----
-
 ### Axis-angle: any axis
 
 <small>(~22 min)</small>
@@ -180,6 +190,7 @@ M_y M_x = diag(-1, -1, 1) = R_z(180°),   det = +1              two mirrors: a r
 We can spin about x, y, or z. But a rotation can be about **any** axis, a unit vector `n`, by any angle `θ`.
 
 - store a rotation as **just that**: an axis `n` and an angle `θ` (four numbers, one constraint: `|n| = 1`)
+- positive `θ` follows the **right-hand rule**: thumb along `n`, the fingers curl the way the turn goes
 - but how do you *apply* it: rotate an arbitrary `v` about an arbitrary `n`?
 
 The answer reuses **exactly** the projection split of the vectors review.
@@ -192,9 +203,9 @@ The answer reuses **exactly** the projection split of the vectors review.
 <img src="../../textbook/figures/rot-rodrigues.svg" alt="v split into a frozen part along n and a turning part across n" style="height:250px">
 
 ```text
-v-par  = (v . n) n          the piece along the axis     (frozen)
+v-par  = (v · n) n          the piece along the axis     (frozen)
 v-perp = v - v-par          the piece in the rotation plane (turns)
-w      = n × v              the plane's second axis, |w| = |v-perp|
+w      = n × v              the plane's second axis: |w| = |v| sin∠(n, v) = |v-perp|
 ```
 
 
@@ -208,10 +219,11 @@ A 2D rotation of `v-perp` by `θ`, using `v-perp` and `w` as the two axes:
 v-perp' = cos θ · v-perp + sin θ · w
 ```
 
-Add back the frozen part and substitute; this is the axis-angle rotation of `v`:
+Add back the frozen part, substitute `v-perp = v − (v · n) n` and `w = n × v`, and collect the `(v · n) n` terms:
 
 ```text
-v' = cos θ · v  +  (1 - cos θ)(v . n) n  +  sin θ · (n × v)
+v' = v-par + v-perp' = (v · n) n  +  cos θ (v − (v · n) n)  +  sin θ (n × v)
+   = cos θ · v  +  (1 - cos θ)(v · n) n  +  sin θ · (n × v)          Rodrigues' formula
 ```
 
 
@@ -219,10 +231,10 @@ v' = cos θ · v  +  (1 - cos θ)(v . n) n  +  sin θ · (n × v)
 
 ## Worked: Rodrigues on one vector
 
-`n = (0, 1, 0)`, `θ = 30°`, `v = (1, 0.6, 0.3)`:
+`n = (0, 1, 0)`, `θ = 30°` (cos θ = 0.866, sin θ = 0.5, 1 − cos θ = 0.134), `v = (1, 0.6, 0.3)`:
 
 ```text
-v . n = 0.6          n × v = (1·0.3 - 0·0.6,  0·1 - 0·0.3,  0·0.6 - 1·1) = (0.3, 0, -1)
+v · n = 0.6          n × v = (1·0.3 - 0·0.6,  0·1 - 0·0.3,  0·0.6 - 1·1) = (0.3, 0, -1)
 v' = 0.866 (1, 0.6, 0.3) + 0.134 · 0.6 (0, 1, 0) + 0.5 (0.3, 0, -1)
    = (0.866 + 0.15,  0.520 + 0.080,  0.260 - 0.5) = (1.016, 0.6, -0.240)
 ```
@@ -247,15 +259,15 @@ The library's `R_y(30°)` applied to the same `v` gives `(1.016, 0.6, -0.240)`.
 
 ## Worked: build R_y(30) column by column
 
-Apply Rodrigues to each basis vector; the results are the columns:
+`n = (0, 1, 0)`, `θ = 30°`: apply Rodrigues to each unit axis; the results are the columns:
 
 ```text
-x=(1,0,0): v.n=0, n × x=(0,0,-1) -> 0.866(1,0,0)+0.5(0,0,-1) = (0.866, 0, -0.5)
-y=(0,1,0): v.n=1, n × y=(0,0,0)  -> (0,1,0), unchanged        = (0, 1, 0)
-z=(0,0,1): v.n=0, n × z=(1,0,0)  -> 0.866(0,0,1)+0.5(1,0,0)   = (0.5, 0, 0.866)
+x̂ = (1,0,0): x̂·n = 0, n × x̂ = (0,0,-1) -> 0.866(1,0,0) + 0.5(0,0,-1) = (0.866, 0, -0.5)
+ŷ = (0,1,0): ŷ·n = 1, n × ŷ = (0,0,0)  -> along the axis, unchanged      = (0, 1, 0)
+ẑ = (0,0,1): ẑ·n = 0, n × ẑ = (1,0,0)  -> 0.866(0,0,1) + 0.5(1,0,0)      = (0.5, 0, 0.866)
 ```
 
-These three columns **are** `R_y(30°)`, and the demos' column readouts, digit for digit.
+These three columns **are** `R_y(30°)`: the axes demo's "x/y/z lands at" rows, digit for digit.
 
 
 ---
@@ -272,6 +284,8 @@ R = [ 0 0 1 ]      x -> y,   y -> z,   z -> x         R (1,1,1) = (1,1,1): the a
     [ 0 1 0 ]
 ```
 
+As a matrix: `R = I + sin θ K + (1 − cos θ) K²`, with `K` the **cross-product matrix** of n: `K v = n × v`.
+
 
 ---
 
@@ -279,7 +293,7 @@ R = [ 0 0 1 ]      x -> y,   y -> z,   z -> x         R (1,1,1) = (1,1,1): the a
 
 <img src="../../textbook/figures/rot-trace.svg" alt="the axis keeps all of itself; each of two perpendicular directions in the rotation plane keeps cos theta of itself" style="height:330px">
 
-**Trace** = the sum of the diagonal. Diagonal entry `i` is `eᵢ · (R eᵢ)`: **how much of axis i stays itself**.
+**Trace** = the sum of the diagonal. With `eᵢ` the i-th unit axis, `R eᵢ` is column i and diagonal entry `i` is `eᵢ · (R eᵢ)`: **how much of axis i stays itself**. The trace is the same in every orthonormal frame, so measure in one lined up with the rotation:
 
 ```text
 along the axis: 1     in the plane: cos θ + cos θ     trace = 1 + 2 cos θ, for any axis
@@ -291,44 +305,44 @@ R_y(30):  0.866 + 1 + 0.866 = 2.732 = 1 + 2(0.866)
 
 ## Reading axis and angle out of a matrix
 
-`R = R_x(30°) R_y(30°)`, rows `(0.866, 0, 0.5)`, `(0.25, 0.866, -0.433)`, `(-0.433, 0.5, 0.75)`:
+`R = R_x(30°) R_y(30°)` (R_y acts first), rows `(0.866, 0, 0.5)`, `(0.25, 0.866, -0.433)`, `(-0.433, 0.5, 0.75)`; `Rij` is the entry in row i, column j:
 
 ```text
-trace R = 1 + 2 cos θ = 2.482          ->  cos θ = 0.741,  θ = 42.18°
-R - Rᵀ gives (R21-R12, R02-R20, R10-R01) = (0.933, 0.933, 0.25)
-divide by 2 sin θ = 1.343              ->  n = (0.695, 0.695, 0.186)
+trace R = 1 + 2 cos θ = 2.482                       ->  cos θ = 0.741,  θ = 42.18°
+(R21 - R12, R02 - R20, R10 - R01) = (0.933, 0.933, 0.25) = 2 sin θ · n
+divide by 2 sin θ = 1.343                           ->  n = (0.695, 0.695, 0.186)
 ```
 
-**Antisymmetric part** `R − Rᵀ`: the matrix minus its transpose, which keeps only the off-diagonal *differences*: `2 sin θ` times the axis. Two rotations about two axes are **one** rotation about a third.
+The differences come from `R − Rᵀ`, twice the **antisymmetric part**: in Rodrigues the `cos θ` and `(1 − cos θ)` terms are symmetric (equal across the diagonal) and cancel; the `sin θ (n × v)` term is not, and its off-diagonal entries are n's components. Two rotations about two axes are **one** rotation about a third.
 
 
 ---
 
 ## Pitfall: the axis near a half turn
 
-For `R_y(θ)`, the vector read from `R - Rᵀ` has length `2 sin θ`:
+For `R_y(θ)`, the vector of differences read from `R − Rᵀ` has length `2 sin θ`:
 
-| θ | length of the antisymmetric vector |
+| θ | length of (R21 − R12, R02 − R20, R10 − R01) |
 | --- | --- |
 | 170° | 0.347 |
 | 179° | 0.035 |
 | 179.9° | 0.0035 |
 | 180° | 2e-16 (round-off) |
 
-At 180° you divide noise by noise: the "axis" points anywhere. The diagonal still works: `sqrt((Rii + 1)/2)` gives `(0, 1, 0)`.
+At 180° you divide noise by noise: the "axis" points anywhere. The diagonal still works: at 180°, `R = 2 n nᵀ − I` (`n nᵀ`: the matrix of products `nᵢ nⱼ`), so `Rii = 2 nᵢ² − 1` and `|nᵢ| = √((Rii + 1)/2)`: here `(0, 1, 0)`; the signs come from `Rij = 2 nᵢ nⱼ`.
 
 
 ---
 
 ## Small rotations are almost linear
 
-**First order** in θ: keep the terms proportional to θ, drop θ², θ³, ... Then `sin θ ≈ θ`, `1 − cos θ ≈ 0`, and Rodrigues becomes
+**First order** in θ (in radians): keep the terms proportional to θ, drop θ², θ³, ... Then `sin θ ≈ θ`, `1 − cos θ ≈ 0` (next term `θ²/2`), and Rodrigues becomes
 
 ```text
 R v ≈ v + θ (n × v)          R ≈ I + θ K,   K = the cross-product matrix: K v = n × v
 ```
 
-| angle | error of `I + θK` | error of `I + θK + ½θ²K²` | column length of `I + θK` |
+| angle (axis y) | largest entry error of `I + θK` | of `I + θK + ½θ²K²` (next term) | column length of `I + θK` |
 | --- | --- | --- | --- |
 | 1° | 0.000152 | 0.00000089 | 1.0002 |
 | 5° | 0.00381 | 0.000111 | 1.0038 |
@@ -341,15 +355,14 @@ A small turn moves each point **along the tangent** `n × v`; the exact turn ben
 
 ## Angular velocity is an axis times a rate
 
-`ω` (omega) is a vector: its **direction** is the spin axis, its **length** the rate in radians per second. A point at `p` on the body moves at `v = ω × p`, tangent to its circle.
+`ω` (omega) is a vector: its **direction** is the spin axis, its **length** the rate in radians per second. A point at `p` on the body moves with velocity `ω × p`, tangent to its circle. `Δt` is the time step: the time one frame advances the simulation.
 
 ```text
    ω = (0, 1.5708, 0)          a quarter turn per second about +y  (90°/s = 1.5708 rad/s)
-   p = (1, 0, 0):   v = ω × p = (0, 0, −1.5708)     speed 1.5708 = |ω| · (distance from the axis)
-   one frame, Δt = 1/60 s:  ω Δt = 0.0262 rad = 1.5°   →   q = (0, sin 0.75°, 0, cos 0.75°)
+   p = (1, 0, 0):   velocity ω × p = (0, 0, −1.5708)     speed 1.5708 = |ω| · (distance from the axis)
+   one frame, Δt = 1/60 s:  |ω| Δt = 0.0262 rad = 1.5°   →   turn exactly 1.5° about y each frame
 ```
 
-`Δt` is the time step: the time one frame advances the simulation.
 
 
 ---
@@ -358,7 +371,7 @@ A small turn moves each point **along the tangent** `n × v`; the exact turn ben
 
 <img src="../../textbook/figures/rot-tangent-step.svg" alt="a linear step along the tangent lands outside the circle; repeated steps spiral outward while exact steps stay on the circle" style="height:300px">
 
-`p ← p + (ω × p) Δt` steps along the tangent, **perpendicular** to `p`: by Pythagoras each step multiplies the length by `√(1 + (ωΔt)²)`.
+`p ← p + (ω × p) Δt` steps along the tangent, **perpendicular** to `p`: for `p` square to the axis, Pythagoras makes each step multiply the length by `√(1 + (|ω|Δt)²)`.
 
 ```text
 90°/s about y, 60 steps/s:  one step 1.000343   after 1 s 1.0208   after 10 s 1.2282
@@ -372,10 +385,10 @@ A small turn moves each point **along the tangent** `n × v`; the exact turn ben
 ## Spinning, live: linear step vs exact step
 
 <div class="cockpit" data-demo="spin-step" data-controls="time,rate,fps,play"><pre class="viz-fallback">  p0 = (1, 0, 0), ω = 90°/s about +y, 60 steps per second
-     linear step   p ← p + (ω × p) Δt          quaternion step   q ← q_step q
-  -- time 1 s ------------  linear |p| = 1.0208     quaternion |p| = 1.0000
-  -- time 10 s -----------  linear |p| = 1.2282     quaternion |p| = 1.0000
-     predicted: (1 + (ωΔt)²)^(n/2)</pre></div>
+     linear step   p ← p + (ω × p) Δt          exact step   p ← (turn of |ω|Δt about ω) p
+  -- time 1 s ------------  linear |p| = 1.0208     exact |p| = 1.0000
+  -- time 10 s -----------  linear |p| = 1.2282     exact |p| = 1.0000
+     predicted after k steps: (1 + (|ω|Δt)²)^(k/2)</pre></div>
 
 
 ---
@@ -388,13 +401,13 @@ A small turn moves each point **along the tangent** `n × v`; the exact turn ben
 
 ## The trouble with storing the matrix
 
-Nine numbers, six hidden constraints, where **four** would do. Three problems:
+Nine numbers with six hidden constraints, for three degrees of freedom. Three problems:
 
 - **drift**: composing matrices in floating point breaks orthonormality; shapes shear
 - **interpolation**: averaging two rotation matrices is not a rotation
-- **redundancy**: nine numbers for three degrees of freedom
+- **size**: nine numbers to store, send and keep consistent, where four will do
 
-Axis-angle interpolates well but composes awkwardly. The quaternion does both.
+Axis-angle has no simple rule for composing two turns. The quaternion composes by one product and interpolates cleanly.
 
 
 ---
@@ -408,7 +421,7 @@ A number with one real part and **three** imaginary parts, `w + x i + y j + z k`
    so   ij = k,  jk = i,  ki = j        but   ji = −k,  kj = −i,  ik = −j        (order matters)
 ```
 
-- engines store the four numbers as `(x, y, z, w)`; `w` is the **scalar part**, `(x, y, z)` the **vector part**
+- engines store the four numbers as `(x, y, z, w)`; `w` is the **scalar part** (a number, not Rodrigues' `w = n × v`), `(x, y, z)` the **vector part**
 - like complex numbers (one `i`) turn the plane, quaternions turn space
 - the product is **not commutative**, and neither are rotations
 
@@ -426,34 +439,26 @@ q = ( sin(θ/2) n ,  cos(θ/2) ) = ( x, y, z, w )
 - the vector part `(x, y, z)` points along the axis, scaled by `sin(θ/2)`
 - the scalar part `w = cos(θ/2)`
 - always **unit length**: `x² + y² + z² + w² = sin²(θ/2) + cos²(θ/2) = 1`
+- no turn (θ = 0) gives `(0, 0, 0, 1)`, the **identity** quaternion
 
 Worked, `R_y(30°)`: half angle 15°, `q = (0, 0.259, 0, 0.966)`; `0.259² + 0.966² = 0.067 + 0.933 = 1`.
 
 
 ---
 
-## Why the half angle
+## The product, written out
 
-<img src="../../textbook/figures/rot-half-angle.svg" alt="the object turns theta; the quaternion's point on its circle turns theta over two, so a full turn of the object takes q to minus the identity" style="height:300px">
+Write each quaternion as (vector part, scalar part): `q = (qv, qw)`, `r = (rv, rw)`.
 
-q turns a point by a **sandwich**, `q p q⁻¹`, one multiply on each side:
+```text
+   q r = ( qw rv + rw qv + qv × rv ,   qw rw − qv · rv )
+           vector part                 scalar part
+```
 
-- **across** the axis, each side turns `p` by `θ/2`: total `θ`
-- **along** the axis, the left side tilts `p` into `w`, the right side tilts it back
-- so `q` has turned only `θ/2`: at 360°, `q = (0, 0, 0, −1)`, **minus** the identity
+- the scalar part: product of the scalars minus the dot of the vectors
+- the vector part: each vector scaled by the other's scalar, plus their cross
 
-
----
-
-<!-- .slide: class="demo-full" -->
-
-## The half angle, live
-
-<div class="cockpit" data-demo="axis-angle" data-controls="angle,halfangle"><pre class="viz-fallback">  the cube turns θ about y; q = (0, sin(θ/2), 0, cos(θ/2)) turns θ/2
-     θ =  30:  q = (0, 0.259, 0, 0.966)
-     θ = 180:  q = (0, 1, 0, 0)          w = 0
-     θ = 360:  q = (0, 0, 0, -1)         the cube is home; q is minus the identity
-     θ = 720:  q = (0, 0, 0, 1)          q is home</pre></div>
+A dot, a cross, and two scalings: 16 multiplies, against 27 for a `3×3` matrix product. The cross product is where the order enters.
 
 
 ---
@@ -471,7 +476,7 @@ Two cross products and some scaling; no trig at apply time. `q⁻¹` is the **co
 
 ---
 
-## Verify the identity on one point
+## Check the formula on one point
 
 Rotate `p = (1, 0, 0)` by 90° about `y`: `q = (0, 0.707, 0, 0.707)`.
 
@@ -484,6 +489,32 @@ p' = (1,0,0) + (0,0,-1) + (-1,0,0)              = (0, 0, -1)
 ```
 
 `R_y(90°)` sent `(1,0,0)` to `(0,0,-1)` (its column 0). **The quaternion and the matrix agree.**
+
+
+---
+
+## Why the half angle
+
+<img src="../../textbook/figures/rot-half-angle.svg" alt="the object turns theta; the quaternion's point on its circle turns theta over two, so a full turn of the object takes q to minus the identity" style="height:250px">
+
+q turns a point by a **sandwich**, `q p q⁻¹`, one multiply on each side:
+
+- **across** the axis, each side turns `p` by `θ/2`: total `θ`
+- **along** the axis, the left multiply adds a scalar part; the right one removes it
+- so `q` has turned only `θ/2`: at 360°, `q = (0, 0, 0, −1)`, **minus** the identity
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The half angle, live
+
+<div class="cockpit" data-demo="axis-angle" data-controls="angle,halfangle"><pre class="viz-fallback">  the cube turns θ about y; q = (0, sin(θ/2), 0, cos(θ/2)) turns θ/2
+     θ =  30:  q = (0, 0.259, 0, 0.966)
+     θ = 180:  q = (0, 1, 0, 0)          w = 0
+     θ = 360:  q = (0, 0, 0, -1)         the cube is home; q is minus the identity
+     θ = 720:  q = (0, 0, 0, 1)          q is home</pre></div>
 
 
 ---
@@ -507,25 +538,11 @@ All nine give `R_y(30°)`, with no cosine evaluated.
 
 ---
 
-## The product, written out
-
-With `q = (v, w)` and `r = (u, s)` (vector part, scalar part):
-
-```text
-   q r = ( w u + s v + v × u ,   w s − v · u )
-
-   components:  x = w·ux + s·vx + (vy·uz − vz·uy)
-                y = w·uy + s·vy + (vz·ux − vx·uz)
-                z = w·uz + s·vz + (vx·uy − vy·ux)
-                w = w·s − (vx·ux + vy·uy + vz·uz)
-```
-
-A dot, a cross, and two scalings: 16 multiplies, against 27 for a `3×3` matrix product. The cross product is where the order enters.
-
-
----
-
 ## Composing rotations = multiplying quaternions
+
+Turn by `q1`, then by `q2`: `q2 (q1 p q1⁻¹) q2⁻¹ = (q2 q1) p (q2 q1)⁻¹`, so the product `q2 q1` **is** the composite; like matrices, the right factor acts first.
+
+<div class="code-tabs">
 
 ```csharp
 // returns the product q1 q2; a quaternion is stored as (x, y, z, w) in a Vector4
@@ -539,7 +556,21 @@ Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
 }
 ```
 
-<small>`EX_8_1_MyScript.cs`. Like matrix multiply, the product is **not commutative**: order is the rotation order.</small>
+```javascript
+// returns the product q1 q2; a quaternion is stored as (x, y, z, w) in a THREE.Vector4
+function QMultiplication(q1, q2) {
+    const r = new THREE.Vector4();
+    r.x =  q1.x*q2.w + q1.y*q2.z - q1.z*q2.y + q1.w*q2.x;
+    r.y = -q1.x*q2.z + q1.y*q2.w + q1.z*q2.x + q1.w*q2.y;
+    r.z =  q1.x*q2.y - q1.y*q2.x + q1.z*q2.w + q1.w*q2.z;
+    r.w = -q1.x*q2.x - q1.y*q2.y - q1.z*q2.z + q1.w*q2.w;
+    return r;
+}
+```
+
+</div>
+
+<small>The C# is `EX_8_1_MyScript.cs`. Each line is one component of the product formula.</small>
 
 
 ---
@@ -552,8 +583,8 @@ Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
 q = qx qy = (0.25, 0.25, 0.067, 0.933)            |q|² = 1.000
 sandwich on (1, 2, 3)                   -> (2.366, 0.683, 2.817)
 R_x(30°) R_y(30°) on (1, 2, 3)          -> (2.366, 0.683, 2.817)
-angle 2 acos(0.933) = 42.2°, axis (0.695, 0.695, 0.186)
-the other order, qy qx = (0.25, 0.25, -0.067, 0.933): 15.4° away
+angle 2 acos(0.933) = 42.18°, axis (0.695, 0.695, 0.186)
+the other order, qy qx = (0.25, 0.25, -0.067, 0.933): an end pose 15.4° away
 ```
 
 
@@ -567,7 +598,7 @@ the other order, qy qx = (0.25, 0.25, -0.067, 0.933): 15.4° away
      A then B:  qB qA = (0.25, 0.25, 0.067, 0.933)    one turn of 42.18° about (0.695, 0.695, 0.186)
      B then A:  qA qB = (0.25, 0.25, -0.067, 0.933)   one turn of 42.18° about (0.695, 0.695, -0.186)
      the two end poses differ by 15.4°
-  set both to 90°: x then y and y then x land 120° turns about different diagonals</pre></div>
+  set both to 90°: each order is one 120° turn, about two different cube diagonals</pre></div>
 
 
 ---
@@ -577,27 +608,28 @@ the other order, qy qx = (0.25, 0.25, -0.067, 0.933): 15.4° away
 The trace of `R` is `1 + 2 cos θ`, and `w = cos(θ/2)`, so `w` falls out of the trace (`1 + trace = 4w²`):
 
 ```text
-   s = 2 √(1 + trace)          w = s / 4
-   x = (m21 − m12) / s         y = (m02 − m20) / s         z = (m10 − m01) / s
+   s = 2 √(1 + trace) = 4w      w = s / 4
+   x = (R21 − R12) / s         y = (R02 − R20) / s         z = (R10 − R01) / s
+   why: from the quaternion-to-matrix table, R21 − R12 = 2(yz + xw) − 2(yz − xw) = 4xw
 ```
 
 - when the trace is near `−1` (a half turn) `s` is near 0, and dividing by it amplifies round-off
-- **Shepperd's method** (1978): compute whichever of `w, x, y, z` is largest by a square root from the diagonal, then divide the others by it
-- this is how `Quaternion.LookRotation`, `Matrix4x4.rotation` and three.js `setFromRotationMatrix` get their answer
+- **Shepperd's method** (1978): take the largest of `4w² = 1 + trace`, `4x² = 1 + R00 − R11 − R22` (likewise y, z) by a square root, then divide the others by it
+- three.js's `setFromRotationMatrix` uses a variant: the trace branch whenever the trace is positive, else the largest diagonal
 
 
 ---
 
 ## Worked: the composed rotation back to four numbers
 
-The product `R_x(30)·R_y(30)` from the composition slide (y first, then x):
+The product `R_x(30°) R_y(30°)` from the composition slide (y first, then x):
 
 ```text
-   R = [ 0.866   0      0.5   ]      trace = 0.866 + 0.866 + 0.75 = 2.4821
-       [ 0.25    0.866 −0.433 ]      s = 2 √3.4821 = 3.7321      w = 0.933
-       [−0.433   0.5    0.75  ]      x = (0.5 − (−0.433)) / 3.7321 = 0.25
-                                     y = (0.5 − (−0.433)) / 3.7321 = 0.25
-                                     z = (0.25 − 0) / 3.7321       = 0.067
+   R = [ 0.866   0      0.5   ]      trace = 0.866 + 0.866 + 0.75 = 2.482
+       [ 0.25    0.866 −0.433 ]      s = 2 √3.482 = 3.732      w = s/4 = 0.933
+       [−0.433   0.5    0.75  ]      x = (R21 − R12)/s = (0.5 + 0.433)/3.732 = 0.25
+                                     y = (R02 − R20)/s = (0.5 + 0.433)/3.732 = 0.25
+                                     z = (R10 − R01)/s = (0.25 − 0)/3.732    = 0.067
 ```
 
 `(0.25, 0.25, 0.067, 0.933)`: the **same** four numbers as the quaternion product `qx qy`. Angle `2 acos 0.933 = 42.18°`.
@@ -605,16 +637,17 @@ The product `R_x(30)·R_y(30)` from the composition slide (y first, then x):
 
 ---
 
-## The shortest arc from one direction to another
+## The shortest arc between two directions
 
-<img src="../../textbook/figures/rot-shortest-arc.svg" alt="unit vectors a and b, the arc from a to b, the axis a cross b, and the halfway direction" style="height:270px">
+<img src="../../textbook/figures/rot-shortest-arc.svg" alt="unit vectors a and b, the arc from a to b, the axis a cross b, and the halfway direction" style="height:250px">
 
-Turn unit `a` onto unit `b` by the smallest rotation: axis `a × b`, angle `acos(a · b)`, and no trigonometry:
+Turn unit `a` onto unit `b` by the smallest rotation (axis along `a × b`, angle `θ = acos(a · b)`); the quaternion needs no trigonometry:
 
 ```text
    q = normalize( a × b ,  1 + a · b )            (vector part, scalar part)
    a = (0.6, 0.8, 0),  b = (0, 0.6, 0.8):   a · b = 0.48,  a × b = (0.64, −0.48, 0.36)
    q = (0.372, −0.279, 0.209, 0.860),  angle 61.3°;   check: q applied to a gives b
+   why: |a × b| = 2 sin(θ/2) cos(θ/2) and 1 + a · b = 2 cos²(θ/2); normalizing cancels 2 cos(θ/2)
 ```
 
 
@@ -626,7 +659,7 @@ Turn unit `a` onto unit `b` by the smallest rotation: axis `a × b`, angle `acos
    a = (1, 0, 0),  b = (−1, 0, 0):   a × b = (0, 0, 0),  1 + a · b = 0     q = normalize(0, 0, 0, 0): undefined
 ```
 
-Every axis perpendicular to `a` gives a valid half turn, so the formula has nothing to pick. Robust code detects `1 + a · b < ε` (a small tolerance) and chooses **any** perpendicular axis (for example `a × (0, 1, 0)`, or `a × (1, 0, 0)` if that is also near zero).
+Every axis perpendicular to `a` gives a valid half turn, so the formula has nothing to pick. Robust code detects `1 + a · b` below a small tolerance (say `1e-6`), takes a unit axis `n` perpendicular to `a` (normalize `a × (0, 1, 0)`, or `a × (1, 0, 0)` when `a` lies along y) and returns the half turn `q = (n, 0)`: here `(0, 0, 1, 0)`.
 
 
 ---
@@ -635,12 +668,13 @@ Every axis perpendicular to `a` gives a valid half turn, so the formula has noth
 
 <img src="../../textbook/figures/rot-slerp.svg" alt="slerp walks the great arc; the plain average leaves the unit sphere" style="height:220px">
 
-Unit quaternions are the points of length 1, a **sphere in 4D**. **Slerp** walks the **great arc** (shortest path on it) between two at constant speed; `cos Ω = q1 · q2`.
+Unit quaternions are the points of length 1, a **sphere in 4D**. **Slerp** (spherical linear interpolation) walks the **great arc** (shortest path on it) from `q1` (at `t = 0`) to `q2` (at `t = 1`) at constant speed. `Ω` is the angle between them: `cos Ω = q1 · q2`, the dot of the four components.
 
 ```text
-identity (0,0,0,1) to R_y(120°), q2 = (0, 0.866, 0, 0.5):   cos Ω = 0.5,  Ω = 60°
-slerp at t = 1/2:  0.577 (0, 0.866, 0, 1.5) = (0, 0.5, 0, 0.866)    = the quaternion of R_y(60°)
-plain average:     (0, 0.433, 0, 0.75),  length 0.866               not a rotation
+slerp(q1, q2, t) = ( sin((1 − t)Ω) q1 + sin(tΩ) q2 ) / sin Ω
+q1 = identity (0,0,0,1), q2 = R_y(120°) = (0, 0.866, 0, 0.5):   cos Ω = 0.5,  Ω = 60° (half the turn)
+t = 1/2:  both weights sin 30° / sin 60° = 0.577:   0.577 (q1 + q2) = (0, 0.5, 0, 0.866), the quaternion of R_y(60°)
+plain average (q1 + q2)/2 = (0, 0.433, 0, 0.75),  length 0.866                     not a rotation
 ```
 
 
@@ -653,9 +687,9 @@ plain average:     (0, 0.433, 0, 0.75),  length 0.866               not a rotati
 `q` and `-q` give the **same matrix** (each entry is a product of two components): two quaternions per rotation, the **double cover**.
 
 ```text
-q1 = identity,  q2 = -(quaternion of R_y(120°)) = (0, -0.866, 0, -0.5)
-q1 . q2 = -0.5  ->  slerp walks 120° in 4D  ->  a 240° turn: the long way round
-fix: if q1 . q2 < 0, negate q2 first
+q1 = identity,  q2 = R_y(120°) = (0, 0.866, 0, 0.5),  −q2 = (0, −0.866, 0, −0.5): same rotation
+q1 · (−q2) = −0.5  ->  slerp toward −q2 walks Ω = 120° in 4D  ->  a 240° turn: the long way round
+fix: if q1 · q2 < 0, negate q2 first (same rotation, the short arc)
 ```
 
 
@@ -663,17 +697,17 @@ fix: if q1 . q2 < 0, negate q2 first
 
 ## nlerp: cheaper, almost as good
 
-Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((1 − t) q1 + t q2)`.
+**nlerp** (normalized linear interpolation): normalize the straight blend instead of walking the arc, `nlerp(t) = normalize((1 − t) q1 + t q2)`.
 
 `q1` = identity, `q2` = 120° about y (`q1·q2 = 0.5`, arc `Ω = 60°`):
 
-| t | slerp angle | nlerp angle |
+| t | turned so far, slerp | turned so far, nlerp |
 | --- | --- | --- |
 | 0.25 | 30.0° | 27.8° |
 | 0.5 | 60.0° | 60.0° |
 
 - same path, **uneven speed**: at most 1.1 times the average rate for this pair
-- no `sin`, no `acos`: games blend thousands of bones per frame with nlerp and renormalize
+- no `sin`, no `acos`: animation systems blend thousands of joint rotations per frame with nlerp
 
 
 ---
@@ -685,7 +719,7 @@ Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((
 <div class="cockpit" data-demo="quat-slerp" data-controls="t,endAngle,method,flip,play,arc"><pre class="viz-fallback">  q1 = identity, q2 = 120° about y, t = 0.5
      slerp:  q = (0, 0.5, 0, 0.866)      turned 60°     |q| = 1
      nlerp:  t = 0.25 turned 27.8° (slerp 30.0°)
-     lerp:   q = (0, 0.433, 0, 0.75)     |q| = 0.866: not a rotation
+     lerp (straight blend, not normalized):  q = (0, 0.433, 0, 0.75), |q| = 0.866: not a rotation
      use -q2 with no sign check:  q1·q2 = -0.5, a 240° swing the other way</pre></div>
 
 
@@ -693,9 +727,9 @@ Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((
 
 ## Drift, measured
 
-<img src="../../textbook/figures/rot-drift.svg" alt="error growth over 200,000 float32 compositions: matrix, quaternion, renormalized quaternion" style="height:220px">
+<img src="../../textbook/figures/rot-drift.svg" alt="error growth over 200,000 float32 compositions: matrix, quaternion, renormalized quaternion" style="height:180px">
 
-200,000 compositions of `R_y(1°)` in float32 (single precision, about 7 decimal digits):
+200,000 compositions of `R_y(1°)` in float32:
 
 | representation | error after 200,000 steps |
 | --- | --- |
@@ -703,10 +737,12 @@ Normalize the straight blend instead of walking the arc: `nlerp(t) = normalize((
 | quaternion product | length off 1 by 2.1e-3 |
 | quaternion, renormalized each step | 1.8e-8 |
 
+Both drift: the quaternion is repaired by one division, the matrix by a Gram-Schmidt on its columns.
+
 
 ---
 
-## The same rotation in two APIs
+## The same rotation in Unity and three.js
 
 <div class="code-tabs">
 
@@ -726,7 +762,7 @@ const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.
 
 - both store the same four numbers `(0, 0.259, 0, 0.966)`; Unity's `transform.rotation` is **always** a quaternion
 - build with `AngleAxis` / `setFromAxisAngle`; compose with `*` / `multiply`; blend with `Slerp` / `slerp`
-- the Inspector *shows* Euler angles, computed on demand; **units differ**: radians in three.js, degrees in Unity
+- the Inspector *shows* Euler angles; the stored rotation is the quaternion; **units differ**: radians in three.js, degrees in Unity
 
 
 ---
@@ -734,7 +770,7 @@ const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.
 ## Pitfall: degrees where radians were expected
 
 ```text
-   Math.sin(30)             = −0.988      (30 radians: 4.77 full turns and a bit)
+   Math.sin(30)             = −0.988      (30 radians = 4.77 turns)
    Math.sin(30 · π / 180)   =  0.5
 ```
 
@@ -764,17 +800,17 @@ const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.
 
 ## Euler angles: three turns in a row
 
-Three rotations about three axes, in a **fixed order**:
+Three rotations about three axes, in a **fixed order**. **Intrinsic**: each turn about the object's own, already-turned axis; **extrinsic**: about the fixed world axes.
 
-- **intrinsic**: each turn about the object's own, already-turned axis
-- **extrinsic**: each turn about a fixed world axis
-- the same product read in opposite directions: intrinsic Y, X, Z is extrinsic Z, X, Y
+- one product, two readings: `R_y R_x R_z` right to left is extrinsic Z, X, Y; left to right, intrinsic Y, X, Z
+- order *names* use either reading: three.js 'XYZ' is `R_x R_y R_z`; Unity's 'ZXY' is `R_y R_x R_z` (three.js: 'YXZ')
+- the table: where the x axis lands for (x, y, z) = (20°, 45°, 10°)
 
-| convention | product | x lands at, (20°, 45°, 10°) |
+| convention | product | x axis lands at |
 | --- | --- | --- |
-| Unity `Quaternion.Euler` | `RyRxRz` | (0.738, 0.163, -0.654) |
-| three.js default XYZ | `RxRyRz` | (0.696, 0.401, -0.595) |
-| aerospace (roll x, pitch y, yaw z) | `RzRyRx` | (0.696, 0.123, -0.707) |
+| Unity `Quaternion.Euler` | `R_y R_x R_z` | (0.738, 0.163, -0.654) |
+| three.js default XYZ | `R_x R_y R_z` | (0.696, 0.401, -0.595) |
+| aerospace (x roll, y pitch, z yaw) | `R_z R_y R_x` | (0.696, 0.123, -0.707) |
 
 
 ---
@@ -792,12 +828,12 @@ Unity and three.js differ by **15.2°**, Unity and aerospace by 8.2°: name the 
 
 <img src="../../textbook/figures/rot-gimbal.svg" alt="at a 90-degree middle angle the inner and outer rotation axes coincide" style="height:230px">
 
-A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Z` inner, `X` middle, `Y` outer; after the middle turn the inner axis is
+A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Z` inner, `X` middle, `Y` outer. The outer axis is always `ŷ`; after a middle turn of `x` degrees the inner axis is
 
 ```text
-R_x(x) z = (0, -sin x, cos x)
-x = 30°:  (0, -0.5, 0.866)        a distinct direction
-x = 90°:  (0, -1, 0)              the outer Y axis itself: Z and Y now do the same thing
+R_x(x) ẑ = (0, -sin x, cos x)     (the outer turn y spins both together, so take y = 0)
+x = 30°:  (0, -0.5, 0.866)        60° from ŷ: a distinct direction
+x = 90°:  (0, -1, 0)              along ŷ: the inner Z and outer Y now turn about the same line
 ```
 
 
@@ -808,10 +844,10 @@ x = 90°:  (0, -1, 0)              the outer Y axis itself: Z and Y now do the s
 ## Gimbal lock, live
 
 <div class="cockpit" data-demo="euler-gimbal" data-controls="x,y,z,order,wiggle"><pre class="viz-fallback">  Unity order: outer Y (yaw), middle X (pitch), inner Z (roll)
-  -- (20, 45, 10) -----  x lands at (0.738, 0.163, -0.654)
+  -- (x, y, z) = (20, 45, 10) --  x lands at (0.738, 0.163, -0.654)
                          inner axis 70° from the outer axis
-  -- (90, 45, 10) -----  inner axis = outer axis: LOCKED
-                         wiggle outer and wiggle inner move the airplane the same way</pre></div>
+  -- (x, y, z) = (90, 45, 10) --  inner axis = outer axis: LOCKED
+                         wiggle outer and wiggle inner swing the airplane about the same axis (opposite senses)</pre></div>
 
 
 ---
@@ -821,11 +857,12 @@ x = 90°:  (0, -1, 0)              the outer Y axis itself: Z and Y now do the s
 Reading the triple back from `R` (Unity order); `atan2(s, c)` is the angle whose sine and cosine are proportional to `s` and `c`, in all four quadrants:
 
 ```text
+R_y R_x R_z:  R12 = -sin x,  R02 = sin y cos x,  R22 = cos y cos x,  R10 = cos x sin z,  R11 = cos x cos z
 (20°, 45°, 10°):  x = asin(-R12) = asin(0.342) = 20°
                   y = atan2(R02, R22) = atan2(0.6645, 0.6645) = 45°
                   z = atan2(R10, R11) = atan2(0.163, 0.925) = 10°
 (90°, 45°, 10°):  R12 = -1, so x = 90°, but R02 = R22 = R10 = R11 = 0:  atan2(0, 0)
-                  only y - z survives: atan2(R01, R00) = 35°
+                  only y - z survives (row 0 is (cos(y-z), sin(y-z), 0)): atan2(R01, R00) = 35°
 ```
 
 At the lock, `(90°, 45°, 10°)` and `(90°, 60°, 25°)` are the **same orientation**.
@@ -836,25 +873,25 @@ At the lock, `(90°, 45°, 10°)` and `(90°, 60°, 25°)` are the **same orient
 ## Two triples, one rotation
 
 ```text
-   (20°, 45°, 10°)   and   (160°, 225°, 190°)   give the SAME matrix in Unity's ZXY order
+   (20°, 45°, 10°)   and   (160°, 225°, 190°)   give the SAME matrix R_y R_x R_z (Unity's order)
 ```
 
-- every orientation has **two** Euler triples (away from the lock), and infinitely many at the lock
+- with each angle in [0°, 360°), every orientation has **two** Euler triples (away from the lock), and infinitely many at the lock
 - so "interpolate the three angles" can take the long way: from `(20, 45, 10)` to `(160, 225, 190)` is a large motion between identical poses
-- store and interpolate quaternions; show Euler angles only in the inspector
+- store and interpolate quaternions; show Euler angles only in the Inspector
 
 
 ---
 
 ## Gimbal lock, in flight
 
-The Apollo guidance platform held its orientation on **three gimbals**. Near lock, the crew was warned to steer away; on Apollo 11, when Houston warned that Columbia was close to gimbal lock, Michael Collins answered:
+The Apollo guidance platform held its orientation on **three gimbals**. Near lock, the crew was warned to steer away; on Apollo 11, when Houston warned that the command module Columbia was close to gimbal lock, Michael Collins answered:
 
 > "How about sending me a fourth gimbal for Christmas?"
 
 <small>Apollo 11 air-to-ground transcript, 1969.</small>
 
-Three gimbals are three Euler angles in hardware; a fourth, redundant gimbal removes the lock, as the fourth number of a quaternion does in software.
+Three gimbals are three Euler angles in hardware. A fourth, redundant gimbal keeps the axes from lining up; a quaternion has no nested axes to line up.
 
 
 ---

@@ -49,7 +49,7 @@
 - **Lines and planes**: nearest points, skew lines, signed distance, which side, projection onto a plane, reflection, rays against planes
 - **Triangles**: barycentric weights, inside or out, in both tracks
 - **Precision**: arccos near 0° and past 1, an angle that never fails, cancellation
-- **Rotation**: where the axes land; axis-angle and Rodrigues; angular velocity; quaternions and the half angle, composition, the shortest arc, slerp, the double cover, drift; yaw, pitch, roll, gimbals and gimbal lock; one rotation, five definitions
+- **Rotation**: where the axes land; axis-angle and Rodrigues; angular velocity; quaternions and the half angle, composition, the shortest arc, slerp (spherical linear interpolation), the double cover, drift; yaw, pitch, roll, gimbals and gimbal lock; one rotation, five definitions
 - **Wrap**, then HW1 help and open questions
 
 Reading: [Vectors](../../textbook/vectors.html), Sections 4 to 8 · [Rotation](../../textbook/rotation.html), Sections 1 to 8.

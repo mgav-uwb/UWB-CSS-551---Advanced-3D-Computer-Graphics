@@ -365,25 +365,25 @@
       </figure>
       <p>
         The nearest point on a line to a query point \(P_t\) is a projection: dot the offset
-        \(P_t - P_0\) against the unit direction to get the distance \(d\) along the line, and step
-        that far. For a segment, clamp \(d\) to the endpoints first. That clamp is the one line
+        \(P_t - P_0\) against the unit direction \(\hat{\mathbf{d}}\) to get the distance \(t\) along the line, and step
+        that far. For a segment, clamp \(t\) to the endpoints first. That clamp is the one line
         separating &ldquo;the infinite line&rdquo; from &ldquo;the thing you can walk on&rdquo;.
       </p>
       <figure>
         <img src="figures/vec-line-foot.svg" alt="A segment from the origin to (4,2) with three query points: (1,3) whose foot (2,1) lies inside the segment, (6,4) whose foot lies past the far end and is clamped to (4,2), and (-1,1) whose foot lies before the start and is clamped to the origin." />
         <figcaption>
-          Nearest point on a segment, three cases. The dashed drop is the perpendicular to the infinite line; where its foot falls outside \([0, \|\mathbf{v}\|]\), the nearest point of the <em>segment</em> is the end it overshot (ringed).
+          Nearest point on a segment, three cases. The dashed drop is the perpendicular to the infinite line; where its foot falls outside \([0, \|\mathbf{d}\|]\), the nearest point of the <em>segment</em> is the end it overshot (ringed).
         </figcaption>
       </figure>
       <div class="ex">
         <span class="tag">Worked example (point to segment, three points)</span>
-        Segment \(P_0 = (0,0)\) to \(P_1 = (4,2)\): \(\mathbf{v} = (4,2)\), \(\|\mathbf{v}\| = 4.472\),
-        \(\hat{\mathbf{v}} = (0.894, 0.447)\).
+        Segment \(P_0 = (0,0)\) to \(P_1 = (4,2)\): \(\mathbf{d} = P_1 - P_0 = (4,2)\), \(\|\mathbf{d}\| = 4.472\),
+        \(\hat{\mathbf{d}} = (0.894, 0.447)\).
         <table>
-          <tr><th>\(P_t\)</th><th>\(d = (P_t - P_0)\cdot\hat{\mathbf{v}}\)</th><th>foot \(P_0 + d\hat{\mathbf{v}}\)</th><th>inside?</th><th>nearest point of the segment</th></tr>
+          <tr><th>\(P_t\)</th><th>\(t = (P_t - P_0)\cdot\hat{\mathbf{d}}\)</th><th>foot \(P_0 + t\hat{\mathbf{d}}\)</th><th>inside?</th><th>nearest point of the segment</th></tr>
           <tr><td>\((1, 3)\)</td><td>\(0.894 + 1.342 = 2.236\)</td><td>\((2, 1)\)</td><td>yes</td><td>\((2, 1)\), at distance \(2.236\)</td></tr>
-          <tr><td>\((6, 4)\)</td><td>\(5.367 + 1.789 = 7.155\)</td><td>\((6.4, 3.2)\)</td><td>no, \(d > 4.472\)</td><td>the far end \((4, 2)\), at distance \(2.828\)</td></tr>
-          <tr><td>\((-1, 1)\)</td><td>\(-0.894 + 0.447 = -0.447\)</td><td>\((-0.4, -0.2)\)</td><td>no, \(d < 0\)</td><td>the start \((0, 0)\), at distance \(1.414\)</td></tr>
+          <tr><td>\((6, 4)\)</td><td>\(5.367 + 1.789 = 7.155\)</td><td>\((6.4, 3.2)\)</td><td>no, \(t > 4.472\)</td><td>the far end \((4, 2)\), at distance \(2.828\)</td></tr>
+          <tr><td>\((-1, 1)\)</td><td>\(-0.894 + 0.447 = -0.447\)</td><td>\((-0.4, -0.2)\)</td><td>no, \(t < 0\)</td><td>the start \((0, 0)\), at distance \(1.414\)</td></tr>
         </table>
         Every entry is a dot, a scale, an add, or a comparison. The unclamped foot would report the
         distances to the infinite line instead, \(0.894\) and \(1.342\): smaller, and wrong for the segment.
@@ -512,7 +512,7 @@
         \]
         The numerator is minus the signed distance of the ray&rsquo;s origin; the denominator is how
         fast the ray closes on the plane. If \(\hat{\mathbf{n}}\cdot\mathbf{d} = 0\) the ray runs
-        parallel and there is no hit; if \(t < 0\) the plane is behind the origin.
+        parallel and there is no hit; if \(t < 0\) the plane is behind the ray&rsquo;s start \(\mathbf{o}\).
       </div>
       <figure>
         <img src="figures/vec-ray-plane.svg" alt="Side view of the plane n dot P = D with four rays: one descends and hits the foot at t = 1.667, one rises and hits Q at t = 1, one runs parallel and never meets the plane, and one points away so the plane is behind it at t = -1.667." />
@@ -523,10 +523,10 @@
         The plane above, \(\hat{\mathbf{n}} = (\tfrac13, \tfrac23, \tfrac23)\), \(D = \tfrac13\).
         <table>
           <tr><th>origin \(\mathbf{o}\)</th><th>direction \(\mathbf{d}\)</th><th>\(\hat{\mathbf{n}}\cdot\mathbf{d}\)</th><th>\(t\)</th><th>hit</th></tr>
-          <tr><td>\((4, 1, 0)\)</td><td>\(-\hat{\mathbf{n}}\)</td><td>\(-1\)</td><td>\((\tfrac13 - \tfrac53)/(-1) = 1.667\)</td><td>\((3.444, -0.111, -1.111)\), the foot of Section 6</td></tr>
+          <tr><td>\((4, 1, 0)\)</td><td>\(-\hat{\mathbf{n}}\)</td><td>\(-1\)</td><td>\((\tfrac13 - 2)/(-1) = 1.667\)</td><td>\((3.444, -0.111, -1.111)\), the foot of Section 6</td></tr>
           <tr><td>\((0, 0, 0)\)</td><td>\((1, 0, 0)\)</td><td>\(\tfrac13\)</td><td>\((\tfrac13 - 0)/\tfrac13 = 1\)</td><td>\((1, 0, 0) = Q\)</td></tr>
           <tr><td>\((0, 0, 0)\)</td><td>\((0, 1, -1)/\sqrt2\)</td><td>\(0\)</td><td>none</td><td>parallel: the direction lies in the plane</td></tr>
-          <tr><td>\((4, 1, 0)\)</td><td>\(+\hat{\mathbf{n}}\)</td><td>\(1\)</td><td>\(-1.667\)</td><td>behind the origin: a ray never reaches it</td></tr>
+          <tr><td>\((4, 1, 0)\)</td><td>\(+\hat{\mathbf{n}}\)</td><td>\(1\)</td><td>\(-1.667\)</td><td>behind the start \(\mathbf{o}\): a ray never reaches it</td></tr>
         </table>
         The first row walks straight down the normal and covers exactly the signed distance; the
         second walks along \(x\) and closes at a third of the rate, so it needs three times the
@@ -606,9 +606,10 @@
         <span class="tag">Pitfall</span>
         <strong>The angle from \(\arccos(\mathbf{a}\cdot\mathbf{b})\) is useless for small angles.</strong>
         Near \(\theta = 0\), \(\cos\theta \approx 1 - \theta^2/2\), so the dot product of two unit
-        vectors \(\theta\) apart differs from 1 by only \(\theta^2/2\). Once that is below \(\varepsilon\),
-        the dot rounds to exactly 1 and the angle to exactly 0. The threshold is
-        \(\theta = \sqrt{2\varepsilon} = 4.9\times10^{-4}\) radians, about \(0.03^\circ\), and the loss
+        vectors \(\theta\) apart differs from 1 by only \(\theta^2/2\). Just below 1 the float32 values are
+        \(\varepsilon/2\) apart, so once \(\theta^2/2\) is under half that gap the dot rounds to exactly 1 and
+        the angle to exactly 0. The threshold is
+        \(\theta = \sqrt{\varepsilon/2} = 2.4\times10^{-4}\) radians, about \(0.014^\circ\), and the loss
         starts well before it. Measured in float32 arithmetic on \((1, 0, 0)\) against \((\cos\theta, \sin\theta, 0)\):
         <table>
           <tr><th>true \(\theta\) (rad)</th><th>float32 dot</th><th>\(\arccos\) gives</th><th>\(\mathrm{atan2}(\|\mathbf{a}\times\mathbf{b}\|, \mathbf{a}\cdot\mathbf{b})\) gives</th></tr>
@@ -647,14 +648,16 @@
         degenerate normal.
       </p>
       <p>
-        Dot products of long vectors have a third, milder hazard: catastrophic cancellation
-        (subtracting two nearly equal numbers keeps their absolute errors but loses their leading
-        digits). The dot
-        of \((10^6, 1, 0)\) with \((1, -10^6, 0)\) is \(10^6 - 10^6 = 0\) in exact arithmetic, but each
-        product is known only to about \(0.1\), so the computed sum is noise of that size. Positions
-        far from the origin are the usual source (a world a million units across, a camera near the
-        edge of it); the cure is to subtract a nearby reference point first, which is why the
-        camera&rsquo;s view matrix is applied before anything else is computed on a vertex.
+        Large coordinates have a third hazard: catastrophic cancellation (subtracting two nearly
+        equal numbers cancels their leading digits, and what is left is mostly their rounding errors).
+        float32 values near \(10^6\) are \(0.0625\) apart, so the points \(x_1 = 1000000.1\) and
+        \(x_2 = 1000000.2\) are stored as \(1000000.125\) and \(1000000.1875\), and \(x_2 - x_1\) comes out
+        \(0.0625\) instead of \(0.1\), 37.5 percent wrong; near the origin the same subtraction is right to
+        eight digits. The subtraction is exact; the damage was done when the large numbers were stored.
+        Positions far from the origin are the usual source (a world a million units across, a camera
+        near the edge of it); the cure is to keep the numbers small, storing positions relative to a
+        nearby origin (the camera, the object) before they become float32. Large-world games move the
+        origin with the player (a floating origin).
       </p>
 
 <!-- ============================================================ -->
@@ -668,11 +671,12 @@
       </p>
       <pre>const add = (p, q) =&gt; [p[0] + q[0], p[1] + q[1], p[2] + q[2]];
 const scale = (p, s) =&gt; p.map((x) =&gt; x * s);
-const v1  = sub(P1, P0);              // segment direction
-const v1n = normalize(v1);            // unit direction
-const d   = dot(sub(Pt, P0), v1n);    // projected distance along the line
-const foot = add(P0, scale(v1n, d));  // the foot of the perpendicular
-const inside = d &gt;= 0 &amp;&amp; d &lt;= Math.hypot(...v1);   // the clamp test</pre>
+const d    = sub(P1, P0);              // segment direction
+const p    = sub(Pt, P0);              // offset of the query point
+const dHat = normalize(d);             // unit direction
+const t    = dot(p, dHat);             // distance along the line
+const foot = add(P0, scale(dHat, t));  // the foot of the perpendicular
+const inside = t &gt;= 0 &amp;&amp; t &lt;= Math.hypot(...d);   // the clamp test</pre>
       <p>
         Two habits keep this code honest. Normalize before you dot when you want a length, or the
         result is scaled by the direction&rsquo;s magnitude. And test for zero-length
