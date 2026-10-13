@@ -4,7 +4,11 @@
      tools/gen-textbook-figures-foundations.mjs from lib/core/xform.js (axisAngleMatrix, quatFromAxisAngle;
      v2.0 adds the matrix properties, reflections, the matrix form of Rodrigues, the log map, the small-angle
      approximation, quaternion-matrix conversions and Euler extraction); the numbers quoted here come from
-     figures/numbers-foundations.json. Never hand-edit either. -->
+     figures/numbers-foundations.json. Never hand-edit either. v2.1 (2026-10-13) adds figures from
+     tools/gen-textbook-figures-rotation-intuition.mjs (rot-half-angle, rot-noncommute, rot-yaw-pitch-roll,
+     rot-euler-orders, rot-shortest-arc, rot-tangent-step, rot-trace, rot-long-way), computed from
+     lib/core/rot-reps.js, and links to the rotation demos (rotation-ways, axis-angle, spin-step, rot-compose,
+     quat-slerp, euler-gimbal). -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -32,7 +36,7 @@
       </blockquote>
 
       <p class="lead">
-        A rotation keeps lengths and angles and fixes the origin, which makes it the best-behaved transform in graphics and, at the same time, the hardest to store well. A matrix applies it fast but drifts and cannot be blended; an axis and an angle say what it is; a quaternion stores it in four numbers that compose by multiplication and blend along a sphere; three Euler angles read nicely and lock. This chapter builds the four in that order, proves what a rotation matrix must satisfy and checks it numerically, derives Rodrigues&rsquo; formula from the projection split of <a href="vectors.html#dot">the vectors chapter</a> and then writes it as a matrix, recovers an axis and angle from a matrix, converts a quaternion to a matrix and back, verifies the quaternion sandwich on a point by hand, extracts Euler angles from a matrix and watches the extraction fail at the lock, and measures the drift with real single-precision arithmetic. One axis and angle, \((0, 1, 0)\) at \(30^\circ\), runs through the worked examples and the live demo.
+        A rotation keeps lengths and angles and fixes the origin, which makes it the best-behaved transform in graphics and, at the same time, the hardest to store well. A matrix applies it fast but drifts and cannot be blended; an axis and an angle say what it is; a quaternion stores it in four numbers that compose by multiplication and blend along a sphere; three Euler angles read nicely and lock; and &ldquo;turn this direction onto that one&rdquo; names the smallest rotation that does it. This chapter builds the four representations in that order, proves what a rotation matrix must satisfy and checks it numerically, derives Rodrigues&rsquo; formula from the projection split of <a href="vectors.html#dot">the vectors chapter</a> and then writes it as a matrix, recovers an axis and angle from a matrix, converts a quaternion to a matrix and back, verifies the quaternion sandwich on a point by hand, extracts Euler angles from a matrix and watches the extraction fail at the lock, and measures the drift with real single-precision arithmetic. One axis and angle, \((0, 1, 0)\) at \(30^\circ\), runs through the worked examples and the live demo.
       </p>
 
       <div class="toc">
@@ -57,6 +61,7 @@
         <span class="tag">Definition (rotation)</span>
         A rotation is a linear map \(R\) that preserves the dot product,
         \((R\mathbf{u})\cdot(R\mathbf{v}) = \mathbf{u}\cdot\mathbf{v}\), and preserves handedness.
+        (<em>Linear</em>: it sends sums to sums and multiples to multiples, \(R(a\mathbf{u} + b\mathbf{v}) = aR\mathbf{u} + bR\mathbf{v}\).)
         Preserving dot products preserves lengths and angles; linearity fixes the origin. In
         matrix terms, \(R^{\mathsf T}R = I\) and \(\det R = +1\): the columns of \(R\) are unit and
         mutually perpendicular. (With \(\det R = -1\) the map is a reflection, which also keeps
@@ -70,6 +75,8 @@
       <h3>1.1 The three properties, and why they follow from one</h3>
       <div class="thm">
         <span class="tag">Orthogonal matrices</span>
+        The transpose \(R^{\mathsf T}\) is \(R\) with its rows written as columns, so entry \((i, j)\) of
+        \(R^{\mathsf T}R\) is column \(i\) of \(R\) dotted with column \(j\).
         If \(R^{\mathsf T}R = I\) then: (i) \(R^{-1} = R^{\mathsf T}\), so the inverse costs nothing;
         (ii) the columns are orthonormal (entry \((i, j)\) of \(R^{\mathsf T}R\) is column \(i\) dotted with
         column \(j\)), and so are the rows; (iii) \(\det R = \pm1\), since
@@ -84,7 +91,10 @@
         \(0.866\cdot0.5 + 0 - 0.5\cdot0.866 = 0\); the full product \(R^{\mathsf T}R\) is the identity to
         \(10^{-6}\) in every entry. The determinant is \(0.866\cdot0.866 - 0.5\cdot(-0.5) = 1\). And the
         transpose undoes the rotation: \(R^{\mathsf T}(1.016, 0.6, -0.24) = (1, 0.6, 0.3)\), the vector
-        Section 3 started from. Nine numbers, six constraints, three degrees of freedom left.
+        Section 3 started from. Nine numbers, six constraints (three unit lengths, three right angles),
+        three <em>degrees of freedom</em> left: three numbers can still be chosen freely, two to aim the
+        new \(x\) axis and one to twist the new \(y\) axis about it, and the new \(z\) axis is then
+        forced to be their cross product.
       </div>
       <h3>1.2 Reflections, and why two of them are a rotation</h3>
       <figure>
@@ -101,7 +111,16 @@
         which is \(R_z(180^\circ)\). Every rotation is a product of two reflections, and no product of
         an odd number of reflections is a rotation. A model imported with one negative scale factor
         is in the second class, which <a href="affine-transforms.html#affine">the affine chapter</a>
-        returns to.
+        returns to. (\(\mathrm{diag}(a, b, c)\) is the matrix with \(a, b, c\) on its diagonal and zeros
+        elsewhere: it scales the three axes.)
+      </div>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=rotation-ways" target="_blank" rel="noopener">One rotation, five definitions</a>, in its
+        <em>columns</em> mode: aim the new \(x\) axis (two sliders) and twist the new \(y\) axis about it
+        (one slider); the new \(z\) axis is forced to be \(x' \times y'\), which is the three degrees of
+        freedom in your hands. The <em>mirror</em> switch sets \(z' = -(x' \times y')\): the determinant
+        reads \(-1\) and the cube turns into its mirror image.
       </div>
 
 <!-- ============================================================ -->
@@ -125,7 +144,10 @@
       </figure>
       <div class="thm">
         <span class="tag">The column reading</span>
-        For any linear map, column \(j\) of the matrix is the image of the \(j\)-th basis vector.
+        A matrix times a vector is a mix of the matrix&rsquo;s columns:
+        \(M\mathbf{v} = v_x\,(\text{column }0) + v_y\,(\text{column }1) + v_z\,(\text{column }2)\).
+        Feed it a basis vector and only one column survives, so
+        for any linear map, column \(j\) of the matrix is the image of the \(j\)-th basis vector.
         A rotation matrix is therefore its rotated basis vectors, stacked as columns. You can read
         where any axis goes without multiplying anything. Its rows are the same statement for the
         inverse: row \(i\) is where the \(i\)-th axis <em>came from</em>.
@@ -211,7 +233,10 @@
         <a href="../lib/demo.html?demo=axis-angle" target="_blank" rel="noopener">Axis-angle rotation</a>:
         a cube spins about a draggable axis; the panel prints the matrix and the quaternion,
         both from the course&rsquo;s own code. Drag the angle and watch column 0 trace
-        \((\cos\theta, 0, -\sin\theta)\).
+        \((\cos\theta, 0, -\sin\theta)\). The <em>Rodrigues construction</em> layer draws this
+        section&rsquo;s vectors for \(\mathbf{v} = (1, 0.6, 0.3)\): the frozen part \(\mathbf{v}_\parallel\),
+        the turning part \(\mathbf{v}_\perp\), \(\mathbf{w} = \hat{\mathbf{n}}\times\mathbf{v}\), and
+        \(\mathbf{v}'\) sweeping its circle of radius \(1.044\) at height \(0.6\).
       </div>
       <h3>3.1 Rodrigues as a matrix</h3>
       <p>
@@ -252,9 +277,24 @@
       </div>
       <h3>3.2 The log map: axis and angle from a matrix</h3>
       <p>
-        The formula also runs backward. The trace of \(R\) is \(3 + 0 + (1 - \cos\theta)\,\mathrm{tr}(K^2)\), and
+        The <em>trace</em> of a matrix is the sum of its diagonal entries. For a rotation it has a
+        picture. Diagonal entry \(i\) is \(\mathbf{e}_i\cdot(R\mathbf{e}_i)\): how much of axis \(i\)
+        is still pointing along itself after the turn. Measure with a frame lined up with the
+        rotation, one axis along \(\hat{\mathbf{n}}\) and two in the plane across it: the axis keeps all
+        of itself (1), and each in-plane direction keeps \(\cos\theta\) of itself. The trace is the same
+        in every orthonormal frame (a change of frame is \(R\mapsto Q^{\mathsf T}RQ\), and the trace of a
+        product does not change when its factors are cycled), so \(\mathrm{tr}\,R = 1 + 2\cos\theta\)
+        whatever the axis. For \(R_y(30^\circ)\): \(0.866 + 1 + 0.866 = 2.732 = 1 + 2(0.866)\).
+      </p>
+      <figure>
+        <img src="figures/rot-trace.svg" alt="The rotation axis n unchanged, and two perpendicular unit vectors e1 and e2 in the plane across it with their images R e1 and R e2 turned by theta; the projection of each image back onto the original is cos theta." />
+        <figcaption>Why \(\mathrm{tr}\,R = 1 + 2\cos\theta\): the axis keeps all of itself, each of two perpendicular in-plane directions keeps \(\cos\theta\) of itself. Computed from the library&rsquo;s matrix for the drawn angle.</figcaption>
+      </figure>
+      <p>
+        The same fact, from the matrix form: the trace of \(R\) is \(3 + 0 + (1 - \cos\theta)\,\mathrm{tr}(K^2)\), and
         \(\mathrm{tr}(K^2) = -2\) for a unit axis, so \(\mathrm{tr}\,R = 1 + 2\cos\theta\). The symmetric part of \(R\) is
-        \(I + (1 - \cos\theta)K^2\) and the antisymmetric part is \(\sin\theta\,K\), from which the axis
+        \(I + (1 - \cos\theta)K^2\) and the antisymmetric part (half of \(R - R^{\mathsf T}\), the matrix minus
+        its transpose, which keeps only the off-diagonal differences) is \(\sin\theta\,K\), from which the axis
         can be read entry by entry:
       </p>
       <div class="thm">
@@ -286,12 +326,18 @@
       </div>
       <h3>3.3 Small angles, and the angular velocity</h3>
       <p>
-        For small \(\theta\), \(\sin\theta\approx\theta\) and \(1 - \cos\theta\approx\theta^2/2\), so
-        \(R \approx I + \theta K + \tfrac12\theta^2K^2\), and to first order \(R\mathbf{v}\approx\mathbf{v} + \theta\,\hat{\mathbf{n}}\times\mathbf{v}\).
+        For small \(\theta\) (in radians), \(\sin\theta\approx\theta\) and \(1 - \cos\theta\approx\theta^2/2\), so
+        \(R \approx I + \theta K + \tfrac12\theta^2K^2\), and to <em>first order</em> (keeping the terms
+        proportional to \(\theta\) and dropping \(\theta^2, \theta^3, \ldots\))
+        \(R\mathbf{v}\approx\mathbf{v} + \theta\,\hat{\mathbf{n}}\times\mathbf{v}\): a small turn moves every point
+        along the tangent \(\hat{\mathbf{n}}\times\mathbf{v}\) of its circle.
         That is the physics of spinning: a body turning about \(\hat{\mathbf{n}}\) at rate \(\omega\) has
         <strong>angular velocity</strong> \(\boldsymbol\omega = \omega\hat{\mathbf{n}}\), and a point at \(\mathbf{p}\) on it
         moves with velocity \(\boldsymbol\omega\times\mathbf{p}\). The exact rotation is the limit of many small
-        ones, \(R = \exp(\theta K)\), the matrix exponential, which is why the axis-angle vector
+        ones, \(R = \exp(\theta K)\), the <em>matrix exponential</em>, defined by the same power series as
+        \(e^x\): \(\exp(A) = I + A + A^2/2! + A^3/3! + \cdots\). For \(A = \theta K\), \(K^3 = -K\) folds every
+        power back onto \(K\) or \(K^2\), the odd terms sum to \(\sin\theta\,K\) and the even ones to
+        \((1 - \cos\theta)K^2\), which is Rodrigues again. That is why the axis-angle vector
         \(\theta\hat{\mathbf{n}}\) is called the <em>exponential coordinate</em> of a rotation and Section 3.2 its
         <em>logarithm</em>.
       </p>
@@ -309,6 +355,28 @@
         keeps it on. Sixty such steps a second is the drift measured in Section 7, and
         <a href="animation.html#simulation">the animation chapter</a> shows the same effect in a spring.
       </div>
+      <figure>
+        <img src="figures/rot-tangent-step.svg" alt="Top view of a unit circle: a point p, its tangent velocity, a linear step landing outside the circle, and repeated linear steps spiralling outward while exact steps stay on the circle." />
+        <figcaption>The linear step, drawn with a large step so it shows: each step is along the tangent, perpendicular to \(\mathbf{p}\), so by Pythagoras it multiplies the length by \(\sqrt{1 + (\omega\Delta t)^2}\). Exact steps stay on the circle.</figcaption>
+      </figure>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        <strong>Stepping a spin with the linear rule.</strong> The update
+        \(\mathbf{p}\leftarrow\mathbf{p} + \Delta t\,(\boldsymbol\omega\times\mathbf{p})\), where \(\Delta t\) is the
+        time one frame advances (an <em>explicit Euler step</em>: move along the current velocity for one
+        time step), multiplies the length by \(\sqrt{1 + (\omega\Delta t)^2}\) every frame, and the error
+        compounds: at \(90^\circ\) per second and 60 steps per second the point is at radius \(1.000343\)
+        after one step, \(1.0208\) after one second, and \(1.2282\) after ten. A spinning object integrated
+        this way spirals outward. Step the orientation instead, by the rotation of \(\boldsymbol\omega\Delta t\)
+        (as a quaternion, Section 4), and renormalize.
+      </div>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=spin-step" target="_blank" rel="noopener">Angular velocity: stepping a spin</a>:
+        two points start at \((1, 0, 0)\) on a turntable; one takes the linear step, one the exact
+        rotation per frame. Scrub the time to 1 s and 10 s and read the two radii; lower the steps per
+        second to 4 to see the spiral at a glance.
+      </div>
 
 <!-- ============================================================ -->
       <h2 id="quaternions">4 &middot; Quaternions</h2>
@@ -319,6 +387,29 @@
         orientations cannot be blended. A quaternion has four numbers, one constraint, composes by
         multiplication, and blends along a sphere.
       </p>
+      <h3>4.0 What a quaternion is</h3>
+      <p>
+        A complex number \(a + b\,i\) with \(i^2 = -1\) turns the plane: multiplying by
+        \(\cos\theta + i\sin\theta\) adds \(\theta\) to every angle. William Rowan Hamilton spent years
+        looking for the three-dimensional version and found, on 16 October 1843, that it needs
+        <em>three</em> imaginary units. A quaternion is \(w + x\,i + y\,j + z\,k\), multiplied by the
+        rule he carved into Broom Bridge in Dublin,
+      </p>
+      \[
+        i^2 = j^2 = k^2 = ijk = -1, \qquad\text{so}\qquad ij = k,\; jk = i,\; ki = j, \qquad ji = -k,\; kj = -i,\; ik = -j .
+      \]
+      <p>
+        \(w\) is the <em>scalar part</em> and \((x, y, z)\) the <em>vector part</em>; the words entered
+        mathematics here. Writing a quaternion as (vector part, scalar part) and expanding a product term
+        by term with these rules gives
+      </p>
+      \[
+        (\mathbf{v}, w)\,(\mathbf{u}, s) = \big(w\,\mathbf{u} + s\,\mathbf{v} + \mathbf{v}\times\mathbf{u},\;\; ws - \mathbf{v}\cdot\mathbf{u}\big),
+      \]
+      <p>
+        a dot, a cross and two scalings. The cross product is why the product does not commute, and
+        rotations do not commute either.
+      </p>
       <div class="def">
         <span class="tag">Definition (unit quaternion of a rotation)</span>
         For axis \(\hat{\mathbf{n}}\) and angle \(\theta\),
@@ -327,7 +418,7 @@
         \]
         three &ldquo;vector&rdquo; components and one scalar \(w\), in the storage order of three.js and
         Unity. It has unit length: \(x^2 + y^2 + z^2 + w^2 = \sin^2\tfrac\theta2 + \cos^2\tfrac\theta2 = 1\).
-        The identity is \((0, 0, 0, 1)\). The inverse of a unit quaternion is its conjugate,
+        The identity is \((0, 0, 0, 1)\). The inverse of a unit quaternion is its <em>conjugate</em>, the vector part negated,
         \(q^{-1} = (-x, -y, -z, w)\): same axis, opposite angle.
       </div>
       <div class="ex">
@@ -337,9 +428,30 @@
         Unit length: \(0.259^2 + 0.966^2 = 0.067 + 0.933 = 1.000\). This is the demo panel&rsquo;s \(q\) row.
       </div>
       <p>
-        The half angle is the one surprise. It comes from how a quaternion rotates a point: by a
-        <strong>sandwich</strong>, \(p' = q\,p\,q^{-1}\), which applies the half-turn twice. Expanded
-        into vector operations (with \(\mathbf{q}_v = (x, y, z)\)) the sandwich needs no
+        The half angle is the one surprise. It comes from how a quaternion rotates a point: write the
+        point as the quaternion \((\mathbf{p}, 0)\) and multiply on both sides, a <strong>sandwich</strong>,
+        \(p' = q\,p\,q^{-1}\). Split \(\mathbf{p}\) as in Section 3. On the part across the axis,
+        \(\hat{\mathbf{n}}\cdot\mathbf{p} = 0\), so the product rule above gives
+        \(q\,(\mathbf{p}, 0) = (\cos\tfrac\theta2\,\mathbf{p} + \sin\tfrac\theta2\,\hat{\mathbf{n}}\times\mathbf{p},\; 0)\):
+        the left factor turns it by \(\theta/2\), and the right factor \(q^{-1}\) turns it by another
+        \(\theta/2\). On the part along the axis, the left factor tilts it into the fourth (\(w\)) component
+        and the right factor tilts it back, leaving it unchanged. So the point turns by \(\theta\) while
+        \(q\) itself has turned only \(\theta/2\). A one-sided product \(q\,p\) would turn the across part by
+        half the angle and smear the along part into \(w\); the sandwich is what makes the halves add.
+      </p>
+      <figure>
+        <img src="figures/rot-half-angle.svg" alt="Left: an object turned by theta at 0, 90, 180, 270 and 360 degrees, back home at 360. Right: the quaternion's point (cos theta/2, sin theta/2) on a unit circle, reaching (0, 1) at theta = 180 and (-1, 0), minus the identity, at theta = 360, and home again only at 720." />
+        <figcaption>The object needs one lap, \(360^\circ\), to come home; \(q\) needs two. At \(\theta = 360^\circ\) the object is back where it started and \(q = (0, 0, 0, -1)\), minus the identity: every rotation has two quaternions (Section 4.2).</figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        The <a href="../lib/demo.html?demo=axis-angle" target="_blank" rel="noopener">axis-angle demo</a>&rsquo;s
+        <em>half angle</em> layer shows two dials: the cube&rsquo;s turn \(\theta\) and \(q\)&rsquo;s point
+        \((\cos\tfrac\theta2, \sin\tfrac\theta2)\). Drag to \(180^\circ\) (\(w = 0\)) and to \(360^\circ\)
+        (the cube is home, \(q = (0, 0, 0, -1)\)).
+      </div>
+      <p>
+        Expanded into vector operations (with \(\mathbf{q}_v = (x, y, z)\)) the sandwich needs no
         trigonometry at all:
       </p>
       \[
@@ -374,7 +486,7 @@
         \]
         Going back, the trace is \(3 - 4(x^2 + y^2 + z^2) = 4w^2 - 1\), so \(w = \tfrac12\sqrt{1 + \mathrm{tr}\,R}\),
         and the off-diagonal differences give \(x = (R_{21} - R_{12})/4w\) and its cyclic siblings. When
-        \(w\) is small the division loses digits, so a robust routine (Shepperd&rsquo;s method) picks
+        \(w\) is small the division loses digits, so a robust routine (Shepperd&rsquo;s method, 1978) picks
         whichever of \(w, x, y, z\) is largest from the diagonal, computes that one by a square root,
         and divides the others by it.
       </div>
@@ -397,8 +509,13 @@
         exactly those numbers. Every rotation has two quaternions, antipodal on the unit sphere.
         This matters in exactly one place, interpolation: the arc from \(q_1\) to \(q_2\) and the arc
         from \(q_1\) to \(-q_2\) reach the same orientation, but one is short and the other goes the
-        long way round. Section 5 tests the sign of \(q_1\cdot q_2\) for that reason.
+        long way round. Section 5 tests the sign of \(q_1\cdot q_2\) for that reason. The name for the
+        two-to-one relation is the <em>double cover</em>: the unit quaternions cover the rotations twice.
       </p>
+      <figure>
+        <img src="figures/rot-long-way.svg" alt="The circle through the identity and q2: q2 sits 60 degrees from the identity, minus q2 sits 120 degrees away; the short arc is a 120 degree turn and the long arc a 240 degree turn the other way." />
+        <figcaption>\(q_2\) and \(-q_2\) are the same orientation, \(R_y(120^\circ)\). From the identity, the arc to \(q_2\) (\(q_1\cdot q_2 = 0.5 > 0\)) is a \(120^\circ\) turn; the arc to \(-q_2\) (\(q_1\cdot(-q_2) = -0.5\)) is a \(240^\circ\) turn the other way.</figcaption>
+      </figure>
 
 <!-- ============================================================ -->
       <h2 id="slerp">5 &middot; Composition and interpolation</h2>
@@ -432,18 +549,74 @@
         composite is itself one rotation: reading \(q\) back, its angle is
         \(2\arccos 0.933 = 42.2^\circ\) about the axis \((0.695, 0.695, 0.186)\), a single turn
         about a tilted axis that no one specified. Two rotations about two axes are always one
-        rotation about a third, and Section 3.2 read the same axis and angle out of the matrix.
+        rotation about a third, and Section 3.2 read the same axis and angle out of the matrix. The
+        other order, \(q_y\,q_x = (0.25, 0.25, -0.067, 0.933)\), differs only in the sign of the cross-product
+        term, and its pose is \(15.4^\circ\) away.
       </div>
+      <figure>
+        <img src="figures/rot-noncommute.svg" alt="Two rows of three poses of a small airplane: x 90 degrees then y 90 degrees, and y 90 degrees then x 90 degrees; the final poses differ." />
+        <figcaption>Order matters: the same two quarter turns in the two orders, computed with the library&rsquo;s matrices. Each final pose is itself one \(120^\circ\) turn, about two different cube diagonals.</figcaption>
+      </figure>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=rot-compose" target="_blank" rel="noopener">Composing rotations</a>: two copies of
+        an object, &ldquo;A then B&rdquo; and &ldquo;B then A&rdquo;, with the single equivalent axis of each drawn in
+        gold. Play animates the two sequences; set both angles to \(90^\circ\), then put both turns on the same
+        axis and watch the two orders agree.
+      </div>
+      <h3>5.1 From one direction to another</h3>
       <p>
-        <strong>Blending.</strong> To ease a camera from orientation \(q_1\) to \(q_2\), walk the
-        short arc between them on the unit sphere at constant angular speed
-        (<em>slerp</em>, spherical linear interpolation). A straight-line blend leaves the sphere:
-        halfway between two orientations \(120^\circ\) apart, the average quaternion has length
-        \(0.5\), and renormalizing it gives a rotation that moves fast in the middle and slow at
-        the ends.
+        A fifth way to name a rotation: &ldquo;turn this direction onto that one&rdquo;, as when a head turns
+        toward a target. For unit vectors \(\mathbf{a}\) and \(\mathbf{b}\), the smallest such rotation has axis
+        \(\mathbf{a}\times\mathbf{b}\) and angle \(\arccos(\mathbf{a}\cdot\mathbf{b})\), and its quaternion needs no
+        trigonometry: since \(1 + \mathbf{a}\cdot\mathbf{b} = 1 + \cos\theta = 2\cos^2\tfrac\theta2\) and
+        \(\|\mathbf{a}\times\mathbf{b}\| = \sin\theta = 2\sin\tfrac\theta2\cos\tfrac\theta2\), both carry the factor
+        \(2\cos\tfrac\theta2\), and
+      </p>
+      \[
+        q = \mathrm{normalize}\big(\mathbf{a}\times\mathbf{b},\; 1 + \mathbf{a}\cdot\mathbf{b}\big)
+      \]
+      <p>
+        is exactly \((\sin\tfrac\theta2\,\hat{\mathbf{n}}, \cos\tfrac\theta2)\). Unity&rsquo;s
+        <code>Quaternion.FromToRotation</code> and three.js&rsquo;s <code>setFromUnitVectors</code> compute it. It
+        names one rotation among many: any extra twist about \(\mathbf{b}\) also sends \(\mathbf{a}\) onto
+        \(\mathbf{b}\), and this one has none.
       </p>
       <figure>
-        <img src="figures/rot-slerp.svg" alt="A unit circle with two orientations q1 and q2 120 degrees apart; the straight-line lerp points in amber cut inside the circle and bunch toward the middle, while the slerp points in blue sit evenly spaced along the arc." />
+        <img src="figures/rot-shortest-arc.svg" alt="Unit vectors a and b from the origin, the 61.3 degree arc from a to b, the rotation axis a cross b, and the halfway direction normalize(a + b) at half the angle from each." />
+        <figcaption>The shortest arc from \(\mathbf{a} = (0.6, 0.8, 0)\) to \(\mathbf{b} = (0, 0.6, 0.8)\): axis along \(\mathbf{a}\times\mathbf{b}\), angle \(61.3^\circ\); the halfway direction \(\mathrm{normalize}(\mathbf{a} + \mathbf{b})\) sits at \(\theta/2\) from each.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (the shortest arc)</span>
+        \(\mathbf{a} = (0.6, 0.8, 0)\), \(\mathbf{b} = (0, 0.6, 0.8)\): \(\mathbf{a}\cdot\mathbf{b} = 0.48\),
+        \(\mathbf{a}\times\mathbf{b} = (0.8\cdot0.8 - 0,\; 0 - 0.6\cdot0.8,\; 0.6\cdot0.6 - 0) = (0.64, -0.48, 0.36)\), so
+        \(q = \mathrm{normalize}(0.64, -0.48, 0.36, 1.48) = (0.372, -0.279, 0.209, 0.860)\), angle
+        \(2\arccos 0.860 = 61.3^\circ = \arccos 0.48\). The sandwich applied to \(\mathbf{a}\) returns
+        \((0, 0.6, 0.8) = \mathbf{b}\).
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        <strong>Turning a vector onto its opposite.</strong> For \(\mathbf{a} = (1, 0, 0)\),
+        \(\mathbf{b} = (-1, 0, 0)\): \(\mathbf{a}\times\mathbf{b} = \mathbf{0}\) and \(1 + \mathbf{a}\cdot\mathbf{b} = 0\), so
+        the formula normalizes four zeros and returns NaN. Every axis perpendicular to \(\mathbf{a}\) gives a
+        valid half turn, so there is nothing to pick; robust code tests \(1 + \mathbf{a}\cdot\mathbf{b} < \varepsilon\)
+        (a small tolerance) and chooses a perpendicular axis by a fixed rule, such as
+        \(\mathbf{a}\times(0, 1, 0)\), or \(\mathbf{a}\times(1, 0, 0)\) when that is also near zero.
+      </div>
+      <h3>5.2 Blending orientations</h3>
+      <p>
+        To ease a camera from orientation \(q_1\) to \(q_2\), walk the
+        short arc between them on the unit sphere at constant angular speed
+        (<em>slerp</em>, spherical linear interpolation). The unit quaternions are the points
+        \((x, y, z, w)\) of length 1, a sphere in four dimensions; the shortest path between two of them is a
+        <em>great arc</em>, which lies in the plane through \(q_1\), \(q_2\) and the origin, so every slerp
+        happens on an ordinary circle. A straight-line blend leaves the sphere:
+        halfway between two orientations \(120^\circ\) apart (\(60^\circ\) apart on the sphere), the
+        average quaternion has length \(0.866\), and renormalizing it gives a rotation that moves fast
+        in the middle and slow at the ends.
+      </p>
+      <figure>
+        <img src="figures/rot-slerp.svg" alt="A unit circle with the identity q1 and the quaternion q2 of a 120 degree turn, 60 degrees apart on the circle; the straight-line lerp points in amber cut inside the circle, while the slerp points in blue sit evenly spaced along the arc." />
         <figcaption>
           Unit quaternions live on the unit sphere in four dimensions; a circle stands in for it. Every slerp step is a valid rotation and the steps are equal; the lerp steps are neither.
         </figcaption>
@@ -452,6 +625,10 @@
         \mathrm{slerp}(q_1, q_2, t) = \frac{\sin\big((1-t)\Omega\big)}{\sin\Omega}\,q_1 + \frac{\sin(t\,\Omega)}{\sin\Omega}\,q_2, \qquad \cos\Omega = q_1\cdot q_2 .
       \]
       <p>
+        \(\Omega\) is the angle between the two quaternions in four dimensions, half the turn between the
+        orientations (the half angle again).
+      </p>
+      <p>
         (If \(q_1\cdot q_2 < 0\), negate one of them first: \(q\) and \(-q\) are the same rotation,
         and the short arc is the one between the nearer pair. For the pair below, using \(-q_2\)
         would give \(\cos\Omega = -0.5\), \(\Omega = 120^\circ\), and a swing of \(240^\circ\) the other
@@ -459,8 +636,16 @@
         the same small quaternion each frame is a discretized slerp; it is how a turntable, a
         door, or an orbiting camera is animated without ever touching a matrix, and
         <a href="animation.html#rotations">the animation chapter</a> measures slerp against the
-        normalized-lerp shortcut.
+        normalized-lerp shortcut, <em>nlerp</em> (normalize the straight blend): it walks the same arc at an
+        uneven speed, \(27.8^\circ\) at \(t = 0.25\) where slerp has turned \(30^\circ\) for the pair below, with no
+        sine or arccosine to evaluate.
       </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=quat-slerp" target="_blank" rel="noopener">Blending orientations</a>: scrub \(t\)
+        under slerp, nlerp and the plain blend and compare the spacing of the dots; the inset is this
+        section&rsquo;s circle. Tick &ldquo;use \(-q_2\)&rdquo; and untick the sign check to see the long way round.
+      </div>
       <div class="ex">
         <span class="tag">Worked example (slerp midpoint)</span>
         From the identity \((0,0,0,1)\) to \(R_y(120^\circ)\), \(q_2 = (0, 0.866, 0, 0.5)\):
@@ -473,6 +658,17 @@
 
 <!-- ============================================================ -->
       <h2 id="euler">6 &middot; Euler angles and gimbal lock</h2>
+      <p>
+        The vocabulary comes from vehicles. <em>Yaw</em> turns about the up axis (look left or right),
+        <em>pitch</em> about the side or wing axis (nose up or down), <em>roll</em> about the forward axis
+        (bank). In Unity, with \(y\) up and \(z\) forward, yaw is about \(y\), pitch about \(x\) and roll about
+        \(z\); aerospace puts \(x\) forward and \(z\) down, so there roll is about \(x\), pitch about \(y\) and yaw
+        about \(z\). Same words, different letters.
+      </p>
+      <figure>
+        <img src="figures/rot-yaw-pitch-roll.svg" alt="A small airplane with its three body axes: yaw about the up axis, pitch about the wing axis, roll about the forward axis, with curved arrows." />
+        <figcaption>Yaw, pitch and roll in Unity&rsquo;s convention (\(y\) up, \(z\) forward). Schematic.</figcaption>
+      </figure>
       <p>
         The human way to say an orientation: three rotations about three axes, in a fixed order.
         Unity&rsquo;s <code>Quaternion.Euler(x, y, z)</code> applies \(Z\) first, then \(X\), then
@@ -506,6 +702,18 @@
         Unity and aerospace ones by \(8.2^\circ\). Same three numbers, three poses.
       </div>
       <figure>
+        <img src="figures/rot-euler-orders.svg" alt="Three airplanes posed by the same angles (20, 45, 10) under Unity's, three.js's and the aerospace order, each labeled with where its x axis lands." />
+        <figcaption>One triple, three conventions, three poses, computed with the library&rsquo;s matrices: the \(x\) axis lands at \((0.738, 0.163, -0.654)\), \((0.696, 0.401, -0.595)\) and \((0.696, 0.123, -0.707)\).</figcaption>
+      </figure>
+      <p>
+        A <em>gimbal</em> is a ring on two pins: it turns about one axis, the line through its pins. Nest
+        three, each pinned inside the last, and the outer ring turns everything inside it while the inner one
+        turns only the object. Three nested gimbals are a physical Euler-angle triple read intrinsically:
+        the outer angle is the leftmost factor of the product, the inner angle the rightmost. Gyroscopes,
+        camera heads and spacecraft inertial platforms are built this way, which is where the next
+        failure got its name.
+      </p>
+      <figure>
         <img src="figures/rot-gimbal.svg" alt="Two 3D diagrams of the three effective Euler axes for Unity's Z-X-Y order: at pitch 30 degrees the inner Z axis points to (0, -0.5, 0.866), distinct from the outer Y axis; at pitch 90 degrees it points to (0, -1, 0), along the Y axis." />
         <figcaption>
           The effective axes of the three Euler rotations in the world, computed from the rotation matrices. The middle rotation (about \(X\)) carries the inner \(Z\) axis with it; at \(X = 90^\circ\) the inner axis has been tipped onto the outer one.
@@ -521,11 +729,20 @@
         freedom is gone until \(x\) is backed off \(90^\circ\). That dead direction is
         <strong>gimbal lock</strong>.
       </div>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=euler-gimbal" target="_blank" rel="noopener">Euler angles on three gimbals</a>:
+        three nested rings carry a small airplane. Drag the pitch to \(90^\circ\) and press &ldquo;wiggle
+        outer&rdquo; and &ldquo;wiggle inner&rdquo;: both turn the airplane about the same world axis. Back the pitch
+        off to \(30^\circ\) and the two wiggles differ. Switch the order to three.js and the lock moves to the
+        middle angle of that order, \(y\).
+      </div>
       <h3>6.2 Extracting Euler angles from a matrix</h3>
       <p>
         Multiplying out \(R_y(y)\,R_x(x)\,R_z(z)\) puts single trigonometric factors in three places:
         the entry \((1, 2)\) is \(-\sin x\), the entries \((0, 2)\) and \((2, 2)\) are \(\sin y\cos x\) and
-        \(\cos y\cos x\), and the entries \((1, 0)\) and \((1, 1)\) are \(\cos x\sin z\) and \(\cos x\cos z\). So
+        \(\cos y\cos x\), and the entries \((1, 0)\) and \((1, 1)\) are \(\cos x\sin z\) and \(\cos x\cos z\). So,
+        with \(\mathrm{atan2}(s, c)\) the angle whose sine and cosine are in the ratio \(s : c\), in all four quadrants,
       </p>
       \[
         x = \arcsin(-R_{12}), \qquad y = \mathrm{atan2}(R_{02}, R_{22}), \qquad z = \mathrm{atan2}(R_{10}, R_{11}),
@@ -555,7 +772,8 @@
       </p>
       <p>
         Nothing is wrong with the orientation at pitch \(90^\circ\); the object is fine. It is the
-        chart \((\text{yaw}, \text{pitch}, \text{roll})\) that goes singular there, the way longitude
+        chart \((\text{yaw}, \text{pitch}, \text{roll})\) that goes singular there (a <em>chart</em> is a
+        set of coordinates laid over the rotations, as latitude and longitude are laid over the globe), the way longitude
         is undefined at the poles. A quaternion names an axis and an angle with no nested frames,
         so there is no configuration where two of its parts align. That is the engineering reason
         engines store the quaternion and show Euler angles only for editing:
@@ -612,8 +830,17 @@
         The practice that follows from the table: store and interpolate a quaternion, compose
         quaternions, convert to a matrix once per frame for the GPU, show Euler angles in the
         inspector, and use axis-angle when the physics hands you an angular velocity. Every
-        conversion in that pipeline is in this chapter.
+        conversion in that pipeline is in this chapter. The fifth name, &ldquo;turn this direction onto that
+        one&rdquo; (Section 5.1), is a way to <em>build</em> a rotation rather than to store one; it produces a
+        quaternion.
       </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=rotation-ways" target="_blank" rel="noopener">One rotation, five definitions</a>:
+        define the rotation by its columns, an axis and angle, a quaternion, Euler angles or a from-to pair,
+        and read the other four live. Every mode starts at \(R_y(30^\circ)\), so switching modes changes the
+        controls and not the cube.
+      </div>
 
 <!-- ============================================================ -->
       <h2 id="code">9 &middot; In code</h2>
@@ -717,8 +944,44 @@
         </details>
       </div>
 
+      <div class="ex">
+        <span class="tag">Exercise 11 (the half angle and the double cover)</span>
+        Write the quaternion for \(R_y(360^\circ)\) and for \(R_y(720^\circ)\). Which matrix does each give,
+        and what does the first one say about the half angle?
+        <details><summary>Solution</summary>
+          Half angles \(180^\circ\) and \(360^\circ\): \(q = (0, \sin 180^\circ, 0, \cos 180^\circ) = (0, 0, 0, -1)\) and
+          \((0, 0, 0, 1)\). Both give the identity matrix (every entry of \(R(q)\) is a product of two components,
+          so the sign cancels). A full turn of the object is half a lap of \(q\): \(q\) has reached minus the
+          identity and needs a second full turn to come home. Check it in the axis-angle demo&rsquo;s half-angle layer.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 12 (from one direction to another, with code)</span>
+        Find the quaternion that turns \((0, 0, 1)\) onto \((1, 0, 0)\) with the formula of Section 5.1, by
+        hand, then check it with <code>fromTo</code> in <code>lib/core/rot-reps.js</code>.
+        <details><summary>Solution</summary>
+          \(\mathbf{a}\cdot\mathbf{b} = 0\), \(\mathbf{a}\times\mathbf{b} = (0\cdot0 - 1\cdot0,\; 1\cdot1 - 0\cdot0,\; 0\cdot0 - 0\cdot1) = (0, 1, 0)\),
+          so \(q = \mathrm{normalize}(0, 1, 0, 1) = (0, 0.707, 0, 0.707)\): \(90^\circ\) about \(y\), and indeed
+          \(R_y(90^\circ)\) has column 2 equal to \((1, 0, 0)\). Code:
+          <code>node -e "import('./lib/core/rot-reps.js').then(r=>console.log(r.fromTo([0,0,1],[1,0,0]).q.map(v=>+v.toFixed(3))))"</code>
+          prints <code>[ 0, 0.707, 0, 0.707 ]</code>.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 13 (the linear step, with the demo)</span>
+        A point at radius 1 spins at \(180^\circ\) per second and is stepped with
+        \(\mathbf{p}\leftarrow\mathbf{p} + \Delta t\,(\boldsymbol\omega\times\mathbf{p})\) at 30 steps per second. What is its
+        radius after one second? Check it in the spin-step demo.
+        <details><summary>Solution</summary>
+          \(\omega\Delta t = \pi/30 = 0.1047\) rad per step; each step multiplies the length by
+          \(\sqrt{1 + 0.1047^2} = 1.00547\), and 30 steps give \(1.00547^{30} = 1.178\): 18 percent too far out after
+          one half turn. Halving the step (60 per second) gives \(\sqrt{1 + 0.0524^2}^{\,60} = 1.086\): the error
+          shrinks with the step but never vanishes. The quaternion step stays at radius 1.
+        </details>
+      </div>
+
       <footer>
-        CSS 551 &middot; course text &middot; Rotation v2.0 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Rotation v2.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

@@ -288,7 +288,9 @@
 <!-- ============================================================ -->
       <h2 id="frames">4 &middot; From two vectors to a frame</h2>
       <p>
-        Given any two non-parallel vectors, one cross product gives an axis square to both and a
+        A <em>frame</em> is a set of axes to measure along; it is <em>orthonormal</em> when each axis has
+        unit length and each is perpendicular to the others, so that coordinates are plain dot products
+        (Section 1.1). Given any two non-parallel vectors, one cross product gives an axis square to both and a
         second cross completes an orthonormal trio. This is exactly how a camera&rsquo;s
         look-at basis is built in <a href="viewing.html#frame">the viewing chapter</a>:
       </p>
@@ -321,6 +323,10 @@
         onto the axes already built, then normalize. The projection is Section 2.1&rsquo;s split, applied
         once per finished axis.
       </p>
+      <figure>
+        <img src="figures/vec-gram-schmidt.svg" alt="In the plane of a and b: b splits into its shadow along e1 (length 1.789) and a perpendicular remainder (length 1.673), which normalizes to e2." />
+        <figcaption>One Gram&ndash;Schmidt step on \(\mathbf{a} = (2, 1, 0)\), \(\mathbf{b} = (1, 2, 1)\), drawn in their plane: subtract the shadow of \(\mathbf{b}\) on \(\mathbf{e}_1\), keep the perpendicular remainder \((-0.6, 1.2, 1)\) and normalize it to \(\mathbf{e}_2\).</figcaption>
+      </figure>
       <div class="thm">
         <span class="tag">Gram&ndash;Schmidt</span>
         \[
@@ -353,6 +359,10 @@
         \(P_0\) to \(P_1 = P_0 + \mathbf{v}\) is the same with \(t\) held to \([0, \|\mathbf{v}\|]\).
         A <strong>ray</strong> keeps \(t \ge 0\).
       </div>
+      <figure>
+        <img src="figures/vec-param-line.svg" alt="A line P(t) = P0 + t d with ticks at t = -1, 0, 0.5, 1 and 2; the segment from t = 0 to 1 is highlighted and the ray t at least 0 continues past t = 2 with an arrow." />
+        <figcaption>One base point, one direction and one knob \(t\) make a line; holding \(t\) to \([0, 1]\) (with \(\mathbf{d} = P_1 - P_0\)) gives the segment, and \(t \ge 0\) the ray. Computed for \(P_0 = (1, 1)\), \(\mathbf{d} = (2, 1)\).</figcaption>
+      </figure>
       <p>
         The nearest point on a line to a query point \(P_t\) is a projection: dot the offset
         \(P_t - P_0\) against the unit direction to get the distance \(d\) along the line, and step
@@ -395,6 +405,33 @@
         \(\mathbf{a}_\perp\) from Section 2.1, \(\|(1.333, -0.333, -0.667)\| = 1.528\), reached without
         computing the vector.
       </div>
+      <figure>
+        <img src="figures/vec-point-line.svg" alt="In the plane of a and b, the point a sits 1.633 along the line through the origin along the unit direction and 1.528 across it; the parallelogram of a and the unit direction has base 1 and height 1.528." />
+        <figcaption>Along and across, in the plane of \(\mathbf{a}\) and \(\mathbf{b}\): the dot gives how far along the line \(\mathbf{a}\) lies (\(1.633\)); the cross length is the parallelogram&rsquo;s area, base 1 times height, so it is the distance from the line (\(1.528\)).</figcaption>
+      </figure>
+      <h3>5.2 The distance between two skew lines</h3>
+      <p>
+        In three dimensions two lines usually neither meet nor run parallel; such lines are called
+        <em>skew</em>. The shortest segment between them is perpendicular to both, so it runs along
+        \(\mathbf{d}_1\times\mathbf{d}_2\), and its length is the part of any connecting vector along that
+        direction:
+      </p>
+      \[
+        \text{dist} = \frac{\big|(\mathbf{p}_2 - \mathbf{p}_1)\cdot(\mathbf{d}_1\times\mathbf{d}_2)\big|}{\|\mathbf{d}_1\times\mathbf{d}_2\|} .
+      \]
+      <figure>
+        <img src="figures/vec-skew-lines.svg" alt="Two skew lines in 3D joined by their shortest segment, which is perpendicular to both, runs along d1 cross d2, and has length 0.707." />
+        <figcaption>Line 1 through \((0, 0, 0)\) along \((1, 0, 0)\), line 2 through \((0, 1, 2)\) along \((0, 1, 1)\): \(\mathbf{d}_1\times\mathbf{d}_2 = (0, -1, 1)\), and the closest points \((0, 0, 0)\) and \((0, -0.5, 0.5)\) are \(1/\sqrt2 = 0.707\) apart.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (two skew lines)</span>
+        \(\mathbf{d}_1\times\mathbf{d}_2 = (1,0,0)\times(0,1,1) = (0\cdot1 - 0\cdot1,\; 0\cdot0 - 1\cdot1,\; 1\cdot1 - 0\cdot0) = (0, -1, 1)\),
+        of length \(\sqrt2\); \((\mathbf{p}_2 - \mathbf{p}_1)\cdot(0, -1, 1) = -1 + 2 = 1\); the distance is
+        \(1/\sqrt2 = 0.707\). Motion capture uses the same construction: two cameras&rsquo; rays through one
+        marker should meet, noise makes them miss by a little, and the midpoint of this shortest segment is
+        the marker&rsquo;s estimate. If \(\mathbf{d}_1\times\mathbf{d}_2 = \mathbf{0}\) the lines are parallel and
+        Section 5.1 gives the distance instead.
+      </div>
 
 <!-- ============================================================ -->
       <h2 id="planes">6 &middot; Planes and signed distance</h2>
@@ -433,11 +470,38 @@
       <p>
         The which-side test needs no distance at all: the sign of
         \(\hat{\mathbf{n}}\cdot P - D\) is the in-front-of test of Section 2.2 with the plane&rsquo;s
-        constant subtracted. Frustum culling, back-face tests and portal visibility are this sign,
+        constant subtracted. Frustum culling (skipping objects outside the camera&rsquo;s view volume, a
+        box bounded by six planes), back-face tests and portal visibility are this sign,
         evaluated many times. Under a transform a plane does not move like a point;
         <a href="affine-transforms.html#normals">the affine chapter</a> gives the rule.
       </p>
-      <h3>6.1 Where a ray meets a plane</h3>
+      <h3>6.1 Projection onto a plane, and reflection</h3>
+      <p>
+        The projection split of Section 2.1, against the unit normal, gives the two other plane
+        operations. Removing the part along the normal leaves the part that lies in the plane, and
+        negating it mirrors the vector across the plane:
+      </p>
+      \[
+        \text{project: } \mathbf{v} - (\mathbf{v}\cdot\hat{\mathbf{n}})\,\hat{\mathbf{n}}, \qquad
+        \text{reflect: } \mathbf{r} = \mathbf{d} - 2(\mathbf{d}\cdot\hat{\mathbf{n}})\,\hat{\mathbf{n}} .
+      \]
+      <figure>
+        <img src="figures/vec-project-reflect.svg" alt="Two side views of a plane. Left: projecting v removes its part along n and leaves a vector in the plane. Right: reflecting d off a 45 degree mirror flips the along part and keeps the across part, turning (1, 0, 0) into (0, -1, 0)." />
+        <figcaption>Projection drops the part of a vector along the normal; reflection negates it and keeps the rest. Left: \(\mathbf{v} = (2, 1, 0)\), \(\hat{\mathbf{n}} = (1, 2, 2)/3\). Right: \(\mathbf{d} = (1, 0, 0)\) against a \(45^\circ\) mirror.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (project and reflect)</span>
+        Project \(\mathbf{v} = (2, 1, 0)\) onto the plane of Section 6: \(\mathbf{v}\cdot\hat{\mathbf{n}} = (2 + 2 + 0)/3 = 1.333\), and
+        \(\mathbf{v} - 1.333\,(0.333, 0.667, 0.667) = (1.556, 0.111, -0.889)\), whose dot with \(\hat{\mathbf{n}}\) is 0: it
+        lies in the plane. That is the direction an object slides along a wall, or a character walks on a
+        slope. Reflect \(\mathbf{d} = (1, 0, 0)\) off a mirror tilted \(45^\circ\), \(\hat{\mathbf{n}} = (1, 1, 0)/\sqrt2\):
+        \(\mathbf{d}\cdot\hat{\mathbf{n}} = 0.707\), and \(\mathbf{r} = (1, 0, 0) - 2\cdot0.707\,(0.707, 0.707, 0) = (0, -1, 0)\): a ray
+        going right leaves the mirror going straight down. Both formulas need \(\hat{\mathbf{n}}\) of unit length;
+        with an unnormalized normal the reflection comes out scaled and bent.
+        <a href="illumination.html">The illumination chapter</a> uses the reflection for the highlight, and
+        <a href="ray-tracing.html">the ray-tracing chapter</a> for mirrors.
+      </div>
+      <h3>6.2 Where a ray meets a plane</h3>
       <div class="thm">
         <span class="tag">Ray&ndash;plane intersection</span>
         Substitute the ray \(P(t) = \mathbf{o} + t\,\mathbf{d}\) into the plane equation
@@ -449,6 +513,10 @@
         fast the ray closes on the plane. If \(\hat{\mathbf{n}}\cdot\mathbf{d} = 0\) the ray runs
         parallel and there is no hit; if \(t < 0\) the plane is behind the origin.
       </div>
+      <figure>
+        <img src="figures/vec-ray-plane.svg" alt="Side view of the plane n dot P = D with four rays: one descends and hits the foot at t = 1.667, one rises and hits Q at t = 1, one runs parallel and never meets the plane, and one points away so the plane is behind it at t = -1.667." />
+        <figcaption>The four rays of the worked example, seen edge-on to the plane (height measured along \(\hat{\mathbf{n}}\)). Divide the gap by the closing rate: test \(\hat{\mathbf{n}}\cdot\mathbf{d}\) first, and a negative \(t\) means a line hits but a ray does not.</figcaption>
+      </figure>
       <div class="ex">
         <span class="tag">Worked example (four rays, one plane)</span>
         The plane above, \(\hat{\mathbf{n}} = (\tfrac13, \tfrac23, \tfrac23)\), \(D = \tfrac13\).
@@ -511,14 +579,26 @@
         weights in two dimensions with edge functions and uses them for every interpolated
         attribute; <a href="ray-tracing.html#intersections">the ray-tracing chapter</a> uses the
         three-dimensional form above to decide whether a ray&rsquo;s hit on a triangle&rsquo;s plane lies
-        within the triangle.
+        within the triangle. (The name comes from <em>barycenter</em>, the center of mass: \(X\) is the
+        balance point of masses \(w_0, w_1, w_2\) placed at the corners, and the centroid, the corners&rsquo;
+        average, has equal weights.)
       </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href=\"../lib/demo.html?demo=vec-geometry" target="_blank" rel="noopener">Vector geometry</a>: five modes with this
+        chapter&rsquo;s numbers. <em>Frame</em> turns \(\mathbf{b}\) toward \(\mathbf{a}\) until the cross product, and the
+        frame, vanish; <em>segment</em> drags the query point past either end of the segment; <em>plane</em>
+        moves a point through the plane and, with reflect on, shows the projection and the reflection;
+        <em>ray</em> tilts the ray until it stops hitting the ground; <em>barycentric</em> drags \(X\) out of the
+        triangle and watches one weight go negative while the sum stays 1.
+      </div>
 
 <!-- ============================================================ -->
       <h2 id="precision">8 &middot; What floating point does to all of this</h2>
       <p>
-        A GPU and most of a game run in single precision, whose relative resolution is
-        \(\varepsilon = 2^{-23} \approx 1.2\times10^{-7}\): a number near 1 can only be represented to
+        A GPU and most of a game run in single precision (<em>float32</em>: 24 significant bits), whose
+        relative resolution, the <em>machine epsilon</em>, is the gap between 1 and the next representable
+        number, \(\varepsilon = 2^{-23} \approx 1.2\times10^{-7}\): a number near 1 can only be represented to
         about seven decimal digits. Most of the chapter is immune to that. Two operations are not.
       </p>
       <div class="pitfall">
@@ -538,7 +618,9 @@
           <tr><td>\(10^{-6}\)</td><td>1.00000000</td><td>0, error 100 %</td><td>\(1.0000\times10^{-6}\), error \(3\times10^{-9}\)</td></tr>
         </table>
         The cross product&rsquo;s length is \(\sin\theta \approx \theta\), which keeps its full seven digits
-        however small \(\theta\) is, and \(\mathrm{atan2}\) of the two never loses them. Use it whenever
+        however small \(\theta\) is, and \(\mathrm{atan2}\) of the two never loses them
+        (\(\mathrm{atan2}(y, x)\) is the angle of the point \((x, y)\), in all four quadrants, computed without
+        dividing). Use it whenever
         an angle between nearly parallel directions matters: joint limits, snapping, the slerp of
         <a href="animation.html#rotations">the animation chapter</a>. The same rounding can push a dot
         product a hair <em>past</em> 1 or \(-1\), where \(\arccos\) returns NaN; clamp before you call it.
@@ -564,7 +646,9 @@
         degenerate normal.
       </p>
       <p>
-        Dot products of long vectors have a third, milder hazard: catastrophic cancellation. The dot
+        Dot products of long vectors have a third, milder hazard: catastrophic cancellation
+        (subtracting two nearly equal numbers keeps their absolute errors but loses their leading
+        digits). The dot
         of \((10^6, 1, 0)\) with \((1, -10^6, 0)\) is \(10^6 - 10^6 = 0\) in exact arithmetic, but each
         product is known only to about \(0.1\), so the computed sum is noise of that size. Positions
         far from the origin are the usual source (a world a million units across, a camera near the
@@ -692,7 +776,7 @@ const inside = d &gt;= 0 &amp;&amp; d &lt;= Math.hypot(...v1);   // the clamp te
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Vectors v2.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Vectors v2.2 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code> and <code>tools/gen-textbook-figures-vector-geometry.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Vector geometry: frames, lines, planes, triangles, precision (~28 min).
+  CSS 551 · TOPIC DECK: Vector geometry: frames, lines, planes, triangles, precision (~30 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/vector-geometry.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -19,8 +19,12 @@
   EDITED 2026-10-08: the three two-track listings (point to segment, barycentric weights, the atan2
   angle) put in Unity/WebGL code tabs; notes that pointed at a HW1 which-side exercise now point at
   HW2's signedDistance (EX3) and shadowOnPlane (EX4).
+  EDITED 2026-10-13 (improvement pass): frame, orthonormal, look-at, skew lines, normal, frustum culling,
+  clipping, barycentric, centroid, float32, machine epsilon, cancellation and atan2 defined where they first
+  appear; figures for Gram-Schmidt, the parametric line, the distance to a line, skew lines, projection and
+  reflection, and the ray cases; the vec-geometry demo slide (five modes) before the precision pitfalls.
   NEEDS:   the vectors-review topic (the projection split, the cross product, the triple product).
-  DEMOS:   none (figures).
+  DEMOS:   vec-geometry (data-controls="modes,reflect"), one full-slide demo with five modes.
   NUMBERS: textbook/figures/numbers-foundations.json (keys vec, line, plane) or recomputed by node
            against lib/core/xform.js and Math.fround.
   FIGURES: ../../textbook/figures/vec-*.svg (tools/gen-textbook-figures-foundations.mjs).
@@ -36,7 +40,7 @@
 
 ### Vector geometry: frames, lines, planes, triangles
 
-<small>(~28 min) · reading: <a href="../../textbook/vectors.html">Vectors</a>, Sections 4 to 8</small>
+<small>(~30 min) · reading: <a href="../../textbook/vectors.html">Vectors</a>, Sections 4 to 8</small>
 
 
 ---
@@ -44,6 +48,8 @@
 ## Two vectors, a whole frame
 
 <img src="../../textbook/figures/vec-frame.svg" alt="an orthonormal frame built from a and b" style="height:230px">
+
+A **frame** is three axes to measure along; **orthonormal**: each of unit length, each perpendicular to the others.
 
 ```text
 w = normalize(a)             = (0.894, 0.447, 0)
@@ -69,7 +75,8 @@ Now `b = (0, 0, 2)`, parallel to a:
 ```
 
 - parallel inputs span **no plane**, so no first axis can be chosen
-- the look-at failure: an **up vector along the view direction**; test |a × b| before normalizing
+- the **look-at** failure: a camera builds its frame from its view direction and an "up" hint; up along the view direction breaks it
+- test |a × b| before normalizing
 
 
 ---
@@ -90,7 +97,9 @@ rebuild:         1.789 w - 1.673 t = (1, 2, 1)             1.789² + 1.673² = 6
 
 ---
 
-## Gram-Schmidt: the same frame, another recipe
+## Gram-Schmidt: another recipe
+
+<img src="../../textbook/figures/vec-gram-schmidt.svg" alt="b split into its shadow along e1 and a perpendicular remainder, which normalizes to e2" style="height:230px">
 
 Orthonormalize `a`, `b`, `c = (0, 0, 1)` in order: subtract what each vector has along the axes already built, then normalize.
 
@@ -106,6 +115,8 @@ c - (c.e1) e1 - (c.e2) e2 = (0.214, -0.429, 0.643)    ->  e3 = (0.267, -0.535, 0
 ---
 
 ## A line is a point and a direction
+
+<img src="../../textbook/figures/vec-param-line.svg" alt="a line P(t) = P0 + t d with ticks at t = -1, 0, 0.5, 1, 2; the segment from 0 to 1 and the ray t at least 0 highlighted" style="height:240px">
 
 Every point on the line is the base point plus some amount of the direction:
 
@@ -162,6 +173,8 @@ const inside = d >= 0 && d <= Math.hypot(...sub(P1, P0));
 
 ## Distance to a line in 3D: one cross
 
+<img src="../../textbook/figures/vec-point-line.svg" alt="in the plane of a and b, a lies 1.633 along the line and 1.528 across it; the parallelogram of a and the unit direction has height 1.528" style="height:240px">
+
 The line through the origin along `b̂ = (0.408, 0.816, 0.408)`; the point at `a = (2, 1, 0)`:
 
 ```text
@@ -177,7 +190,9 @@ The across distance is `|a-perp|` from the projection split, **without building 
 
 ## Two skew lines: one cross, one dot
 
-Lines through **p1** along **d1** and **p2** along **d2**. The shortest segment between them is along **d1 × d2**:
+<img src="../../textbook/figures/vec-skew-lines.svg" alt="two skew lines joined by their shortest segment, perpendicular to both, of length 0.707" style="height:270px">
+
+**Skew lines** neither meet nor run parallel (only in 3D). The shortest segment is perpendicular to both: along **d1 × d2**.
 
 ```text
    distance = | (p2 − p1) · (d1 × d2) | / | d1 × d2 |
@@ -187,14 +202,14 @@ Lines through **p1** along **d1** and **p2** along **d2**. The shortest segment 
    distance = 1 / √2 = 0.707
 ```
 
-Motion capture triangulation: two camera rays through one marker **nearly** meet; the midpoint of this segment is the estimate.
-
 
 ---
 
 ## A plane is a point and a normal
 
 <img src="../../textbook/figures/vec-plane-distance.svg" alt="a plane with its normal and a point's signed distance" style="height:240px">
+
+The **normal** `n` is a vector perpendicular to the plane. Every point of the plane has the same dot with it:
 
 ```text
 n . P = D        D = n . Q for any point Q on the plane;   with unit n, D is the plane's distance from the origin
@@ -231,7 +246,7 @@ n . P - D  =  0   ->  P is ON the plane
 n . P - D  <  0   ->  P is BEHIND
 ```
 
-One dot, one subtraction, one comparison: frustum culling, clipping, and HW2's `signedDistance`.
+One dot, one subtraction, one comparison: HW2's `signedDistance`, and later **frustum culling** (skip objects outside the camera's view volume, a box bounded by six planes) and **clipping** (cut triangles at those planes).
 
 
 ---
@@ -254,7 +269,9 @@ A shadow direction on the ground, a camera sliding along a wall, a velocity afte
 
 ## Reflection: flip the along part
 
-Split **d** into the part along a unit normal **n** and the part across it; reflection keeps the across part and **negates** the along part:
+<img src="../../textbook/figures/vec-project-reflect.svg" alt="left: projecting v drops its part along n; right: reflecting d off a 45 degree mirror flips the along part, turning (1, 0, 0) into (0, -1, 0)" style="height:270px">
+
+Reflection keeps the part across the unit normal **n** and **negates** the part along it:
 
 ```text
    r = d − 2 (d·n) n
@@ -263,21 +280,14 @@ Split **d** into the part along a unit normal **n** and the part across it; refl
    d·n = 0.707   →   r = (1, 0, 0) − 2 · 0.707 · (0.707, 0.707, 0) = (0, −1, 0)
 ```
 
-A ray going right, off a 45° mirror, goes straight down. Mirrors, bounces, specular highlights, ray-traced reflections: all this line.
-
 
 ---
 
 ## Ray against plane: four cases
 
-Ray `o + t d`, plane `n . P = D`: `t = (D - n . o) / (n . d)`. With the plane above, `n = (1/3, 2/3, 2/3)`, `D = 1/3`:
+Ray `o + t d`, plane `n . P = D`: substitute and solve, `t = (D - n . o) / (n . d)`: the gap over the closing rate.
 
-| origin o | direction d | n · d | t | hit |
-| --- | --- | --- | --- | --- |
-| (4, 1, 0) | −n | −1 | 1.667 | (3.444, −0.111, −1.111), the foot |
-| (0, 0, 0) | (1, 0, 0) | 1/3 | 1 | (1, 0, 0) = Q |
-| (0, 0, 0) | (0, 1, −1)/√2 | 0 | none | parallel: the direction lies in the plane |
-| (4, 1, 0) | +n | 1 | −1.667 | behind the origin: a ray never reaches it |
+<img src="../../textbook/figures/vec-ray-plane.svg" alt="side view of the plane with four rays: a hit at t = 1.667, a hit at Q at t = 1, a parallel ray that never meets, and a plane behind the origin at t = -1.667" style="height:330px">
 
 
 ---
@@ -307,7 +317,7 @@ X = w0 P0 + w1 P1 + w2 P2,   w0 + w1 + w2 = 1
 w0 = ((P1 - X) x (P2 - X)) . n / (n . n)       (and cyclically for w1, w2)
 ```
 
-Each weight is the **signed area** of the sub-triangle opposite its corner, over the whole.
+Each weight is the **signed area** of the sub-triangle opposite its corner, over the whole. (Barycentric, from barycenter, the center of mass: X is the balance point of masses w0, w1, w2 at the corners.)
 
 
 ---
@@ -319,7 +329,7 @@ Each weight is the **signed area** of the sub-triangle opposite its corner, over
 | X | (w0, w1, w2) | sum | verdict |
 | --- | --- | --- | --- |
 | (0.5, 0, −0.5) | (0.5, 0.25, 0.25) | 1 | inside |
-| (2/3, 0, −2/3) | (1/3, 1/3, 1/3) | 1 | inside: the centroid |
+| (2/3, 0, −2/3) | (1/3, 1/3, 1/3) | 1 | inside: the centroid (the corners' average) |
 | (1, 0, −1) | (0, 0.5, 0.5) | 1 | on the edge opposite P0 |
 | (2, 0, −2) | (−1, 1, 1) | 1 | outside, beyond the edge opposite P0 |
 
@@ -353,9 +363,22 @@ const w2 = 1 - w0 - w1;      // X = (1, 0, -0.5): [0.25, 0.5, 0.25], inside
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Frames, segments, planes, rays, triangles, live
+
+<div class="cockpit" data-demo="vec-geometry" data-controls="modes,reflect"><pre class="viz-fallback">  frame        a = (2, 1, 0), b = (1, 2, 1):  w = (0.894, 0.447, 0), u = (0.267, -0.535, 0.802), t = (0.359, -0.717, -0.598)
+  segment      P0 = (0, 0), P1 = (4, 2), Pt = (1, 3):  d = 2.236, foot (2, 1), inside, distance 2.236
+  plane        n = (1, 2, 2)/3, D = 1/3, P = (4, 1, 0):  n·P - D = 1.667 (in front), foot (3.444, -0.111, -1.111)
+  ray          o = (0, 5, 0), d = (0.6, -0.8, 0) against y = 0:  t = 6.25, hit (3.75, 0, 0)
+  barycentric  X = (0.5, 0, -0.5):  (w0, w1, w2) = (0.5, 0.25, 0.25), inside</pre></div>
+
+
+---
+
 ## Pitfall: arccos near 0° and just past 1
 
-Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, every operation in float32:
+Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, every operation in **float32** (single precision: 24 significant bits, about 7 decimal digits; the GPU's and Unity's number type):
 
 | true θ (rad) | float32 dot | acos: relative error | atan2(\|a×b\|, a·b): relative error |
 | --- | --- | --- | --- |
@@ -363,7 +386,7 @@ Angle between `(1, 0, 0)` and `(cos θ, sin θ, 0)`, every operation in float32:
 | 0.001 | 0.99999952 | 0.023 | 4.2e-8 |
 | 0.0001 | 1.00000000 | 1 (returns 0) | 2.9e-8 |
 
-- below θ = √(2ε) ≈ 4.9e-4 rad (0.03°) the dot rounds to exactly 1 and acos returns **0**
+- **ε** (machine epsilon) = 1.19e-7, the gap between 1 and the next float32; below θ = √(2ε) ≈ 4.9e-4 rad (0.03°) the dot rounds to exactly 1 and acos returns **0**
 - normalize (1, 0, 4) in float32 and dot it with itself: **1.0000001**, and acos of that is **NaN**
 
 
@@ -388,6 +411,7 @@ angleDeg([2, 1, 0], [1, 2, 1]);   // 43.0887
 
 </div>
 
+- `atan2(y, x)` is the angle of the point (x, y), in all four quadrants, with no division
 - |a × b| = |a||b| sin θ and a · b = |a||b| cos θ: atan2 of the pair cancels **both lengths**
 - full precision near 0° and near 180°; no domain to leave
 
@@ -401,6 +425,7 @@ angleDeg([2, 1, 0], [1, 2, 1]);   // 43.0887
    in float32, each product is known to about ± 0.1   → the computed 0 is noise of that size
 ```
 
+- **cancellation**: subtracting two nearly equal numbers keeps their absolute errors but loses their leading digits
 - the relative error of float32 is about **1.2 × 10⁻⁷**; at 10⁶ that is **0.1** absolute
 - positions a million units from the origin lose everything below a tenth of a unit
 - **subtract a nearby reference point first**, then compute: the view matrix does exactly this for every vertex
