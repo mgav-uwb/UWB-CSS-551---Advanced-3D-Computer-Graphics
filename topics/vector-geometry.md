@@ -19,6 +19,8 @@
   EDITED 2026-10-08: the three two-track listings (point to segment, barycentric weights, the atan2
   angle) put in Unity/WebGL code tabs; notes that pointed at a HW1 which-side exercise now point at
   HW2's signedDistance (EX3) and shadowOnPlane (EX4).
+  FIXED 2026-10-13: the segment table gave the distances to the infinite line (0.894, 1.342) as the
+  distances to the segment; they are 2.828 and 1.414 (Quiz bank item vec-segment-distance-01 has it right).
   EDITED 2026-10-13 (improvement pass): frame, orthonormal, look-at, skew lines, normal, frustum culling,
   clipping, barycentric, centroid, float32, machine epsilon, cancellation and atan2 defined where they first
   appear; figures for Gram-Schmidt, the parametric line, the distance to a line, skew lines, projection and
@@ -140,8 +142,8 @@ Segment `P0 = (0,0)` to `P1 = (4,2)`: `|v| = 4.472`, unit `v = (0.894, 0.447)`.
 | Pt | d = (Pt − P0) · v̂ | foot | inside? | nearest point |
 | --- | --- | --- | --- | --- |
 | (1, 3) | 2.236 | (2, 1) | yes | (2, 1), distance 2.236 |
-| (6, 4) | 7.155 | (6.4, 3.2) | no, d > 4.472 | the end (4, 2), distance 0.894 |
-| (−1, 1) | −0.447 | (−0.4, −0.2) | no, d < 0 | the start (0, 0), distance 1.342 |
+| (6, 4) | 7.155 | (6.4, 3.2) | no, d > 4.472 | the end (4, 2), distance 2.828 |
+| (−1, 1) | −0.447 | (−0.4, −0.2) | no, d < 0 | the start (0, 0), distance 1.414 |
 
 
 ---

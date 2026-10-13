@@ -382,10 +382,11 @@
         <table>
           <tr><th>\(P_t\)</th><th>\(d = (P_t - P_0)\cdot\hat{\mathbf{v}}\)</th><th>foot \(P_0 + d\hat{\mathbf{v}}\)</th><th>inside?</th><th>nearest point of the segment</th></tr>
           <tr><td>\((1, 3)\)</td><td>\(0.894 + 1.342 = 2.236\)</td><td>\((2, 1)\)</td><td>yes</td><td>\((2, 1)\), at distance \(2.236\)</td></tr>
-          <tr><td>\((6, 4)\)</td><td>\(5.367 + 1.789 = 7.155\)</td><td>\((6.4, 3.2)\)</td><td>no, \(d > 4.472\)</td><td>the far end \((4, 2)\)</td></tr>
-          <tr><td>\((-1, 1)\)</td><td>\(-0.894 + 0.447 = -0.447\)</td><td>\((-0.4, -0.2)\)</td><td>no, \(d < 0\)</td><td>the start \((0, 0)\)</td></tr>
+          <tr><td>\((6, 4)\)</td><td>\(5.367 + 1.789 = 7.155\)</td><td>\((6.4, 3.2)\)</td><td>no, \(d > 4.472\)</td><td>the far end \((4, 2)\), at distance \(2.828\)</td></tr>
+          <tr><td>\((-1, 1)\)</td><td>\(-0.894 + 0.447 = -0.447\)</td><td>\((-0.4, -0.2)\)</td><td>no, \(d < 0\)</td><td>the start \((0, 0)\), at distance \(1.414\)</td></tr>
         </table>
-        Every entry is a dot, a scale, an add, or a comparison.
+        Every entry is a dot, a scale, an add, or a comparison. The unclamped foot would report the
+        distances to the infinite line instead, \(0.894\) and \(1.342\): smaller, and wrong for the segment.
       </div>
       <h3>5.1 Distance to a line in three dimensions</h3>
       <p>
