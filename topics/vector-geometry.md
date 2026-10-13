@@ -157,22 +157,28 @@ Segment `P0 = (0,0)` to `P1 = (4,2)`: `|v| = 4.472`, unit `v = (0.894, 0.447)`.
 <div class="code-tabs">
 
 ```csharp
-Vector3 vt  = Pt.transform.localPosition - P0.transform.localPosition;
-Vector3 v1n = v1.normalized;                       // unit direction
+// GameObjects: P0, P1 segment ends; Pt test point; Pon marks the foot
+Vector3 v1  = P1.transform.localPosition - P0.transform.localPosition;  // v
+Vector3 vt  = Pt.transform.localPosition - P0.transform.localPosition;  // Pt - P0
+Vector3 v1n = v1.normalized;                       // unit direction, v-hat
 float d = Vector3.Dot(vt, v1n);                    // projected length = t
 Pon.transform.localPosition = P0.transform.localPosition + d * v1n;  // foot
 bool inside = (d >= 0) && (d <= v1.magnitude);     // the segment range test
 ```
 
 ```javascript
-const v1n = normalize(sub(P1, P0)), d = dot(sub(Pt, P0), v1n);   // xform.js
-const inside = d >= 0 && d <= Math.hypot(...sub(P1, P0));
+// points are [x, y, z] arrays; sub, dot, normalize from lib/core/xform.js
+const v1  = sub(P1, P0);                           // v
+const vt  = sub(Pt, P0);                           // Pt - P0
+const v1n = normalize(v1);                         // unit direction, v-hat
+const d   = dot(vt, v1n);                          // projected length = t
+const inside = d >= 0 && d <= Math.hypot(...v1);   // the segment range test
 // P0 = (0,0,0), P1 = (4,2,0), Pt = (6,4,0):  d = 7.155, inside = false
 ```
 
 </div>
 
-<small>The C# is EX_5_3_MyScript.cs, Chap-5-DotProducts.</small>
+<small>The C# is from EX_5_3_MyScript.cs, Chap-5-DotProducts.</small>
 
 
 ---
@@ -349,6 +355,7 @@ First row by hand: `(P1 - X) x (P2 - X) = (1.5,0,0.5) x (-0.5,0,-1.5) = (0, 2, 0
 <div class="code-tabs">
 
 ```csharp
+// Vector3 corners P0, P1, P2 and the point X
 Vector3 n  = Vector3.Cross(P1 - P0, P2 - P0);
 float   nn = Vector3.Dot(n, n);
 float   w0 = Vector3.Dot(Vector3.Cross(P1 - X, P2 - X), n) / nn;
@@ -358,6 +365,7 @@ bool inside = w0 >= 0f && w1 >= 0f && w2 >= 0f;
 ```
 
 ```javascript
+// corners P0, P1, P2 and the point X as [x, y, z]; sub, dot, cross from xform.js
 const n = cross(sub(P1, P0), sub(P2, P0)), nn = dot(n, n);
 const w0 = dot(cross(sub(P1, X), sub(P2, X)), n) / nn;
 const w1 = dot(cross(sub(P2, X), sub(P0, X)), n) / nn;

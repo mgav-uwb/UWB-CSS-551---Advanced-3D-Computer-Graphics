@@ -527,13 +527,15 @@ A dot, a cross, and two scalings: 16 multiplies, against 27 for a `3×3` matrix 
 
 ## Composing rotations = multiplying quaternions
 
-```csharp [1-6]
+```csharp
+// returns the product q1 q2; a quaternion is stored as (x, y, z, w) in a Vector4
 Vector4 QMultiplication(Vector4 q1, Vector4 q2) {
     Vector4 r;
     r.x =  q1.x*q2.w + q1.y*q2.z - q1.z*q2.y + q1.w*q2.x;
     r.y = -q1.x*q2.z + q1.y*q2.w + q1.z*q2.x + q1.w*q2.y;
     r.z =  q1.x*q2.y - q1.y*q2.x + q1.z*q2.w + q1.w*q2.z;
     r.w = -q1.x*q2.x - q1.y*q2.y - q1.z*q2.z + q1.w*q2.w;
+    return r;
 }
 ```
 
