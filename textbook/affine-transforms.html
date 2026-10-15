@@ -426,22 +426,33 @@
       <div class="ex">
         <span class="tag">Worked example (the top of the flight)</span>
         The default throw: \(v = 22\) m/s at \(\alpha = 30^\circ\), released at \(\mathbf{s} = (20, 2, 25)\) on
-        the field with heading \(h = 12^\circ\), field yaw \(\gamma = 0\), the wobble set to 0. The top comes at
-        \(t = v\sin\alpha / g = 11/9.81 = 1.121\) s, where \(v_y = 0\), so \(\theta = 0\) and \(A = I\).
-        \(T\) translates by \((0,\; 11\cdot1.121 - 4.905\cdot1.121^2,\; 19.053\cdot1.121) = (0, 6.167, 21.364)\).
-        \(H\) turns that by \(12^\circ\) about \(y\), to \((21.364\sin12^\circ,\; 6.167,\; 21.364\cos12^\circ) = (4.442, 6.167, 20.897)\),
-        and adds \(\mathbf{s}\): the center is at field \((24.442, 8.167, 45.897)\). \(F\) subtracts \((25, 0, 55)\):
-        world \((-0.558, 8.167, -9.103)\). The nose tip \((0, 0, 0.14)\) lies on the spin axis, so \(S\) leaves it
-        where it is, and it lands \(0.14\) m along the heading \((\sin12^\circ, 0, \cos12^\circ) = (0.208, 0, 0.978)\):
-        world \((-0.529, 8.167, -8.966)\).
+        the field with heading \(h = 12^\circ\), field yaw \(\gamma = 0\), the wobble set to 0, and Seattle&rsquo;s
+        gravity, \(g = 9.808\) m/s&sup2;. The top comes at \(t = v\sin\alpha / g = 11/9.808 = 1.1215\) s, where
+        \(v_y = 0\), so \(\theta = 0\) and \(A = I\). \(T\) translates by
+        \((0,\; 11t - 4.904t^2,\; 19.053t) = (0, 6.168, 21.368)\). \(H\) turns that by \(12^\circ\) about \(y\), to
+        \((21.368\sin12^\circ,\; 6.168,\; 21.368\cos12^\circ) = (4.443, 6.168, 20.901)\), and adds \(\mathbf{s}\): the
+        center is at field \((24.443, 8.168, 45.901)\). \(F\) subtracts \((25, 0, 55)\): world
+        \((-0.557, 8.168, -9.099)\). The nose tip \((0, 0, 0.14)\) lies on the spin axis, so \(S\) leaves it where it
+        is, and it lands \(0.14\) m along the heading \((\sin12^\circ, 0, \cos12^\circ) = (0.208, 0, 0.978)\): world
+        \((-0.528, 8.168, -8.962)\).
       </div>
+      <p>
+        A chain can also change its root. In the demo a cart carrying an open bowl drives to where the ball comes
+        down and catches it at \(t_c\). From then on the ball is the cart&rsquo;s child, and its placement must not
+        jump at the switch, so its new local matrix is its old placement measured in the cart&rsquo;s frame,
+        \(L = K(t_c)^{-1}\,H\,T\,A\,W\,S\,(t_c)\), and afterwards it is \(F\,K(t)\,L\): the cart&rsquo;s
+        placement \(K(t)\) times a constant. That is what Unity&rsquo;s <code>SetParent(cart, true)</code>
+        (&ldquo;world position stays&rdquo;) computes, and what three.js&rsquo;s <code>Object3D.attach</code> does.
+      </p>
       <div class="demo">
         <span class="tag">See it live</span>
         <a href="../lib/demo.html?demo=football" target="_blank" rel="noopener">A spiral pass, step by step</a>:
-        the chain built one link at a time. Ride any frame (riding frame \(X\) shows exactly the links to the
+        the chain built one link at a time, a cart that catches the ball, and two more balls with chains of their
+        own. Ride any frame (riding frame \(X\) shows exactly the links to the
         right of \(X\)), choose among nine shot cameras, switch a link off, edit each link&rsquo;s three.js code
-        beside its Unity C#, follow the nose to its pixel, and compare the Euler angles typed with the quaternion
-        stored.
+        beside its Unity C#, follow the nose to its pixel, compare the Euler angles typed with the quaternion
+        stored, and read the whole program for both tracks. The ball itself, OBJ and GLB with its texture, is in
+        <code>lib/assets/models/football/</code>.
       </div>
 
 <!-- ============================================================ -->

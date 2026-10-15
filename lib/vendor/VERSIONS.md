@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Vendored Library Versions"
-version: "1.1"
+version: "1.2"
 status: draft
 created_by: "Claude"
 created_at: "2026-07-11T00:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-07-18T00:00"
+last_modified_at: "2026-10-14T23:00"
 contributors:
   - "Claude"
 tags:
@@ -44,6 +44,13 @@ related:
   `from 'three'` bare-specifier import at the top is rewritten to
   `from './three.module.js'`; see the comment left in place at the top of the
   file. No other changes.
+- three.js `examples/jsm/loaders/GLTFLoader.js` and `examples/jsm/utils/BufferGeometryUtils.js` (vendored as
+  `GLTFLoader.js`, `BufferGeometryUtils.js`): fetched 2026-10-14 from jsdelivr at the pinned 0.170.0 tag
+  (`https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/...`), MIT license (three.js examples). They load
+  `lib/assets/models/football/football.glb` in the WebGL football example (`lib/programs/football/webgl/`) and
+  are there for students who load glTF models. Hand-edits: `from 'three'` rewritten to
+  `from './three.module.js'` in both, and GLTFLoader's `../utils/BufferGeometryUtils.js` to
+  `./BufferGeometryUtils.js`; a comment at the top of each says so. No other changes.
 
 ---
 
@@ -51,5 +58,6 @@ related:
 
 | Version | Date             | Author | Summary       |
 | ------- | ---------------- | ------ | ------------- |
+| 1.2     | 2026-10-14T23:00 | Claude | Vendored `GLTFLoader.js` and `BufferGeometryUtils.js` (three.js 0.170.0 examples, MIT) for the football model. |
 | 1.1     | 2026-07-18T00:00 | Claude | Task B2: vendored `TeapotGeometry.js` (three.js 0.170.0 examples, MIT); added frontmatter/endmatter to this file. |
 | 1.0     | 2026-07-11T00:00 | Claude | Initial: three.js 0.170.0, @mkkellogg/gaussian-splats-3d 0.4.7. |

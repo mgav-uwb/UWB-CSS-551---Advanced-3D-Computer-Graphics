@@ -27,6 +27,10 @@
   EDITED 2026-10-14 (~70 to ~76 min): a closing section, One throw, the whole chain: the spiral pass as
   P·V·F·H·T·A·W·S (a table of the eight links) and the football demo, which builds the chain one link at a
   time, lets the observer ride any frame, and shows Euler angles against the stored quaternion (L04).
+  EDITED 2026-10-14 (later): the demo gained a target cart that catches the ball (a change of parent), two more
+  balls (one at rest, one spinning on its tip), a gravity menu (Seattle, Denver, the Moon, a white dwarf), any
+  ball as the camera's target, and a Code window with the whole program for both tracks (lib/programs/football/);
+  the ball model is in lib/assets/models/football/. Default numbers now use Seattle's g = 9.808 m/s².
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
@@ -901,11 +905,12 @@ p_clip = P · V · F · H · T(t) · A(t) · W(t) · S(t) · p_mesh       applie
 
 ## A spiral pass, live: ride any frame of the chain
 
-<div class="cockpit" data-demo="football" data-controls="step:1"><pre class="viz-fallback">  clip point = P · V · F · H · T(t) · A(t) · W(t) · S(t) · mesh point     (steps 1 to 11 add one link each)
-  -- default throw: 22 m/s at 30 deg, from (20, 2, 25), heading 12 deg, 600 rpm, wobble 3 deg at 2 Hz --
-     climb angle  30 deg at release, 0 at the top (t = 1.12 s), -33.5 deg at landing
+<div class="cockpit" data-demo="football" data-controls="step:1"><pre class="viz-fallback">  clip point = P · V · F · H · T(t) · A(t) · W(t) · S(t) · mesh point     (steps 1 to 14 build it one link at a time)
+  -- default throw: 22 m/s at 30 deg, from (20, 2, 25), heading 12 deg, 600 rpm, Seattle g = 9.808 m/s2 --
+     climb angle  30 deg at release, 0 at the top (t = 1.12 s), -31.4 deg at the catch
      apex         6.17 m above the release (8.17 m above the field)
-     landing      t = 2.40 s at field (29.5, 69.8), 45.8 m from the release, 24.0 turns of spin
-  views: object, spin axis, velocity, flight, throw, field, world, camera
-  shot cameras: tripod, pan, sideline, chase, skycam, ball cam, spin cam, receiver, orbit</pre></div>
+     the catch    t = 2.30 s, 1.3 m up, 43.9 m from the release; the cart drove 21.4 m (it would land at 2.41 s, 45.8 m)
+     after it     ball = F · K(t) · D(t) · K(tc)^-1 · H·T·A·W·S(tc): a change of parent
+  views: object, spin axis, velocity, flight, throw, field, world, camera, cart
+  shot cameras: tripod, pan, sideline, chase, skycam, ball cam, spin cam, receiver, orbit; any of three balls</pre></div>
 
