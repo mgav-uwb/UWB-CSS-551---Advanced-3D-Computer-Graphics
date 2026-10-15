@@ -47,7 +47,7 @@
 **Laptops and phones away.** A pencil and the quiz sheet, nothing else.
 
 - **20 minutes**, 5:45 to 6:05 PM: 8 multiple-choice questions, 5 points each
-- **Covers**: Lecture 3, building blocks: vectors, MVC, the main loop (Thursday, October 8); Lecture 4, rotation (Tuesday, October 13); HW1
+- **Covers**: Lecture 3, building blocks: vectors, MVC, the main loop (Thursday, October 8); Lecture 4, vector geometry (Tuesday, October 13); HW1
 - Mark one letter per question in the grid on the first page; only the grid is graded
 
 

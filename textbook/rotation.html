@@ -15,7 +15,10 @@
      (6.2) and drift (7), with Exercises A1 to A5 (were 7, 8, 9, 10, 13); the main sections renumbered (7
      Choosing, 8 In code, 9 Exercises; 4.2 became 4.1); 2D-first figures from the same generator: rot-preserve,
      rot-columns-2d, rot-y-topview, rot-rodrigues-plane, rot-matrix-average, rot-complex,
-     rot-sandwich-halves, rot-sandwich-sum, rot-euler-steps. -->
+     rot-sandwich-halves, rot-sandwich-sum, rot-euler-steps. v2.4 (2026-10-15): 6.2 Gimbals and the lock and
+     6.3 What locks: the angles, not the airplane (the axes that align are a world axis and a body axis; turns
+     about the body's own axes never lock; the angle rates dy = dθ/cos x, dz = tan x dθ, and the 1-degree
+     read-back, from rot-reps eulerFromMatrix); the euler-gimbal demo's own-axis buttons. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -625,13 +628,15 @@
         <img src="figures/rot-euler-orders.svg" alt="Three Cessna 208 models posed by the same angles (20, 45, 10) under Unity's, three.js's and the aerospace order, each labeled with where its x axis lands." />
         <figcaption>One triple, three conventions, three poses, computed with the library&rsquo;s matrices: the \(x\) axis lands at \((0.738, 0.163, -0.654)\), \((0.696, 0.401, -0.595)\) and \((0.696, 0.123, -0.707)\).</figcaption>
       </figure>
+      <h3 id="gimbal-lock">6.2 Gimbals and the lock</h3>
       <p>
         A <em>gimbal</em> is a ring on two pins: it turns about one axis, the line through its pins. Nest
         three, each pinned inside the last, and the outer ring turns everything inside it while the inner one
         turns only the object. Three nested gimbals are a physical Euler-angle triple read intrinsically:
-        the outer angle is the leftmost factor of the product, the inner angle the rightmost. Gyroscopes,
-        camera heads and spacecraft inertial platforms are built this way, which is where the next
-        failure got its name.
+        the outer angle is the leftmost factor of the product, the inner angle the rightmost. The outer
+        ring is pinned to the ground, so its axis is a world axis; the object is fixed to the inner ring, so
+        that ring&rsquo;s axis is one of the object&rsquo;s own. Gyroscopes, camera heads and spacecraft
+        inertial platforms are built this way, which is where the next failure got its name.
       </p>
       <figure>
         <img src="figures/rot-gimbal.svg" alt="A Cessna 208 model and the three effective Euler axes for Unity's Z-X-Y order: at pitch 30 degrees the nose and the inner Z axis point to (0, -0.5, 0.866), distinct from the outer Y axis; at pitch 90 degrees the nose points straight down and the Z axis, (0, -1, 0), lies along the Y axis." />
@@ -644,7 +649,8 @@
         The inner rotation is about \(\hat{\mathbf{z}}\), but after the middle rotation \(R_x(x)\)
         its axis in the world is \(R_x(x)\,\hat{\mathbf{z}} = (0, -\sin x, \cos x)\). At
         \(x = 30^\circ\) that is \((0, -0.5, 0.866)\), a distinct direction. At \(x = 90^\circ\) it is
-        \((0, -1, 0)\), the outer \(Y\) axis itself. Then rotating about \(Z\) and rotating about
+        \((0, -1, 0)\), the outer \(Y\) axis itself: the airplane&rsquo;s nose axis now lies on the world&rsquo;s
+        \(y\) axis. Then rotating about \(Z\) and rotating about
         \(Y\) produce the same motion, three sliders give two effects, and one rotational degree of
         freedom is gone until \(x\) is backed off \(90^\circ\). That dead direction is
         <strong>gimbal lock</strong>.
@@ -654,17 +660,64 @@
         <a href="../lib/demo.html?demo=euler-gimbal" target="_blank" rel="noopener">Euler angles on three gimbals</a>:
         three nested rings carry a small airplane. Drag the pitch to \(90^\circ\) and press &ldquo;wiggle
         outer&rdquo; and &ldquo;wiggle inner&rdquo;: both turn the airplane about the same world axis. Back the pitch
-        off to \(30^\circ\) and the two wiggles differ. Switch the order to three.js and the lock moves to the
-        middle angle of that order, \(y\).
+        off to \(30^\circ\) and the two wiggles differ. Then set \((89^\circ, 0, 0)\) and press &ldquo;fin y&rdquo;,
+        which turns the airplane itself \(1^\circ\) about its own up axis and reads the angles back: the airplane
+        barely moves while the outer and inner rings swing \(45^\circ\) each (Section 6.3). Switch the order to
+        three.js and the lock moves to the middle angle of that order, \(y\).
+      </div>
+      <h3 id="what-locks">6.3 What locks: the angles, not the airplane</h3>
+      <p>
+        The two axes that line up at the lock are not two of the airplane&rsquo;s axes. Those stay
+        perpendicular at every pose, and turning the airplane about any of them always works: a program
+        that keeps the orientation as a quaternion or a matrix and multiplies in a small turn about the
+        body&rsquo;s own axis, \(R \leftarrow R\,R_{\text{axis}}(\delta)\), can turn any way from any pose and
+        never locks. That is how engines and physics apply rotation (Unity&rsquo;s
+        <code>transform.rotation * Quaternion.AngleAxis(d, Vector3.up)</code>, three.js&rsquo;s
+        <code>object.rotateY(d)</code>). The axes that line up are the outer ring&rsquo;s, fixed in the world,
+        and the inner ring&rsquo;s, fixed in the airplane.
+      </p>
+      <p>
+        What fails is the description by three angles. A program whose state <em>is</em> the triple
+        \((x, y, z)\) (an inspector, an animation curve on Euler channels, a camera kept as yaw and pitch)
+        has to express every turn as changes of the three numbers, and near the lock some turns need
+        enormous changes.
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (how fast the angles must move)</span>
+        To first order two small turns compose by adding their rotation vectors \(\theta\hat{\mathbf{n}}\)
+        (multiply \(I + aK_1\) by \(I + bK_2\) and drop the product term; Appendix A.2). So a small change
+        \((dx, dy, dz)\) of Unity&rsquo;s angles turns the object by
+        \(dy\,\hat{\mathbf{y}} + dx\,\hat{\mathbf{x}} + dz\,(0, -\sin x, \cos x)\), each change about its
+        gimbal&rsquo;s axis in the world (take \(y = 0\); a nonzero \(y\) turns the whole picture about
+        \(\hat{\mathbf{y}}\) and changes none of the numbers). Now turn the
+        airplane by a small angle \(d\theta\) about its own fin axis, which in the world is
+        \(R_x(x)\,\hat{\mathbf{y}} = (0, \cos x, \sin x)\). Matching components: \(dx = 0\),
+        \(dz\cos x = d\theta\sin x\) and \(dy - dz\sin x = d\theta\cos x\), so
+        \[
+          dz = \tan x \; d\theta, \qquad dy = \frac{d\theta}{\cos x}.
+        \]
+        At \(x = 20^\circ\) that is \(dy = 1.06\,d\theta\) and \(dz = 0.36\,d\theta\); at \(80^\circ\),
+        \(5.76\,d\theta\) and \(5.67\,d\theta\); at \(90^\circ\) no change of the angles does it, which is the
+        dead direction of the previous example. For a whole \(1^\circ\) turn, read back with the extraction
+        of Appendix A.4: at \(x = 89^\circ\) the angles move \(y\) by \(45^\circ\) and \(z\) by \(45^\circ\);
+        at \(x = 90^\circ\) they move \(90^\circ\) each, however small the turn. Code:
+        <code>eulerFromMatrix('unity', matMul(eulerMatrix('unity', 89, 0, 0), axisRot('y', 1)))</code>
+        (<code>lib/core/rot-reps.js</code>, with <code>matMul</code> from <code>lib/core/xform.js</code>) returns
+        \((88.59, 45.00, 45.00)\).
       </div>
       <p>
-        Nothing is wrong with the orientation at pitch \(90^\circ\); the object is fine. It is the
-        chart \((\text{yaw}, \text{pitch}, \text{roll})\) that goes singular there (a <em>chart</em> is a
-        set of coordinates laid over the rotations, as latitude and longitude are laid over the globe), the way longitude
-        is undefined at the poles. A quaternion names an axis and an angle with no nested frames,
-        so there is no configuration where two of its parts align. That is the engineering reason
-        engines store the quaternion and show Euler angles only for editing:
-        <code>transform.rotation</code> is a quaternion under the hood, always.
+        A physical gimbal is that program in hardware: its three ring angles are the state. To hold an
+        inertial platform still while the spacecraft turns about the dead direction, the gimbal motors
+        would have to turn \(1/\cos x\) times as fast as the craft, so the Apollo crews flew around the lock
+        orientation. Nothing is wrong with the orientation at pitch \(90^\circ\); the object is fine. It is
+        the chart \((\text{yaw}, \text{pitch}, \text{roll})\) that goes singular there (a <em>chart</em> is a
+        set of coordinates laid over the rotations, as latitude and longitude are laid over the globe), the
+        way longitude is undefined at the poles: one step at the North Pole can change your longitude by
+        \(90^\circ\). A quaternion names an axis and an angle with no nested frames, so there is no
+        configuration where two of its parts align. That is the engineering reason engines store the
+        quaternion and show Euler angles only for editing: <code>transform.rotation</code> is a quaternion
+        under the hood, always. Cameras that do keep yaw and pitch as their state clamp the pitch short of
+        \(\pm 90^\circ\).
       </p>
 
 <!-- ============================================================ -->

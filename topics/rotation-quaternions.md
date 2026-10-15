@@ -14,7 +14,7 @@
   tip to tail; why the half angle, one factor at a time; composition as the product, worked against
   matrices, and the order; slerp worked; the double cover and the long way round; what Unity and
   three.js store); Euler angles (yaw, pitch, roll; three turns in a row, extrinsic and intrinsic;
-  three conventions give three poses; gimbals and the lock), why quaternions have no lock; one
+  three conventions give three poses; gimbals and the lock; what locks: the angles, not the airplane); one
   rotation, five definitions.
   SUPPLEMENT: rotation-quaternions-supplement.md (~37 min), mounted after the lecture's wrap and covered
   time permitting: a mirror is not a rotation; R_y(30) column by column, the diagonal axis at 120
@@ -22,6 +22,11 @@
   QMultiplication in both tracks, the sandwich checked by hand, quaternion to matrix and back, order
   matters live (rot-compose), the shortest arc and its opposite-vector case, nlerp, drift measured,
   degrees against radians; Euler extraction at the lock and the two Euler triples.
+  EDITED 2026-10-15 (Marcel: "if we apply rotations along one of the axes of the model frame, we should
+  never collapse two axes"): the gimbal slide says which two axes line up (a world axis and a body axis,
+  never two body axes); the euler-gimbal demo gains own-axis turns (data-controls "own"); "Quaternions
+  have no lock" became "What locks: the angles, not the airplane", with the 1-degree table, the 1/cos x
+  rate in the note and the Apollo quote kept.
   SPLIT 2026-10-15: 16 slides moved to the supplement (the textbook's Appendix holds the same material).
   TRIMMED 2026-10-15 (Marcel: "trim it and make it more intuitive and visual", ~45 min): seven more
   slides to the supplement (mirror, column-by-column, QMultiplication code, the hand check of the
@@ -451,12 +456,12 @@ Unity and three.js differ by **15.2°**, Unity and aerospace by 8.2°: name the 
 
 <img src="../../textbook/figures/rot-gimbal.svg" alt="a Cessna 208 model pitched 30 and 90 degrees: at 90 degrees, nose straight down, the inner and outer rotation axes coincide" style="height:260px">
 
-A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Z` inner, `X` middle, `Y` outer. The outer axis is always `ŷ`; after a middle turn of `x` degrees the inner axis is
+A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Y` outer, `X` middle, `Z` inner. The outer axis is fixed to the **world** (always `ŷ`); the inner axis is fixed to the **airplane** (its nose), so the middle turn carries it:
 
 ```text
 R_x(x) ẑ = (0, -sin x, cos x)     (the outer turn y spins both together, so take y = 0)
 x = 30°:  (0, -0.5, 0.866)        60° from ŷ: a distinct direction
-x = 90°:  (0, -1, 0)              along ŷ: the inner Z and outer Y now turn about the same line
+x = 90°:  (0, -1, 0)              along ŷ: the airplane's nose axis lies on the world's ŷ
 ```
 
 
@@ -466,21 +471,32 @@ x = 90°:  (0, -1, 0)              along ŷ: the inner Z and outer Y now turn ab
 
 ## Gimbal lock, live
 
-<div class="cockpit" data-demo="euler-gimbal" data-controls="x,y,z,order,wiggle"><pre class="viz-fallback">  Unity order: outer Y (yaw), middle X (pitch), inner Z (roll)
+<div class="cockpit" data-demo="euler-gimbal" data-controls="x,y,z,order,wiggle,own"><pre class="viz-fallback">  Unity order: outer Y (yaw), middle X (pitch), inner Z (roll)
   -- (x, y, z) = (20, 45, 10) --  x lands at (0.738, 0.163, -0.654)
                          inner axis 70° from the outer axis
   -- (x, y, z) = (90, 45, 10) --  inner axis = outer axis: LOCKED
-                         wiggle outer and wiggle inner swing the airplane about the same axis (opposite senses)</pre></div>
+                         wiggle outer and wiggle inner swing the airplane about the same axis (opposite senses)
+  -- (x, y, z) = (89, 0, 0), turn the airplane 1° about its own fin axis --
+                         the angles move by x -0.41°, y +45.00°, z +45.00°</pre></div>
 
 
 ---
 
-## Quaternions have no lock
+## What locks: the angles, not the airplane
 
-Gimbal lock belongs to the **representation**, not to the rotation. Euler angles are a **chart**, coordinates laid over the rotations like latitude and longitude over the globe, and like longitude at a pole they fail at some points.
+The airplane's own axes stay perpendicular; turning it about any of them always works. What fails is **reading the pose back as three angles**. Turn the airplane 1° about its own fin axis; Unity's angles move by:
 
-- a **quaternion** names axis and angle directly: no nested axes to line up
-- engines **store** quaternions and **show** Euler angles for editing
+```text
+pitch x      y         z
+  20°        1.06°     0.36°
+  60°        2.00°     1.73°
+  80°        5.74°     5.65°
+  89°        45°       45°
+  90°        90°       90°      for any turn, however small
+```
+
+- Euler angles are a **chart**, like longitude: at the pole, one step can change it by 90°
+- engines **store** quaternions (no nested axes to line up) and **show** Euler angles
 
 > "How about sending me a fourth gimbal for Christmas?"
 
