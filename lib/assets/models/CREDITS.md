@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Model Assets: Credits & Provenance"
-version: "1.7"
+version: "1.8"
 status: draft
 created_by: "Claude"
 created_at: "2026-07-18T14:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-10-15T01:00"
+last_modified_at: "2026-10-15T01:30"
 contributors:
   - "Claude"
 tags:
@@ -46,7 +46,18 @@ Each source model is baked into four LOD levels (`l0`–`l3`) as compact
   `football/BLENDSWAP_LICENSE.txt`, `football/FOOTBALL.md` (the full-size textures, the .psd and the downloaded
   archive are kept out of the published site)
 
+## Field drawing (field/)
+
+- **What:** `field/huskies_field.jpg`, a drawing of the Husky Stadium field at the University of Washington,
+  supplied by Marcel (`Washington-Huskies.jpeg`, private copy only); its original source is not recorded. The
+  logos and marks on it belong to their owners.
+- **Changes:** the white background outside the field-level outline filled with dark ground
+  (`tools/make-field-texture.py`); the plane's size and placement are in `field/FIELD.md`.
+
 ## Stadium (stadium/)
+
+- **Not used (2026-10-15):** the football demo drew too slowly with it and went back to the field drawing. The
+  converted files stay in the course's private copy with their converter; they are no longer published.
 
 - **Model:** "Soccer and American football stadium" by **ericchip1983**
 - **Source:** BlendSwap, `http://www.blendswap.com/blends/view/74526`
@@ -165,6 +176,7 @@ Regenerate with `cd tools && npm run prep:models` (downloads are cached in
 
 | Version | Date | Author | Summary |
 | --- | --- | --- | --- |
+| 1.8 | 2026-10-15T01:30 | Claude | The field drawing (Husky Stadium, supplied by Marcel) replaces the stadium in the football demo; the stadium is no longer published. |
 | 1.7 | 2026-10-15T01:00 | Claude | The aircraft: a Cessna 208 by Helijah (CC0), a Harrier II by panko10 (CC BY 3.0) and an A380 by theMaker (CC BY-SA 3.0, non-commercial), from BlendSwap, converted by tools/convert-aircraft-blend.py. |
 | 1.6 | 2026-10-14T23:50 | Claude | The stadium: "Soccer and American football stadium" by ericchip1983 (BlendSwap, CC BY 3.0), converted by tools/convert-stadium-blend.py. |
 | 1.5 | 2026-10-14T23:45 | Claude | The football is "Football" by rnepb13 (BlendSwap, CC BY 3.0), converted by tools/convert-football-blend.py; the generated ball is retired. |

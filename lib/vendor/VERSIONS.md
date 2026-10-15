@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Vendored Library Versions"
-version: "1.3"
+version: "1.4"
 status: draft
 created_by: "Claude"
 created_at: "2026-07-11T00:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-10-14T23:00"
+last_modified_at: "2026-10-15T01:30"
 contributors:
   - "Claude"
 tags:
@@ -53,7 +53,7 @@ related:
   `./BufferGeometryUtils.js`; a comment at the top of each says so. No other changes.
 - three.js `examples/jsm/libs/meshopt_decoder.module.js` (vendored as `meshopt_decoder.module.js`): fetched
   2026-10-14 from jsdelivr at the pinned 0.170.0 tag. MIT (meshoptimizer, Arseny Kapoulkine). Decodes the
-  meshopt-compressed stadium (`lib/assets/models/stadium/stadium.glb`) for GLTFLoader; no imports, unmodified
+  meshopt-compressed aircraft (`lib/assets/models/aircraft/`, loaded by `lib/core/aircraft.js`) for GLTFLoader; no imports, unmodified
   apart from a provenance comment on its first line.
 
 ---
@@ -62,6 +62,7 @@ related:
 
 | Version | Date             | Author | Summary       |
 | ------- | ---------------- | ------ | ------------- |
+| 1.4     | 2026-10-15T01:30 | Claude | The meshopt decoder now serves the aircraft (the stadium is retired). |
 | 1.3     | 2026-10-14T23:50 | Claude | Vendored `meshopt_decoder.module.js` (three.js 0.170.0, MIT) for the stadium. |
 | 1.2     | 2026-10-14T23:00 | Claude | Vendored `GLTFLoader.js` and `BufferGeometryUtils.js` (three.js 0.170.0 examples, MIT) for the football model. |
 | 1.1     | 2026-07-18T00:00 | Claude | Task B2: vendored `TeapotGeometry.js` (three.js 0.170.0 examples, MIT); added frontmatter/endmatter to this file. |
