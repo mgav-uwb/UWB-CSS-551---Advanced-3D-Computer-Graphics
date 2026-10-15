@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~70 min).
+  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~76 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/affine-transforms.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -8,6 +8,7 @@
   TEACHES: the affine map x -> A x + t as the family every placement transform belongs to; what it preserves (lines, parallels, ratios) and what it does not; the determinant as volume and handedness; points versus displacements; homogeneous coordinates as the lift that makes affine maps linear (the 4x4 block [A t; 0 1], w = 1 points, w = 0 vectors); composition as the block product and why order matters (T.R vs R.T worked to the demo's numbers, live); the block inverse and the rigid case; a matrix as an affine frame (columns + origin), object versus world space; TRS as the special case engines store (and the shear it cannot); normals by the inverse transpose; pivots as conjugation with translation (I - R)p; where affine ends (the last row, projective maps, the perspective matrix of the viewing lecture).
   NEEDS:   the vectors-review topic (dot, cross, projection) and the rotation topic (R_y, columns are where the axes land).
   DEMOS:   data-demo="trs-order" data-controls="tx,ry" (under the lecture page's 200px crop). Fallback hand-verified (lib/core/xform.js): tx = 1.5, ry = 60: T.R column 3 = (1.50, 0, 0); R.T column 3 = (0.75, 0, -1.30).
+           data-demo="football" data-controls="step:1" (a full slide). Fallback numbers from lib/tests/football.test.mjs (default throw).
   SOURCE:  reframed 2026-09-18 (Plan B) from the former sessions/S04-matrices-spaces/L04-matrices-spaces.md (35 slides), whose worked numbers (T.R/R.T, the rigid inverse, the pivot at (2,0,0)) are kept digit for digit; Sung's Topic4 CDP code slides are reduced to two. Trimmed 2026-09-29 (Plan C, a 90-minute Tuesday lecture): the separate two-map composition slide was folded into the block-product slide. Real C# / shader excerpts are from Kelvin Sung's CSS 451 ClassExamples.
   DENSIFIED 2026-09-29 (Plan C; 60+ slides per two hours): the family ladder, figures for shear, points and vectors, blocks, order, normals, frame, polar, storage, pivot, projective; affine combinations; a determinant and area; winding and two mirrors; Möbius and Roberts; T·S vs S·T; predict-then-run; w in both APIs; the demo inverse; the oblique-scale and conditioning pitfalls; planes by the inverse transpose; a 2D frame both ways; storage conventions; TRS read-back and apply-and-undo; polar decomposition; costs; scale about a corner; the pivot in three.js; a projective map worked; TRS in both tracks; a check-yourself slide. Numbers from numbers-foundations.json (aff, rot) or node.
 
@@ -23,6 +24,10 @@
   and TRS listings in Unity/WebGL code tabs; the three.js pivot slide and Sung's pivot excerpt merged
   into one tabbed slide (the by-hand storage block dropped; the column-major slide covers it).
 
+  EDITED 2026-10-14 (~70 to ~76 min): a closing section, One throw, the whole chain: the spiral pass as
+  P·V·F·H·T·A·W·S (a table of the eight links) and the football demo, which builds the chain one link at a
+  time, lets the observer ride any frame, and shows Euler angles against the stored quaternion (L04).
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -32,7 +37,7 @@
 
 ### Affine transformations over homogeneous coordinates
 
-<small>(~70 min)</small>
+<small>(~76 min)</small>
 
 
 ---
@@ -859,4 +864,48 @@ const q = new THREE.Vector3(1, 1, 1).applyMatrix4(m);   // (2.433, 3, 1.518)
 </div>
 
 Both build `T·R·S`; `m.decompose(pos, quat, scale)` in three.js reads it back.
+
+
+---
+
+### One throw, the whole chain
+
+<small>(~6 min)</small>
+
+
+---
+
+## One throw, one chain
+
+```text
+p_clip = P · V · F · H · T(t) · A(t) · W(t) · S(t) · p_mesh       applied right to left
+```
+
+| Link | Matrix | From → to |
+| --- | --- | --- |
+| `S(t)` spin | `R_z(φ)`, φ = 2π · rpm / 60 · t | object → spin axis |
+| `W(t)` wobble | `R_z(ψ) · R_x(β) · R_z(−ψ)` | spin axis → velocity |
+| `A(t)` aim | `R_x(−θ)`, θ = `atan2(v_y, v_z)` | velocity → flight |
+| `T(t)` flight | translate(0, y(t), z(t)), a parabola | flight → throw |
+| `H` set-up | `T(start) · R_y(h)` | throw → field |
+| `F` field | `R_y(γ) · T(−25, 0, −55)` | field → world |
+| `V` view | `(F · C)⁻¹`, C the camera's placement | world → camera |
+| `P` projection | perspective(fov, aspect, near, far) | camera → clip |
+
+`S`, `W`, `A`, `T` change every frame; `H`, `F` once per throw; `M = F·H·T·A·W·S` is the model matrix. [Full page](../../lib/demo.html?demo=football)
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## A spiral pass, live: ride any frame of the chain
+
+<div class="cockpit" data-demo="football" data-controls="step:1"><pre class="viz-fallback">  clip point = P · V · F · H · T(t) · A(t) · W(t) · S(t) · mesh point     (steps 1 to 11 add one link each)
+  -- default throw: 22 m/s at 30 deg, from (20, 2, 25), heading 12 deg, 600 rpm, wobble 3 deg at 2 Hz --
+     climb angle  30 deg at release, 0 at the top (t = 1.12 s), -33.5 deg at landing
+     apex         6.17 m above the release (8.17 m above the field)
+     landing      t = 2.40 s at field (29.5, 69.8), 45.8 m from the release, 24.0 turns of spin
+  views: object, spin axis, velocity, flight, throw, field, world, camera
+  shot cameras: tripod, pan, sideline, chase, skycam, ball cam, spin cam, receiver, orbit</pre></div>
 

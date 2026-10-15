@@ -47,6 +47,8 @@
     [data-demo="trs-order"] .demo-panel .demo-hint { font-size: 9px !important; margin: 3px 0 0 !important; }
     [data-demo="trs-order"] .demo-panel .mat-panel { font-size: 8.5px; }
     [data-demo="trs-order"] .demo-panel .mat-panel td { padding: 1.5px 4px; min-width: 2.1em; }
+    /* football: the rail holds tabs (steps, throw, chain, stored), so it needs more than 270px */
+    .reveal section.demo-full [data-demo="football"] .demo-shell-rail--embed { flex: 0 0 330px; }
   </style>
 </head>
 <body>
@@ -54,17 +56,17 @@
     <div class="slides">
       <!-- One section per file, in order: the lecture opening (L05-open.md),
            one or more ../../topics/*.md, then discussion and wrap (L05-discuss.md). -->
-      <section data-markdown="L05-open.md?v=20261008r"
+      <section data-markdown="L05-open.md?v=20261014b"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/affine-transforms.md?v=20261008r"
+      <section data-markdown="../../topics/affine-transforms.md?v=20261014b"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L05-discuss.md?v=20261008r"
+      <section data-markdown="L05-discuss.md?v=20261014b"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
