@@ -7,7 +7,7 @@
 
 ### HW2, and the wrap
 
-<small>(~14 min) · then setup help, both tracks</small>
+<small>(~4 to 14 min) · then setup help, both tracks, as time allows</small>
 
 
 ---
@@ -48,5 +48,5 @@ An affine map is a linear part plus a shift; one extra coordinate makes it one 4
 
 - **Read:** [Affine Transformations](../../textbook/affine-transforms.html)
 - **Due:** HW2, Wednesday October 21, 11:59 PM
-- **Now:** HW2 setup help, both tracks
+- **Now:** HW2 setup help, both tracks, as time allows; the supplement after this slide is time permitting, or reading
 

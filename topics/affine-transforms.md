@@ -1,11 +1,12 @@
 <!--
-  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~76 min).
+  CSS 551 · TOPIC DECK: Affine transformations over homogeneous coordinates (~50 min).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/affine-transforms.md"> among others; it carries no
   logistics (no title, homework, wrap) and no "Part N" numbering.
   Lectures compose topics in their index.html; see lectures/README.md and topics/README.md.
 
-  TEACHES: the affine map x -> A x + t as the family every placement transform belongs to; what it preserves (lines, parallels, ratios) and what it does not; the determinant as volume and handedness; points versus displacements; homogeneous coordinates as the lift that makes affine maps linear (the 4x4 block [A t; 0 1], w = 1 points, w = 0 vectors); composition as the block product and why order matters (T.R vs R.T worked to the demo's numbers, live); the block inverse and the rigid case; a matrix as an affine frame (columns + origin), object versus world space; TRS as the special case engines store (and the shear it cannot); normals by the inverse transpose; pivots as conjugation with translation (I - R)p; where affine ends (the last row, projective maps, the perspective matrix of the viewing lecture).
+  TEACHES: homogeneous coordinates first: a point as a ray through the origin ((x, y) -> (x, y, 1), (x, y, w) is (x/w, y/w)), and why graphics uses them (one matrix for every placement, perspective by the divide, w = 0 as a direction and a point at infinity, one 4-vector data type; the hardware history stated accurately); translation as a shear one dimension up; points move, directions do not (w in both APIs); a light at infinity (point versus directional, L.xyz − L.w · p); the affine map x -> A x + t and what it preserves; the determinant as area and handedness; composition as the block product and why order matters (T·R vs R·T in 2D, then the 3D demo); the block inverse and the rigid case as subtract-then-dot; a matrix as a frame (columns + origin, read backward), object versus world space, column-major storage, TRS and the shear it cannot store, TRS in both tracks; normals by the inverse transpose (the ellipse); the pivot sandwich step by step and in both tracks; where affine ends (the last row) and the pipeline; one throw as one chain (football demo). Every core picture is 2D.
+  SUPPLEMENT: affine-transforms-supplement.md (~38 min), mounted after the lecture's wrap and covered time permitting: the ladder of families, affine combinations, the 3x3 determinant worked, two mirrors, the winding pitfall; T·R and R·T worked to the demo's numbers, T·S and S·T, the 3D rigid inverse, undoing the demo's T·R, inverting a non-TRS matrix, the condition number and huge scales; a row-vector matrix pasted as columns, TRS read back and undone, the polar decomposition, detecting a mirror and a shear; the inverse transpose derived and in both tracks' shaders, planes and the ground plane; the 3D pivot, scaling about a corner, conjugation; a projective map in 2D and its vanishing point.
   NEEDS:   the vectors-review topic (dot, cross, projection) and the rotation topic (R_y, columns are where the axes land).
   DEMOS:   data-demo="trs-order" data-controls="tx,ry" (under the lecture page's 200px crop). Fallback hand-verified (lib/core/xform.js): tx = 1.5, ry = 60: T.R column 3 = (1.50, 0, 0); R.T column 3 = (0.75, 0, -1.30).
            data-demo="football" data-controls="step:1" (a full slide). Fallback numbers from lib/tests/football.test.mjs (default throw).
@@ -32,6 +33,15 @@
   ball as the camera's target, and a Code window with the whole program for both tracks (lib/programs/football/);
   the ball model is in lib/assets/models/football/. Default numbers now use Seattle's g = 9.808 m/s².
 
+  EDITED 2026-10-15 (Marcel: an appendix for what can wait, a more intuitive core with 2D examples and many
+  pictures, and an opening on homogeneous coordinates): a new first section (a point as a ray, why graphics
+  uses w, translation as a shear, points and directions, a light at infinity), every core concept on one 2D
+  figure from tools/gen-textbook-figures-affine-intuition.mjs (aff-rays, aff-lift, aff-lights, aff-det-2d,
+  aff-order-2d, aff-rigid-2d, aff-pivot-2d, aff-normals-ellipse) or the fixed foundations figures (aff-shear,
+  aff-frame, aff-projective); 26 slides moved to affine-transforms-supplement.md; the question slide, the
+  old lift, w and points-move slides, the determinant table, the 2D-frame worked slide and the w-in-the-APIs
+  table folded into the new slides; the football slide's full-page link dropped (every demo has a ↗ button).
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -41,26 +51,82 @@
 
 ### Affine transformations over homogeneous coordinates
 
-<small>(~76 min)</small>
+<small>(~50 min) · reading: <a href="../../textbook/affine-transforms.html">Affine Transformations</a>, Sections 0 to 9</small>
+
+
+---
+
+### Homogeneous coordinates: one more number
+
+<small>(~9 min)</small>
+
+---
+
+## Homogeneous coordinates: one more number
+
+<img src="../../textbook/figures/aff-rays.svg" alt="points of a line lifted to (x, w): the points (1, 0.5), (2, 1), (4, 2) lie on one ray through the origin and all name x = 2; shrinking w with x fixed moves the hit on the line w = 1 out to 4 and 6; w = 0 never meets the line" style="height:255px">
+
+- a 2D point (x, y) is written (x, y, 1); a 3D point (x, y, z) is written (x, y, z, 1)
+- any multiple names the same point: (x, y, w) is (x/w, y/w), so (1, 0.5), (2, 1), (4, 2) all name x = 2
+- w = 0 never reaches the line w = 1: (x, y, 0) is a **direction**, a point at infinity
+
+
+---
+
+## Why graphics uses them
+
+- **one matrix for every placement**: rotation, scale and shear are matrix products, but translation is an addition; with the extra coordinate all four become one `3×3` (2D) or `4×4` (3D) product, and a chain of placements multiplies down to one matrix
+- **perspective**: a matrix can write depth into `w`; dividing `x`, `y`, `z` by `w` afterward makes distant things smaller (the viewing lecture)
+- **points at infinity**: `w = 0` is a direction, which a translation cannot move; a directional light such as the sun is one
+- **one data type from file to shader**: shading languages make `vec4` / `float4` and the `4×4` product built-in types; the first programmable vertex processors (DirectX 8 vertex shaders, 2000, in hardware on the GeForce 3, 2001) computed on 4-component registers; today's GPUs (graphics processing units) execute scalar instructions per thread, and a `vec4` is four of them
+
+
+---
+
+## Translation becomes a matrix
+
+<img src="../../textbook/figures/aff-lift.svg" alt="the plane w = 1 above the floor w = 0 in (x, y, w) space: a flag on the plane slides by t = (2, 1), the w axis leans, and a direction on the floor does not move" style="height:380px">
+
+```text
+[ 1  0  tx ] [ x ]   [ x + tx ]
+[ 0  1  ty ] [ y ] = [ y + ty ]        in 3D, the same lift:  [A t; 0 1] · (x, 1) = (A x + t, 1)
+[ 0  0  1  ] [ 1 ]   [   1    ]
+```
+
+
+---
+
+## Points move, directions do not
+
+Subtract two moved points: `(A p + t) − (A q + t) = A (p − q)`. The `t` cancels; `w` does that bookkeeping:
+
+```text
+[ A  t ] [ v ]   [ A v ]       point (w = 1):      A x + t     moved
+[ 0  1 ] [ 0 ] = [  0  ]       direction (w = 0):  A v         the translation column times 0
+point − point: w = 1 − 1 = 0, a direction        point + direction: w = 1 + 0 = 1, a point
+```
+
+| | Unity | three.js |
+| --- | --- | --- |
+| point (w = 1) | `M.MultiplyPoint3x4(p)` | `p.applyMatrix4(M)` |
+| direction (w = 0) | `M.MultiplyVector(v)` | `v.transformDirection(M)` (also normalizes) |
+
+
+---
+
+## A light at infinity
+
+<img src="../../textbook/figures/aff-lights.svg" alt="left: a point light at (1, 4, 1) with rays spreading to the ground; right: a directional light (−1, 2, 0) with parallel rays; the same box casts a shadow ending at x = 4.333 and x = 4" style="height:330px">
+
+- a light at (x, y, z, 1) is a **point light**; at (x, y, z, 0) it is a **directional light**, the sun: parallel rays
+- one formula for both: the direction toward the light from a surface point p is L.xyz − L.w · p
 
 
 ---
 
 ### Affine maps
 
-<small>(~20 min)</small>
-
----
-
-## The question: placing a model
-
-A mesh is authored once, in its own coordinates. To put it in the world you **translate** it, **rotate** it, **scale** it, sometimes **shear** it, and you do these in **some order**, then undo them for picking and cameras.
-
-- what **family of maps** is that, and what does every member of it do to shapes?
-- is there **one representation** that composes, inverts, and stores all of them the same way?
-
-The answers: **affine maps**, and **homogeneous coordinates**.
-
+<small>(~6 min)</small>
 
 ---
 
@@ -83,20 +149,6 @@ A **linear** map is the special case `t = 0`: it fixes the origin. Translation i
 
 ---
 
-## A ladder of transformation families
-
-| family | example | keeps lines | keeps parallels | keeps angles | keeps lengths |
-| --- | --- | --- | --- | --- | --- |
-| rigid (6 numbers) | rotate + translate | yes | yes | yes | yes |
-| similarity (7) | + uniform scale | yes | yes | yes | no |
-| affine (12) | + non-uniform scale, shear | yes | yes | no | no |
-| projective (15) | + perspective | yes | **no** | no | no |
-
-Each step up the ladder gives up one invariant. Placement transforms are the third rung; the camera's perspective is the fourth.
-
-
----
-
 ## What an affine map preserves
 
 An affine map keeps the **structure of lines** and nothing more:
@@ -105,158 +157,24 @@ An affine map keeps the **structure of lines** and nothing more:
 - **ratios along a line** survive: the midpoint of a segment maps to the midpoint of the image segment
 - **lengths and angles are not preserved** in general (only when `A` is orthogonal: rotations and reflections)
 
-```text
-   shear  A = [[1, 0.5], [0, 1]]  on the unit square:   (0,0)→(0,0)  (1,0)→(1,0)  (0,1)→(0.5,1)  (1,1)→(1.5,1)
-   the square becomes a parallelogram; the midpoint (0.5, 0.5) → (0.75, 0.5), still the midpoint of the image diagonal
-```
+<img src="../../textbook/figures/aff-shear.svg" alt="the unit square and its image under the shear [[1, 0.5], [0, 1]], a parallelogram; the midpoint (0.5, 0.5) maps to (0.75, 0.5), the midpoint of the image diagonal" style="height:250px">
 
 
 ---
 
-## Affine combinations: weights that sum to one
+## The determinant: area and handedness
 
-Points cannot be added, but they can be **averaged**: `α p + β q` is a point when `α + β = 1`.
+<img src="../../textbook/figures/aff-det-2d.svg" alt="left: the unit square and its image under A with columns (2, 0) and (1, 1.5), a parallelogram of area 3; right: a counter-clockwise triangle and its mirror image under diag(−1, 1), now clockwise" style="height:340px">
 
-```text
-   f(α p + β q) = α f(p) + β f(q)        whenever α + β = 1       (the t's add up to exactly one t)
-
-   f(x) = A x + (1, 1),  A = [[1, 0.5], [0, 1]]
-   p = (0, 0) → (1, 1)        q = (2, 0) → (3, 1)        midpoint (1, 0) → (2, 1) = ½ (1,1) + ½ (3,1)
-```
-
-- this is **why** an affine map keeps ratios: a point at weight `t` along a segment stays at weight `t`
-- weights that do not sum to one mix in the origin: `p + q` depends on where the origin is, so it is not a point
+- `|det A|` scales **every** area (every volume in 3D) by the same factor; `det A = 0` collapses a dimension, and nothing undoes it
+- `det A < 0` is a **mirror**: windings flip, so back-face culling drops the front faces; engines flip the culling mode when `det < 0` (Unity does it for a negative scale)
 
 
 ---
 
-## Worked: a determinant, and an area
+### Composition and the inverse
 
-```text
-   A = [ 2  1  0 ]         det A = 2 · (1·3 − 0·0) − 1 · (0·3 − 0·0) + 0 = 6
-       [ 0  1  0 ]
-       [ 0  0  3 ]
-
-   2D: triangle (0,0), (1,0), (0,1), area 0.5
-       under diag(2, 3):   (0,0), (2,0), (0,3), area 3 = 0.5 · det = 0.5 · 6
-```
-
-Volumes (and areas) scale by `|det A|` **everywhere at once**: every triangle of the mesh grows by the same factor.
-
-
----
-
-## Two mirrors make a rotation
-
-```text
-   mirror in x:  diag(−1, 1, 1),  det −1
-   mirror in y:  diag(1, −1, 1),  det −1
-   product:      diag(−1, −1, 1), det (−1)(−1) = +1      a half turn about z
-```
-
-Determinants multiply, so an **even** number of mirrors is a rotation and an **odd** number is a mirror. A model with scale `(−1, −1, 1)` is only turned; one with `(−1, 1, 1)` is mirrored and renders inside out unless the renderer flips its culling.
-
-
----
-
-## Pitfall: a mirror flips the winding
-
-```text
-   triangle (0,0), (1,0), (0,1):     edge function  = +1   counter-clockwise, normal (0, 0, +1)
-   mirror x → −x:  (0,0), (−1,0), (0,1):  edge function = −1   clockwise,  normal (0, 0, −1)
-```
-
-- back-face culling keeps counter-clockwise triangles: after the mirror the **whole mesh is culled**, or drawn inside out
-- engines check `det < 0` on the model matrix and flip the culling mode (Unity does this automatically for negative scale)
-
-
----
-
-## The determinant: volume and handedness
-
-`det A` is the factor by which `A` scales **volume**, and its **sign** says whether handedness flipped:
-
-```text
-   det diag(2, 1, 1) =  2      twice the volume
-   det R             =  1      a rotation keeps volume and handedness
-   det diag(-1,1,1)  = -1      a mirror: same volume, left hand ↔ right hand
-   det = 0                     a dimension collapsed: not invertible (a zero scale)
-```
-
-- a **negative determinant** turns every right-handed frame into a left-handed one: triangle windings flip, normals point inward
-- the `det = 0` case is why a zero scale cannot be undone
-
-
----
-
-## Points move, displacements do not
-
-Apply `f` to two points and subtract:
-
-```text
-   f(p) − f(q) = (A p + t) − (A q + t) = A (p − q)
-```
-
-A **displacement** (the vector from `q` to `p`, a velocity, a normal) feels only the linear part `A`. The translation cancels. Points have a location and move with `t`; vectors have no location and ignore it.
-
-```text
-   translate by (2, 0, 0):   point (0,0,0) → (2,0,0)      moved
-                             vector (1,0,0) → (1,0,0)     unchanged
-```
-
-
----
-
-### Homogeneous coordinates
-
-<small>(~25 min)</small>
-
----
-
-## The lift: one more coordinate makes affine linear
-
-Append a `1` to every point, `(x, y, z) → (x, y, z, 1)`, and pack `A` and `t` into one `4×4`:
-
-```text
-   [ A  t ] [ x ]   [ A x + t ]
-   [ 0  1 ] [ 1 ] = [    1    ]            the affine map is now ONE matrix product
-```
-
-In one line: **`[A t; 0 1] · (x, 1) = (A x + t, 1)`**.
-
-- the top-left `3×3` is the linear part, **column 3** is the translation, the bottom row is `(0, 0, 0, 1)`
-- translation became a matrix multiply, so **every** placement transform is the same data type
-- this is why graphics is done in `4×4`: one code path, one upload to the GPU, one composition rule
-
-
----
-
-## w = 1 for points, w = 0 for vectors
-
-Feed the block matrix a vector with `w = 0`:
-
-```text
-   [ A  t ] [ v ]   [ A v ]
-   [ 0  1 ] [ 0 ] = [  0  ]            the translation column is multiplied by w and vanishes
-```
-
-- a **point** `(x, y, z, 1)` gets `A x + t`: it moves
-- a **vector** `(x, y, z, 0)` gets `A v`: the translation is gone, exactly as the subtraction proved
-- point minus point gives `w = 1 − 1 = 0`, a vector; point plus vector gives `w = 1`, a point: the arithmetic keeps the types straight
-
-
----
-
-## w in the APIs
-
-| operation | Unity | three.js |
-| --- | --- | --- |
-| point (w = 1) | `M.MultiplyPoint3x4(p)` | `p.applyMatrix4(M)` (divides by w) |
-| direction (w = 0) | `M.MultiplyVector(v)` | `v.transformDirection(M)` (**normalizes** too) |
-| normal | `M.inverse.transpose.MultiplyVector(n)` | `n.applyNormalMatrix(new THREE.Matrix3().getNormalMatrix(M))` |
-
-Pick the call by what the vector **means**, not by its type: both libraries store positions and directions in the same `Vector3`.
-
+<small>(~12 min)</small>
 
 ---
 
@@ -278,34 +196,11 @@ In one line: **`[B s; 0 1] · [A t; 0 1] = [B A,  B t + s; 0 1]`**.
 
 ---
 
-## Worked: T·R and R·T from the block formula
+## Order matters: T·R against R·T
 
-`T` = translate by `t = (1.5, 0, 0)`; `R` = `R_y(60)`, `cos60 = 0.5`, `sin60 = 0.866`.
+<img src="../../textbook/figures/aff-order-2d.svg" alt="a flag at the origin; T·R turns it 90 degrees in place and slides it to (2, 0); R·T slides it to (2, 0) first and then swings it about the origin to (0, 2), along a dashed quarter circle" style="height:420px">
 
-```text
-   T·R :  B = I, s = t;  A = R, t' = 0     →  linear part R,  translation  I·0 + t   = (1.5, 0, 0)
-   R·T :  B = R, s = 0;  A = I, t' = t     →  linear part R,  translation  R·t + 0   = (1.5·cos60, 0, −1.5·sin60) = (0.75, 0, −1.30)
-
-   T·R = [ 0.5    0  0.866  1.5 ]      R·T = [ 0.5    0  0.866   0.75 ]
-         [ 0      1  0      0   ]            [ 0      1  0       0    ]
-         [ −0.866 0  0.5    0   ]            [ −0.866 0  0.5    −1.30 ]
-```
-
-Same linear part, different translation column: **rotate then translate** drops the move in as is; **translate then rotate** swings the move by `60°`. The object lands at `(1.5, 0, 0)` in one case and on an arc of radius `1.5` in the other.
-
-
----
-
-## Worked: T·S and S·T
-
-`T` = translate by `(1, 0, 0)`, `S` = uniform scale by 2:
-
-```text
-   T·S :  linear part 2I,  translation  I·0 + (1, 0, 0) = (1, 0, 0)      scale in place, then move 1
-   S·T :  linear part 2I,  translation  2·(1, 0, 0)    = (2, 0, 0)      move 1, then the move is scaled too
-```
-
-The scale **stretches the translation** when it acts second. Same lesson as `T·R` and `R·T`: column 3 carries the order.
+`T·R = [R | t]` and `R·T = [R | R t]`: the same linear part, a different column 3. The factor nearest the point acts first.
 
 
 ---
@@ -346,119 +241,47 @@ In one line: **`[A t; 0 1]⁻¹ = [A⁻¹,  −A⁻¹ t; 0 1]`**, and for a rota
 
 ---
 
-## Worked: invert M = T(2,0,0)·R_y(90)
+## Undo a rigid placement: subtract, then dot
 
-`R_y(90)` sends the x-axis to `−z` (columns `(0,0,−1)`, `(0,1,0)`, `(1,0,0)`); `t = (2, 0, 0)`.
+<img src="../../textbook/figures/aff-rigid-2d.svg" alt="left: a frame at t = (3, 1) turned 30 degrees and a world point p = (4, 3); right: the same point in the frame's coordinates, (1.866, 1.232), the two dot products of p − t with the frame's axes" style="height:370px">
 
-```text
-      [ 0   0   1   2 ]                 [ 0   0  −1   0 ]
-  M = [ 0   1   0   0 ]      M⁻¹  =     [ 0   1   0   0 ]      linear part R^T,  column 3 = −R^T t
-      [ −1  0   0   0 ]                 [ 1   0   0  −2 ]
-      [ 0   0   0   1 ]                 [ 0   0   0   1 ]
-
-   R^T t = (row 0 of R^T · t, …) = (0, 0, 2)   →   −R^T t = (0, 0, −2)
-```
-
-Multiply `M · M⁻¹` and every entry lands on the identity. One transpose, one small product, no elimination.
+`M = [R | t]`, so `M⁻¹ = [Rᵀ | −Rᵀ t]`: a transpose and one product, no elimination. HW3's `rigidInverse` and `worldToLocal` are this, in 3D.
 
 
 ---
 
-## Worked: undo the demo's T·R
+### Frames, storage, and TRS
 
-`M = T(1.5, 0, 0) · R_y(60)`. The inverse by the reversal rule: `M⁻¹ = R_y(60)⁻¹ · T(1.5, 0, 0)⁻¹ = R_y(−60) · T(−1.5, 0, 0)`:
-
-```text
-   linear part  R^T,  first row (0.5, 0, −0.866)
-   translation  −R^T t = −R^T (1.5, 0, 0) = (−0.75, 0, −1.299)
-
-   check: M⁻¹ · (1.5, 0, 0, 1) = (0, 0, 0, 1)      the object's origin comes home
-```
-
-The inverse of `T·R` has the shape of `R·T`: a rotation first, then a translation.
-
-
----
-
-## Pitfall: inverting as if the matrix were TRS
-
-`M` has columns `(1.5, 0.5, 0)` and `(0.5, 1.5, 0)`: a **non-uniform scale along a diagonal**. It is affine, `det = 2`, but not `T·R·S` (its columns are not orthogonal: dot 1.5).
-
-```text
-   true inverse, column 0:           (0.75, −0.25, 0)
-   invertTRS (assumes T·R·S), col 0: (0.6,   0.2,  0)
-   M · invertTRS(M), row 0:          (1, 0.6, 0)        should be (1, 0, 0): error 0.6
-```
-
-A TRS inverse divides by column lengths and transposes; that is only right when the columns are **orthogonal**.
-
-
----
-
-## The condition number: largest stretch over smallest
-
-`κ(A)` = the largest factor `A` stretches any direction by, over the smallest. A round trip through `A` and `A⁻¹` keeps about `κ · ε` relative accuracy:
-
-| A | stretches | κ |
-| --- | --- | --- |
-| a rotation | 1, 1, 1 | 1 |
-| diag(2, 1, 1) | 2, 1, 1 | 2 |
-| the shear `[[1, 0.5], [0, 1]]` | 1.281, 0.781 | 1.640 |
-| diag(10⁶, 1, 1) | 10⁶, 1, 1 | 10⁶ |
-
-In float32, ε = 2⁻²³ ≈ 1.2 × 10⁻⁷: at κ = 10⁶ only about one decimal digit survives.
-
-
----
-
-## Pitfall: huge scales lose digits
-
-Round-trip a point through `M = diag(s, 1, 1)` and its inverse in 32-bit floats:
-
-| scale `s` | condition number | round-trip error | predicted (`κ · 2⁻²³`) |
-| --- | --- | --- | --- |
-| 1 | 1 | 2.4e−7 | 1.2e−7 |
-| 100 | 100 | 2.3e−6 | 1.2e−5 |
-| 10,000 | 10,000 | 2.7e−4 | 1.2e−3 |
-| 1,000,000 | 10⁶ | 0.024 | 0.12 |
-| 10,000,000 | 10⁷ | 0.34 | 1.2 |
-
-Keep scales near 1: model in sensible units, and never "hide" an object with scale `1e−7`.
-
-
----
-
-### Frames and spaces
-
-<small>(~25 min)</small>
+<small>(~9 min)</small>
 
 ---
 
 ## A matrix is a frame
 
-Feed the block matrix the basis vectors and the origin:
+<img src="../../textbook/figures/aff-frame.svg" alt="a 2D frame drawn in the world: column 0 and column 1 are the object's axes, column 3 its origin at (1.5, 1); a point at object (1/2, 1/2) lands at (1.9, 1.808)" style="height:330px">
 
 ```text
-   M · (1,0,0,0) = column 0      where the x-axis lands (a vector)
-   M · (0,1,0,0) = column 1      where the y-axis lands
-   M · (0,0,1,0) = column 2      where the z-axis lands
-   M · (0,0,0,1) = column 3      where the ORIGIN lands (a point)
+M · (1, 0, 0, 0) = column 0     where the x-axis lands          M · (0, 0, 0, 1) = column 3     where the ORIGIN lands
+M · (0, 1, 0, 0) = column 1     where the y-axis lands          the column lengths are the scale factors
 ```
 
-An affine matrix **is** an affine frame: three axis vectors and an origin, stacked as columns. Read any placement matrix by eye: column 3 is the position, columns 0–2 are the object's axes in the world, and their lengths are its scale.
+Read backward, `M⁻¹` gives a world point's coordinates in the frame: world `(3, 3)` is frame `(1.533, 0.982)`.
 
 
 ---
 
-## Worked: a 2D frame, both directions
+## Object space and world space
 
-<img src="../../textbook/figures/aff-frame.svg" alt="a 2D frame with its two axis columns and origin drawn over the world grid, and one point read in both frames" style="height:220px">
+Every object has its **own** frame; the model matrix `M` is the bridge:
 
 ```text
-   columns c0 = (1.299, 0.75),  c1 = (−0.5, 0.866),  origin t = (1.5, 1)
-   frame point q = (0.5, 0.5):   world = t + 0.5 c0 + 0.5 c1 = (1.9, 1.808)          (active: move the point)
-   world point (3, 3):           frame coords = M⁻¹ (3, 3) = (1.533, 0.982)            (passive: rename the point)
+   p_world  = M · p_object          place the mesh: its vertices never change
+   p_object = M⁻¹ · p_world         bring a world point (a mouse ray hit) into the object's frame
 ```
+
+- **object (local) space**: the frame the mesh was authored in; a cube's corners at `±0.5` forever
+- **world space**: the shared scene frame everything is placed into
+- Unity: `transform.localPosition` is in the **parent's** frame, `transform.position` in the **world**; `Matrix4x4.TRS(...)` builds the local `M`
 
 
 ---
@@ -481,83 +304,6 @@ Both conventions map the point `(1, 0, 0)` to `(2, 0, −0.866)`: the numbers ar
 
 ---
 
-## Pitfall: a row-vector matrix pasted as columns
-
-`T(2, 0, 0)` copied from a row-vector source without transposing: the 2 lands in the **bottom row**.
-
-```text
-   [ 1  0  0  0 ]        (0, 0, 0, 1) → w = 1  → (0, 0, 0)        should be (2, 0, 0)
-   [ 0  1  0  0 ]        (1, 0, 0, 1) → w = 3  → (0.333, 0, 0)    should be (3, 0, 0)
-   [ 0  0  1  0 ]        (2, 0, 0, 1) → w = 5  → (0.4, 0, 0)      should be (4, 0, 0)
-   [ 2  0  0  1 ]        x = −0.5     → w = 0  → a point at infinity
-```
-
-Nothing moves by 2: the object is **squashed toward the origin** by a projective divide. The tell is a bottom row other than `(0, 0, 0, 1)`.
-
-
----
-
-## Worked: read TRS back from a matrix
-
-```text
-   M = [ 1     0   0.433  1 ]      |col 0| = √(1² + 1.732²) = 2        sx = 2
-       [ 0     1   0      2 ]      |col 1| = 1                          sy = 1
-       [−1.732 0   0.25   3 ]      |col 2| = √(0.433² + 0.25²) = 0.5   sz = 0.5
-       [ 0     0   0      1 ]      t = (1, 2, 3)
-   R = columns / lengths:  (0.5, 0, −0.866), (0, 1, 0), (0.866, 0, 0.5)   =  R_y(60)
-```
-
-`M = T(1, 2, 3) · R_y(60) · S(2, 1, 0.5)`, read off by eye.
-
-
----
-
-## Worked: apply it, then undo it
-
-The same `M = T(1, 2, 3) · R_y(60) · S(2, 1, 0.5)` on the point `(1, 1, 1)`:
-
-```text
-   S:  (2, 1, 0.5)      R_y(60):  (1.433, 1, −1.482)      T:  (2.433, 3, 1.518)
-
-   M⁻¹ = S⁻¹ · R^T · T⁻¹:   linear rows (0.25, 0, −0.433), (0, 1, 0), (1.732, 0, 1)
-                            translation −S⁻¹ R^T t = (1.049, −2, −4.732)
-   M⁻¹ · (2.433, 3, 1.518, 1) = (1, 1, 1, 1)
-```
-
-Scale first, rotate, move; undo in reverse: move back, unrotate, unscale.
-
-
----
-
-## Any affine map: a rotation times a stretch
-
-<img src="../../textbook/figures/aff-polar.svg" alt="the shear's unit circle mapped to an ellipse, with the stretch directions and the rotation marked" style="height:220px">
-
-```text
-   A = [[1, 0.5], [0, 1]]  (the shear)  =  R · P,   P symmetric
-   stretches 1.281 and 0.781 along directions at 52.0° and −38.0°,   then R = rotation by −14.0°
-   TRS read-back of A: column lengths 1 and 1.118, columns 63.4° apart (not 90°): not a rotation
-```
-
-
----
-
-## Object space and world space
-
-Every object has its **own** frame; the model matrix `M` is the bridge:
-
-```text
-   p_world  = M · p_object          place the mesh: its vertices never change
-   p_object = M⁻¹ · p_world         bring a world point (a mouse ray hit) into the object's frame
-```
-
-- **object (local) space**: the frame the mesh was authored in; a cube's corners at `±0.5` forever
-- **world space**: the shared scene frame everything is placed into
-- Unity: `transform.localPosition` is in the **parent's** frame, `transform.position` in the **world**; `Matrix4x4.TRS(...)` builds the local `M`
-
-
----
-
 ## TRS: the special case engines store
 
 Any affine `A` can be written as a **rotation times a symmetric stretch** (`A = R S`, polar decomposition); engines store the case where the stretch is **axis-aligned**:
@@ -574,183 +320,52 @@ Any affine `A` can be written as a **rotation times a symmetric stretch** (`A = 
 
 ---
 
-## Real code: detect a mirror and a shear
+## Real code: a matrix from TRS, in both tracks
 
 <div class="code-tabs">
 
 ```csharp
-float det = m.determinant;                           // equals the 3x3 part's for an affine m
-Vector3 u0 = ((Vector3)m.GetColumn(0)).normalized, u1 = ((Vector3)m.GetColumn(1)).normalized;
-bool sheared = Mathf.Abs(Vector3.Dot(u0, u1)) > 1e-4f;   // and the other two pairs
+Matrix4x4 m = Matrix4x4.TRS(new Vector3(1, 2, 3),
+                            Quaternion.Euler(0, 60, 0),
+                            new Vector3(2, 1, 0.5f));
+Vector3 q = m.MultiplyPoint3x4(new Vector3(1, 1, 1));   // (2.433, 3, 1.518)
 ```
 
 ```javascript
-import { normalize, dot, cross } from '../core/xform.js';
-const col = (m, j) => [m[4 * j], m[4 * j + 1], m[4 * j + 2]];
-const [c0, c1, c2] = [0, 1, 2].map((j) => col(M, j));
-const det = dot(c0, cross(c1, c2));                  // < 0: mirrored, flip the culling
-const [u0, u1, u2] = [c0, c1, c2].map(normalize);
-const shear = Math.max(Math.abs(dot(u0, u1)), Math.abs(dot(u0, u2)), Math.abs(dot(u1, u2)));
-// TRS(1,2,3, 0,60,0, 2,1,0.5): det 1, shear 0      oblique scale: det 2, shear 0.6
+const m = new THREE.Matrix4().compose(new THREE.Vector3(1, 2, 3),
+  new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 3, 0)),
+  new THREE.Vector3(2, 1, 0.5));
+const q = new THREE.Vector3(1, 1, 1).applyMatrix4(m);   // (2.433, 3, 1.518)
 ```
 
 </div>
 
+Both build `T·R·S`; `m.decompose(pos, quat, scale)` in three.js reads it back.
+
+
+---
+
+### Normals, pivots, and where affine ends
+
+<small>(~9 min)</small>
 
 ---
 
 ## Normals need the inverse transpose
 
-A surface direction `d` transforms by `A d`. A **normal** must stay perpendicular to the surface, and `A n` does not:
+<img src="../../textbook/figures/aff-normals-ellipse.svg" alt="the unit circle with a normal and tangent at 45 degrees, and the ellipse after diag(2, 1): the normal pushed through A leans away from the true normal, the inverse-transpose normal is perpendicular to the tangent" style="height:350px">
 
-```text
-   scale A = diag(2, 1, 1);  surface along d = (1, 1, 0), normal n = (1, −1, 0)
-   A d = (2, 1, 0)        A n = (2, −1, 0)        (A d)·(A n) = 4 − 1 = 3 ≠ 0     WRONG
-   A⁻ᵀ n = diag(½, 1, 1) n = (0.5, −1, 0)         (A d)·(A⁻ᵀ n) = 1 − 1 = 0    right
-```
-
-- normals transform by `(A⁻¹)^T`, the **inverse transpose** of the linear part (then renormalize)
-- for a rotation `A⁻ᵀ = A`, so nobody notices until the first non-uniform scale
+- a tangent moves by `A`; the normal must stay perpendicular to it, and `A n` does not: use `A⁻ᵀ n`, the **inverse transpose**, then renormalize
+- why: `(A⁻ᵀ n) · (A d) = nᵀ A⁻¹ A d = n · d = 0`; for a rotation `A⁻ᵀ = A`, so the bug hides until the first non-uniform scale
 
 
 ---
 
-## The inverse transpose, derived
+## Rotate about a pivot: a sandwich
 
-A normal `n` is defined by `n · d = 0` for every tangent `d`. Find `N` so that `(N n) · (A d) = 0` too:
+<img src="../../textbook/figures/aff-pivot-2d.svg" alt="four panels: a square with its corner at the pivot c = (2, 1); moved so the pivot is at the origin; turned 90 degrees there; moved back, with the pivot fixed and the square turned about it" style="height:440px">
 
-```text
-   (N n) · (A d)  =  (N n)ᵀ (A d)  =  nᵀ Nᵀ A d
-
-   choose Nᵀ A = I,  i.e.  N = (A⁻¹)ᵀ = A⁻ᵀ:      nᵀ Nᵀ A d  =  nᵀ d  =  n · d  =  0
-```
-
-- any `N` that keeps every such dot at zero is a multiple of `A⁻ᵀ`, so renormalizing afterward is all that is left
-- a rotation is orthogonal, `R⁻ᵀ = R`; a uniform scale `s I` gives `(1/s) I`, the same direction: **only non-uniform scale and shear** need it
-
-
----
-
-## Real code: the normal matrix in both tracks' shaders
-
-<div class="code-tabs">
-
-<pre data-track="unity" data-label="Unity · HLSL"><code class="language-cpp">// Unity built-in pipeline (UnityCG.cginc)
-float3 n = UnityObjectToWorldNormal(v.normal);
-// = normalize(mul(v.normal, (float3x3)unity_WorldToObject)): normal times the INVERSE,
-//   which as a row vector is the inverse transpose</code></pre>
-
-```glsl
-// three.js ShaderMaterial: normalMatrix is supplied per object
-uniform mat3 normalMatrix;       // inverse transpose of modelViewMatrix's 3x3
-attribute vec3 normal;
-varying vec3 vN;
-void main() {
-  vN = normalize(normalMatrix * normal);     // a view-space normal
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-```
-
-</div>
-
-
----
-
-## Planes transform by the inverse transpose too
-
-A plane is a row `π = (n, d)` with `π · (x, 1) = 0`. Keep the equation true under `M`: `π' = π · M⁻¹`, i.e. `π'ᵀ = M⁻ᵀ πᵀ`.
-
-```text
-   π = (1/3, 2/3, 2/3, −1/3)            the unit-normal plane of the vector-geometry topic
-   π' = π · M⁻¹ = (1.238, 0.667, 0.522, −4.472)
-   normalized:   n' = (0.825, 0.444, 0.348),  d' = −2.981
-   check: a mapped point of the plane satisfies π' · (x', 1) = 0        (0 to 4 digits)
-   naive M·n gives (0.622, 0.667, −0.411): the mapped point misses the plane by 3.0
-```
-
-Clipping planes, frustum planes and mirror planes all move this way.
-
-
----
-
-## Worked: the ground plane, moved
-
-The plane `y = 0` is `π = (0, 1, 0, 0)`. Move it with `M = T(0, 2, 0) · diag(1, 3, 1)`:
-
-```text
-   M⁻¹: linear part diag(1, 1/3, 1),  translation −diag(1, 1/3, 1)(0, 2, 0) = (0, −2/3, 0)
-   π' = π · M⁻¹ = (0, 1/3, 0, −2/3)       normalized: (0, 1, 0, −2)     the plane y = 2
-   check:  M (0, 0, 0) = (0, 2, 0) and M (1, 0, 5) = (1, 2, 5) both lie on y = 2
-```
-
-The scale did nothing to a plane through the origin except be undone; the translation moved it.
-
-
----
-
-### Pivots, and where affine ends
-
-<small>(~20 min)</small>
-
----
-
-## Rotate about a pivot: conjugate the rotation
-
-`R` spins about the origin. To spin about a point `p`: bring `p` to the origin, rotate, send it back:
-
-```text
-   M = T(p) · R · T(−p)        read right to left: pivot to origin, rotate, pivot back
-   by the block formula:  linear part R,  translation  p − R p = (I − R) p
-```
-
-`p` is the **fixed point**: `T(−p)` sends it to the origin, `R` leaves the origin, `T(p)` returns it. Swap `R` for `S` to scale about a point. The translation column `(I − R) p` is a number you would never enter by hand, which is why you build it from the sandwich.
-
-
----
-
-## Worked: pivot (2, 0, 0), rotate 90° about y
-
-`R = R_y(90)`, `p = (2, 0, 0)`. `R p = 2 · column 0 = (0, 0, −2)`, so `(I − R) p = (2, 0, 0) − (0, 0, −2) = (2, 0, 2)`:
-
-```text
-      [ 0   0   1   2 ]      pivot   (2,0,0) → (2, 0,  0)    FIXED
-  M = [ 0   1   0   0 ]      (3,0,0) → (2, 0, −1)    +x of the pivot swings to −z
-      [ −1  0   0   2 ]      (2,0,1) → (3, 0,  0)    +z of the pivot swings to +x
-      [ 0   0   0   1 ]
-```
-
-
----
-
-## Worked: scale about a corner
-
-Double a unit square about its corner `p = (1, 1, 0)`: `M = T(p) · S(2) · T(−p)`:
-
-```text
-   translation column = (I − S) p = (1 − 2)(1, 1, 0) = (−1, −1, 0)
-   (1, 1, 0) → (1, 1, 0)     the corner stays put
-   (2, 1, 0) → (3, 1, 0)     the far edge moves twice as far from the corner
-```
-
-<img src="../../textbook/figures/aff-pivot.svg" alt="an object rotated about an off-center pivot, with the pivot fixed" style="height:170px">
-
-
----
-
-## Conjugation: do it in the frame where it is simple
-
-The sandwich is `M = F · X · F⁻¹` with any frame `F`, not only a translation:
-
-```text
-   F = T(p),         X = R              rotate about the point p
-   F = R_z(45°),     X = diag(2, 1, 1)  scale by 2 along the diagonal (1, 1, 0)/√2
-
-   R_z(45°) · diag(2, 1, 1) · R_z(−45°) = [ 1.5  0.5  0 ]      M (1, 1, 0) = (2, 2, 0)   doubled
-                                          [ 0.5  1.5  0 ]      M (1, −1, 0) = (1, −1, 0) unchanged
-                                          [ 0    0    1 ]
-```
-
-The oblique scale of the inverse pitfall is exactly this sandwich: a symmetric matrix, no rotation, and not a TRS.
+`M = T(c) · R · T(−c)`: linear part `R`, translation `(I − R) c`, here `(3, −1)`. Swap `R` for a scale to scale about a corner.
 
 
 ---
@@ -784,50 +399,10 @@ const M = new THREE.Matrix4()
 
 ## Where affine ends: the last row
 
-The bottom row `(0, 0, 0, 1)` is what keeps `w = 1`. Change it and the map is no longer affine:
+<img src="../../textbook/figures/aff-projective.svg" alt="left: a grid under an affine map stays a grid of parallels; right: the same grid through a 3 by 3 with last row (0, 0.5, 1) and the divide by w: the verticals converge" style="height:300px">
 
-```text
-   general 4×4:  (x, y, z, w) with w ≠ 1  →  the point is  (x/w, y/w, z/w)      (homogeneous ≡ up to scale)
-   perspective:  bottom row (0, 0, −1, 0)  →  w = −z_view:  divide by depth, far things shrink
-```
-
-- a matrix whose last row is not `(0,0,0,1)` is **projective**: lines still go to lines, but parallels can meet and ratios are not kept
-- `w = 0` is a **point at infinity**, which is exactly what a direction is: every `w = 0` vector is a point at infinity
-- the camera's perspective matrix is the **one non-affine matrix** in the pipeline; the divide by `w` is its signature
-
-
----
-
-## Worked: a projective map in 2D
-
-Put a nonzero entry in the last row: `H = [[1, 0, 0], [0, 1, 0], [0, 0.5, 1]]`, so `w = 1 + 0.5 y`:
-
-| in | w | out = (x/w, y/w) |
-| --- | --- | --- |
-| (0, 0) | 1 | (0, 0) |
-| (1, 0) | 1 | (1, 0) |
-| (0, 1) | 1.5 | (0, 0.667) |
-| (1, 1) | 1.5 | (0.667, 0.667) |
-| (0, 2) | 2 | (0, 1) |
-| (1, 2) | 2 | (0.5, 1) |
-
-The parallel lines `x = 0` and `x = 1` now **converge**: their images are 1, 0.667, 0.5 apart at `y` = 0, 1, 2.
-
-
----
-
-## Worked: where the parallels meet
-
-Same `H`, `w = 1 + 0.5 y`, along the line `x = 1`:
-
-```text
-   (1, 6)    → w = 4     → (0.25, 1.5)
-   (1, 100)  → w = 51    → (0.02, 1.961)
-   y → ∞     →             (1/(1 + 0.5y), y/(1 + 0.5y)) → (0, 2)
-   x = 0:    (0, y)      → (0, y/(1 + 0.5y))          → (0, 2) as well
-```
-
-Every vertical line approaches **(0, 2)**: the **vanishing point**, the image of the point at infinity `(0, 1, 0)`.
+- an affine matrix keeps the bottom row `(0, 0, 0, 1)`, so `w` stays 1; change that row and `w` varies, and the point is `(x/w, y/w, z/w)`
+- such a map is **projective**: lines stay lines, but parallels meet; the perspective matrix (bottom row `(0, 0, −1, 0)`, so `w = −z`) is the one such matrix in the pipeline
 
 
 ---
@@ -843,31 +418,6 @@ o.vertex = mul(UNITY_MATRIX_VP, o.vertex);  // world → view → clip (view: af
 ```
 
 `UnityObjectToClipPos(v)` folds all of it into one `MVP` multiply. Split, it is a chain of frame changes: **model → world → view → projection**, every arrow a `4×4`, all affine but the last.
-
-
----
-
-## Real code: a matrix from TRS, in both tracks
-
-<div class="code-tabs">
-
-```csharp
-Matrix4x4 m = Matrix4x4.TRS(new Vector3(1, 2, 3),
-                            Quaternion.Euler(0, 60, 0),
-                            new Vector3(2, 1, 0.5f));
-Vector3 q = m.MultiplyPoint3x4(new Vector3(1, 1, 1));   // (2.433, 3, 1.518)
-```
-
-```javascript
-const m = new THREE.Matrix4().compose(new THREE.Vector3(1, 2, 3),
-  new THREE.Quaternion().setFromEuler(new THREE.Euler(0, Math.PI / 3, 0)),
-  new THREE.Vector3(2, 1, 0.5));
-const q = new THREE.Vector3(1, 1, 1).applyMatrix4(m);   // (2.433, 3, 1.518)
-```
-
-</div>
-
-Both build `T·R·S`; `m.decompose(pos, quat, scale)` in three.js reads it back.
 
 
 ---
@@ -896,7 +446,7 @@ p_clip = P · V · F · H · T(t) · A(t) · W(t) · S(t) · p_mesh       applie
 | `V` view | `(F · C)⁻¹`, C the camera's placement | world → camera |
 | `P` projection | perspective(fov, aspect, near, far) | camera → clip |
 
-`S`, `W`, `A`, `T` change every frame; `H`, `F` once per throw; `M = F·H·T·A·W·S` is the model matrix. [Full page](../../lib/demo.html?demo=football)
+`S`, `W`, `A`, `T` change every frame; `H`, `F` once per throw; `M = F·H·T·A·W·S` is the model matrix.
 
 
 ---

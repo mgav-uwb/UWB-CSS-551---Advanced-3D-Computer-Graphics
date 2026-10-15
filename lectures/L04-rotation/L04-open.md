@@ -1,7 +1,8 @@
 <!--
   CSS 551 · L04, Tuesday October 13, 2026 (week 3, online): Rotation.
   Mounted by index.html: L04-open.md, ../../topics/vector-geometry.md (~30 min),
-  ../../topics/rotation-quaternions.md (~78 min), L04-discuss.md.
+  ../../topics/rotation-quaternions.md (~45 min), L04-discuss.md, then
+  ../../topics/rotation-quaternions-supplement.md (~37 min, time permitting).
   Resequenced 2026-10-05: the vector geometry that leads into rotation (frames, lines, planes,
   barycentric weights, precision), then rotation; the vector basics moved to L03.
   Improvement pass 2026-10-13: every new term defined where it first appears, a figure for every
@@ -13,15 +14,21 @@
     0:02  Vector geometry: frames, Gram-Schmidt, lines,
           skew lines, planes, projection, reflection,
           rays, barycentric, the demo, precision (topic)  30 min
-    0:32  Rotation: where the axes land, axis-angle and
-          Rodrigues, the trace, angular velocity,
-          quaternions and the half angle, composition,
-          the shortest arc, slerp, Euler angles, gimbals
-          and the lock, five definitions (topic)          78 min
-    1:50  Wrap                                             5 min
-    1:55  HW1 help and open questions                      5 min
-  The demo slides are where the time can flex: skipping the two rotation-ways slides and the
-  spin-step slide returns about 6 minutes to HW1 help.
+    0:32  Rotation: where the axes land, Rodrigues as the
+          2D turn across the axis, quaternions from the
+          unit complex number, the sandwich and the half
+          angle, composition, slerp and the sign, Euler
+          angles and gimbal lock, five definitions (topic) 45 min
+    1:17  Wrap                                             5 min
+    1:22  HW1 help and open questions; the supplement,
+          time permitting                                 38 min
+  The demo slides are where the time can flex.
+  AS TAUGHT 2026-10-13: vector geometry ran long and rotation did not start; the rotation topic
+  opens Thursday's class (L05) from this page, before the affine topic.
+  SPLIT 2026-10-15 (Marcel): the rotation topic trimmed to a ~45-minute core with a figure or demo
+  for every concept (2D first); the rest (the trace and log map, small angles and angular velocity,
+  conversions, nlerp, drift, Euler extraction, further worked examples) moved to the supplement,
+  mounted after the wrap.
   CUT 2026-10-08: the four discussion questions (L04-discuss.md keeps the wrap).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -49,8 +56,8 @@
 - **Lines and planes**: nearest points, skew lines, signed distance, which side, projection onto a plane, reflection, rays against planes
 - **Triangles**: barycentric weights, inside or out, in both tracks
 - **Precision**: arccos near 0° and past 1, an angle that never fails, cancellation
-- **Rotation**: where the axes land; axis-angle and Rodrigues; angular velocity; quaternions and the half angle, composition, the shortest arc, slerp (spherical linear interpolation), the double cover, drift; yaw, pitch, roll, gimbals and gimbal lock; one rotation, five definitions
+- **Rotation**: where the axes land; Rodrigues; quaternions, the half angle, composition, slerp (spherical linear interpolation); yaw, pitch, roll and gimbal lock; five definitions
 - **Wrap**, then HW1 help and open questions
 
-Reading: [Vectors](../../textbook/vectors.html), Sections 4 to 8 · [Rotation](../../textbook/rotation.html), Sections 1 to 8.
+Reading: [Vectors](../../textbook/vectors.html), Sections 4 to 8 · [Rotation](../../textbook/rotation.html), Sections 1 to 7.
 

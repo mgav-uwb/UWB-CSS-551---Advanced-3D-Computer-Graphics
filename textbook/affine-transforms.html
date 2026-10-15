@@ -5,7 +5,12 @@
      v2.0 adds the storage layout, the polar decomposition, the float32 conditioning experiment and the
      plane-transform check); the numbers quoted here come from figures/numbers-foundations.json. Never
      hand-edit either. v2.1 (2026-10-14) adds Section 5.2, one throw as one chain (the football demo), and
-     Exercise 11; its numbers come from lib/core/football.js (lib/tests/football.test.mjs). -->
+     Exercise 11; its numbers come from lib/core/football.js (lib/tests/football.test.mjs). v2.2 (2026-10-15) opens with
+     Section 0 (homogeneous coordinates and why graphics uses them), adds eight 2D figures from
+     tools/gen-textbook-figures-affine-intuition.mjs (aff-rays, aff-lift, aff-lights, aff-det-2d, aff-order-2d,
+     aff-rigid-2d, aff-pivot-2d, aff-normals-ellipse) with 2D worked examples, and moves conditioning (was 4.1),
+     the polar decomposition (was 6.1) and planes (was 7.1, with Exercise 10) to an Appendix after the exercises;
+     6.2 became 6.1 and Exercise 11 became 10. Section numbers 1 to 11 are otherwise unchanged. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -33,25 +38,76 @@
       </blockquote>
 
       <p class="lead">
-        To place a model in a scene you translate, rotate, scale and sometimes shear it, in some order, and then undo those operations for picking and for cameras. All of these are one kind of map, an affine map: a linear part and a shift. This chapter names the family and what it preserves, lifts it into homogeneous coordinates so that the whole family becomes a single \(4\times4\) matrix, and then derives from two block formulas everything the pipeline needs: why composition order matters, the inverse and how well conditioned it is, a matrix read as a coordinate frame and the same matrix read backward as a change of coordinates, the TRS decomposition engines store and the polar decomposition that explains what it leaves out, the rule for transforming normals and planes, pivots and conjugation, and finally the boundary of the family, where the perspective matrix leaves it. It also settles the question that costs more debugging time than any other in this subject, which way round the sixteen numbers are stored. Every number is computed by the course&rsquo;s own transform library.
+        To place a model in a scene you translate, rotate, scale and sometimes shear it, in some order, and then undo those operations for picking and for cameras. All of these are one kind of map, an affine map: a linear part and a shift, and one extra coordinate, \(w\), turns the whole family into a single matrix multiplication. The chapter starts with that coordinate and the reasons graphics uses it, names the family and what it preserves, and derives from two block formulas what the pipeline needs: why composition order matters, the inverse, a matrix read as a coordinate frame and read backward as a change of coordinates, the TRS form engines store and the shear it cannot hold, the rule for transforming normals, pivots and conjugation, and the boundary of the family, where the perspective matrix leaves it. It also settles which way round the sixteen numbers are stored. The Appendix holds the conditioning of the inverse, the polar decomposition and the transformation of planes. The pictures are two-dimensional wherever the idea allows, and every number is computed by the course&rsquo;s own transform library.
       </p>
 
       <div class="toc">
         <strong>Contents</strong>
-        <ol>
+        <ol start="0">
+          <li><a href="#why-homogeneous">Homogeneous coordinates, and why graphics uses them</a></li>
           <li><a href="#affine">Affine maps and what they preserve</a></li>
           <li><a href="#homogeneous">Homogeneous coordinates: the lift</a></li>
           <li><a href="#composition">Composition, and why order matters</a></li>
-          <li><a href="#inverse">The inverse, and its conditioning</a></li>
+          <li><a href="#inverse">The inverse</a></li>
           <li><a href="#frames">A matrix is a frame; object and world space</a></li>
-          <li><a href="#trs">TRS, the polar decomposition, and the shear it cannot store</a></li>
-          <li><a href="#normals">Normals and planes transform by the inverse transpose</a></li>
+          <li><a href="#trs">TRS, and the shear it cannot store</a></li>
+          <li><a href="#normals">Normals transform by the inverse transpose</a></li>
           <li><a href="#pivots">Pivots and conjugation</a></li>
           <li><a href="#projective">Where affine ends</a></li>
           <li><a href="#code">In code</a></li>
           <li><a href="#exercises">Exercises</a></li>
         </ol>
+        <a href="#appendix">Appendix</a>: <a href="#conditioning">A.1 Conditioning</a> &middot; <a href="#polar">A.2 The polar decomposition</a> &middot; <a href="#planes">A.3 Planes</a> &middot; <a href="#appendix-exercises">A.4 Exercises</a>
       </div>
+
+<!-- ============================================================ -->
+      <h2 id="why-homogeneous">0 &middot; Homogeneous coordinates, and why graphics uses them</h2>
+      <p>
+        <em>Homogeneous coordinates</em> add one number, \(w\), to every point: the 2D point \((x, y)\) is
+        written \((x, y, 1)\) and the 3D point \((x, y, z)\) is written \((x, y, z, 1)\). Any nonzero multiple
+        names the same point, so \((x, y, w)\) is the point \((x/w,\, y/w)\). Seen one dimension up, a homogeneous
+        point is a whole ray through the origin, and the ordinary point is where that ray crosses \(w = 1\),
+        found by dividing by \(w\).
+      </p>
+      <figure>
+        <img src="figures/aff-rays.svg" alt="Points of a line lifted to pairs (x, w): the points (1, 0.5), (2, 1) and (4, 2) lie on one ray through the origin and all name x = 2; keeping x = 2 and shrinking w to 0.5 and 1/3 flattens the ray so it meets the line w = 1 at x = 4 and x = 6; the ray along w = 0 is the direction +x and never meets the line." />
+        <figcaption>One dimension down, so it fits a page: points \(x\) of a line lifted to \((x, w)\). Every point on a ray through the origin names the same \(x = x/w\); as \(w\) shrinks the crossing runs outward, and at \(w = 0\) there is no crossing: a direction.</figcaption>
+      </figure>
+      <p>Graphics uses this representation for four reasons.</p>
+      <ul>
+        <li><strong>One matrix for every placement.</strong> Rotation, scale and shear are matrix
+          products, but translation is an addition. With \(w\) all four become one \(3\times3\) product in 2D or
+          one \(4\times4\) product in 3D (Section 2), and a chain of placements multiplies down to one matrix
+          (Section 3).</li>
+        <li><strong>Perspective.</strong> A matrix can write a point&rsquo;s depth into \(w\); dividing
+          \(x, y, z\) by \(w\) afterward makes distant things smaller. That is the perspective projection of
+          <a href="viewing.html#projection">the viewing chapter</a>, and Section 9 is where it leaves the affine family.</li>
+        <li><strong>Points at infinity.</strong> \((x, y, z, 0)\) never reaches \(w = 1\): it is a direction, which no
+          translation moves (Sections 1.2 and 2). A light placed there is a directional light, such as the sun.</li>
+        <li><strong>One data type from file to shader.</strong> Shading languages make the 4-vector
+          (<code>vec4</code> in GLSL, the OpenGL Shading Language; <code>float4</code> in HLSL, the High-Level
+          Shading Language) and the \(4\times4\) product built-in types, so vertices, matrices and shader math share
+          one representation. The first programmable vertex processors (DirectX 8 vertex shaders, 2000, in
+          hardware on the GeForce 3 in 2001) computed on four-component registers. NVIDIA&rsquo;s G80 (2006) and
+          AMD&rsquo;s GCN (2012) moved to scalar instructions per thread, so on a current GPU (graphics processing
+          unit) a <code>vec4</code> operation is four scalar ones; the four-wide representation stayed.</li>
+      </ul>
+      <div class="ex">
+        <span class="tag">Worked example (a point light and a directional light)</span>
+        A shader needs the direction from a surface point \(\mathbf{p}\) toward the light. Store the light as a
+        homogeneous \(\mathbf{L} = (L_x, L_y, L_z, L_w)\); then that direction is \(\mathbf{L}_{xyz} - L_w\,\mathbf{p}\)
+        with no branch. For a point light at \((1, 4)\), \(\mathbf{L} = (1, 4, 1)\) and the direction is
+        \(\mathbf{L} - \mathbf{p}\), different at every surface point; for the light &ldquo;infinitely far toward
+        \((-1, 2)\)&rdquo;, \(\mathbf{L} = (-1, 2, 0)\) and the direction is \((-1, 2)\) everywhere. A unit box on
+        the ground at \(2.5 \le x \le 3.5\) casts the shadow of its corner \((3.5, 1)\) to \(x = 1 + 2.5\cdot\tfrac{4}{3} = 4.333\)
+        under the point light and to \(x = 3.5 + \tfrac12 = 4\) under the directional one. Fixed-function OpenGL
+        treated a light position with \(w = 0\) as a directional light, and Unity&rsquo;s built-in shaders still receive
+        <code>_WorldSpaceLightPos0</code> as (direction, 0) or (position, 1).
+      </div>
+      <figure>
+        <img src="figures/aff-lights.svg" alt="Left: a point light at (1, 4, 1) with rays spreading to the ground and a box whose shadow ends at x = 4.333. Right: a directional light (−1, 2, 0) with parallel rays; the same box's shadow ends at x = 4." />
+        <figcaption>The same box under a light with \(w = 1\) and with \(w = 0\). The rays spread from a point and are parallel from a direction; the shadow ends were computed from \(\mathbf{L}_{xyz} - L_w\,\mathbf{p}\).</figcaption>
+      </figure>
 
 <!-- ============================================================ -->
       <h2 id="affine">1 &middot; Affine maps and what they preserve</h2>
@@ -106,6 +162,10 @@
         <tr><td>the shear above</td><td>\(1\)</td><td>area kept, shape not</td></tr>
         <tr><td>a zero scale</td><td>\(0\)</td><td>a dimension collapsed; no inverse</td></tr>
       </table>
+      <figure>
+        <img src="figures/aff-det-2d.svg" alt="Left: the unit square and its image under the matrix with columns (2, 0) and (1, 1.5), a parallelogram of area 3. Right: a counter-clockwise triangle and its mirror image under diag(−1, 1), which is clockwise." />
+        <figcaption>In 2D, \(\det\begin{pmatrix} 2 & 1 \\ 0 & 1.5\end{pmatrix} = 2\cdot1.5 - 1\cdot0 = 3\): the unit square&rsquo;s area 1 becomes 3, and so does every other area. The mirror \(\mathrm{diag}(-1, 1)\) has determinant \(-1\): the area is kept and the order of the corners reverses.</figcaption>
+      </figure>
       <div class="ex">
         <span class="tag">Worked example (a mirror flips the winding)</span>
         The triangle \((0,0), (1,0), (0,1)\) is counter-clockwise: its edge function
@@ -159,6 +219,18 @@
         <figcaption>
           The four blocks. The bottom row \((0\;0\;0\;|\;1)\) is the signature of an affine matrix: it keeps \(w = 1\). Section 9 is about what happens when a matrix changes it.
         </figcaption>
+      </figure>
+      <p>
+        In two dimensions the same construction is a \(3\times3\): translation by \((t_x, t_y)\) is
+        \(\begin{pmatrix} 1 & 0 & t_x \\ 0 & 1 & t_y \\ 0 & 0 & 1 \end{pmatrix}\), and
+        \((x, y, 1)\mapsto(x + t_x,\, y + t_y,\, 1)\). In the three-dimensional \((x, y, w)\) space this matrix is
+        linear: it fixes the origin and slides each horizontal layer by \(w\) times \(\mathbf{t}\), a
+        <em>shear</em>. The floor \(w = 0\) does not move; the plane \(w = 1\), where the points live, moves by \(\mathbf{t}\).
+        Translation, which no \(2\times2\) matrix can do, is a shear one dimension up.
+      </p>
+      <figure>
+        <img src="figures/aff-lift.svg" alt="The plane w = 1 above the floor w = 0 in (x, y, w) space: a flag on the plane slides by t = (2, 1), the w axis leans toward (2, 1, 1), and a direction on the floor does not move." />
+        <figcaption>The \(3\times3\) translation by \(\mathbf{t} = (2, 1)\) acting on \((x, y, w)\) space: \(T(x, y, 1) = (x + 2, y + 1, 1)\) and \(T(x, y, 0) = (x, y, 0)\). Drawn in an oblique view; the numbers are the library&rsquo;s <code>makeTRS</code> on the plane \(z = 0\).</figcaption>
       </figure>
       <p>
         This is the entire engineering reason for \(4\times4\) matrices in graphics: translation,
@@ -244,6 +316,10 @@
         placements, an arm on a base on a table, is a product of several such matrices, and
         <a href="scene-graphs.html#rule">the scene-graph chapter</a> is this formula applied down a tree.
       </p>
+      <figure>
+        <img src="figures/aff-order-2d.svg" alt="A flag at the origin; T·R turns it 90 degrees in place and slides it to (2, 0); R·T slides it to (2, 0) first and then swings it about the origin to (0, 2) along a dashed quarter circle." />
+        <figcaption>In 2D, with \(T\) the translation by \((2, 0)\) and \(R\) a \(90^\circ\) counter-clockwise turn: \(T\cdot R\) turns in place and slides, its column 3 is \(\mathbf{t} = (2, 0)\); \(R\cdot T\) slides out and swings about the origin, its column 3 is \(R\,\mathbf{t} = (0, 2)\). Dashed: the state after the first factor.</figcaption>
+      </figure>
       <div class="ex">
         <span class="tag">Worked example (\(T\cdot R\) and \(R\cdot T\) from the block formula)</span>
         \(T\) = translate by \(\mathbf{t} = (1.5, 0, 0)\); \(R = R_y(60^\circ)\), \(\cos 60^\circ = 0.5\), \(\sin 60^\circ = 0.866\).
@@ -274,7 +350,7 @@
       </div>
 
 <!-- ============================================================ -->
-      <h2 id="inverse">4 &middot; The inverse, and its conditioning</h2>
+      <h2 id="inverse">4 &middot; The inverse</h2>
       <p>Solve \(\mathbf{y} = A\mathbf{x} + \mathbf{t}\) for \(\mathbf{x}\): \(\mathbf{x} = A^{-1}\mathbf{y} - A^{-1}\mathbf{t}\).</p>
       <div class="thm">
         <span class="tag">The block inverse</span>
@@ -308,32 +384,15 @@
         negated \((0, 0, -2)\). The library&rsquo;s <code>invertTRS</code> returns exactly this matrix, and
         \(M\cdot M^{-1}\) evaluates to the identity in every entry.
       </div>
-      <h3>4.1 Conditioning: how much precision the inverse costs</h3>
       <p>
-        An inverse exists whenever \(\det A \ne 0\), but existing and being computable in single
-        precision are different things. The <strong>condition number</strong> \(\kappa(A)\), the ratio
-        of the largest to the smallest stretch \(A\) applies to any direction, bounds how much a
-        relative error in the input grows in the output: a round trip \(\mathbf{x}\to M\mathbf{x}\to M^{-1}(M\mathbf{x})\)
-        in arithmetic with relative precision \(\varepsilon\) returns \(\mathbf{x}\) only to about
-        \(\kappa\,\varepsilon\). For a rotation \(\kappa = 1\); for \(\mathrm{diag}(s, 1, 1)\), \(\kappa = s\).
+        The rigid inverse has a picture. \(M^{-1}\mathbf{p} = R^{\mathsf T}(\mathbf{p} - \mathbf{t})\): subtract the
+        frame&rsquo;s origin, then measure along the frame&rsquo;s axes, one dot product each, because the rows of
+        \(R^{\mathsf T}\) are the columns of \(R\), the frame&rsquo;s axes.
       </p>
       <figure>
-        <img src="figures/aff-conditioning.svg" alt="A log-log plot of the round-trip error of x through M and back through its inverse, in float32, against the scale ratio s from 1 to ten million: the measured points climb along a line just below the dashed prediction kappa times two to the minus 23, reaching 0.34 at s equals ten million." />
-        <figcaption>\(M = T\,R\,S\) with \(S = \mathrm{diag}(s, 1, 1)\), every multiply and add rounded to float32. The error follows \(\kappa\cdot2^{-23}\) within a small factor; at \(s = 10^7\) the point \((1,1,1)\) comes back with a third of a unit of error.</figcaption>
+        <img src="figures/aff-rigid-2d.svg" alt="Left: a frame at t = (3, 1) turned 30 degrees, with axes u and v, and the world point p = (4, 3). Right: the same point in the frame's coordinates, (1.866, 1.232), the dot products of p − t with u and v." />
+        <figcaption>\(M = T(3, 1)\cdot R(30^\circ)\) and the world point \(\mathbf{p} = (4, 3)\): \(\mathbf{p} - \mathbf{t} = (1, 2)\), and its dot products with the frame&rsquo;s axes \(\mathbf{u} = (0.866, 0.5)\) and \(\mathbf{v} = (-0.5, 0.866)\) are \(1.866\) and \(1.232\), the coordinates of \(\mathbf{p}\) in the frame. As one matrix, \(M^{-1}\) has translation column \(-R^{\mathsf T}\mathbf{t} = (-3.098, 0.634)\).</figcaption>
       </figure>
-      <div class="ex">
-        <span class="tag">Worked example (the round trip, measured)</span>
-        <table>
-          <tr><th>scale ratio \(s = \kappa\)</th><th>1</th><th>\(10^2\)</th><th>\(10^4\)</th><th>\(10^6\)</th><th>\(10^7\)</th></tr>
-          <tr><td>round-trip error of \((1,1,1)\)</td><td>\(2.4\times10^{-7}\)</td><td>\(2.3\times10^{-6}\)</td><td>\(2.7\times10^{-4}\)</td><td>\(2.4\times10^{-2}\)</td><td>\(0.34\)</td></tr>
-          <tr><td>\(\kappa\cdot2^{-23}\)</td><td>\(1.2\times10^{-7}\)</td><td>\(1.2\times10^{-5}\)</td><td>\(1.2\times10^{-3}\)</td><td>\(0.12\)</td><td>\(1.2\)</td></tr>
-        </table>
-        At \(\kappa = 10^4\) the object&rsquo;s own coordinates are known to three decimals after a
-        pick; at \(10^6\) to one. Scales that extreme occur when a model authored in millimeters is
-        placed in a world of kilometers, or when a flattened object (a decal scaled to \(10^{-4}\) in
-        one axis) is inverted for picking. The remedy is the one every engine takes: keep unit
-        scales in the hierarchy and bake extreme scales into the mesh, and never invert a scale of 0.
-      </div>
 
 <!-- ============================================================ -->
       <h2 id="frames">5 &middot; A matrix is a frame; object and world space</h2>
@@ -456,10 +515,10 @@
       </div>
 
 <!-- ============================================================ -->
-      <h2 id="trs">6 &middot; TRS, the polar decomposition, and the shear it cannot store</h2>
+      <h2 id="trs">6 &middot; TRS, and the shear it cannot store</h2>
       <p>
         Any invertible \(A\) factors as a rotation times a symmetric stretch, \(A = R\,P\) (the polar
-        decomposition, Section 6.1). Engines store the special case in which the stretch is axis-aligned:
+        decomposition, Appendix A.2). Engines store the special case in which the stretch is axis-aligned:
       </p>
       \[
         \begin{gathered}
@@ -487,31 +546,7 @@
         matrix, and its <code>lossyScale</code> property is the honest admission that the world-space scale
         it reports is an approximation.
       </p>
-      <h3>6.1 The polar decomposition</h3>
-      <div class="thm">
-        <span class="tag">Polar decomposition</span>
-        Every invertible \(A\) is uniquely \(A = R\,P\) with \(R\) orthogonal and \(P\) symmetric
-        positive definite: \(P = \sqrt{A^{\mathsf T}A}\), the square root taken by diagonalizing the
-        symmetric matrix \(A^{\mathsf T}A\), and \(R = A\,P^{-1}\). \(P\) stretches by the square roots of the
-        eigenvalues of \(A^{\mathsf T}A\) along its eigenvectors; \(R\) then turns the result. TRS is the case
-        where \(P\)&rsquo;s eigenvectors are the coordinate axes.
-      </div>
-      <figure>
-        <img src="figures/aff-polar.svg" alt="Three panels: the unit square; the square after the symmetric stretch P, a tilted rhombus elongated along a dashed axis at 52 degrees and compressed across it; that rhombus rotated by minus 14 degrees, which is the sheared parallelogram of the shear A." />
-        <figcaption>The shear \(A = \begin{pmatrix}1 & 0.5\\0 & 1\end{pmatrix}\) as a stretch followed by a rotation. There is no axis-aligned stretch that produces the middle picture, which is why TRS cannot store the right one.</figcaption>
-      </figure>
-      <div class="ex">
-        <span class="tag">Worked example (decomposing the shear)</span>
-        \(A^{\mathsf T}A = \begin{pmatrix} 1 & 0.5 \\ 0.5 & 1.25 \end{pmatrix}\), with eigenvalues \(1.640\) and
-        \(0.610\) along the directions \((0.615, 0.788)\) (at \(52.0^\circ\)) and \((0.788, -0.615)\).
-        So \(P\) stretches by \(\sqrt{1.640} = 1.281\) along the first direction and by
-        \(\sqrt{0.610} = 0.781\) along the second, and as a matrix
-        \(P = \begin{pmatrix} 0.970 & 0.243 \\ 0.243 & 1.091 \end{pmatrix}\). Then
-        \(R = A\,P^{-1} = \begin{pmatrix} 0.970 & 0.243 \\ -0.243 & 0.970 \end{pmatrix}\), a rotation by
-        \(-14.04^\circ\), and \(R\,P\) multiplies back to \(A\) in every entry. A shear of \(0.5\) is a
-        \(28\,\%\) stretch on one diagonal, a \(22\,\%\) squeeze on the other, and a small turn.
-      </div>
-      <h3>6.2 What the read-back does to a shear</h3>
+      <h3>6.1 What the read-back does to a shear</h3>
       <p>
         The stretch need not come from a shear matrix. Scaling by 2 along the diagonal
         \((1, 1, 0)/\sqrt2\), the conjugation \(R_z(45^\circ)\,\mathrm{diag}(2, 1, 1)\,R_z(-45^\circ)\) of
@@ -526,7 +561,7 @@
         &ldquo;rotation&rdquo; whose columns are not orthogonal, and <code>invertTRS</code>, which trusts
         the read-back, returns a matrix whose first column is \((0.6, 0.2, 0)\) where the true inverse
         has \((0.75, -0.25, 0)\); \(M\) times that answer has \(0.6\) in an entry that should be 0.
-        The shear of Section 6.1 fails the same way: its columns have lengths \(1\) and \(1.118\) and meet at
+        The shear of Appendix A.2 fails the same way: its columns have lengths \(1\) and \(1.118\) and meet at
         \(63.4^\circ\).
       </div>
       <div class="pitfall">
@@ -541,13 +576,17 @@
       </div>
 
 <!-- ============================================================ -->
-      <h2 id="normals">7 &middot; Normals and planes transform by the inverse transpose</h2>
+      <h2 id="normals">7 &middot; Normals transform by the inverse transpose</h2>
       <p>
         A tangent direction \(\mathbf{d}\) is a difference of points and transforms by \(A\). A normal
         is defined by being perpendicular to tangents, and \(A\mathbf{n}\) is not, in general,
         perpendicular to \(A\mathbf{d}\). What is: \(A^{-\mathsf T}\mathbf{n}\), because
         \((A\mathbf{d})\cdot(A^{-\mathsf T}\mathbf{n}) = \mathbf{d}^{\mathsf T}A^{\mathsf T}A^{-\mathsf T}\mathbf{n} = \mathbf{d}\cdot\mathbf{n} = 0\).
       </p>
+      <figure>
+        <img src="figures/aff-normals-ellipse.svg" alt="The unit circle with its normal and tangent at 45 degrees, and the ellipse after diag(2, 1): the normal pushed through A leans away from the true normal, while the inverse-transpose normal is perpendicular to the transformed tangent." />
+        <figcaption>Squash a circle into an ellipse with \(A = \mathrm{diag}(2, 1)\). At \(\mathbf{p} = (0.707, 0.707)\) the circle&rsquo;s normal is \(\mathbf{p}\) itself. After \(A\) the tangent is \((-1.414, 0.707)\); \(A\mathbf{n} = (1.414, 0.707)\) has dot product \(-1.5\) with it, while \(A^{-\mathsf T}\mathbf{n} = (0.354, 0.707)\) has dot product 0 and, renormalized, \((0.447, 0.894)\) is the ellipse&rsquo;s true normal.</figcaption>
+      </figure>
       <figure>
         <img src="figures/aff-normals.svg" alt="Left: a surface line along d = (1,1) with its normal n. Right: after the scale diag(2,1) the surface runs along (2,1); the naively transformed normal A n in red is visibly not perpendicular to it, while the inverse-transpose normal in green is." />
         <figcaption>
@@ -564,29 +603,6 @@
           <tr><td>inverse transpose</td><td>\(A^{-\mathsf T} = \mathrm{diag}(\tfrac12, 1, 1)\); \(A^{-\mathsf T}\mathbf{n} = (0.354, -0.707, 0)\); \((2,1,0)\cdot(0.354, -0.707, 0) = 0.707 - 0.707 = 0\)</td></tr>
         </table>
         Then renormalize. The shaders of <a href="illumination.html#normals">the illumination chapter</a> do exactly this, or approximate it when the inverse is unavailable.
-      </div>
-      <h3>7.1 Planes</h3>
-      <p>
-        A plane is a normal and an offset, and the two travel together. Write the plane
-        \(\hat{\mathbf{n}}\cdot P = D\) of <a href="vectors.html#planes">the vectors chapter</a> as the
-        homogeneous row \(\boldsymbol\pi = (n_x, n_y, n_z, -D)\), so that a point is on the plane exactly
-        when \(\boldsymbol\pi\cdot(x, y, z, 1) = 0\). If points move by \(M\), the plane through their images
-        must satisfy \(\boldsymbol\pi'\cdot(M\tilde{\mathbf{p}}) = 0\) whenever \(\boldsymbol\pi\cdot\tilde{\mathbf{p}} = 0\),
-        which holds for \(\boldsymbol\pi' = M^{-\mathsf T}\boldsymbol\pi\): the full \(4\times4\) inverse transpose,
-        which moves the offset as well as tilting the normal. Renormalize the first three components
-        afterward and \(-\boldsymbol\pi'_3\) is the new \(D\).
-      </p>
-      <div class="ex">
-        <span class="tag">Worked example (the vectors chapter&rsquo;s plane under a TRS)</span>
-        \(\boldsymbol\pi = (0.333, 0.667, 0.667, -0.333)\) and \(M = \)<code>makeTRS(1,2,3, 0,60,0, 2,1,0.5)</code>.
-        \(M^{-\mathsf T}\boldsymbol\pi = (1.238, 0.667, 0.522, -4.472)\), normalized on its first three components to
-        \((0.825, 0.444, 0.348, -2.981)\): the new normal is \((0.825, 0.444, 0.348)\) and the new offset
-        \(D' = 2.981\). Check on two points known to be on the old plane, \(Q = (1, 0, 0)\) and the foot
-        \((3.444, -0.111, -1.111)\): their images \(M Q = (2, 2, 1.268)\) and \((3.963, 1.889, -3.243)\) both
-        satisfy \(\hat{\mathbf{n}}'\cdot P - D' = 0\) to six decimals. The naive normal \(A\hat{\mathbf{n}}\),
-        normalized to \((0.622, 0.667, -0.411)\), fails: the two image points differ by \(3.0\) in
-        their &ldquo;signed distance&rdquo; from a plane that should contain both. Clipping planes,
-        mirrors and shadow-caster planes all move this way.
       </div>
 
 <!-- ============================================================ -->
@@ -606,6 +622,10 @@
         translation column \((I - R)\mathbf{p}\) is a number nobody would enter by hand, which is why
         the sandwich is built rather than typed.
       </p>
+      <figure>
+        <img src="figures/aff-pivot-2d.svg" alt="Four panels: a square with its corner at the pivot c = (2, 1); moved so the pivot is at the origin; turned 90 degrees about the origin; moved back, with the pivot fixed and the square turned a quarter turn about it." />
+        <figcaption>The sandwich in 2D, one factor at a time, with the pivot \(\mathbf{c} = (2, 1)\) and a \(90^\circ\) turn: \(T(-\mathbf{c})\), then \(R\), then \(T(\mathbf{c})\). The product has linear part \(R\) and translation \((I - R)\,\mathbf{c} = (2, 1) - (-1, 2) = (3, -1)\); the pivot is fixed and the corner \((3, 1)\) ends at \((2, 2)\).</figcaption>
+      </figure>
       <figure>
         <img src="figures/aff-pivot.svg" alt="Top view: a unit square with corners (2,0,0), (3,0,0), (2,0,1), (3,0,1) in blue, and its image under a 90 degree turn about the y axis through the pivot (2,0,0) in red: the pivot stays, (3,0,0) swings to (2,0,-1), (2,0,1) swings to (3,0,0)." />
         <figcaption>
@@ -628,7 +648,7 @@
         The pivot sandwich is a special case of \(M = F\,X\,F^{-1}\): move into the frame \(F\) where
         the operation \(X\) is simple, do it, move back. With \(F = T(\mathbf{p})\) it rotates about a
         point; with \(F = R_z(45^\circ)\) and \(X = \mathrm{diag}(2, 1, 1)\) it scales along the diagonal
-        (the oblique scale of Section 6.2, \(M = R_z(45^\circ)\,S\,R_z(-45^\circ)\) with columns
+        (the oblique scale of Section 6.1, \(M = R_z(45^\circ)\,S\,R_z(-45^\circ)\) with columns
         \((1.5, 0.5, 0)\) and \((0.5, 1.5, 0)\)); with \(F = T(\mathbf{p})\,R_{\text{axis}}\) it rotates about an
         arbitrary line. Joints in <a href="scene-graphs.html#joints">the scene-graph chapter</a> and
         the texture placement matrix of <a href="texture-mapping.html#placement">the texture chapter</a>,
@@ -689,13 +709,13 @@
           <li>The translation columns of \(T\cdot R\) and \(R\cdot T\) (Section 3):
             <pre>node -e "import('./lib/core/xform.js').then(x=>{const T=x.makeTRS(1.5,0,0,0,0,0,1,1,1),R=x.makeTRS(0,0,0,0,60,0,1,1,1);console.log(x.matMul(T,R).slice(12,15).map(v=>+v.toFixed(3)), x.matMul(R,T).slice(12,15).map(v=>+v.toFixed(3)));})"
 [ 1.5, 0, 0 ] [ 0.75, 0, -1.299 ]</pre></li>
-          <li>A round trip through a TRS matrix and its inverse (in double precision; Section 4.1 measures the float32 version):
+          <li>A round trip through a TRS matrix and its inverse (in double precision; Appendix A.1 measures the float32 version):
             <pre>node -e "import('./lib/core/xform.js').then(x=>{const M=x.makeTRS(1,2,3,30,60,10,2,1,0.5);const p=x.applyMat4(M,[1,1,1]);console.log(x.applyMat4(x.invertTRS(M),p.slice(0,3)).slice(0,3).map(v=>+v.toFixed(6)));})"
 [ 1, 1, 1 ]</pre></li>
           <li>The refusal on a projective matrix (Section 9):
             <pre>node -e "import('./lib/core/xform.js').then(x=>{try{x.invertTRS(x.perspective(45,1.78,1,8))}catch(e){console.log(e.message)}})"
 invertTRS: bottom row must be (0,0,0,1) ... Got a perspective/shear-shaped bottom row.</pre></li>
-          <li>The silent failure on an oblique scale (Section 6.2): the call succeeds and the first column of its answer is wrong:
+          <li>The silent failure on an oblique scale (Section 6.1): the call succeeds and the first column of its answer is wrong:
             <pre>node -e "import('./lib/core/xform.js').then(x=>{const Rd=x.axisAngleMatrix(0,0,1,45),S=x.makeTRS(0,0,0,0,0,0,2,1,1);const M=x.matMul(x.matMul(Rd,S),x.invertTRS(Rd));console.log(x.invertTRS(M).slice(0,3).map(v=>+v.toFixed(3)));})"
 [ 0.6, 0.2, 0 ]</pre></li>
           <li>In the <a href="../lib/demo.html?demo=trs-order" target="_blank" rel="noopener">order demo</a>, set the rotation to \(180^\circ\) with the translation at \(1.5\): the \(R\cdot T\) cube lands at \(x = -1.5\), the \(T\cdot R\) cube at \(+1.5\), the widest the two orders can disagree.</li>
@@ -768,15 +788,7 @@ invertTRS: bottom row must be (0,0,0,1) ... Got a perspective/shear-shaped botto
         </details>
       </div>
       <div class="ex">
-        <span class="tag">Exercise 10 (planes)</span>
-        The ground plane \(y = 0\) is \(\boldsymbol\pi = (0, 1, 0, 0)\). Transform it by \(M = T(0, 2, 0)\cdot\mathrm{diag}(1, 3, 1)\) and give the new plane. Check with the image of the origin.
-        <details><summary>Solution</summary>
-          \(M^{-1}\) has linear part \(\mathrm{diag}(1, \tfrac13, 1)\) and translation \(-\mathrm{diag}(1, \tfrac13, 1)(0,2,0) = (0, -\tfrac23, 0)\); its transpose puts that translation in the bottom row, so \(M^{-\mathsf T}\boldsymbol\pi = (0, \tfrac13, 0, -\tfrac23)\), normalized \((0, 1, 0, -2)\): the plane \(y = 2\). The origin maps to \((0, 2, 0)\), which lies on it. The scale did nothing to a plane through the origin except be undone; the translation moved it.
-        </details>
-      </div>
-
-      <div class="ex">
-        <span class="tag">Exercise 11 (a camera&rsquo;s parent)</span>
+        <span class="tag">Exercise 10 (a camera&rsquo;s parent)</span>
         In the chain of Section 5.2, a camera on the ball is placed by \(C_{\text{ball}} = H\,T(t)\,A(t)\,K\), and a
         camera on the spinning ball by \(C_{\text{spin}} = H\,T(t)\,A(t)\,W(t)\,S(t)\,K\), with the same seat \(K\)
         (0.3 m up, 1 m back, a half turn about \(y\)). Write both view matrices and explain why one picture rolls
@@ -792,8 +804,93 @@ invertTRS: bottom row must be (0,0,0,1) ... Got a perspective/shear-shaped botto
         </details>
       </div>
 
+<!-- ============================================================ -->
+      <h2 id="appendix">Appendix</h2>
+      <h3 id="conditioning">A.1 Conditioning: how much precision the inverse costs</h3>
+      <p>
+        An inverse exists whenever \(\det A \ne 0\), but existing and being computable in single
+        precision are different things. The <strong>condition number</strong> \(\kappa(A)\), the ratio
+        of the largest to the smallest stretch \(A\) applies to any direction, bounds how much a
+        relative error in the input grows in the output: a round trip \(\mathbf{x}\to M\mathbf{x}\to M^{-1}(M\mathbf{x})\)
+        in arithmetic with relative precision \(\varepsilon\) returns \(\mathbf{x}\) only to about
+        \(\kappa\,\varepsilon\). For a rotation \(\kappa = 1\); for \(\mathrm{diag}(s, 1, 1)\), \(\kappa = s\).
+      </p>
+      <figure>
+        <img src="figures/aff-conditioning.svg" alt="A log-log plot of the round-trip error of x through M and back through its inverse, in float32, against the scale ratio s from 1 to ten million: the measured points climb along a line just below the dashed prediction kappa times two to the minus 23, reaching 0.34 at s equals ten million." />
+        <figcaption>\(M = T\,R\,S\) with \(S = \mathrm{diag}(s, 1, 1)\), every multiply and add rounded to float32. The error follows \(\kappa\cdot2^{-23}\) within a small factor; at \(s = 10^7\) the point \((1,1,1)\) comes back with a third of a unit of error.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (the round trip, measured)</span>
+        <table>
+          <tr><th>scale ratio \(s = \kappa\)</th><th>1</th><th>\(10^2\)</th><th>\(10^4\)</th><th>\(10^6\)</th><th>\(10^7\)</th></tr>
+          <tr><td>round-trip error of \((1,1,1)\)</td><td>\(2.4\times10^{-7}\)</td><td>\(2.3\times10^{-6}\)</td><td>\(2.7\times10^{-4}\)</td><td>\(2.4\times10^{-2}\)</td><td>\(0.34\)</td></tr>
+          <tr><td>\(\kappa\cdot2^{-23}\)</td><td>\(1.2\times10^{-7}\)</td><td>\(1.2\times10^{-5}\)</td><td>\(1.2\times10^{-3}\)</td><td>\(0.12\)</td><td>\(1.2\)</td></tr>
+        </table>
+        At \(\kappa = 10^4\) the object&rsquo;s own coordinates are known to three decimals after a
+        pick; at \(10^6\) to one. Scales that extreme occur when a model authored in millimeters is
+        placed in a world of kilometers, or when a flattened object (a decal scaled to \(10^{-4}\) in
+        one axis) is inverted for picking. The remedy is the one every engine takes: keep unit
+        scales in the hierarchy and bake extreme scales into the mesh, and never invert a scale of 0.
+      </div>
+      <h3 id="polar">A.2 The polar decomposition</h3>
+      <div class="thm">
+        <span class="tag">Polar decomposition</span>
+        Every invertible \(A\) is uniquely \(A = R\,P\) with \(R\) orthogonal and \(P\) symmetric
+        positive definite: \(P = \sqrt{A^{\mathsf T}A}\), the square root taken by diagonalizing the
+        symmetric matrix \(A^{\mathsf T}A\), and \(R = A\,P^{-1}\). \(P\) stretches by the square roots of the
+        eigenvalues of \(A^{\mathsf T}A\) along its eigenvectors; \(R\) then turns the result. TRS is the case
+        where \(P\)&rsquo;s eigenvectors are the coordinate axes.
+      </div>
+      <figure>
+        <img src="figures/aff-polar.svg" alt="Three panels: the unit square; the square after the symmetric stretch P, a tilted rhombus elongated along a dashed axis at 52 degrees and compressed across it; that rhombus rotated by minus 14 degrees, which is the sheared parallelogram of the shear A." />
+        <figcaption>The shear \(A = \begin{pmatrix}1 & 0.5\\0 & 1\end{pmatrix}\) as a stretch followed by a rotation. There is no axis-aligned stretch that produces the middle picture, which is why TRS cannot store the right one.</figcaption>
+      </figure>
+      <div class="ex">
+        <span class="tag">Worked example (decomposing the shear)</span>
+        \(A^{\mathsf T}A = \begin{pmatrix} 1 & 0.5 \\ 0.5 & 1.25 \end{pmatrix}\), with eigenvalues \(1.640\) and
+        \(0.610\) along the directions \((0.615, 0.788)\) (at \(52.0^\circ\)) and \((0.788, -0.615)\).
+        So \(P\) stretches by \(\sqrt{1.640} = 1.281\) along the first direction and by
+        \(\sqrt{0.610} = 0.781\) along the second, and as a matrix
+        \(P = \begin{pmatrix} 0.970 & 0.243 \\ 0.243 & 1.091 \end{pmatrix}\). Then
+        \(R = A\,P^{-1} = \begin{pmatrix} 0.970 & 0.243 \\ -0.243 & 0.970 \end{pmatrix}\), a rotation by
+        \(-14.04^\circ\), and \(R\,P\) multiplies back to \(A\) in every entry. A shear of \(0.5\) is a
+        \(28\,\%\) stretch on one diagonal, a \(22\,\%\) squeeze on the other, and a small turn.
+      </div>
+      <h3 id="planes">A.3 Planes</h3>
+      <p>
+        A plane is a normal and an offset, and the two travel together. Write the plane
+        \(\hat{\mathbf{n}}\cdot P = D\) of <a href="vectors.html#planes">the vectors chapter</a> as the
+        homogeneous row \(\boldsymbol\pi = (n_x, n_y, n_z, -D)\), so that a point is on the plane exactly
+        when \(\boldsymbol\pi\cdot(x, y, z, 1) = 0\). If points move by \(M\), the plane through their images
+        must satisfy \(\boldsymbol\pi'\cdot(M\tilde{\mathbf{p}}) = 0\) whenever \(\boldsymbol\pi\cdot\tilde{\mathbf{p}} = 0\),
+        which holds for \(\boldsymbol\pi' = M^{-\mathsf T}\boldsymbol\pi\): the full \(4\times4\) inverse transpose,
+        which moves the offset as well as tilting the normal. Renormalize the first three components
+        afterward and \(-\boldsymbol\pi'_3\) is the new \(D\).
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (the vectors chapter&rsquo;s plane under a TRS)</span>
+        \(\boldsymbol\pi = (0.333, 0.667, 0.667, -0.333)\) and \(M = \)<code>makeTRS(1,2,3, 0,60,0, 2,1,0.5)</code>.
+        \(M^{-\mathsf T}\boldsymbol\pi = (1.238, 0.667, 0.522, -4.472)\), normalized on its first three components to
+        \((0.825, 0.444, 0.348, -2.981)\): the new normal is \((0.825, 0.444, 0.348)\) and the new offset
+        \(D' = 2.981\). Check on two points known to be on the old plane, \(Q = (1, 0, 0)\) and the foot
+        \((3.444, -0.111, -1.111)\): their images \(M Q = (2, 2, 1.268)\) and \((3.963, 1.889, -3.243)\) both
+        satisfy \(\hat{\mathbf{n}}'\cdot P - D' = 0\) to six decimals. The naive normal \(A\hat{\mathbf{n}}\),
+        normalized to \((0.622, 0.667, -0.411)\), fails: the two image points differ by \(3.0\) in
+        their &ldquo;signed distance&rdquo; from a plane that should contain both. Clipping planes,
+        mirrors and shadow-caster planes all move this way.
+      </div>
+      <h3 id="appendix-exercises">A.4 Exercises</h3>
+      <div class="ex">
+        <span class="tag">Exercise A1 (planes)</span>
+        The ground plane \(y = 0\) is \(\boldsymbol\pi = (0, 1, 0, 0)\). Transform it by \(M = T(0, 2, 0)\cdot\mathrm{diag}(1, 3, 1)\) and give the new plane. Check with the image of the origin.
+        <details><summary>Solution</summary>
+          \(M^{-1}\) has linear part \(\mathrm{diag}(1, \tfrac13, 1)\) and translation \(-\mathrm{diag}(1, \tfrac13, 1)(0,2,0) = (0, -\tfrac23, 0)\); its transpose puts that translation in the bottom row, so \(M^{-\mathsf T}\boldsymbol\pi = (0, \tfrac13, 0, -\tfrac23)\), normalized \((0, 1, 0, -2)\): the plane \(y = 2\). The origin maps to \((0, 2, 0)\), which lies on it. The scale did nothing to a plane through the origin except be undone; the translation moved it.
+        </details>
+      </div>
+
+
       <footer>
-        CSS 551 &middot; course text &middot; Affine Transformations v2.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Affine Transformations v2.2 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code> and <code>tools/gen-textbook-figures-affine-intuition.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>
