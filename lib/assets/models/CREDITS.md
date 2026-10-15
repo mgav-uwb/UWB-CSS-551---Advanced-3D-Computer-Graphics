@@ -1,11 +1,11 @@
 ---
 title: "CSS 551 · Model Assets: Credits & Provenance"
-version: "1.8"
+version: "1.9"
 status: draft
 created_by: "Claude"
 created_at: "2026-07-18T14:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-10-15T01:30"
+last_modified_at: "2026-10-15T10:30"
 contributors:
   - "Claude"
 tags:
@@ -76,7 +76,8 @@ The frame, files, sizes and the Cessna's hinges are in `aircraft/AIRCRAFT.md`.
 
 - **Cessna 208 Caravan** (`aircraft/cessna/`): "Cessna 208 Caravan (Wheels version)" by **Helijah** (Emmanuel
   Baranger), BlendSwap blend 66877, **CC0** (`aircraft/cessna/BLENDSWAP_LICENSE.txt`; the author's FlightGear
-  read-me says GPL).
+  read-me says GPL). Also drawn into the Rotation chapter's figures (`textbook/figures/rot-noncommute.svg`,
+  `rot-yaw-pitch-roll.svg`, `rot-euler-orders.svg`, `rot-gimbal.svg`), credited in the chapter's footer.
 - **Harrier II** (`aircraft/harrier/`): "Harrier II" by **panko10**, BlendSwap, `https://blendswap.com/blend/30230`,
   **CC BY 3.0**.
 - **Airbus A380** (`aircraft/A380/`): "Airbus-A380" by **theMaker**, BlendSwap blend 87811 (now
@@ -176,6 +177,7 @@ Regenerate with `cd tools && npm run prep:models` (downloads are cached in
 
 | Version | Date | Author | Summary |
 | --- | --- | --- | --- |
+| 1.9 | 2026-10-15T10:30 | Claude | The Cessna also appears in the Rotation chapter's figures, rendered by tools/aircraft-figure-renderer.mjs. |
 | 1.8 | 2026-10-15T01:30 | Claude | The field drawing (Husky Stadium, supplied by Marcel) replaces the stadium in the football demo; the stadium is no longer published. |
 | 1.7 | 2026-10-15T01:00 | Claude | The aircraft: a Cessna 208 by Helijah (CC0), a Harrier II by panko10 (CC BY 3.0) and an A380 by theMaker (CC BY-SA 3.0, non-commercial), from BlendSwap, converted by tools/convert-aircraft-blend.py. |
 | 1.6 | 2026-10-14T23:50 | Claude | The stadium: "Soccer and American football stadium" by ericchip1983 (BlendSwap, CC BY 3.0), converted by tools/convert-stadium-blend.py. |

@@ -1,11 +1,11 @@
 ---
 title: "The aircraft models"
-version: "1.0"
+version: "1.1"
 status: final
 created_by: "Claude"
 created_at: "2026-10-15T01:00"
 last_modified_by: "Claude"
-last_modified_at: "2026-10-15T01:00"
+last_modified_at: "2026-10-15T10:30"
 contributors:
   - "Claude"
   - "Marcel Gavriliu"
@@ -20,6 +20,8 @@ related:
     desc: "the loader the demos use"
   - path: "../../../../tools/convert-aircraft-blend.py"
     desc: "the Blender script that made the GLB, OBJ and textures from the originals"
+  - path: "../../../../tools/aircraft-figure-renderer.mjs"
+    desc: "renders an aircraft into the textbook's SVG figures"
 ---
 
 # The aircraft models
@@ -58,6 +60,19 @@ in for them unchanged. (With the nose on +z and the top on +y, the pilot's right
 
 The original `.blend` files, the downloaded archives and the Cessna's original textures stay in the course's
 private copy.
+
+## In the textbook's figures
+
+The Rotation chapter's airplane figures (`rot-noncommute`, `rot-yaw-pitch-roll`, `rot-euler-orders`, `rot-gimbal`)
+show the Cessna. `tools/gen-textbook-figures-rotation-intuition.mjs` asks `tools/aircraft-figure-renderer.mjs` for
+each pose: three.js in headless Chromium renders the GLB with the figure's own orthographic view (no dev server
+needed), and the PNG goes into the SVG under the vector arrows and labels.
+
+```js
+const air = await openAircraftRenderer({ name: 'cessna', size: 1.6 });   // size: wingspan in figure units
+s += await air.image({ m, view: { yaw, pitch, scale, cx, cy } });        // m: column-major rotation
+await air.close();
+```
 
 ## The Cessna's moving parts
 
@@ -102,4 +117,5 @@ npx gltfpack@0.24.0 -i <name>.glb -o <name>.glb -cc -kn -km -ke
 
 | Version | Date             | Author | Summary       |
 | ------- | ---------------- | ------ | ------------- |
+| 1.1     | 2026-10-15T10:30 | Claude | The Cessna in the Rotation chapter's figures (tools/aircraft-figure-renderer.mjs) |
 | 1.0     | 2026-10-15T01:00 | Claude | Initial: three BlendSwap aircraft Marcel found, converted to the course's frame |

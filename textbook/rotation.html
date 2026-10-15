@@ -8,7 +8,9 @@
      tools/gen-textbook-figures-rotation-intuition.mjs (rot-half-angle, rot-noncommute, rot-yaw-pitch-roll,
      rot-euler-orders, rot-shortest-arc, rot-tangent-step, rot-trace, rot-long-way), computed from
      lib/core/rot-reps.js, and links to the rotation demos (rotation-ways, axis-angle, spin-step, rot-compose,
-     quat-slerp, euler-gimbal). -->
+     quat-slerp, euler-gimbal). v2.2 (2026-10-15): rot-noncommute, rot-yaw-pitch-roll, rot-euler-orders and
+     rot-gimbal (now drawn by the rotation-intuition generator) show the demos' Cessna 208 model, rendered by
+     tools/aircraft-figure-renderer.mjs. -->
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -554,7 +556,7 @@
         term, and its pose is \(15.4^\circ\) away.
       </div>
       <figure>
-        <img src="figures/rot-noncommute.svg" alt="Two rows of three poses of a small airplane: x 90 degrees then y 90 degrees, and y 90 degrees then x 90 degrees; the final poses differ." />
+        <img src="figures/rot-noncommute.svg" alt="Two rows of three poses of a Cessna 208 model: x 90 degrees then y 90 degrees, and y 90 degrees then x 90 degrees; the final poses differ." />
         <figcaption>Order matters: the same two quarter turns in the two orders, computed with the library&rsquo;s matrices. Each final pose is itself one \(120^\circ\) turn, about two different cube diagonals.</figcaption>
       </figure>
       <div class="demo">
@@ -666,8 +668,8 @@
         about \(z\). Same words, different letters.
       </p>
       <figure>
-        <img src="figures/rot-yaw-pitch-roll.svg" alt="A small airplane with its three body axes: yaw about the up axis, pitch about the wing axis, roll about the forward axis, with curved arrows." />
-        <figcaption>Yaw, pitch and roll in Unity&rsquo;s convention (\(y\) up, \(z\) forward). Schematic.</figcaption>
+        <img src="figures/rot-yaw-pitch-roll.svg" alt="A Cessna 208 model with its three body axes: yaw about the up axis, pitch about the wing axis, roll about the forward axis, with curved arrows." />
+        <figcaption>Yaw, pitch and roll in Unity&rsquo;s convention (\(y\) up, \(z\) forward).</figcaption>
       </figure>
       <p>
         The human way to say an orientation: three rotations about three axes, in a fixed order.
@@ -702,7 +704,7 @@
         Unity and aerospace ones by \(8.2^\circ\). Same three numbers, three poses.
       </div>
       <figure>
-        <img src="figures/rot-euler-orders.svg" alt="Three airplanes posed by the same angles (20, 45, 10) under Unity's, three.js's and the aerospace order, each labeled with where its x axis lands." />
+        <img src="figures/rot-euler-orders.svg" alt="Three Cessna 208 models posed by the same angles (20, 45, 10) under Unity's, three.js's and the aerospace order, each labeled with where its x axis lands." />
         <figcaption>One triple, three conventions, three poses, computed with the library&rsquo;s matrices: the \(x\) axis lands at \((0.738, 0.163, -0.654)\), \((0.696, 0.401, -0.595)\) and \((0.696, 0.123, -0.707)\).</figcaption>
       </figure>
       <p>
@@ -714,7 +716,7 @@
         failure got its name.
       </p>
       <figure>
-        <img src="figures/rot-gimbal.svg" alt="Two 3D diagrams of the three effective Euler axes for Unity's Z-X-Y order: at pitch 30 degrees the inner Z axis points to (0, -0.5, 0.866), distinct from the outer Y axis; at pitch 90 degrees it points to (0, -1, 0), along the Y axis." />
+        <img src="figures/rot-gimbal.svg" alt="A Cessna 208 model and the three effective Euler axes for Unity's Z-X-Y order: at pitch 30 degrees the nose and the inner Z axis point to (0, -0.5, 0.866), distinct from the outer Y axis; at pitch 90 degrees the nose points straight down and the Z axis, (0, -1, 0), lies along the Y axis." />
         <figcaption>
           The effective axes of the three Euler rotations in the world, computed from the rotation matrices. The middle rotation (about \(X\)) carries the inner \(Z\) axis with it; at \(X = 90^\circ\) the inner axis has been tipped onto the outer one.
         </figcaption>
@@ -981,7 +983,7 @@
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Rotation v2.1 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code>. <a href="index.html">All chapters</a>.
+        CSS 551 &middot; course text &middot; Rotation v2.2 &middot; prepared by Dr. Marcel Gavriliu. Figures computed by <code>tools/gen-textbook-figures-foundations.mjs</code> and <code>tools/gen-textbook-figures-rotation-intuition.mjs</code>; the airplane is &ldquo;Cessna 208 Caravan&rdquo; by Helijah (BlendSwap, CC0). <a href="index.html">All chapters</a>.
       </footer>
     </div>
   </body>

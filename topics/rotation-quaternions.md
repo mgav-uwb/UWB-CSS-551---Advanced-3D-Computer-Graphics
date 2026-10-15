@@ -789,7 +789,7 @@ const p = new THREE.Vector3(1, 0, 0).applyQuaternion(q);     // (0.866, 0, −0.
 
 ## Yaw, pitch, roll
 
-<img src="../../textbook/figures/rot-yaw-pitch-roll.svg" alt="an airplane with its three body axes: yaw about up, pitch about the wing axis, roll about the forward axis" style="height:370px">
+<img src="../../textbook/figures/rot-yaw-pitch-roll.svg" alt="a Cessna 208 model with its three body axes: yaw about up, pitch about the wing axis, roll about the forward axis" style="height:370px">
 
 - **yaw**: turn about the **up** axis (look left or right): Unity's `y`
 - **pitch**: turn about the **side** (wing) axis (nose up or down): Unity's `x`
@@ -817,7 +817,7 @@ Three rotations about three axes, in a **fixed order**. **Intrinsic**: each turn
 
 ## Same three numbers, three poses
 
-<img src="../../textbook/figures/rot-euler-orders.svg" alt="the same three angles under three conventions give three different poses" style="height:380px">
+<img src="../../textbook/figures/rot-euler-orders.svg" alt="the same three angles under three conventions give a Cessna 208 model three different poses" style="height:380px">
 
 Unity and three.js differ by **15.2°**, Unity and aerospace by 8.2°: name the order whenever you pass Euler angles between tools.
 
@@ -826,7 +826,7 @@ Unity and three.js differ by **15.2°**, Unity and aerospace by 8.2°: name the 
 
 ## A gimbal is a ring on two pins
 
-<img src="../../textbook/figures/rot-gimbal.svg" alt="at a 90-degree middle angle the inner and outer rotation axes coincide" style="height:230px">
+<img src="../../textbook/figures/rot-gimbal.svg" alt="a Cessna 208 model pitched 30 and 90 degrees: at 90 degrees, nose straight down, the inner and outer rotation axes coincide" style="height:270px">
 
 A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Z` inner, `X` middle, `Y` outer. The outer axis is always `ŷ`; after a middle turn of `x` degrees the inner axis is
 
