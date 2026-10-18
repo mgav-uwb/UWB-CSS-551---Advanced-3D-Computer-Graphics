@@ -23,8 +23,5 @@ namespace CSS551.HW02
         public static readonly float cyl_halfHeight = 1f;
         public static readonly Vector3 cyl_inside = new Vector3(1.2f, 0.6f, -0.9f);
         public static readonly Vector3 cyl_outside = new Vector3(0.9f, 1.4f, 0.4f);
-        public static readonly Vector3 rot_v = new Vector3(1f, 0.6f, 0.3f);
-        public static readonly Vector3 rot_axis = new Vector3(0f, 1f, 0f);
-        public static readonly float rot_deg = 30f;
     }
 }

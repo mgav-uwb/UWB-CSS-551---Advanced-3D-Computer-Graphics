@@ -1,6 +1,6 @@
 // CSS 551 · HW2 checks and scene (GIVEN). Add to an empty GameObject and press Play: the
 // Console prints the checks; the scene shows the plane, P (green in front, red behind) and
-// its shadow, and the rotated vector two ways. Drag py and angle in the Inspector.
+// its shadow. Drag py in the Inspector.
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -10,9 +10,8 @@ namespace CSS551.HW02
     public class Checks : MonoBehaviour
     {
         [Range(-3f, 3f)] public float py = 1f;
-        [Range(0f, 360f)] public float angle = 30f;
 
-        GameObject plane, ball, shadow, vRod, vQuat;
+        GameObject plane, ball, shadow;
 
         static double[] F(Vector3 v) => new double[] { v.x, v.y, v.z };
         static double[] Cat(params double[][] parts) { var l = new List<double>(); foreach (var p in parts) l.AddRange(p); return l.ToArray(); }
@@ -32,9 +31,6 @@ namespace CSS551.HW02
                 case "reflect": return F(HW.Reflect((Inputs.P2 - Inputs.P).normalized, n));
                 case "cylIn": { bool inside = HW.ProjectToCylinder(Inputs.cyl_inside, Inputs.cyl_c, Inputs.cyl_axis, Inputs.cyl_radius, Inputs.cyl_halfHeight, out var pt); return Cat(F(pt), new double[] { inside ? 1 : 0 }); }
                 case "cylOut": { bool inside = HW.ProjectToCylinder(Inputs.cyl_outside, Inputs.cyl_c, Inputs.cyl_axis, Inputs.cyl_radius, Inputs.cyl_halfHeight, out var pt); return Cat(F(pt), new double[] { inside ? 1 : 0 }); }
-                case "rodrigues": return F(HW.RotateAxisAngle(Inputs.rot_v, Inputs.rot_axis, Inputs.rot_deg));
-                case "quat": { var q = HW.QuatFromAxisAngle(Inputs.rot_axis, Inputs.rot_deg); return new double[] { q.x, q.y, q.z, q.w }; }
-                case "quatRot": return F(HW.QuatRotate(HW.QuatFromAxisAngle(Inputs.rot_axis, Inputs.rot_deg), Inputs.rot_v));
             }
             return null;
         }
@@ -46,8 +42,6 @@ namespace CSS551.HW02
             plane.transform.localScale = Vector3.one * 5f;
             ball = GameObject.CreatePrimitive(PrimitiveType.Sphere); ball.transform.localScale = Vector3.one * 0.2f;
             shadow = GameObject.CreatePrimitive(PrimitiveType.Sphere); shadow.transform.localScale = Vector3.one * 0.12f;
-            vRod = GameObject.CreatePrimitive(PrimitiveType.Sphere); vRod.transform.localScale = Vector3.one * 0.15f;
-            vQuat = GameObject.CreatePrimitive(PrimitiveType.Cube); vQuat.transform.localScale = Vector3.one * 0.12f;
         }
 
         void Update()
@@ -62,9 +56,6 @@ namespace CSS551.HW02
             ball.transform.position = p;
             ball.GetComponent<Renderer>().material.color = HW.SignedDistance(n, D, p) > 0 ? Color.green : Color.red;
             shadow.transform.position = HW.ShadowOnPlane(n, D, p);
-            var origin = new Vector3(2.5f, 0, -2.5f);
-            vRod.transform.position = origin + HW.RotateAxisAngle(Inputs.rot_v, Inputs.rot_axis, angle);
-            vQuat.transform.position = origin + HW.QuatRotate(HW.QuatFromAxisAngle(Inputs.rot_axis, angle), Inputs.rot_v);
         }
     }
 

@@ -1,11 +1,10 @@
-// CSS 551 · HW2 · Vectors and rotation (EX1 to EX6) · Unity track. YOUR FILE: fill in
+// CSS 551 · HW2 · Vector geometry (EX1 to EX6) · Unity track. YOUR FILE: fill in
 // every TODO. Checks.cs runs the checks on Play.
 //
 // Allowed: Vector3.Dot, Vector3.Cross, .normalized, .magnitude, component access, + - * /,
 // Mathf. Off limits: Vector3.Project / ProjectOnPlane / Reflect / Angle / MoveTowards /
-// Lerp, the Plane struct, Quaternion.AngleAxis and quaternion * vector.
-// A plane is (n, D) with n a UNIT normal: the points P with n · P = D. Angles in degrees.
-// A quaternion is a Vector4 (x, y, z, w).
+// Lerp, and the Plane struct.
+// A plane is (n, D) with n a UNIT normal: the points P with n · P = D.
 using UnityEngine;
 
 namespace CSS551.HW02
@@ -59,24 +58,6 @@ namespace CSS551.HW02
         public static bool ProjectToCylinder(Vector3 p, Vector3 c, Vector3 axis, float radius, float halfHeight, out Vector3 point)
         {
             point = p; return false; // TODO
-        }
-
-        // v rotated by deg about axis (any length), by the along/across split.
-        public static Vector3 RotateAxisAngle(Vector3 v, Vector3 axis, float deg)
-        {
-            return v; // TODO
-        }
-
-        // The unit quaternion (x, y, z, w) for deg about axis (any length).
-        public static Vector4 QuatFromAxisAngle(Vector3 axis, float deg)
-        {
-            return new Vector4(0, 0, 0, 1); // TODO
-        }
-
-        // v rotated by the unit quaternion q, by q v q* or its expanded vector form.
-        public static Vector3 QuatRotate(Vector4 q, Vector3 v)
-        {
-            return v; // TODO
         }
     }
 }

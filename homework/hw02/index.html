@@ -5,7 +5,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CSS 551 · HW2 · Vectors and rotation</title>
+<title>CSS 551 · HW2 · Vector geometry</title>
 <style>
   :root{ --bg:#fcf8ff; --panel:#ffffff; --line:#e9def8; --ink:#2d2640; --dim:#6c6584;
          --accent:#1c8766; --accent2:#c2457e; --warn:#bf6a14; }
@@ -48,18 +48,17 @@
 </head>
 <body>
 <header>
-  <h1>HW2 · Vectors and rotation</h1>
-  <blockquote class="epi">Olinde Rodrigues published his rotation formula in 1840, three years before Hamilton found quaternions.<cite>Rodrigues, Journal de Mathématiques Pures et Appliquées, 1840</cite></blockquote>
-  <div class="meta">Out Thursday October 15 · due Wednesday October 21, 11:59 PM on Canvas · 25 points · Unity or WebGL · <a href="../../index.html">hub</a> · <a href="../../schedule/index.html">schedule</a> · <a href="../../syllabus/index.html">syllabus</a> · <a href="../index.html">all homework</a></div>
+  <h1>HW2 · Vector geometry</h1>
+  <blockquote class="epi">Modern vector notation (the dot product, the cross product) was developed independently by Josiah Willard Gibbs and Oliver Heaviside in the 1880s, partly as a simpler rival to quaternions.<cite>Gibbs and Wilson, Vector Analysis, 1901; Heaviside, Electromagnetic Theory, 1893</cite></blockquote>
+  <div class="meta">Out Thursday October 15 · due Wednesday October 28, 11:59 PM on Canvas (extended from Wednesday October 21) · 25 points · Unity or WebGL · <a href="../../index.html">hub</a> · <a href="../../schedule/index.html">schedule</a> · <a href="../../syllabus/index.html">syllabus</a> · <a href="../index.html">all homework</a></div>
 </header>
 
-<div class="read"><b>Read before this homework:</b> <a href="../../textbook/vectors.html#dot">Vectors §2 and §3, dot and cross</a> · <a href="../../textbook/vectors.html#lines">§5, lines</a> · <a href="../../textbook/vectors.html#planes">§6, planes and signed distance</a> · <a href="../../textbook/rotation.html#rodrigues">Rotation §3, Rodrigues</a> · <a href="../../textbook/rotation.html#quaternions">§4, quaternions</a> · <a href="../../textbook/unity-basics.html#mathtypes">Unity for This Course §7</a> · <a href="../../textbook/webgl-basics.html#conventions">WebGL and three.js for This Course §7</a></div>
+<div class="read"><b>Read before this homework:</b> <a href="../../textbook/vectors.html#dot">Vectors §2 and §3, dot and cross</a> · <a href="../../textbook/vectors.html#lines">§5, lines</a> · <a href="../../textbook/vectors.html#planes">§6, planes and signed distance</a> · <a href="../../textbook/unity-basics.html#mathtypes">Unity for This Course §7</a> · <a href="../../textbook/webgl-basics.html#conventions">WebGL and three.js for This Course §7</a></div>
 
 <h2>What you build</h2>
 <p>The six exercises of the old vector labs as functions: march along a line, lay out a segment, build
       a plane, test which side of it a point is on, drop a shadow onto it, cut a segment with it and reflect the
-      direction, and project a point onto a cylinder. Then rotation two ways: by the along/across split of
-      Rodrigues' formula and by a quaternion, which must agree.</p>
+      direction, and project a point onto a cylinder.</p>
 <div class="tw"><table>
   <tr><th>JavaScript</th><th>C#</th><th>What it computes</th></tr>
 <tr><td><code>marchStep</code></td><td><code>MarchStep</code></td><td>EX1: one frame of marching from p toward the line from → to at speed units per second.</td></tr>
@@ -70,29 +69,23 @@
 <tr><td><code>linePlaneHit</code></td><td><code>LinePlaneHit</code></td><td>EX5: the point where the line through p1 and p2 crosses the plane; null (C#: false) when parallel.</td></tr>
 <tr><td><code>reflect</code></td><td><code>Reflect</code></td><td>EX5: d − 2 (d · n) n.</td></tr>
 <tr><td><code>projectToCylinder</code></td><td><code>ProjectToCylinder</code></td><td>EX6: the foot on the axis, pushed out to the radius; and whether the foot is within halfHeight of the center.</td></tr>
-<tr><td><code>rotateAxisAngle</code></td><td><code>RotateAxisAngle</code></td><td>v rotated by deg about the axis: v<sub>∥</sub> + cos θ v<sub>⊥</sub> + sin θ (a × v<sub>⊥</sub>).</td></tr>
-<tr><td><code>quatFromAxisAngle</code></td><td><code>QuatFromAxisAngle</code></td><td>The unit quaternion (x, y, z, w) = (sin(θ/2) a, cos(θ/2)).</td></tr>
-<tr><td><code>quatRotate</code></td><td><code>QuatRotate</code></td><td>v rotated by the quaternion: q v q*, or its expanded form v + 2w (u × v) + 2 u × (u × v).</td></tr>
 </table></div>
-<ul><li>A plane is (n, D) with n a unit normal: the points P with n · P = D.</li><li>Angles in degrees; a quaternion is [x, y, z, w] (a Vector4 in C#).</li></ul>
+<ul><li>A plane is (n, D) with n a unit normal: the points P with n · P = D.</li></ul>
 
 <h2>The numbers a correct build reproduces</h2>
 <p>Each row is one check, run on your functions with the published inputs below. The same table appears under
 the scene in the runner and in the Unity Console.</p>
 <div class="tw"><table>
   <tr><th>#</th><th>Check</th><th>Expected</th><th>Tolerance</th><th>Points</th></tr>
-<tr><td>1</td><td>EX1 marchStep: one step toward (4, 0, 3)</td><td class="num">(0.8, 0, 0.6)</td><td class="num">0.001</td><td>8</td></tr>
-<tr><td>2</td><td>EX1 lineFrame: midpoint, direction, length</td><td class="num">((2.5, 2, 0), (0.6, 0.8, 0), 5)</td><td class="num">0.001</td><td>8</td></tr>
-<tr><td>3</td><td>EX2 planeFromPoint: unit normal n and D</td><td class="num">((0.3333, 0.6667, 0.6667), 0.3333)</td><td class="num">0.001</td><td>8</td></tr>
-<tr><td>4</td><td>EX3 signedDistance for P = (4, 1, 0) and P2 = (-1, 0, 0)</td><td class="num">(1.6667, -0.6667)</td><td class="num">0.001</td><td>8</td></tr>
-<tr><td>5</td><td>EX4 shadowOnPlane of P</td><td class="num">(3.4444, -0.1111, -1.1111)</td><td class="num">0.001</td><td>10</td></tr>
-<tr><td>6</td><td>EX5 linePlaneHit for the segment P to P2</td><td class="num">(0.4286, 0.2857, 0)</td><td class="num">0.001</td><td>10</td></tr>
-<tr><td>7</td><td>EX5 reflect: the unit direction P to P2 reflected about n</td><td class="num">(-0.6755, 0.414, 0.6101)</td><td class="num">0.001</td><td>10</td></tr>
-<tr><td>8</td><td>EX6 projectToCylinder: (1.2, 0.6, -0.9), point and inside</td><td class="num">((0.4, 0.6, -0.3), true)</td><td class="num">0.001</td><td>8</td></tr>
-<tr><td>9</td><td>EX6 projectToCylinder: (0.9, 1.4, 0.4), point and inside</td><td class="num">((0.4569, 1.4, 0.2031), false)</td><td class="num">0.001</td><td>6</td></tr>
-<tr><td>10</td><td>rotateAxisAngle: (1, 0.6, 0.3) by 30° about y</td><td class="num">(1.016, 0.6, -0.2402)</td><td class="num">0.001</td><td>10</td></tr>
-<tr><td>11</td><td>quatFromAxisAngle: 30° about y, as [x, y, z, w]</td><td class="num">(0, 0.2588, 0, 0.9659)</td><td class="num">0.001</td><td>7</td></tr>
-<tr><td>12</td><td>quatRotate: the same rotation applied by the quaternion</td><td class="num">(1.016, 0.6, -0.2402)</td><td class="num">0.001</td><td>7</td></tr>
+<tr><td>1</td><td>EX1 marchStep: one step toward (4, 0, 3)</td><td class="num">(0.8, 0, 0.6)</td><td class="num">0.001</td><td>10</td></tr>
+<tr><td>2</td><td>EX1 lineFrame: midpoint, direction, length</td><td class="num">((2.5, 2, 0), (0.6, 0.8, 0), 5)</td><td class="num">0.001</td><td>10</td></tr>
+<tr><td>3</td><td>EX2 planeFromPoint: unit normal n and D</td><td class="num">((0.3333, 0.6667, 0.6667), 0.3333)</td><td class="num">0.001</td><td>10</td></tr>
+<tr><td>4</td><td>EX3 signedDistance for P = (4, 1, 0) and P2 = (-1, 0, 0)</td><td class="num">(1.6667, -0.6667)</td><td class="num">0.001</td><td>10</td></tr>
+<tr><td>5</td><td>EX4 shadowOnPlane of P</td><td class="num">(3.4444, -0.1111, -1.1111)</td><td class="num">0.001</td><td>13</td></tr>
+<tr><td>6</td><td>EX5 linePlaneHit for the segment P to P2</td><td class="num">(0.4286, 0.2857, 0)</td><td class="num">0.001</td><td>13</td></tr>
+<tr><td>7</td><td>EX5 reflect: the unit direction P to P2 reflected about n</td><td class="num">(-0.6755, 0.414, 0.6101)</td><td class="num">0.001</td><td>13</td></tr>
+<tr><td>8</td><td>EX6 projectToCylinder: (1.2, 0.6, -0.9), point and inside</td><td class="num">((0.4, 0.6, -0.3), true)</td><td class="num">0.001</td><td>11</td></tr>
+<tr><td>9</td><td>EX6 projectToCylinder: (0.9, 1.4, 0.4), point and inside</td><td class="num">((0.4569, 1.4, 0.2031), false)</td><td class="num">0.001</td><td>10</td></tr>
 </table></div>
 <details><summary>The published inputs</summary><pre>{
  "march": {
@@ -119,21 +112,16 @@ the scene in the runner and in the Unity Console.</p>
   "halfHeight": 1,
   "inside": [ 1.2, 0.6, -0.9 ],
   "outside": [ 0.9, 1.4, 0.4 ]
- },
- "rot": {
-  "v": [ 1, 0.6, 0.3 ],
-  "axis": [ 0, 1, 0 ],
-  "deg": 30
  }
 }</pre></details>
 
 <h2>Implement and replace</h2>
-<p>Build each function from primitives (dot, cross, normalize, length, component access, + − × ÷, sin, cos, sqrt.) and use the engine's own helper, where one exists, only to
+<p>Build each function from primitives (dot, cross, normalize, length, component access, + − × ÷, sqrt.) and use the engine's own helper, where one exists, only to
 check your result. These are off limits in your submission:</p>
 <div class="tw"><table>
   <tr><th>Track</th><th>Off limits</th></tr>
-<tr><td>WebGL (JavaScript)</td><td><code>Vector3.projectOnVector</code>, <code>projectOnPlane</code>, <code>reflect</code>, <code>applyAxisAngle</code>, <code>angleTo</code>; <code>THREE.Plane</code> and <code>THREE.Ray</code>; <code>Quaternion.setFromAxisAngle</code>, <code>applyQuaternion</code>; <code>quatFromAxisAngle</code> and <code>axisAngleMatrix</code> from xform.js.</td></tr>
-<tr><td>Unity (C#)</td><td><code>Vector3.Project</code>, <code>ProjectOnPlane</code>, <code>Reflect</code>, <code>Angle</code>, <code>MoveTowards</code>, <code>Lerp</code>; the <code>Plane</code> struct; <code>Quaternion.AngleAxis</code> and quaternion × vector.</td></tr>
+<tr><td>WebGL (JavaScript)</td><td><code>Vector3.projectOnVector</code>, <code>projectOnPlane</code>, <code>reflect</code>, <code>angleTo</code>; <code>THREE.Plane</code> and <code>THREE.Ray</code>.</td></tr>
+<tr><td>Unity (C#)</td><td><code>Vector3.Project</code>, <code>ProjectOnPlane</code>, <code>Reflect</code>, <code>Angle</code>, <code>MoveTowards</code>, <code>Lerp</code>; the <code>Plane</code> struct.</td></tr>
 </table></div>
 
 <h2>Getting started</h2>
