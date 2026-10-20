@@ -38,6 +38,9 @@
            ../../reference/trig-cheat-sheet.html.
   SOURCE:  C# excerpts on the vector slides are from Kelvin Sung's CSS 451 ClassExamples (Chap-4 to Chap-6).
 
+  SIMPLIFIED 2026-10-20 (Marcel: for most of the room this is the first linear algebra): cut the law-of-cosines,
+  perp-dot and Lagrange slides, the engines' mesh storage, the cross-product line distance and the vec-geometry
+  demo; the plane moved after the cross product, which it uses. 25 slides, ~34 min.
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -47,7 +50,7 @@
 
 ### Linear algebra for graphics, a recap
 
-<small>(~40 min) · reading: <a href="../../textbook/vectors.html">Vectors</a> · cheat sheets: <a href="../../reference/linear-algebra-cheat-sheet.html">linear algebra</a>, <a href="../../reference/trig-cheat-sheet.html">trigonometry</a></small>
+<small>(~34 min) · reading: <a href="../../textbook/vectors.html">Vectors</a> · cheat sheets: <a href="../../reference/linear-algebra-cheat-sheet.html">linear algebra</a>, <a href="../../reference/trig-cheat-sheet.html">trigonometry</a></small>
 
 
 ---
@@ -153,36 +156,6 @@ From **A** to **R** at **10 units/s**, one frame every **0.016 s**:
 
 ---
 
-## How the engines store a polygon
-
-<div class="code-tabs">
-
-```csharp
-Mesh mesh = new Mesh();
-mesh.vertices = new Vector3[] {                    // the corners, once each
-    new Vector3(0, 0, 0), new Vector3(3, 0, 0),
-    new Vector3(3, 2, 0), new Vector3(0, 2, 0) };
-mesh.triangles = new int[] { 0, 2, 1,   0, 3, 2 }; // clockwise = front in Unity
-mesh.RecalculateNormals();                         // (0, 0, -1): toward the default camera
-GetComponent<MeshFilter>().mesh = mesh;
-```
-
-```javascript
-const geometry = new THREE.BufferGeometry();
-geometry.setAttribute('position', new THREE.Float32BufferAttribute([
-  0, 0, 0,   3, 0, 0,   3, 2, 0,   0, 2, 0 ], 3));   // the corners, once each
-geometry.setIndex([0, 1, 2,   0, 2, 3]);              // counterclockwise = front in three.js
-geometry.computeVertexNormals();                      // (0, 0, 1): toward a camera on +z
-scene.add(new THREE.Mesh(geometry, new THREE.MeshBasicMaterial()));
-```
-
-</div>
-
-Two arrays: **vertex positions**, and **indices**, three per triangle. The engines disagree on which winding is the front.
-
-
----
-
 ## A line is a point and a direction
 
 <img src="../../textbook/figures/vec-param-line.svg" alt="a line P(t) = P0 + t d with ticks at t = -1, 0, 0.5, 1, 2; the segment from 0 to 1 and the ray t at least 0 highlighted" style="height:200px">
@@ -196,21 +169,6 @@ P(t) = P0 + t d          through two points:  d = P1 − P0
 - `t = 0` gives `P0`; `t = 1` gives `P0 + d`; negative `t` runs backward
 - **segment**: `0 ≤ t ≤ 1` (with `d = P1 − P0`); **ray**: `t ≥ 0`; **line**: any `t`
 - with a **unit** direction, `t` is a **distance** along the line
-
-
----
-
-## A plane is a point and a normal
-
-<img src="../../textbook/figures/vec-plane-distance.svg" alt="a plane with its normal and a point's signed distance" style="height:250px">
-
-The **normal** n is perpendicular to the plane; X is on the plane when `X − P0` is perpendicular to n:
-
-```text
-n · (X − P0) = 0      that is      n · X = D,   D = n · P0
-from three points A, B, C:   n = (B − A) × (C − A),   D = n · A
-A = (0, 2, 0), B = (1, 2, 0), C = (0, 6, −3):   n = (1, 0, 0) × (0, 4, −3) = (0, 3, 4),   D = 6
-```
 
 
 ---
@@ -251,18 +209,6 @@ a · b > 0  ->  θ < 90°: b in FRONT of a      a · b = 0  ->  θ = 90°: perpe
 
 ---
 
-## Why |a| |b| cos θ: the law of cosines
-
-<img src="../../textbook/figures/vecr-law-cosines.svg" alt="The triangle with sides a, b and a minus b, squared lengths 5, 6 and 3 and angle 43.1 degrees, beside four steps: the third side is a minus b; the law of cosines gives its squared length from the angle; squaring a minus b component by component gives the same squared length with minus twice the dot product; so a dot b equals |a||b| cos theta" style="height:320px">
-
-```text
-law of cosines:   |a − b|² = |a|² + |b|² − 2 |a| |b| cos θ
-by components:    |a − b|² = |a|² + |b|² − 2 (a · b)          check: 3 = 5 + 6 − 2·4
-```
-
-
----
-
 ## The dot product is the cosine of a difference
 
 <svg viewBox="0 0 300 290" style="height:250px" role="img" aria-label="The unit circle with u at 20 degrees and v at 80 degrees; arcs mark alpha = 20 degrees, beta = 80 degrees and the angle between them, beta minus alpha = 60 degrees">
@@ -291,42 +237,6 @@ v = (cos β, sin β) = (0.174, 0.985)              β = 80°
 u · v = cos α cos β + sin α sin β = cos(β − α)
       = 0.163 + 0.337 = 0.500 = cos 60°
 ```
-
-
----
-
-## The perp-dot is the sine of the difference
-
-Same **u** at 20°, **v** at 80°. The 2D **perp-dot** `u ⊥ v = ux vy − uy vx` is the z component of the 3D cross product:
-
-```text
-u ⊥ v = cos α sin β − sin α cos β = sin(β − α)
-      = 0.940·0.985 − 0.342·0.174 = 0.925 − 0.059 = 0.866 = sin 60°
-```
-
-- **positive**: v is counterclockwise from u (a left turn); **negative**: clockwise
-- **zero**: parallel
-- for any 2D vectors: `u ⊥ v = |u| |v| sin θ`, θ measured from u to v
-
-
----
-
-## cos² + sin² = 1, for vectors
-
-Square the two products and add (Lagrange's identity):
-
-```text
-(a · b)² + |a × b|² = |a|² |b|² cos² θ + |a|² |b|² sin² θ = |a|² |b|²
-
-a = (2, 1, 0), b = (1, 2, 1):   a · b = 4,   a × b = (1, −2, 3)
-                                 16 + 14 = 30 = 5 · 6
-```
-
-| question | product | trig |
-| --- | --- | --- |
-| how aligned? | dot | cos θ |
-| how far apart, which way? | cross (2D: perp-dot) | sin θ |
-| both together | (a · b)² + \|a × b\|² = \|a\|² \|b\|² | cos² θ + sin² θ = 1 |
 
 
 ---
@@ -435,6 +345,21 @@ e1 × e2 = (0·(−2) − 0·0, 0·0 − 2·(−2), 2·0 − 0·0) = (0, 4, 0)  
 
 ---
 
+## A plane is a point and a normal
+
+<img src="../../textbook/figures/vec-plane-distance.svg" alt="a plane with its normal and a point's signed distance" style="height:250px">
+
+The **normal** n is perpendicular to the plane; X is on the plane when `X − P0` is perpendicular to n:
+
+```text
+n · (X − P0) = 0      that is      n · X = D,   D = n · P0
+from three points A, B, C:   n = (B − A) × (C − A),   D = n · A
+A = (0, 2, 0), B = (1, 2, 0), C = (0, 6, −3):   n = (1, 0, 0) × (0, 4, −3) = (0, 3, 4),   D = 6
+```
+
+
+---
+
 ## Distance: point to point, point to line
 
 ```text
@@ -447,20 +372,6 @@ point to line P0 + t d:   t = (P − P0) · d / (d · d)      the projection's s
 ```
 
 P = **a = (2, 1, 0)**, line through the origin along **b = (1, 2, 1)**: `t = 4/6`, foot `(0.667, 1.333, 0.667)`, distance **1.528**.
-
-
----
-
-## Distance to a line in 3D: one cross
-
-<img src="../../textbook/figures/vec-point-line.svg" alt="in the plane of a and b, a lies 1.633 along the line and 1.528 across it; the parallelogram of a and the unit direction has height 1.528" style="height:240px">
-
-```text
-distance = |d × (P − P0)| / |d|           the parallelogram's area over its base
-
-P − P0 = a = (2, 1, 0),  d = b = (1, 2, 1):   |b × a| / |b| = √14 / √6 = 1.528
-check:   along 4/√6 = 1.633,   1.633² + 1.528² = 2.667 + 2.333 = 5 = |a|²
-```
 
 
 ---
@@ -567,19 +478,6 @@ const a = new THREE.Vector3(2, 1, 0), b = new THREE.Vector3(1, 2, 1);
 const n = a.cross(b);   // n IS a, and a is now (1, -2, 3)
 a.dot(b);               // 0, not 4
 ```
-
-
----
-
-<!-- .slide: class="demo-full" -->
-
-## Segments, planes, rays, triangles, live
-
-<div class="cockpit" data-demo="vec-geometry" data-controls="modes,reflect"><pre class="viz-fallback">  frame        a = (2, 1, 0), b = (1, 2, 1):  w = (0.894, 0.447, 0), u = (0.267, -0.535, 0.802), t = (0.359, -0.717, -0.598)
-  segment      P0 = (0, 0), P1 = (4, 2), Pt = (1, 3):  t = 2.236, foot (2, 1), inside, distance 2.236
-  plane        n = (1, 2, 2)/3, D = 1/3, P = (4, 1, 0):  n·P - D = 1.667 (in front), foot (3.444, -0.111, -1.111)
-  ray          o = (0, 5, 0), d = (0.6, -0.8, 0) against y = 0:  t = 6.25, hit (3.75, 0, 0)
-  barycentric  X = (0.5, 0, -0.5):  (w0, w1, w2) = (0.5, 0.25, 0.25), inside</pre></div>
 
 
 ---

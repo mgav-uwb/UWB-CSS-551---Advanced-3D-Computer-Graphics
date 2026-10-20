@@ -4,22 +4,23 @@
   scene graph introduced.
   This lecture replaces the meshes lecture on this date; the meshes deck stays in ../L06-meshes/
   until the schedule is rebuilt. Homogeneous coordinates and affine maps start next week.
-  Mounts, in order: L06-open.md, ../../topics/linear-algebra-recap.md (~40 min),
-  ../../topics/rotation-recap.md (~45 min), ../../topics/scene-graph-intro.md (~28 min, with the
+  Mounts, in order: L06-open.md, ../../topics/linear-algebra-recap.md (~34 min),
+  ../../topics/rotation-recap.md (~41 min), ../../topics/scene-graph-intro.md (~25 min, with the
   spiral pass), L06-discuss.md (the wrap).
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  opening                                                   2 min
     0:02  linear algebra recap: vectors, polygons, lines, planes,
-          dot and cross, the trig identities behind them, closest
-          points and distances, both tracks, the cheat sheets (topic) 40 min
-    0:42  rotation: 2D from the angle-sum identities, R_x R_y R_z,
+          dot and cross, the dot product as a cosine, closest
+          points and distances, both tracks, the cheat sheets (topic) 34 min
+    0:36  rotation: 2D from the angle-sum identities, R_x R_y R_z,
           Rodrigues derived, Euler angles and gimbal lock,
-          quaternions by their rules (topic)                         45 min
-    1:27  the scene graph and hierarchical modeling, the spiral
-          pass walked through (topic)                                28 min
-    1:55  wrap                                                       3 min
-    1:58  buffer                                                     2 min
+          quaternions by their rules (topic)                         41 min
+    1:17  the scene graph and hierarchical modeling, the spiral
+          pass walked through (topic)                                25 min
+    1:42  wrap                                                       3 min
+    1:45  questions; buffer                                         15 min
+  SIMPLIFIED 2026-10-20 (Marcel): 11 slides cut across the three topics for clarity (see each header).
   The demo slides are where the time can flex.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
@@ -44,7 +45,7 @@
 ## Tonight
 
 - **Linear algebra for graphics**: points and vectors, polygons, lines, planes
-- **The two products**: dot and cross, and the trig identities behind them
+- **The two products**: dot and cross; the dot product as the cosine of the angle
 - **Closest points and distances**: point to point, to a line, to a segment, to a plane, in Unity and WebGL
 - **Rotation**: 2D from the angle-sum identities, the axis rotations, Rodrigues derived step by step
 - **Euler angles** and gimbal lock

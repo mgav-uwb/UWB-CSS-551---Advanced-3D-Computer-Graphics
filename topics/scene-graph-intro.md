@@ -45,6 +45,8 @@
            restated without 4x4 matrices; operators, order, inverse and pivot from K. Sung's CSS 451 slides,
            chapters 8 and 9 (Sung, Shirley, Baer, Essentials of Interactive Computer Graphics).
 
+  SIMPLIFIED 2026-10-20 (Marcel: first linear algebra for most of the room): cut the joint-node slide and the
+  reparenting table (the catch slide keeps reparenting). 20 slides, ~25 min.
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -54,7 +56,7 @@
 
 ### The scene graph and hierarchical modeling
 
-<small>(~28 min) · reading: <a href="../../textbook/scene-graphs.html">Scene Graphs</a></small>
+<small>(~25 min) · reading: <a href="../../textbook/scene-graphs.html">Scene Graphs</a></small>
 
 
 ---
@@ -219,23 +221,6 @@ Bend the elbow 90°; **nothing else changes**:
 
 ---
 
-## A joint is a pivot
-
-A box spans `y` from −1 to 1. Hinge it 30° about its **lower end**, and put that end at `(0, 3, 0)`:
-
-```text
-   local(p) = (0, 3, 0) + R_z(30°)( p + (0, 1, 0) )     lower end to the origin, turn, carry
-
-   lower end (0, −1, 0)  →  (0, 3, 0)               stays on the joint
-   center    (0,  0, 0)  →  (−0.5, 3.866, 0)
-   upper end (0,  1, 0)  →  (−1, 4.732, 0)          swings by 30°
-```
-
-- engines split it in two nodes: a **joint** node at the hinge holds the rotation; a **child** offsets the mesh so its end sits at the joint
-
-
----
-
 ## Parents, local and world, in both tracks
 
 <div class="code-tabs">
@@ -278,20 +263,6 @@ function buildArm(baseNode, arm, hand) {
 ```
 
 </div>
-
-
----
-
-## Reparenting: keep the world pose, or the local values?
-
-| call | keeps | on screen, the child |
-| --- | --- | --- |
-| Unity `child.SetParent(p)` (the default, `worldPositionStays = true`) | the **world** pose | stays put; its local values are recomputed |
-| Unity `child.SetParent(p, false)` | the **local** values | jumps into the new parent's frame |
-| three.js `p.add(child)` | the **local** values | jumps |
-| three.js `p.attach(child)` | the **world** pose | stays put |
-
-Keeping the world pose means expressing the child's world placement **in the new parent's frame**: the parent's inverse, applied to it.
 
 
 ---

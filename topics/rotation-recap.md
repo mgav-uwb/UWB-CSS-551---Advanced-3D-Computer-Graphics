@@ -39,6 +39,9 @@
   SOURCE:  derived 2026-10-20 from rotation-quaternions.md (L04) and Sung's CSS 451 Chapter 8 slides
            (Sung, Shirley, Baer, Essentials of Interactive Computer Graphics).
 
+  SIMPLIFIED 2026-10-20 (Marcel: first linear algebra for most of the room): cut the orthonormal-columns and
+  determinant slide, Rodrigues as a matrix, and the slerp/nlerp/long-way demo; the Euler table names the engine's
+  product and its gimbal rings (the two readings in the note). 36 slides, ~41 min.
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -48,14 +51,14 @@
 
 ### Rotation: from 2D to Rodrigues, Euler angles, quaternions
 
-<small>(~45 min) · reading: <a href="../../textbook/rotation.html">Rotation</a></small>
+<small>(~41 min) · reading: <a href="../../textbook/rotation.html">Rotation</a></small>
 
 
 ---
 
 ### Rotation matrices, a review
 
-<small>(~10 min)</small>
+<small>(~9 min)</small>
 
 
 ---
@@ -147,24 +150,6 @@ The same `R(45°)` on each corner: `(5, 2)` → `(2.121, 4.950)` and `(8, 2)` �
 
 ---
 
-## Orthonormal columns, determinant +1
-
-`R_y(30°)` has columns `(0.866, 0, -0.5)`, `(0, 1, 0)`, `(0.5, 0, 0.866)`:
-
-```text
-col0 · col0 = 0.866² + 0.5² = 0.75 + 0.25 = 1         every column has length 1
-col0 · col2 = 0.866(0.5) + 0 + (-0.5)(0.866) = 0      every pair is perpendicular
-det R = col0 · (col1 × col2) = 1                       the triple product: volume +1, right-handed
-Rᵀ (0.866, 0, -0.5) = (col0 · col0, col1 · col0, col2 · col0) = (1, 0, 0)    R⁻¹ = Rᵀ
-```
-
-- **orthonormal**: unit length and mutually perpendicular
-- **Rᵀ** (the transpose): rows written as columns; for a rotation it is the inverse, so undoing a rotation costs nothing
-- nine numbers, six constraints, **three degrees of freedom** (three numbers you can still choose)
-
-
----
-
 ## Order matters: two quarter turns
 
 <img src="../../textbook/figures/rot-noncommute.svg" alt="an airplane turned 90 degrees about x then 90 about y, and 90 about y then 90 about x: the final poses differ" style="height:230px">
@@ -184,7 +169,7 @@ In `R2 R1 v` the **rightmost** matrix acts first. 2D turns commute (the angles a
 
 ### Rodrigues' formula, step by step
 
-<small>(~14 min)</small>
+<small>(~12 min)</small>
 
 
 ---
@@ -294,22 +279,6 @@ v' = −0.5 (1, 0, 0)  +  1.5 (0.333, 0.333, 0.333)  +  0.866 (0, 0.577, −0.57
 
 ---
 
-## The same formula as a matrix
-
-```text
-     [  0   −nz    ny ]
-K =  [  nz    0   −nx ]        K v = n × v: the cross product with n, written as a matrix
-     [ −ny   nx    0  ]
-
-R = I + sin θ K + (1 − cos θ) K²
-
-n = (0, 1, 0), θ = 30°:    K = [ 0 0 1 ; 0 0 0 ; −1 0 0 ]      K² = [ −1 0 0 ; 0 0 0 ; 0 0 −1 ]
-R = [ 0.866 0 0.5 ; 0 1 0 ; −0.5 0 0.866 ] = R_y(30°)
-```
-
-
----
-
 ## Real code: Rodrigues, both tracks
 
 <div class="code-tabs">
@@ -382,12 +351,12 @@ function rotateAboutAxis(v, n, angle) {
 
 <img src="../../textbook/figures/rot-euler-steps.svg" alt="Unity's Euler angles (20, 45, 10) built as roll 10 degrees about z, then pitch 20 about x, then yaw 45 about y, each about the fixed world axis" style="height:210px">
 
-| convention | product | about world axes | about own axes |
-| --- | --- | --- | --- |
-| Unity | `R_y R_x R_z` | z, x, y | y, x, z |
-| three.js, default `'XYZ'` | `R_x R_y R_z` | z, y, x | x, y, z |
+| engine | the three numbers build | the gimbal rings, outside in |
+| --- | --- | --- |
+| Unity, `Quaternion.Euler(x, y, z)` | `R_y R_x R_z` | y, x, z |
+| three.js, default order `'XYZ'` | `R_x R_y R_z` | x, y, z |
 
-Unity's order is three.js's `'YXZ'`. The same three numbers under the two orders differ by 15.2°.
+The order is a convention: (20, 45, 10) under the two orders gives poses 15.2° apart.
 
 
 ---
@@ -446,7 +415,7 @@ pitch x      y         z
 
 ### Quaternions: the rules
 
-<small>(~12 min)</small>
+<small>(~11 min)</small>
 
 
 ---
@@ -517,7 +486,7 @@ q q* = (0, 0, 0, 1)            for a unit q: the conjugate is the inverse
 
 Worked, 90° about z: `q* = (0, 0, −0.7071, 0.7071)`, the turn by −90° about z. With the product rule: vector `0.7071 (0, 0, −0.7071) + 0.7071 (0, 0, 0.7071) + 0 = 0`, scalar `0.7071² + 0.7071² = 1`.
 
-- undoing a rotation costs one sign flip, like the transpose of a rotation matrix
+- undoing a rotation costs one sign flip
 
 
 ---
@@ -585,19 +554,6 @@ q1 = identity (0, 0, 0, 1),  q2 = 120° about y = (0, 0.866, 0, 0.5):     cos Ω
 t = 1/2:   (0, 0.5, 0, 0.866), the quaternion of 60° about y: halfway, and still a rotation
 plain average (q1 + q2)/2 = (0, 0.433, 0, 0.75): length 0.866, not a rotation
 ```
-
-
----
-
-<!-- .slide: class="demo-full" -->
-
-## Slerp, nlerp, and the long way, live
-
-<div class="cockpit" data-demo="quat-slerp" data-controls="t,endAngle,method,flip,play,arc"><pre class="viz-fallback">  q1 = identity, q2 = 120° about y, t = 0.5
-     slerp:  q = (0, 0.5, 0, 0.866)      turned 60°     |q| = 1
-     nlerp:  t = 0.25 turned 27.8° (slerp 30.0°)
-     lerp (straight blend, not normalized):  q = (0, 0.433, 0, 0.75), |q| = 0.866: not a rotation
-     use -q2 with no sign check:  q1·q2 = -0.5, a 240° swing the other way</pre></div>
 
 
 ---
