@@ -5,6 +5,7 @@
   logistics (no title, homework, wrap) and no "Part N" numbering.
   Lectures compose topics in their index.html; see lectures/README.md and topics/README.md.
 
+  2026-10-22: display formulas typeset with MathJax (lib/deck-math.js); the ASCII form kept as each block's aria-label.
   TEACHES: an articulated thing is a tree of local transforms; W_child = W_parent · L_child, worked on a
   two-node chain and on the demo's base-arm-hand; a joint as a pivot sandwich inside the local transform;
   Sung's SceneNode and its CompositeXform recursion; the matrix stack traced on a tree with a mirrored
@@ -109,13 +110,19 @@ Place each part with its **own** world transform. Now yaw the base 30°:
 
 Give every node **one local transform**, where it sits **in its parent's space**, and derive its **world transform** by walking the path from the root:
 
-```text
-   base:  L_base            world = L_base
+<div class="tex" role="img" aria-label="   base:  L_base            world = L_base
     |
    arm:   L_arm             world = L_base · L_arm
     |
-   hand:  L_hand            world = L_base · L_arm · L_hand
-```
+   hand:  L_hand            world = L_base · L_arm · L_hand">
+\[
+\begin{aligned}
+&\text{base: } L_{\text{base}} && \text{world} = L_{\text{base}} \\
+&\quad\text{arm: } L_{\text{arm}} && \text{world} = L_{\text{base}} \cdot L_{\text{arm}} \\
+&\qquad\text{hand: } L_{\text{hand}} && \text{world} = L_{\text{base}} \cdot L_{\text{arm}} \cdot L_{\text{hand}}
+\end{aligned}
+\]
+</div>
 
 Author each part **once**, in its parent's frame. Composition does the rest.
 
@@ -132,9 +139,11 @@ Author each part **once**, in its parent's frame. Composition does the rest.
 
 A child's world transform is its **parent's world transform** times its **own local transform**:
 
-```text
-   W_child = W_parent · L_child
-```
+<div class="tex" role="img" aria-label="   W_child = W_parent · L_child">
+\[
+W_{\text{child}} = W_{\text{parent}} \cdot L_{\text{child}}
+\]
+</div>
 
 Read right to left: `L_child` acts **first**, placing a point in the **parent's** frame; then `W_parent` carries it the rest of the way **to world**.
 
@@ -143,11 +152,17 @@ Read right to left: `L_child` acts **first**, placing a point in the **parent's*
 
 ## The rule, down the whole arm
 
-```text
-   W_base = L_base                    (the root's parent is the world: identity)
+<div class="tex" role="img" aria-label="   W_base = L_base                    (the root's parent is the world: identity)
    W_arm  = W_base · L_arm            = L_base · L_arm
-   W_hand = W_arm  · L_hand           = L_base · L_arm · L_hand
-```
+   W_hand = W_arm  · L_hand           = L_base · L_arm · L_hand">
+\[
+\begin{aligned}
+W_{\text{base}} &= L_{\text{base}} && \text{(the root's parent is the world: identity)} \\
+W_{\text{arm}} &= W_{\text{base}} \cdot L_{\text{arm}} && = L_{\text{base}} \cdot L_{\text{arm}} \\
+W_{\text{hand}} &= W_{\text{arm}} \cdot L_{\text{hand}} && = L_{\text{base}} \cdot L_{\text{arm}} \cdot L_{\text{hand}}
+\end{aligned}
+\]
+</div>
 
 Each world transform is the running product of every local transform **from the root to that node**. The hand carries the base's yaw **and** the arm's bend, for free.
 
@@ -160,12 +175,19 @@ Each world transform is the running product of every local transform **from the 
 
 `L_base = R_y(90°)`, `L_arm = T(1, 0, 0)`:
 
-```text
-                              [ 0   0   1   0 ]      linear part: R_y(90)
+<div class="tex" role="img" style="font-size:0.65em" aria-label="                              [ 0   0   1   0 ]      linear part: R_y(90)
    W_arm = R_y(90) · T(1,0,0) = [ 0   1   0   0 ]      column 3: R_y(90) (1,0,0) = (0, 0, -1)
                               [-1   0   0  -1 ]
-                              [ 0   0   0   1 ]
-```
+                              [ 0   0   0   1 ]">
+\[
+W_{\text{arm}} = R_y(90) \cdot T(1,0,0) = \begin{bmatrix} 0 & 0 & 1 & 0 \\ 0 & 1 & 0 & 0 \\ -1 & 0 & 0 & -1 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+\qquad
+\begin{aligned}
+&\text{linear part: } R_y(90) \\
+&\text{column 3: } R_y(90)\,(1,0,0) = (0, 0, {-1})
+\end{aligned}
+\]
+</div>
 
 The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in world**.
 
@@ -176,13 +198,19 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 `L_base = T(0, 1, 0)`, `L_arm = R_z(90°)`, `L_hand = T(2, 0, 0)`. The hand's origin, applied right to left:
 
-```text
-   W_hand · 0 = T(0,1,0) · R_z(90) · T(2,0,0) · 0
+<div class="tex" role="img" aria-label="   W_hand · 0 = T(0,1,0) · R_z(90) · T(2,0,0) · 0
       (0,0,0) → T(2,0,0) → (2,0,0) → R_z(90) → (0,2,0) → T(0,1,0) → (0, 3, 0)
-
    swap the base and arm locals:  R_z(90) · T(0,1,0) · T(2,0,0) · 0
-      (2,0,0) → (2,1,0) → R_z(90) → (−1, 2, 0)
-```
+      (2,0,0) → (2,1,0) → R_z(90) → (−1, 2, 0)">
+\[
+\begin{aligned}
+&W_{\text{hand}} \cdot 0 = T(0,1,0) \cdot R_z(90) \cdot T(2,0,0) \cdot 0 \\
+&\quad (0,0,0) \xrightarrow{T(2,0,0)} (2,0,0) \xrightarrow{R_z(90)} (0,2,0) \xrightarrow{T(0,1,0)} (0, 3, 0) \\[6pt]
+&\text{swap the base and arm locals: } R_z(90) \cdot T(0,1,0) \cdot T(2,0,0) \cdot 0 \\
+&\quad (2,0,0) \to (2,1,0) \xrightarrow{R_z(90)} ({-1}, 2, 0)
+\end{aligned}
+\]
+</div>
 
 - the root-most factor acts **last**: a rotation above a translation swings it
 
@@ -191,11 +219,17 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 ## The demo's arm: three locals
 
-```text
-   L_base = makeTRS(0, 0.2, 0,   0, baseRy, 0,   1,1,1)   yaw on the floor
+<div class="tex" role="img" aria-label="   L_base = makeTRS(0, 0.2, 0,   0, baseRy, 0,   1,1,1)   yaw on the floor
    L_arm  = T_joint · T_lift · R_bend · T_pivot           hinge at the joint
-   L_hand = makeTRS(0, 0.7, 0,   0, handRy, 0,   1,1,1)   twist at the tip
-```
+   L_hand = makeTRS(0, 0.7, 0,   0, handRy, 0,   1,1,1)   twist at the tip">
+\[
+\begin{aligned}
+L_{\text{base}} &= \mathtt{makeTRS}(0, 0.2, 0,\ \ 0, \mathit{baseRy}, 0,\ \ 1,1,1) && \text{yaw on the floor} \\
+L_{\text{arm}} &= T_{\text{joint}} \cdot T_{\text{lift}} \cdot R_{\text{bend}} \cdot T_{\text{pivot}} && \text{hinge at the joint} \\
+L_{\text{hand}} &= \mathtt{makeTRS}(0, 0.7, 0,\ \ 0, \mathit{handRy}, 0,\ \ 1,1,1) && \text{twist at the tip}
+\end{aligned}
+\]
+</div>
 
 - `L_base`, `L_hand`: one TRS each; each part turns about its **own** center
 - `L_arm`: the hinge is at the arm's **lower end**, so the rotation sits **between** translations: `T_pivot = T(0, 0.7, 0)` puts the end at the origin, `R_bend` hinges there, `T_joint = T(0, 0.2, 0)` sets it on the base's top
@@ -236,13 +270,21 @@ The arm's origin, at `(1,0,0)` in the **base's** frame, lands at **`(0,0,-1)` in
 
 A box spans `y ∈ [−1, 1]` about its origin. Hinge it by **30°** about its **lower end** and place that end at `(0, 3, 0)`:
 
-```text
-   L = T(0, 3, 0) · R_z(30°) · T(0, 1, 0)       lift the lower end to the origin, hinge, carry
-
+<div class="tex" role="img" style="font-size:0.75em" aria-label="   L = T(0, 3, 0) · R_z(30°) · T(0, 1, 0)       lift the lower end to the origin, hinge, carry
    translation column = (0, 3, 0) + R_z(30°)(0, 1, 0) = (−0.5, 3.866, 0)
    lower end (0, −1, 0)  →  (0, 3, 0)            stays on the joint
-   upper end (0,  1, 0)  →  (−1, 4.732, 0)       swings by 30°
-```
+   upper end (0,  1, 0)  →  (−1, 4.732, 0)       swings by 30°">
+\[
+L = T(0, 3, 0) \cdot R_z(30^\circ) \cdot T(0, 1, 0) \qquad \text{lift the lower end to the origin, hinge, carry}
+\]
+\[
+\begin{aligned}
+\text{translation column} &= (0, 3, 0) + R_z(30^\circ)(0, 1, 0) = ({-0.5}, 3.866, 0) \\
+\text{lower end } (0, {-1}, 0) &\to (0, 3, 0) \qquad \text{stays on the joint} \\
+\text{upper end } (0, 1, 0) &\to ({-1}, 4.732, 0) \qquad \text{swings by } 30^\circ
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -390,18 +432,29 @@ public void LoadShaderMatrix(ref Matrix4x4 nodeMatrix) {
 
 ## Local to world, and back
 
-```text
-   p_world = W · p_local            placement: vertices, attachment points, a tip
-   p_local = W⁻¹ · p_world          inquiry: a mouse-ray hit, another object, a collision
-```
+<div class="tex" role="img" aria-label="   p_world = W · p_local            placement: vertices, attachment points, a tip
+   p_local = W⁻¹ · p_world          inquiry: a mouse-ray hit, another object, a collision">
+\[
+\begin{aligned}
+p_{\text{world}} &= W \cdot p_{\text{local}} && \text{placement: vertices, attachment points, a tip} \\
+p_{\text{local}} &= W^{-1} \cdot p_{\text{world}} && \text{inquiry: a mouse-ray hit, another object, a collision}
+\end{aligned}
+\]
+</div>
 
 Two-node chain: the arm's tip at local `(1, 0, 0)`:
 
-```text
-   W_arm · (1, 0, 0, 1) = (0, 0, -2)                 one unit past the arm's origin (0,0,-1)
+<div class="tex" role="img" style="font-size:0.62em" aria-label="   W_arm · (1, 0, 0, 1) = (0, 0, -2)                 one unit past the arm's origin (0,0,-1)
    W_arm⁻¹ = [R_y(90)ᵀ | -R_y(90)ᵀ (0,0,-1)]         the rigid inverse, translation (-1, 0, 0)
-   W_arm⁻¹ · (0, 0, -1, 1) = (0, 0, 0)               the arm's world origin comes home
-```
+   W_arm⁻¹ · (0, 0, -1, 1) = (0, 0, 0)               the arm's world origin comes home">
+\[
+\begin{aligned}
+W_{\text{arm}} \cdot (1, 0, 0, 1) &= (0, 0, {-2}) && \text{one unit past the arm's origin } (0,0,{-1}) \\
+W_{\text{arm}}^{-1} &= \left[\, R_y(90)^T \;\middle|\; {-R_y(90)^T}\,(0,0,{-1}) \,\right] && \text{the rigid inverse, translation } ({-1}, 0, 0) \\
+W_{\text{arm}}^{-1} \cdot (0, 0, {-1}, 1) &= (0, 0, 0) && \text{the arm's world origin comes home}
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -496,14 +549,18 @@ And the world point `(0, 1, 0)` in the hand's frame: `W_hand⁻¹ (0, 1, 0) = (0
 
 Parent a camera to the hand, `L_cam = T(0, 0.3, 0)`:
 
-```text
-   camera, world:  W_hand · (0, 0.3, 0) = (-0.946, 1.702, 0.546)
-
+<div class="tex" role="img" aria-label="   camera, world:  W_hand · (0, 0.3, 0) = (-0.946, 1.702, 0.546)
    V = (W_hand · L_cam)⁻¹ = [  0.66   0.64  -0.38  -0.26 ]
                             [ -0.56   0.77   0.32  -2.01 ]
                             [  0.50   0.00   0.87   0.00 ]
-                            [  0      0      0      1    ]
-```
+                            [  0      0      0      1    ]">
+\[
+\begin{aligned}
+&\text{camera, world: } W_{\text{hand}} \cdot (0, 0.3, 0) = ({-0.946}, 1.702, 0.546) \\[6pt]
+&V = (W_{\text{hand}} \cdot L_{\text{cam}})^{-1} = \begin{bmatrix} 0.66 & 0.64 & -0.38 & -0.26 \\ -0.56 & 0.77 & 0.32 & -2.01 \\ 0.50 & 0.00 & 0.87 & 0.00 \\ 0 & 0 & 0 & 1 \end{bmatrix}
+\end{aligned}
+\]
+</div>
 
 The **view matrix** is the inverse of the camera node's world matrix; its rows are `W_hand`'s rotation columns.
 
@@ -514,10 +571,15 @@ The **view matrix** is the inverse of the camera node's world matrix; its rows a
 
 A spotlight on the hand must point at a target `g` in the world. The look-at gives a **world** rotation; the node stores a **local** one:
 
-```text
-   R_world = lookAt(eye = hand light position, at = g)          (the viewing lecture's basis)
-   R_local = R_parentWorld⁻¹ · R_world = R_parentWorld^T · R_world
-```
+<div class="tex" role="img" style="font-size:0.7em" aria-label="   R_world = lookAt(eye = hand light position, at = g)          (the viewing lecture's basis)
+   R_local = R_parentWorld⁻¹ · R_world = R_parentWorld^T · R_world">
+\[
+\begin{aligned}
+R_{\text{world}} &= \mathtt{lookAt}(\text{eye} = \text{hand light position},\ \text{at} = g) && \text{(the viewing lecture's basis)} \\
+R_{\text{local}} &= R_{\text{parentWorld}}^{-1} \cdot R_{\text{world}} = R_{\text{parentWorld}}^{T} \cdot R_{\text{world}}
+\end{aligned}
+\]
+</div>
 
 Every "follow", "aim", and "look at" constraint in an animation system is this line, run after the parent's world matrix is known.
 
@@ -551,10 +613,15 @@ The demo: hand yaw recomputes 1, the bend 2, the base yaw 3.
 
 At yaw 30°, bend 40°, the hand is at **(−0.779, 1.472, 0.450)**; in the base's frame it is **(−0.900, 1.272, 0)**, and the base sits at **(0, 0.2, 0)**.
 
-```text
-   yaw 90°:  (0, 0.2, 0) + R_y(90°) · (−0.900, 1.272, 0) = (0, 1.472, 0.900)
-   then change only the hand's yaw:  the hand's position does not move
-```
+<div class="tex" role="img" aria-label="   yaw 90°:  (0, 0.2, 0) + R_y(90°) · (−0.900, 1.272, 0) = (0, 1.472, 0.900)
+   then change only the hand's yaw:  the hand's position does not move">
+\[
+\begin{aligned}
+&\text{yaw } 90^\circ\text{: } (0, 0.2, 0) + R_y(90^\circ) \cdot ({-0.900}, 1.272, 0) = (0, 1.472, 0.900) \\
+&\text{then change only the hand's yaw: the hand's position does not move}
+\end{aligned}
+\]
+</div>
 
 - the base yaw recomputed **3** world matrices; the hand yaw recomputes **1**, and only an orientation changes
 
@@ -606,11 +673,17 @@ Each node stores a box around **its whole subtree**. Culling tests the tree top 
 
 The whole arm's bounding **sphere**: center `(−0.312, 0.853, 0.143)`, radius `1.318`. Test against the plane `x = 1` (keep `x < 1`):
 
-```text
-   signed distance of the center:  −0.312 − 1 = −1.312
-   inside if distance < −r:        −1.312 < −1.318 ?   no, by 0.006: the sphere STRADDLES
-   the box test said: max x = 0.478 < 1: inside, accept all
-```
+<div class="tex" role="img" style="font-size:0.7em" aria-label="   signed distance of the center:  −0.312 − 1 = −1.312
+   inside if distance &lt; −r:        −1.312 &lt; −1.318 ?   no, by 0.006: the sphere STRADDLES
+   the box test said: max x = 0.478 &lt; 1: inside, accept all">
+\[
+\begin{aligned}
+\text{signed distance of the center: } & {-0.312} - 1 = {-1.312} \\
+\text{inside if distance} \lt {-r}\text{: } & {-1.312} \lt {-1.318}\ ? \quad \text{no, by 0.006: the sphere STRADDLES} \\
+\text{the box test said: } & \max x = 0.478 \lt 1\text{: inside, accept all}
+\end{aligned}
+\]
+</div>
 
 One subtraction instead of six box corners, at the price of false "maybe"s that send the test down the tree.
 
@@ -681,8 +754,13 @@ Author the mesh **once**; the tree places the copies.
 
 Parent `S(2, 1, 1)`, child `R_z(45°)`. The child's world columns:
 
-```text
-   (1.414, 0.707, 0) and (-1.414, 0.707, 0):  lengths 1.581, 1.581;  126.9° apart, not 90°
-   read back as TRS:  rotation 26.6° (not 45°), scale (1.581, 1.581):  rebuilt entry error 0.707
-```
+<div class="tex" role="img" style="font-size:0.72em" aria-label="   (1.414, 0.707, 0) and (-1.414, 0.707, 0):  lengths 1.581, 1.581;  126.9° apart, not 90°
+   read back as TRS:  rotation 26.6° (not 45°), scale (1.581, 1.581):  rebuilt entry error 0.707">
+\[
+\begin{aligned}
+&(1.414, 0.707, 0) \text{ and } ({-1.414}, 0.707, 0)\text{: lengths } 1.581, 1.581\text{; } 126.9^\circ \text{ apart, not } 90^\circ \\
+&\text{read back as TRS: rotation } 26.6^\circ \text{ (not } 45^\circ\text{), scale } (1.581, 1.581)\text{: rebuilt entry error } 0.707
+\end{aligned}
+\]
+</div>
 

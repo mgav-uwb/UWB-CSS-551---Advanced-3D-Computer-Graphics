@@ -12,7 +12,10 @@
   <script type="module">
     import { DEMOS } from './demos/registry.js';
 
-    const slug = new URLSearchParams(location.search).get('demo');
+    const params = new URLSearchParams(location.search);
+    const slug = params.get('demo');
+    // ?controls=step:8,cam:sideline passes the same tokens a deck embed's data-controls does
+    const controls = (params.get('controls') ?? '').split(',').map((c) => c.trim()).filter(Boolean);
     const root = document.getElementById('demo-root');
     const demo = slug ? DEMOS[slug] : undefined;
 
@@ -30,7 +33,7 @@
       h1.className = 'demo-title';
       h1.textContent = demo.title;
       root.appendChild(h1);
-      demo.make(root, { stage: 'full' });
+      demo.make(root, { stage: 'full', controls });
     }
   </script>
 </body>

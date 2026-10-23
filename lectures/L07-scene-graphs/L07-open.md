@@ -1,16 +1,21 @@
 <!--
   CSS 551 · L07, Thursday October 22, 2026 (week 4, in person): Scene graphs.
-  Mounted by index.html: L07-open.md, ../../topics/scene-graphs.md (~66 min, 48 slides), L07-discuss.md.
+  Mounted by index.html: L07-open.md, ../../topics/scene-graph-intro.md (~28 min), ../../topics/scene-graph-concepts.md
+  (~30 min, 16 slides), L07-discuss.md. Re-composed 2026-10-22: L06 did not reach the scene graph and the affine
+  lecture was not given, so L07 teaches the scene graph by concepts with the spiral pass as the running example
+  (demo links open in a new tab); scene-graphs.md, the 4x4 matrix version, waits for the affine topic.
   55 slides after the 2026-10-08 cuts (exercise slides and discussion questions; re-sequenced 2026-10-06: kinematics and skinning moved to the animation topic,
   rigid bodies to the physics topic, both in L10).
 
   Plan (120 min, Thu 5:45-7:45 PM in person):
-    0:00  Quiz 2, on paper (L05, L06, HW2)            20 min
+    0:00  Quiz 2, on paper (vectors, rotation)        20 min
     0:20  Opening                                      2 min
-    0:22  Scene graphs and hierarchical modeling      66 min
-    1:28  HW3 walk-through                            10 min
-    1:38  Wrap                                         4 min
-    1:42  HW3 setup help, both tracks; buffer         18 min
+    0:22  The scene graph: operators on points, the tree,
+          local and world, the spiral pass (intro)     40 min
+    1:02  Scene graphs in practice (concepts)          30 min
+    1:32  HW3 walk-through                            10 min
+    1:42  Wrap                                         3 min
+    1:45  HW3 setup help, both tracks; buffer         15 min
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.
@@ -36,7 +41,8 @@
 **Laptops and phones away.** A pencil and the quiz sheet, nothing else.
 
 - **20 minutes**, 5:45 to 6:05 PM: 8 multiple-choice questions, 5 points each
-- **Covers**: Lecture 5, affine transformations (Thursday, October 15); Lecture 6, meshes and texture coordinates (Tuesday, October 20); HW2
+- **Covers**: vectors (dot and cross products, distances) and rotation through Rodrigues' formula, from Thursday, October 15, and Tuesday, October 20; HW2 is on Quiz 3
+- **Formula sheet**: the last page, to tear off: dot and cross products, the axis rotations, Rodrigues, the quaternion rules (q v q*), and a sin and cos table
 - Mark one letter per question in the grid on the first page; only the grid is graded
 
 
@@ -44,11 +50,10 @@
 
 ## Tonight
 
-- **Articulated things**: move the parent, the children follow
-- **The composite transform**: `W_child = W_parent · L_child`, three levels in two orders, a joint at an end, live
-- **Sung's SceneNode** and the matrix stack, with a mirrored sibling
-- **Local and world**: the inverse, both tracks' parents, the hand from three frames, the camera as a node
-- **Engineering the tree**: dirty flags, subtree bounds, reuse, and inherited shear
+- **Operators on points**: translate, rotate, scale; order matters; undo in reverse; rotate about a pivot
+- **The scene graph**: a tree of nodes, a local placement per node, the world placement up the tree, base-arm-hand live
+- **A spiral pass, frame by frame**: spin, wobble, aim, flight, and the catch as a change of parent
+- **Scene graphs in practice**: the camera as a node, reparenting, reuse, importing, dirty flags, bounds, transparency
 - the **HW3 walk-through**, then setup help
 
 Reading: [Scene Graphs](../../textbook/scene-graphs.html), Sections 1 to 14.

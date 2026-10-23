@@ -1,12 +1,12 @@
 <!--
-  CSS 551 · L06, Tuesday October 20, 2026 (week 4, online): Vectors, rotation, and the scene graph.
+  CSS 551 · L06, Tuesday October 20, 2026 (week 4, online): Vectors and rotation.
   Built 2026-10-20 at Marcel's request: a slow recap of the linear algebra, rotation finished, the
-  scene graph introduced.
+  scene graph introduced. As given, the class reached Rodrigues and touched quaternions; the scene
+  graph (scene-graph-intro.md) was not reached and moved to L07 (2026-10-22), so it is unmounted here.
   This lecture replaces the meshes lecture on this date; the meshes deck stays in ../L06-meshes/
   until the schedule is rebuilt. Homogeneous coordinates and affine maps start next week.
   Mounts, in order: L06-open.md, ../../topics/linear-algebra-recap.md (~34 min),
-  ../../topics/rotation-recap.md (~41 min), ../../topics/scene-graph-intro.md (~25 min, with the
-  spiral pass), L06-discuss.md (the wrap).
+  ../../topics/rotation-recap.md (~41 min), L06-discuss.md (the wrap).
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  opening                                                   2 min
@@ -31,7 +31,7 @@
 
 ### Advanced 3D Computer Graphics
 
-**Lecture 6: Vectors, Rotation, and the Scene Graph**
+**Lecture 6: Vectors and Rotation**
 
 > In 1840, three years before Hamilton's quaternions, the banker and mathematician Olinde Rodrigues published how to compose two rotations about arbitrary axes; his four parameters combine exactly as unit quaternions multiply.
 
@@ -50,7 +50,6 @@
 - **Rotation**: 2D from the angle-sum identities, the axis rotations, Rodrigues derived step by step
 - **Euler angles** and gimbal lock
 - **Quaternions**: the rules and the operations
-- **The scene graph**: hierarchical modeling, then the spiral pass, link by link
 
-Reading: [Vectors](../../textbook/vectors.html) · [Rotation](../../textbook/rotation.html) · [Scene Graphs](../../textbook/scene-graphs.html) · cheat sheets: [linear algebra](../../reference/linear-algebra-cheat-sheet.html), [trigonometry](../../reference/trig-cheat-sheet.html)
+Reading: [Vectors](../../textbook/vectors.html) · [Rotation](../../textbook/rotation.html) · cheat sheets: [linear algebra](../../reference/linear-algebra-cheat-sheet.html), [trigonometry](../../reference/trig-cheat-sheet.html)
 

@@ -20,6 +20,7 @@
   the two cheat sheets.
   BUILT 2026-10-20 for L06 (the recap lecture) from vectors-review.md and vector-geometry.md (slides
   copied and adapted; those topics are unchanged).
+  2026-10-22: display formulas typeset with MathJax (lib/deck-math.js); the ASCII form kept as each block's aria-label.
   NEEDS:   nothing beyond high-school algebra and trigonometry.
   DEMOS:   dot-cross (data-controls="ax,ay,bx,by") and vec-geometry (data-controls="modes,reflect"),
            each on a demo-full slide, markup and fallbacks as in vectors-review.md and vector-geometry.md.
@@ -94,10 +95,15 @@ Add **component by component**: (3, 1) + (1, 2) = (4, 3). Scale **every componen
 
 <img src="../../textbook/figures/vecr-normalize.svg" alt="v = (3, 4) of length 5 drawn with its 3 and 4 legs, and the unit vector (0.6, 0.8) on a dashed unit circle; a note that (0, 0, 0) has no direction" style="height:300px">
 
-```text
-|v| = sqrt(vx² + vy² + vz²)        |(3, 4, 0)| = sqrt(9 + 16) = 5
-v̂  = v / |v|                        (3, 4, 0) / 5 = (0.6, 0.8, 0), length 1
-```
+<div class="tex" role="img" aria-label="|v| = sqrt(vx² + vy² + vz²)        |(3, 4, 0)| = sqrt(9 + 16) = 5
+v̂  = v / |v|                        (3, 4, 0) / 5 = (0.6, 0.8, 0), length 1">
+\[
+\begin{aligned}
+\lvert v \rvert &= \sqrt{v_x^2 + v_y^2 + v_z^2} && \lvert (3,\ 4,\ 0) \rvert = \sqrt{9 + 16} = 5 \\
+\hat v &= v \,/\, \lvert v \rvert && (3,\ 4,\ 0) \,/\, 5 = (0.6,\ 0.8,\ 0),\ \text{length } 1
+\end{aligned}
+\]
+</div>
 
 A **unit vector** has length 1: a direction only. **(0, 0, 0) has no direction**: test the length before dividing.
 
@@ -110,13 +116,21 @@ A **unit vector** has length 1: a direction only. **(0, 0, 0) has no direction**
 
 From **A** to **R** at **10 units/s**, one frame every **0.016 s**:
 
-```text
-1. aim      R − A                = (3, 0, −4)              tip minus tail
+<div class="tex" style="font-size:0.65em" role="img" aria-label="1. aim      R − A                = (3, 0, −4)              tip minus tail
 2. length   √(3² + 0² + 4²)      = 5                       the distance to fly
 3. unit     (3, 0, −4) / 5       = (0.6, 0, −0.8)          direction only, length 1
 4. step     10 × 0.016 × unit    = (0.096, 0, −0.128)      scale, then add each frame: length 0.16
-5. frames   5 / 0.16             = 31.25                   after 31 steps, 0.04 is left
-```
+5. frames   5 / 0.16             = 31.25                   after 31 steps, 0.04 is left">
+\[
+\begin{array}{llll}
+\text{1. aim} & R - A & = (3,\ 0,\ {-4}) & \text{tip minus tail} \\
+\text{2. length} & \sqrt{3^2 + 0^2 + 4^2} & = 5 & \text{the distance to fly} \\
+\text{3. unit} & (3,\ 0,\ {-4}) \,/\, 5 & = (0.6,\ 0,\ {-0.8}) & \text{direction only, length 1} \\
+\text{4. step} & 10 \times 0.016 \times \text{unit} & = (0.096,\ 0,\ {-0.128}) & \text{scale, then add each frame: length 0.16} \\
+\text{5. frames} & 5 \,/\, 0.16 & = 31.25 & \text{after 31 steps, 0.04 is left}
+\end{array}
+\]
+</div>
 
 
 ---
@@ -162,9 +176,11 @@ From **A** to **R** at **10 units/s**, one frame every **0.016 s**:
 
 Every point on the line is the base point plus some amount of the direction:
 
-```text
-P(t) = P0 + t d          through two points:  d = P1 − P0
-```
+<div class="tex" role="img" aria-label="P(t) = P0 + t d          through two points:  d = P1 − P0">
+\[
+P(t) = P_0 + t\,d \qquad \text{through two points: } d = P_1 - P_0
+\]
+</div>
 
 - `t = 0` gives `P0`; `t = 1` gives `P0 + d`; negative `t` runs backward
 - **segment**: `0 ≤ t ≤ 1` (with `d = P1 − P0`); **ray**: `t ≥ 0`; **line**: any `t`
@@ -175,19 +191,31 @@ P(t) = P0 + t d          through two points:  d = P1 − P0
 
 ## The dot product: two definitions, one number
 
-```text
-by components:   a · b = ax bx + ay by + az bz           a number, not a vector
-geometrically:   a · b = |a| |b| cos θ                    θ = the angle between a and b
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="by components:   a · b = ax bx + ay by + az bz           a number, not a vector
+geometrically:   a · b = |a| |b| cos θ                    θ = the angle between a and b">
+\[
+\begin{aligned}
+&\text{by components:} && a \cdot b = a_x b_x + a_y b_y + a_z b_z && \text{a number, not a vector} \\
+&\text{geometrically:} && a \cdot b = \lvert a \rvert\, \lvert b \rvert \cos\theta && \theta = \text{the angle between } a \text{ and } b
+\end{aligned}
+\]
+</div>
 
 For **a = (2, 1, 0)**, **b = (1, 2, 1)**:
 
-```text
-a · b      = 2·1 + 1·2 + 0·1     = 4
+<div class="tex" role="img" aria-label="a · b      = 2·1 + 1·2 + 0·1     = 4
 |a| |b|    = √5 · √6             = √30 ≈ 5.477
 cos θ      = 4 / 5.477           ≈ 0.7303
-θ          = arccos(0.7303)      ≈ 43.1°
-```
+θ          = arccos(0.7303)      ≈ 43.1°">
+\[
+\begin{aligned}
+a \cdot b &= 2 \cdot 1 + 1 \cdot 2 + 0 \cdot 1 &&= 4 \\
+\lvert a \rvert\, \lvert b \rvert &= \sqrt{5} \cdot \sqrt{6} &&= \sqrt{30} \approx 5.477 \\
+\cos\theta &= 4 \,/\, 5.477 &&\approx 0.7303 \\
+\theta &= \arccos(0.7303) &&\approx 43.1^\circ
+\end{aligned}
+\]
+</div>
 
 Three multiplies and two adds answer geometric questions. arccos returns **0° to 180°**: the angle has no sign.
 
@@ -198,9 +226,15 @@ Three multiplies and two adds answer geometric questions. arccos returns **0° t
 
 <img src="../../textbook/figures/vec-dot-sign.svg" alt="the sign of the dot product splits space into front and behind" style="height:220px">
 
-```text
-a · b > 0  ->  θ < 90°: b in FRONT of a      a · b = 0  ->  θ = 90°: perpendicular      a · b < 0  ->  θ > 90°: b BEHIND a
-```
+<div class="tex" role="img" aria-label="a · b &gt; 0  -&gt;  θ &lt; 90°: b in FRONT of a      a · b = 0  -&gt;  θ = 90°: perpendicular      a · b &lt; 0  -&gt;  θ &gt; 90°: b BEHIND a">
+\[
+\begin{aligned}
+a \cdot b &\gt 0 &&\Rightarrow\ \theta \lt 90^\circ\text{: } b \text{ in FRONT of } a \\
+a \cdot b &= 0 &&\Rightarrow\ \theta = 90^\circ\text{: perpendicular} \\
+a \cdot b &\lt 0 &&\Rightarrow\ \theta \gt 90^\circ\text{: } b \text{ BEHIND } a
+\end{aligned}
+\]
+</div>
 
 - (2, 1, 0) · (−1, 2, 1) = −2 + 2 + 0 = **0**: perpendicular
 - the drone faces `a`, the target is along `b`: fire only when `a · b > 0`
@@ -231,12 +265,19 @@ a · b > 0  ->  θ < 90°: b in FRONT of a      a · b = 0  ->  θ = 90°: perpe
   </g>
 </svg>
 
-```text
-u = (cos α, sin α) = (0.940, 0.342)              α = 20°
+<div class="tex" role="img" aria-label="u = (cos α, sin α) = (0.940, 0.342)              α = 20°
 v = (cos β, sin β) = (0.174, 0.985)              β = 80°
 u · v = cos α cos β + sin α sin β = cos(β − α)
-      = 0.163 + 0.337 = 0.500 = cos 60°
-```
+      = 0.163 + 0.337 = 0.500 = cos 60°">
+\[
+\begin{aligned}
+u &= (\cos\alpha,\ \sin\alpha) = (0.940,\ 0.342) && \alpha = 20^\circ \\
+v &= (\cos\beta,\ \sin\beta) = (0.174,\ 0.985) && \beta = 80^\circ \\
+u \cdot v &= \cos\alpha \cos\beta + \sin\alpha \sin\beta = \cos(\beta - \alpha) \\
+&= 0.163 + 0.337 = 0.500 = \cos 60^\circ
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -245,10 +286,15 @@ u · v = cos α cos β + sin α sin β = cos(β − α)
 
 <img src="../../textbook/figures/vecr-projection.svg" alt="u and v drawn in their own plane with v along the x axis and the angle theta between them; the shadow of u on v, length |u| cos theta = 1.633, is highlighted in green, and a dashed orange line rises from its end to the tip of u. Beside it four steps: the shadow is a right triangle's side of length |u| cos theta; replacing cos theta by the dot product gives (u . v) / |v|; the direction is v / |v|; length times direction is ((u . v) / (v . v)) v" style="height:330px">
 
-```text
-u-along = ( (u · v) / (v · v) ) v        v · v = |v|²: no square root
-if |v| = 1:  u-along = (u · v) v        u-across = u − u-along
-```
+<div class="tex" role="img" aria-label="u-along = ( (u · v) / (v · v) ) v        v · v = |v|²: no square root
+if |v| = 1:  u-along = (u · v) v        u-across = u − u-along">
+\[
+\begin{aligned}
+u_{\text{along}} &= \left( \frac{u \cdot v}{v \cdot v} \right) v && v \cdot v = \lvert v \rvert^2\text{: no square root} \\
+\text{if } \lvert v \rvert = 1\text{:}\quad u_{\text{along}} &= (u \cdot v)\, v && u_{\text{across}} = u - u_{\text{along}}
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -257,39 +303,55 @@ if |v| = 1:  u-along = (u · v) v        u-across = u − u-along
 
 For **u = (2, 1, 0)**, **v = (1, 2, 1)**: `u · v = 4`, `v · v = 6`, so the scale is `4/6 = 2/3`.
 
-```text
-u-along  = (2/3)(1, 2, 1)                   = (0.667, 1.333, 0.667)
-u-across = (2, 1, 0) − (0.667, 1.333, 0.667) = (1.333, −0.333, −0.667)
-```
+<div class="tex" role="img" aria-label="u-along  = (2/3)(1, 2, 1)                   = (0.667, 1.333, 0.667)
+u-across = (2, 1, 0) − (0.667, 1.333, 0.667) = (1.333, −0.333, −0.667)">
+\[
+\begin{aligned}
+u_{\text{along}} &= (2/3)(1,\ 2,\ 1) &&= (0.667,\ 1.333,\ 0.667) \\
+u_{\text{across}} &= (2,\ 1,\ 0) - (0.667,\ 1.333,\ 0.667) &&= (1.333,\ {-0.333},\ {-0.667})
+\end{aligned}
+\]
+</div>
 
 Check: `u-across · v` must be **0**:
 
-```text
-(4/3)(1) + (−1/3)(2) + (−2/3)(1) = 4/3 − 2/3 − 2/3 = 0
-```
+<div class="tex" role="img" aria-label="(4/3)(1) + (−1/3)(2) + (−2/3)(1) = 4/3 − 2/3 − 2/3 = 0">
+\[
+(4/3)(1) + ({-1/3})(2) + ({-2/3})(1) = 4/3 - 2/3 - 2/3 = 0
+\]
+</div>
 
 
 ---
 
 ## The cross product, by components
 
-```text
-a × b = ( ay bz − az by ,
+<div class="tex" role="img" aria-label="a × b = ( ay bz − az by ,
           az bx − ax bz ,
-          ax by − ay bx )
-```
+          ax by − ay bx )">
+\[
+a \times b = \begin{pmatrix} a_y b_z - a_z b_y \\ a_z b_x - a_x b_z \\ a_x b_y - a_y b_x \end{pmatrix}
+\]
+</div>
 
 For **a = (2, 1, 0)**, **b = (1, 2, 1)**:
 
-```text
-a × b = ( 1·1 − 0·2 , 0·1 − 2·1 , 2·2 − 1·1 ) = (1, −2, 3)
-```
+<div class="tex" role="img" aria-label="a × b = ( 1·1 − 0·2 , 0·1 − 2·1 , 2·2 − 1·1 ) = (1, −2, 3)">
+\[
+a \times b = (1 \cdot 1 - 0 \cdot 2,\ \ 0 \cdot 1 - 2 \cdot 1,\ \ 2 \cdot 2 - 1 \cdot 1) = (1,\ {-2},\ 3)
+\]
+</div>
 
 Check it is perpendicular to both; each dot must be **0**:
 
-```text
-(a × b) · a = 1·2 + (−2)·1 + 3·0 = 0      (a × b) · b = 1·1 + (−2)·2 + 3·1 = 0
-```
+<div class="tex" role="img" aria-label="(a × b) · a = 1·2 + (−2)·1 + 3·0 = 0      (a × b) · b = 1·1 + (−2)·2 + 3·1 = 0">
+\[
+\begin{aligned}
+(a \times b) \cdot a &= 1 \cdot 2 + ({-2}) \cdot 1 + 3 \cdot 0 = 0 \\
+(a \times b) \cdot b &= 1 \cdot 1 + ({-2}) \cdot 2 + 3 \cdot 1 = 0
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -310,11 +372,17 @@ Vector3 v2xv1 = Vector3.Cross(v2, v1);   // equals -v1xv2
 
 <img src="../../textbook/figures/vec-cross-area.svg" alt="the parallelogram spanned by a and b, area |a x b|" style="height:220px">
 
-```text
-|a × b| = |a| |b| sin θ = √(1 + 4 + 9) = √14 ≈ 3.742     parallelogram on a and b
+<div class="tex" role="img" aria-label="|a × b| = |a| |b| sin θ = √(1 + 4 + 9) = √14 ≈ 3.742     parallelogram on a and b
 triangle on a and b: half of it                  ≈ 1.871
-parallel: a × b = 0       (1, 2, 1) × (−2, −4, −2) = (0, 0, 0)
-```
+parallel: a × b = 0       (1, 2, 1) × (−2, −4, −2) = (0, 0, 0)">
+\[
+\begin{gathered}
+\lvert a \times b \rvert = \lvert a \rvert\, \lvert b \rvert \sin\theta = \sqrt{1 + 4 + 9} = \sqrt{14} \approx 3.742 \qquad \text{parallelogram on } a \text{ and } b \\
+\text{triangle on } a \text{ and } b\text{: half of it} \approx 1.871 \\
+\text{parallel: } a \times b = 0 \qquad (1,\ 2,\ 1) \times ({-2},\ {-4},\ {-2}) = (0,\ 0,\ 0)
+\end{gathered}
+\]
+</div>
 
 
 ---
@@ -323,10 +391,16 @@ parallel: a × b = 0       (1, 2, 1) × (−2, −4, −2) = (0, 0, 0)
 
 <img src="../../textbook/figures/vecr-face-normal.svg" alt="Left: the triangle P0 = (0,0,0), P1 = (2,0,0), P2 = (0,0,-2) with edges e1, e2, a counterclockwise winding arrow and the normal (0, 1, 0) pointing up. Right: P1 and P2 swapped, clockwise winding, normal (0, -1, 0) pointing down" style="height:300px">
 
-```text
-e1 = P1 − P0 = (2, 0, 0)     e2 = P2 − P0 = (0, 0, −2)
-e1 × e2 = (0·(−2) − 0·0, 0·0 − 2·(−2), 2·0 − 0·0) = (0, 4, 0)    normal (0, 1, 0), area 4/2 = 2
-```
+<div class="tex" role="img" aria-label="e1 = P1 − P0 = (2, 0, 0)     e2 = P2 − P0 = (0, 0, −2)
+e1 × e2 = (0·(−2) − 0·0, 0·0 − 2·(−2), 2·0 − 0·0) = (0, 4, 0)    normal (0, 1, 0), area 4/2 = 2">
+\[
+\begin{aligned}
+e_1 &= P_1 - P_0 = (2,\ 0,\ 0) \qquad e_2 = P_2 - P_0 = (0,\ 0,\ {-2}) \\
+e_1 \times e_2 &= \big(0 \cdot ({-2}) - 0 \cdot 0,\ \ 0 \cdot 0 - 2 \cdot ({-2}),\ \ 2 \cdot 0 - 0 \cdot 0\big) = (0,\ 4,\ 0) \\
+&\text{normal } (0,\ 1,\ 0),\ \text{area } 4/2 = 2
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -351,25 +425,43 @@ e1 × e2 = (0·(−2) − 0·0, 0·0 − 2·(−2), 2·0 − 0·0) = (0, 4, 0)  
 
 The **normal** n is perpendicular to the plane; X is on the plane when `X − P0` is perpendicular to n:
 
-```text
-n · (X − P0) = 0      that is      n · X = D,   D = n · P0
+<div class="tex" style="font-size:0.75em" role="img" aria-label="n · (X − P0) = 0      that is      n · X = D,   D = n · P0
 from three points A, B, C:   n = (B − A) × (C − A),   D = n · A
-A = (0, 2, 0), B = (1, 2, 0), C = (0, 6, −3):   n = (1, 0, 0) × (0, 4, −3) = (0, 3, 4),   D = 6
-```
+A = (0, 2, 0), B = (1, 2, 0), C = (0, 6, −3):   n = (1, 0, 0) × (0, 4, −3) = (0, 3, 4),   D = 6">
+\[
+\begin{gathered}
+n \cdot (X - P_0) = 0 \quad \text{that is} \quad n \cdot X = D,\ \ D = n \cdot P_0 \\
+\text{from three points } A, B, C\text{:} \quad n = (B - A) \times (C - A),\ \ D = n \cdot A \\
+A = (0,\ 2,\ 0),\ B = (1,\ 2,\ 0),\ C = (0,\ 6,\ {-3})\text{:} \\
+n = (1,\ 0,\ 0) \times (0,\ 4,\ {-3}) = (0,\ 3,\ 4),\ \ D = 6
+\end{gathered}
+\]
+</div>
 
 
 ---
 
 ## Distance: point to point, point to line
 
-```text
-point to point:   |Q − P| = √((Qx − Px)² + (Qy − Py)² + (Qz − Pz)²)
+<div class="tex" role="img" aria-label="point to point:   |Q − P| = √((Qx − Px)² + (Qy − Py)² + (Qz − Pz)²)
                   A = (1, 0, 2), R = (4, 0, −2):   |R − A| = |(3, 0, −4)| = 5
-
 point to line P0 + t d:   t = (P − P0) · d / (d · d)      the projection's scale
                           foot = P0 + t d                  the closest point of the line
-                          distance = |P − foot|            the across part's length
-```
+                          distance = |P − foot|            the across part's length">
+\[
+\begin{gathered}
+\text{point to point:} \quad \lvert Q - P \rvert = \sqrt{(Q_x - P_x)^2 + (Q_y - P_y)^2 + (Q_z - P_z)^2} \\
+A = (1,\ 0,\ 2),\ R = (4,\ 0,\ {-2})\text{:} \quad \lvert R - A \rvert = \lvert (3,\ 0,\ {-4}) \rvert = 5
+\end{gathered}
+\]
+\[
+\begin{aligned}
+\text{point to line } P_0 + t\,d\text{:} \quad t &= (P - P_0) \cdot d \,/\, (d \cdot d) && \text{the projection's scale} \\
+\text{foot} &= P_0 + t\,d && \text{the closest point of the line} \\
+\text{distance} &= \lvert P - \text{foot} \rvert && \text{the across part's length}
+\end{aligned}
+\]
+</div>
 
 P = **a = (2, 1, 0)**, line through the origin along **b = (1, 2, 1)**: `t = 4/6`, foot `(0.667, 1.333, 0.667)`, distance **1.528**.
 
@@ -395,16 +487,25 @@ Segment `P0 = (0, 0)` to `P1 = (4, 2)`, so `d = (4, 2)`, `d · d = 20`, and `t =
 
 Plane through `P0 = (0, 2, 0)` with normal `m = (0, 3, 4)`. First make the normal **unit**:
 
-```text
-|m| = √(0 + 9 + 16) = 5      n = (0, 0.6, 0.8)      D = n · P0 = 1.2
-```
+<div class="tex" role="img" aria-label="|m| = √(0 + 9 + 16) = 5      n = (0, 0.6, 0.8)      D = n · P0 = 1.2">
+\[
+\lvert m \rvert = \sqrt{0 + 9 + 16} = 5 \qquad n = (0,\ 0.6,\ 0.8) \qquad D = n \cdot P_0 = 1.2
+\]
+</div>
 
 Point `P = (1, 4, 3)`:
 
-```text
-signed distance   s = n · P − D = (0 + 2.4 + 2.4) − 1.2 = 3.6      positive: the side n points to
-closest point     P − s n = (1, 4 − 2.16, 3 − 2.88) = (1, 1.84, 0.12)    check: n · (1, 1.84, 0.12) = 1.2 = D
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="signed distance   s = n · P − D = (0 + 2.4 + 2.4) − 1.2 = 3.6      positive: the side n points to
+closest point     P − s n = (1, 4 − 2.16, 3 − 2.88) = (1, 1.84, 0.12)    check: n · (1, 1.84, 0.12) = 1.2 = D">
+\[
+\begin{aligned}
+\text{signed distance} \quad s &= n \cdot P - D = (0 + 2.4 + 2.4) - 1.2 = 3.6 \\
+&\text{positive: the side } n \text{ points to} \\
+\text{closest point} \quad P - s\,n &= (1,\ 4 - 2.16,\ 3 - 2.88) = (1,\ 1.84,\ 0.12) \\
+&\text{check: } n \cdot (1,\ 1.84,\ 0.12) = 1.2 = D
+\end{aligned}
+\]
+</div>
 
 `s > 0` in front, `s = 0` on the plane, `s < 0` behind: (1, 0, 0) gives −1.2. In code: HW2, EX2 and EX3.
 

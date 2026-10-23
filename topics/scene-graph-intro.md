@@ -18,7 +18,7 @@
   rotation about a circling axis, the aim as an angle read from the velocity, the flight as a translation,
   the throw, field and camera as parents, the catch as a change of parent, and Euler angles typed against
   the quaternion stored.
-  NEEDS:   tonight's two earlier topics (linear-algebra-recap: vectors, dot, atan2; rotation-recap: 2D
+  NEEDS:   the two L06 recap topics (linear-algebra-recap: vectors, dot, atan2; rotation-recap: 2D
            rotation, R_x, R_y, R_z, Rodrigues, Euler angles, quaternions). Homogeneous coordinates and
            affine maps come after this topic: the scene-graph topic (scene-graphs.md) and the affine topic
            write the same chains as products of 4x4 matrices.
@@ -52,6 +52,7 @@
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
   backtick names with underscores. No <small> on math. Paths are relative to the
   lecture page that mounts this topic (lectures/LNN-slug/index.html).
+  2026-10-22: display formulas typeset with MathJax (lib/deck-math.js); the ASCII form kept as each block's aria-label.
 -->
 
 ### The scene graph and hierarchical modeling
@@ -80,10 +81,15 @@ An operator is written **to the left** of the point it acts on: `T V` is "transl
 
 `V = (3, 8)`, translate `T(−1, −5)`, scale `S(3, 0.5)`:
 
-```text
-   T(−1,−5) S(3, 0.5) V :   (3, 8)  ─S→  (9, 4)    ─T→  (8, −1)      scale first, then translate
-   S(3, 0.5) T(−1,−5) V :   (3, 8)  ─T→  (2, 3)    ─S→  (6, 1.5)     translate first, then scale
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="   T(−1,−5) S(3, 0.5) V :   (3, 8)  ─S→  (9, 4)    ─T→  (8, −1)      scale first, then translate
+   S(3, 0.5) T(−1,−5) V :   (3, 8)  ─T→  (2, 3)    ─S→  (6, 1.5)     translate first, then scale">
+\[
+\begin{aligned}
+T(-1, -5)\, S(3, 0.5)\, V:&\quad (3, 8) \xrightarrow{\;S\;} (9, 4) \xrightarrow{\;T\;} (8, {-1}) && \text{scale first, then translate} \\
+S(3, 0.5)\, T(-1, -5)\, V:&\quad (3, 8) \xrightarrow{\;T\;} (2, 3) \xrightarrow{\;S\;} (6, 1.5) && \text{translate first, then scale}
+\end{aligned}
+\]
+</div>
 
 - read right to left: the operator **next to the point** acts **first**
 - same two operators, different order, different point: `T S ≠ S T`
@@ -97,11 +103,11 @@ An operator is written **to the left** of the point it acts on: `T V` is "transl
 
 To undo "translate, then scale", undo the **scale first**, then the translation:
 
-```text
-   (S T)⁻¹ = T⁻¹ S⁻¹
-
-   (6, 1.5)  ─S(1/3, 2)→  (2, 3)  ─T(1, 5)→  (3, 8)          back where it started
-```
+<div class="tex" role="img" aria-label="   (S T)⁻¹ = T⁻¹ S⁻¹
+   (6, 1.5)  ─S(1/3, 2)→  (2, 3)  ─T(1, 5)→  (3, 8)          back where it started">
+\[ (S\,T)^{-1} = T^{-1}\, S^{-1} \]
+\[ (6, 1.5) \xrightarrow{\;S(1/3,\ 2)\;} (2, 3) \xrightarrow{\;T(1,\ 5)\;} (3, 8) \qquad \text{back where it started} \]
+</div>
 
 Shoes go on after socks and come off before them.
 
@@ -114,12 +120,17 @@ Shoes go on after socks and come off before them.
 
 `R(θ)` turns about the **origin**. To turn about a point `pt`, move `pt` to the origin, turn, move back:
 
-```text
-   R_pt(θ) = T(pt) R(θ) T(−pt)          p' = pt + R(θ)(p − pt)
-
+<div class="tex" style="font-size:0.7em" role="img" aria-label="   R_pt(θ) = T(pt) R(θ) T(−pt)          p' = pt + R(θ)(p − pt)
    p = (6, 3), pt = (8, 3), θ = 90°:   (6, 3) ─T(−pt)→ (−2, 0) ─R(90°)→ (0, −2) ─T(pt)→ (8, 1)
-   about the origin instead:           R(90°)(6, 3) = (−3, 6), the object flies off
-```
+   about the origin instead:           R(90°)(6, 3) = (−3, 6), the object flies off">
+\[ R_{p_t}(\theta) = T(p_t)\, R(\theta)\, T(-p_t) \qquad p' = p_t + R(\theta)\,(p - p_t) \]
+\[
+\begin{aligned}
+p = (6, 3),\ p_t = (8, 3),\ \theta = 90^\circ:&\quad (6, 3) \xrightarrow{\;T(-p_t)\;} ({-2}, 0) \xrightarrow{\;R(90^\circ)\;} (0, {-2}) \xrightarrow{\;T(p_t)\;} (8, 1) \\
+\text{about the origin instead:}&\quad R(90^\circ)\,(6, 3) = ({-3}, 6),\ \text{the object flies off}
+\end{aligned}
+\]
+</div>
 
 <img src="../../topics/media/css451/sung-ch09-s16.webp" alt="Sung's figure: a rectangle moved by T(−8,−3) so its corner pr is at the origin, rotated 45 degrees, and moved back by T(8,3), so it turns about its corner" style="height:220px">
 
@@ -169,12 +180,17 @@ Shoes go on after socks and come off before them.
 
 Each node stores three things, applied **scale first, then rotate, then translate**:
 
-```text
-   local(p) = t + R(s ⊙ p)                s ⊙ p: each coordinate times its own scale
-
+<div class="tex" role="img" aria-label="   local(p) = t + R(s ⊙ p)                s ⊙ p: each coordinate times its own scale
    s = (2, 1), R = 90°, t = (3, 0),  p = (1, 1):
-      s ⊙ p = (2, 1)  ─R(90°)→  (−1, 2)  ─+t→  (2, 2)
-```
+      s ⊙ p = (2, 1)  ─R(90°)→  (−1, 2)  ─+t→  (2, 2)">
+\[ \text{local}(p) = t + R(s \odot p) \qquad s \odot p:\ \text{each coordinate times its own scale} \]
+\[
+\begin{aligned}
+&s = (2, 1),\ R = 90^\circ,\ t = (3, 0),\ p = (1, 1): \\
+&\qquad s \odot p = (2, 1) \xrightarrow{\;R(90^\circ)\;} ({-1}, 2) \xrightarrow{\;+t\;} (2, 2)
+\end{aligned}
+\]
+</div>
 
 | | Unity `Transform` | three.js `Object3D` |
 | --- | --- | --- |
@@ -189,13 +205,19 @@ Each node stores three things, applied **scale first, then rotate, then translat
 
 A point of a node reaches the world through **every ancestor**, nearest first:
 
-```text
-   world(p) = world_parent( local(p) )
-
+<div class="tex" role="img" aria-label="   world(p) = world_parent( local(p) )
    base  → world:   local_base(p)
    arm   → world:   local_base( local_arm(p) )
-   hand  → world:   local_base( local_arm( local_hand(p) ) )
-```
+   hand  → world:   local_base( local_arm( local_hand(p) ) )">
+\[ \text{world}(p) = \text{world}_{\text{parent}}\big(\text{local}(p)\big) \]
+\[
+\begin{aligned}
+\text{base} \to \text{world}:&\quad \text{local}_{\text{base}}(p) \\
+\text{arm} \to \text{world}:&\quad \text{local}_{\text{base}}\big(\text{local}_{\text{arm}}(p)\big) \\
+\text{hand} \to \text{world}:&\quad \text{local}_{\text{base}}\Big(\text{local}_{\text{arm}}\big(\text{local}_{\text{hand}}(p)\big)\Big)
+\end{aligned}
+\]
+</div>
 
 - each part is authored **once**, in its parent's frame; turn the base and everything below it turns
 - read right to left: the hand's own local transform acts **first**, the root's **last**
@@ -213,10 +235,15 @@ A point of a node reaches the world through **every ancestor**, nearest first:
 
 Bend the elbow 90°; **nothing else changes**:
 
-```text
-   hand origin in the base's frame:  (1, 0) + R(90°)(1, 0) = (1, 1)
-   in the world:                     (2, 0) + R(90°)(1, 1) = (2, 0) + (−1, 1) = (1, 1)
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="   hand origin in the base's frame:  (1, 0) + R(90°)(1, 0) = (1, 1)
+   in the world:                     (2, 0) + R(90°)(1, 1) = (2, 0) + (−1, 1) = (1, 1)">
+\[
+\begin{aligned}
+\text{hand origin in the base's frame:}&\quad (1, 0) + R(90^\circ)\,(1, 0) = (1, 1) \\
+\text{in the world:}&\quad (2, 0) + R(90^\circ)\,(1, 1) = (2, 0) + ({-1}, 1) = (1, 1)
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -292,7 +319,7 @@ function buildArm(baseNode, arm, hand) {
 
 ## The ball's frames, nested
 
-| frame | its parent | moved by | tonight's idea |
+| frame | its parent | moved by | the idea |
 | --- | --- | --- | --- |
 | object (the mesh) | spin axis | spin φ about the ball's long axis | rotation about a fixed axis |
 | spin axis | velocity | wobble: a 3° tilt about a circling axis | rotation about any axis |
@@ -303,49 +330,69 @@ function buildArm(baseNode, arm, hand) {
 
 A camera is one more node: on a tripod in the field, or riding a frame of the ball.
 
+<a href="../../lib/demo.html?demo=football&amp;controls=step:1" target="_blank" rel="noopener">Open the spiral pass in a new tab ↗</a>
+
 
 ---
 
 ## Spin and wobble: rotations about axes
 
-**Step 2, spin:** a turn about the ball's own long axis (its z)
+**Step 2, spin:** a turn about the ball's own long axis (its z) <a href="../../lib/demo.html?demo=football&amp;controls=step:2" target="_blank" rel="noopener">open step 2 ↗</a>
 
-```text
-   φ = 2π · (rpm / 60) · t          600 rpm: 10 turns a second, 60° per frame at 60 frames a second
-```
+<div class="tex" role="img" aria-label="   φ = 2π · (rpm / 60) · t          600 rpm: 10 turns a second, 60° per frame at 60 frames a second">
+\[ \varphi = 2\pi \cdot \frac{\text{rpm}}{60} \cdot t \]
+\[ \text{600 rpm: 10 turns a second, } 60^\circ \text{ per frame at 60 frames a second} \]
+</div>
 
-**Step 3, wobble:** the nose tilts 3° toward a direction ψ that circles twice a second
+**Step 3, wobble:** the nose tilts 3° toward a direction ψ that circles twice a second <a href="../../lib/demo.html?demo=football&amp;controls=step:3" target="_blank" rel="noopener">open step 3 ↗</a>
 
-```text
-   a turn by β = 3° about the axis (cos ψ, sin ψ, 0)        Rodrigues, with an axis that moves
-   built as R_z(ψ) R_x(β) R_z(−ψ):  turn the axis onto x, tilt about x, turn back
-```
+<div class="tex" role="img" aria-label="   a turn by β = 3° about the axis (cos ψ, sin ψ, 0)        Rodrigues, with an axis that moves
+   built as R_z(ψ) R_x(β) R_z(−ψ):  turn the axis onto x, tilt about x, turn back">
+\[
+\begin{aligned}
+&\text{a turn by } \beta = 3^\circ \text{ about the axis } (\cos\psi,\ \sin\psi,\ 0) \\
+&\qquad \text{Rodrigues, with an axis that moves} \\
+&\text{built as } R_z(\psi)\, R_x(\beta)\, R_z(-\psi): \\
+&\qquad \text{turn the axis onto } x \text{, tilt about } x \text{, turn back}
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## Aim and fly: an angle from a vector, then a translation
 
-**Step 4, aim:** the nose follows the velocity, `v(t) = (0, v sin α − g t, v cos α)`
+**Step 4, aim:** the nose follows the velocity, `v(t) = (0, v sin α − g t, v cos α)` <a href="../../lib/demo.html?demo=football&amp;controls=step:4" target="_blank" rel="noopener">open step 4 ↗</a>
 
-```text
-   climb angle θ = atan2(vy, vz)        30° at release, 0° at the top, −31.4° at the catch
-   turn about x by −θ                   a positive turn about x takes +z toward −y
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="   climb angle θ = atan2(vy, vz)        30° at release, 0° at the top, −31.4° at the catch
+   turn about x by −θ                   a positive turn about x takes +z toward −y">
+\[
+\begin{aligned}
+&\text{climb angle } \theta = \text{atan2}(v_y, v_z) && 30^\circ \text{ at release, } 0^\circ \text{ at the top, } {-31.4^\circ} \text{ at the catch} \\
+&\text{turn about } x \text{ by } {-\theta} && \text{a positive turn about } x \text{ takes } {+z} \text{ toward } {-y}
+\end{aligned}
+\]
+</div>
 
-**Step 5, flight:** a pure translation, along a parabola in the throw's vertical plane
+**Step 5, flight:** a pure translation, along a parabola in the throw's vertical plane <a href="../../lib/demo.html?demo=football&amp;controls=step:5" target="_blank" rel="noopener">open step 5 ↗</a>
 
-```text
-   y(t) = v sin α · t − ½ g t²,   z(t) = v cos α · t        22 m/s at 30°, g = 9.808 m/s²
-   top: 6.17 m above the release, at t = 1.12 s
-```
+<div class="tex" style="font-size:0.75em" role="img" aria-label="   y(t) = v sin α · t − ½ g t²,   z(t) = v cos α · t        22 m/s at 30°, g = 9.808 m/s²
+   top: 6.17 m above the release, at t = 1.12 s">
+\[
+\begin{aligned}
+&y(t) = v \sin\alpha \cdot t - \tfrac{1}{2}\, g\, t^2, \quad z(t) = v \cos\alpha \cdot t && 22\ \text{m/s at } 30^\circ,\ g = 9.808\ \text{m/s}^2 \\
+&\text{top: } 6.17\ \text{m above the release, at } t = 1.12\ \text{s}
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## The catch: a change of parent
 
-**Step 8:** at `t = 2.30 s` the ball stops being a child of the throw and becomes a child of the **cart**
+<a href="../../lib/demo.html?demo=football&amp;controls=step:8" target="_blank" rel="noopener">Step 8 ↗</a>: at `t = 2.30 s` the ball stops being a child of the throw and becomes a child of the **cart**
 
 - its world pose must not jump: its new local transform is its current world placement **seen from the cart's frame**
 - afterwards it rides the cart: the cart moves, the ball follows
@@ -356,7 +403,7 @@ A camera is one more node: on a tripod in the field, or riding a frame of the ba
 
 ## What you type, what is stored
 
-**Step 14, the Stored tab:**
+<a href="../../lib/demo.html?demo=football&amp;controls=step:14" target="_blank" rel="noopener">Step 14 ↗</a>, the Stored tab:
 
 - **typed:** Euler angles, X (pitch), Y (heading), Z (spin), applied Z, then X, then Y; the spin angle keeps growing
 - **read back:** Unity's `eulerAngles`, recovered from the rotation and wrapped to [0°, 360°)

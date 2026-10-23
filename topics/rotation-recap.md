@@ -36,6 +36,7 @@
            and sung-ch08-s20.webp (slides 18 and 20 of Kelvin Sung's CSS 451 Chapter 8 deck, recovered
            in old/CSS-451/html-recovered/slides/).
   READING: ../../textbook/rotation.html.
+  2026-10-22: display formulas typeset with MathJax (lib/deck-math.js); the ASCII form kept as each block's aria-label.
   SOURCE:  derived 2026-10-20 from rotation-quaternions.md (L04) and Sung's CSS 451 Chapter 8 slides
            (Sung, Shirley, Baer, Essentials of Interactive Computer Graphics).
 
@@ -43,8 +44,9 @@
   determinant slide, Rodrigues as a matrix, and the slerp/nlerp/long-way demo; the Euler table names the engine's
   product and its gimbal rings (the two readings in the note). 36 slides, ~41 min.
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
-  follow "Note:". Math is plain unicode text or fenced ```text blocks (no
-  KaTeX plugin). Never two "_" on one markdown line outside a code fence;
+  follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax
+  (lib/deck-math.js; TeX inside, ASCII as aria-label, no blank line inside); tables stay
+  fenced ```text. Never two "_" on one markdown line outside a code fence;
   backtick names with underscores. No <small> on math. Paths are relative to the
   lecture page that mounts this topic (lectures/LNN-slug/index.html).
 -->
@@ -81,14 +83,23 @@ A rotation keeps a rigid body rigid:
 
 <img src="../../textbook/figures/rot-2d.svg" alt="the point (2, 1) rotated by 30 degrees about the origin lands at (1.232, 1.866); its length stays 2.236" style="height:210px">
 
-```text
-a point at radius r and angle φ:        x = r cos φ             y = r sin φ
+<div class="tex" style="font-size:0.74em" role="img" aria-label="a point at radius r and angle φ:        x = r cos φ             y = r sin φ
 turn it by θ, so its angle is φ + θ:    x' = r cos(φ + θ)       y' = r sin(φ + θ)
 the angle sums:    cos(φ + θ) = cos φ cos θ − sin φ sin θ
                    sin(φ + θ) = sin φ cos θ + cos φ sin θ
 multiply by r:     x' = x cos θ − y sin θ
-                   y' = x sin θ + y cos θ
-```
+                   y' = x sin θ + y cos θ">
+\[
+\begin{aligned}
+\text{a point at radius } r \text{ and angle } \varphi\text{:} &\quad x = r\cos\varphi, \qquad y = r\sin\varphi \\
+\text{turn it by } \theta\text{, so its angle is } \varphi + \theta\text{:} &\quad x' = r\cos(\varphi + \theta), \qquad y' = r\sin(\varphi + \theta) \\
+\text{the angle sums:} &\quad \cos(\varphi + \theta) = \cos\varphi\cos\theta - \sin\varphi\sin\theta \\
+&\quad \sin(\varphi + \theta) = \sin\varphi\cos\theta + \cos\varphi\sin\theta \\
+\text{multiply by } r\text{:} &\quad x' = x\cos\theta - y\sin\theta \\
+&\quad y' = x\sin\theta + y\cos\theta
+\end{aligned}
+\]
+</div>
 
 Positive θ turns counter-clockwise, x toward y. The identities: [trig cheat sheet](../../reference/trig-cheat-sheet.html), Sum and difference.
 
@@ -100,10 +111,16 @@ Positive θ turns counter-clockwise, x toward y. The identities: [trig cheat she
 <img src="../../topics/media/css451/sung-ch08-s18.webp" alt="Sung's slide: the operator R(45 degrees) turns the vertex (8, 4) to (2.83, 8.49) along a circle about the origin" style="height:340px">
 <span class="credit">K. Sung, CSS 451 slides, ch. 8 (Sung, Shirley, Baer, Essentials of Interactive Computer Graphics)</span>
 
-```text
-x' = 8 cos 45° − 4 sin 45° = (8 − 4)(0.7071) = 2.828       length before: √(8² + 4²) = 8.944
-y' = 8 sin 45° + 4 cos 45° = (8 + 4)(0.7071) = 8.485       length after:  √(2.828² + 8.485²) = 8.944
-```
+<div class="tex" style="font-size:0.7em" role="img" aria-label="x' = 8 cos 45° − 4 sin 45° = (8 − 4)(0.7071) = 2.828       length before: √(8² + 4²) = 8.944
+y' = 8 sin 45° + 4 cos 45° = (8 + 4)(0.7071) = 8.485       length after:  √(2.828² + 8.485²) = 8.944">
+\[
+\begin{aligned}
+x' &= 8\cos 45^\circ - 4\sin 45^\circ = (8 - 4)(0.7071) = 2.828 \\
+y' &= 8\sin 45^\circ + 4\cos 45^\circ = (8 + 4)(0.7071) = 8.485 \\
+&\text{length before: } \sqrt{8^2 + 4^2} = 8.944, \quad \text{after: } \sqrt{2.828^2 + 8.485^2} = 8.944
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -129,19 +146,23 @@ The same `R(45°)` on each corner: `(5, 2)` → `(2.121, 4.950)` and `(8, 2)` �
 
 ## Three axis rotations in 3D
 
-```text
-           [ cos θ   −sin θ    0 ]
+<div class="tex" role="img" aria-label="           [ cos θ   −sin θ    0 ]
   R_z(θ) = [ sin θ    cos θ    0 ]        turns x toward y
            [   0        0      1 ]
-
            [ 1     0        0    ]
   R_x(θ) = [ 0   cos θ   −sin θ  ]        turns y toward z
            [ 0   sin θ    cos θ  ]
-
            [  cos θ   0   sin θ ]
   R_y(θ) = [    0     1     0   ]        turns z toward x, so x tips toward −z
-           [ −sin θ   0   cos θ ]
-```
+           [ −sin θ   0   cos θ ]">
+\[
+\begin{aligned}
+R_z(\theta) &= \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix} && \text{turns } x \text{ toward } y \\[4pt]
+R_x(\theta) &= \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\theta & -\sin\theta \\ 0 & \sin\theta & \cos\theta \end{bmatrix} && \text{turns } y \text{ toward } z \\[4pt]
+R_y(\theta) &= \begin{bmatrix} \cos\theta & 0 & \sin\theta \\ 0 & 1 & 0 \\ -\sin\theta & 0 & \cos\theta \end{bmatrix} && \text{turns } z \text{ toward } x\text{, so } x \text{ tips toward } {-z}
+\end{aligned}
+\]
+</div>
 
 - each is the 2D rotation, placed in the plane across its axis
 - the axis's own row and column are 0 except a 1 on the diagonal: that axis does not move
@@ -154,13 +175,21 @@ The same `R(45°)` on each corner: `(5, 2)` → `(2.121, 4.950)` and `(8, 2)` �
 
 <img src="../../textbook/figures/rot-noncommute.svg" alt="an airplane turned 90 degrees about x then 90 about y, and 90 about y then 90 about x: the final poses differ" style="height:230px">
 
-```text
-R_x(90°) = [ 1 0  0 ]     R_y(90°) = [  0 0 1 ]
+<div class="tex" role="img" aria-label="R_x(90°) = [ 1 0  0 ]     R_y(90°) = [  0 0 1 ]
            [ 0 0 −1 ]                [  0 1 0 ]
            [ 0 1  0 ]                [ −1 0 0 ]
 R_x(90°) R_y(90°) (1, 0, 0):    R_y first: (0, 0, −1),    then R_x: (0, 1, 0)
-R_y(90°) R_x(90°) (1, 0, 0):    R_x first: (1, 0, 0),     then R_y: (0, 0, −1)
-```
+R_y(90°) R_x(90°) (1, 0, 0):    R_x first: (1, 0, 0),     then R_y: (0, 0, −1)">
+\[
+R_x(90^\circ) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & -1 \\ 0 & 1 & 0 \end{bmatrix} \qquad R_y(90^\circ) = \begin{bmatrix} 0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0 \end{bmatrix}
+\]
+\[
+\begin{aligned}
+R_x(90^\circ)\,R_y(90^\circ)\,(1, 0, 0)\text{:} &\quad R_y \text{ first: } (0, 0, {-1}), \qquad \text{then } R_x\text{: } (0, 1, 0) \\
+R_y(90^\circ)\,R_x(90^\circ)\,(1, 0, 0)\text{:} &\quad R_x \text{ first: } (1, 0, 0), \qquad \text{then } R_y\text{: } (0, 0, {-1})
+\end{aligned}
+\]
+</div>
 
 In `R2 R1 v` the **rightmost** matrix acts first. 2D turns commute (the angles add); 3D turns about different axes do not.
 
@@ -191,14 +220,25 @@ Turn `v` by `θ` about a **unit** axis `n` (right-hand rule: thumb along `n`, th
 
 ## Step 1: split v along and across the axis
 
-```text
-v-par  = (v · n) n          the projection of v onto the unit axis: the along part
+<div class="tex" style="font-size:0.7em" role="img" aria-label="v-par  = (v · n) n          the projection of v onto the unit axis: the along part
 v-perp = v − v-par          what is left: the across part, perpendicular to n
-
 v · n  = 1(0) + 0.6(1) + 0.3(0) = 0.6
 v-par  = 0.6 (0, 1, 0) = (0, 0.6, 0)
-v-perp = (1, 0.6, 0.3) − (0, 0.6, 0) = (1, 0, 0.3)          check: v-perp · n = 0
-```
+v-perp = (1, 0.6, 0.3) − (0, 0.6, 0) = (1, 0, 0.3)          check: v-perp · n = 0">
+\[
+\begin{aligned}
+v_\parallel &= (v \cdot n)\, n && \text{the projection of } v \text{ onto the unit axis: the along part} \\
+v_\perp &= v - v_\parallel && \text{what is left: the across part, perpendicular to } n
+\end{aligned}
+\]
+\[
+\begin{aligned}
+v \cdot n &= 1(0) + 0.6(1) + 0.3(0) = 0.6 \\
+v_\parallel &= 0.6\,(0, 1, 0) = (0, 0.6, 0) \\
+v_\perp &= (1, 0.6, 0.3) - (0, 0.6, 0) = (1, 0, 0.3) && \text{check: } v_\perp \cdot n = 0
+\end{aligned}
+\]
+</div>
 
 - **step 2**: `v-par` lies on the axis, and points on the axis do not move: `v-par` stays `(0, 0.6, 0)`
 
@@ -207,13 +247,21 @@ v-perp = (1, 0.6, 0.3) − (0, 0.6, 0) = (1, 0, 0.3)          check: v-perp · n
 
 ## Step 3: a second axis in the turning plane, w = n × v
 
-```text
-w = n × v = (1·0.3 − 0·0.6,  0·1 − 0·0.3,  0·0.6 − 1·1) = (0.3, 0, −1)
-
+<div class="tex" style="font-size:0.7em" role="img" aria-label="w = n × v = (1·0.3 − 0·0.6,  0·1 − 0·0.3,  0·0.6 − 1·1) = (0.3, 0, −1)
 why n × v and n × v-perp are the same:   n × v = n × v-par + n × v-perp = 0 + n × v-perp
 w is perpendicular to n and to v-perp:   w · n = 0          w · v-perp = 0.3(1) + 0 + (−1)(0.3) = 0
-w is as long as v-perp:                  |w| = |n| |v-perp| sin 90° = |v-perp| = 1.044
-```
+w is as long as v-perp:                  |w| = |n| |v-perp| sin 90° = |v-perp| = 1.044">
+\[
+w = n \times v = (1 \cdot 0.3 - 0 \cdot 0.6,\ \ 0 \cdot 1 - 0 \cdot 0.3,\ \ 0 \cdot 0.6 - 1 \cdot 1) = (0.3, 0, {-1})
+\]
+\[
+\begin{aligned}
+&\text{why } n \times v \text{ and } n \times v_\perp \text{ are the same: } \ n \times v = n \times v_\parallel + n \times v_\perp = 0 + n \times v_\perp \\
+&w \text{ is perpendicular to } n \text{ and to } v_\perp\text{: } \ w \cdot n = 0, \quad w \cdot v_\perp = 0.3(1) + 0 + ({-1})(0.3) = 0 \\
+&w \text{ is as long as } v_\perp\text{: } \ |w| = |n|\,|v_\perp| \sin 90^\circ = |v_\perp| = 1.044
+\end{aligned}
+\]
+</div>
 
 `v-perp` and `w`: two perpendicular arrows of the **same length**, both across `n`. They are the x and y axes of a little 2D picture.
 
@@ -226,23 +274,33 @@ w is as long as v-perp:                  |w| = |n| |v-perp| sin 90° = |v-perp| 
 
 In 2D, the x axis turned by θ is `cos θ (1, 0) + sin θ (0, 1)`. In the plane, `v-perp` plays x and `w` plays y:
 
-```text
-v-perp' = cos θ v-perp + sin θ w = 0.866 (1, 0, 0.3) + 0.5 (0.3, 0, −1) = (1.016, 0, −0.240)
-```
+<div class="tex" role="img" aria-label="v-perp' = cos θ v-perp + sin θ w = 0.866 (1, 0, 0.3) + 0.5 (0.3, 0, −1) = (1.016, 0, −0.240)">
+\[
+v_\perp' = \cos\theta\, v_\perp + \sin\theta\, w = 0.866\,(1, 0, 0.3) + 0.5\,(0.3, 0, {-1}) = (1.016, 0, {-0.240})
+\]
+</div>
 
 
 ---
 
 ## Step 5: add back, then simplify
 
-```text
-v' = v-par + v-perp'
+<div class="tex" style="font-size:0.7em" role="img" aria-label="v' = v-par + v-perp'
    = (v · n) n  +  cos θ (v − (v · n) n)  +  sin θ (n × v)          substitute v-perp and w
    = cos θ v  +  (1 − cos θ)(v · n) n  +  sin θ (n × v)              collect the (v · n) n terms
-
 worked:  v' = (0, 0.6, 0) + (1.016, 0, −0.240) = (1.016, 0.6, −0.240)
-the library's R_y(30°) v = (1.016, 0.6, −0.240)
-```
+the library's R_y(30°) v = (1.016, 0.6, −0.240)">
+\[
+\begin{aligned}
+v' &= v_\parallel + v_\perp' \\
+   &= (v \cdot n)\, n + \cos\theta\, \big(v - (v \cdot n)\, n\big) + \sin\theta\, (n \times v) && \text{substitute } v_\perp \text{ and } w \\
+   &= \cos\theta\, v + (1 - \cos\theta)(v \cdot n)\, n + \sin\theta\, (n \times v) && \text{collect the } (v \cdot n)\, n \text{ terms}
+\end{aligned}
+\]
+\[
+\text{worked: } v' = (0, 0.6, 0) + (1.016, 0, {-0.240}) = (1.016, 0.6, {-0.240}) = R_y(30^\circ)\, v
+\]
+</div>
 
 **Rodrigues' formula**: one dot, one cross, three scalings, no matrix.
 
@@ -251,14 +309,23 @@ the library's R_y(30°) v = (1.016, 0.6, −0.240)
 
 ## Three checks
 
-```text
-θ = 0:          cos 0 = 1, sin 0 = 0
+<div class="tex" style="font-size:0.74em" role="img" aria-label="θ = 0:          cos 0 = 1, sin 0 = 0
                 v' = v + 0 + 0 = v                                   no turn, no change
 v along n:      v = a n,  so n × v = 0  and  (v · n) n = v
                 v' = cos θ v + (1 − cos θ) v + 0 = v                  the axis stays put
 n = (0, 0, 1):  v · n = z,   n × v = (−y, x, 0)
-                v' = (x cos θ − y sin θ,  x sin θ + y cos θ,  z)      the rows of R_z(θ)
-```
+                v' = (x cos θ − y sin θ,  x sin θ + y cos θ,  z)      the rows of R_z(θ)">
+\[
+\begin{aligned}
+\theta = 0\text{:} &\quad \cos 0 = 1, \ \sin 0 = 0 \\
+&\quad v' = v + 0 + 0 = v && \text{no turn, no change} \\
+v \text{ along } n\text{:} &\quad v = a\,n, \text{ so } n \times v = 0 \text{ and } (v \cdot n)\, n = v \\
+&\quad v' = \cos\theta\, v + (1 - \cos\theta)\, v + 0 = v && \text{the axis stays put} \\
+n = (0, 0, 1)\text{:} &\quad v \cdot n = z, \qquad n \times v = ({-y}, x, 0) \\
+&\quad v' = (x\cos\theta - y\sin\theta,\ \ x\sin\theta + y\cos\theta,\ \ z) && \text{the rows of } R_z(\theta)
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -267,11 +334,19 @@ n = (0, 0, 1):  v · n = z,   n × v = (−y, x, 0)
 
 `n = (1, 1, 1)/√3 = (0.577, 0.577, 0.577)`, `θ = 120°` (cos θ = −0.5, sin θ = 0.866, 1 − cos θ = 1.5), `v = (1, 0, 0)`:
 
-```text
-v · n = 0.577          (v · n) n = (0.333, 0.333, 0.333)          n × v = (0, 0.577, −0.577)
+<div class="tex" style="font-size:0.74em" role="img" aria-label="v · n = 0.577          (v · n) n = (0.333, 0.333, 0.333)          n × v = (0, 0.577, −0.577)
 v' = −0.5 (1, 0, 0)  +  1.5 (0.333, 0.333, 0.333)  +  0.866 (0, 0.577, −0.577)
-   = (−0.5 + 0.5 + 0,   0 + 0.5 + 0.5,   0 + 0.5 − 0.5) = (0, 1, 0)
-```
+   = (−0.5 + 0.5 + 0,   0 + 0.5 + 0.5,   0 + 0.5 − 0.5) = (0, 1, 0)">
+\[
+v \cdot n = 0.577, \qquad (v \cdot n)\, n = (0.333, 0.333, 0.333), \qquad n \times v = (0, 0.577, {-0.577})
+\]
+\[
+\begin{aligned}
+v' &= {-0.5}\,(1, 0, 0) + 1.5\,(0.333, 0.333, 0.333) + 0.866\,(0, 0.577, {-0.577}) \\
+&= ({-0.5} + 0.5 + 0,\ \ 0 + 0.5 + 0.5,\ \ 0 + 0.5 - 0.5) = (0, 1, 0)
+\end{aligned}
+\]
+</div>
 
 - the same turn sends y to z and z to x: it **cycles the three axes**
 - it is the matrix `R_x(90°) R_y(90°)` of the order slide: two quarter turns are one 120° turn about the diagonal
@@ -367,11 +442,17 @@ The order is a convention: (20, 45, 10) under the two orders gives poses 15.2° 
 
 A **gimbal** turns about the line through its two pins. Nest three: three Euler angles. Unity: `Y` outer, `X` middle, `Z` inner. The outer axis is fixed to the **world**; the inner axis is fixed to the **airplane** (its nose), so the middle turn carries it:
 
-```text
-R_x(x) ẑ = (0, -sin x, cos x)     (the outer turn y spins both together, so take y = 0)
+<div class="tex" style="font-size:0.66em" role="img" aria-label="R_x(x) ẑ = (0, -sin x, cos x)     (the outer turn y spins both together, so take y = 0)
 x = 30°:  (0, -0.5, 0.866)        60° from ŷ: a distinct direction
-x = 90°:  (0, -1, 0)              along ŷ: the airplane's nose axis lies on the world's ŷ
-```
+x = 90°:  (0, -1, 0)              along ŷ: the airplane's nose axis lies on the world's ŷ">
+\[
+\begin{aligned}
+R_x(x)\,\hat z &= (0, {-\sin x}, \cos x) && \text{(the outer turn } y \text{ spins both together, so take } y = 0\text{)} \\
+x = 30^\circ\text{:} &\quad (0, {-0.5}, 0.866) && 60^\circ \text{ from } \hat y\text{: a distinct direction} \\
+x = 90^\circ\text{:} &\quad (0, {-1}, 0) && \text{along } \hat y\text{: the airplane's nose axis lies on the world's } \hat y
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -424,18 +505,29 @@ pitch x      y         z
 
 Four numbers, written with three imaginary units:
 
-```text
-q = w + x i + y j + z k          stored as (x, y, z, w) in Unity and three.js
-w: the scalar part               (x, y, z): the vector part, written qv
-```
+<div class="tex" role="img" aria-label="q = w + x i + y j + z k          stored as (x, y, z, w) in Unity and three.js
+w: the scalar part               (x, y, z): the vector part, written qv">
+\[
+\begin{aligned}
+q &= w + x\,i + y\,j + z\,k && \text{stored as } (x, y, z, w) \text{ in Unity and three.js} \\
+w&\text{: the scalar part} && (x, y, z)\text{: the vector part, written } q_v
+\end{aligned}
+\]
+</div>
 
 Hamilton's rules for the units, carved into Broom Bridge, Dublin, on 16 October 1843:
 
-```text
-i² = j² = k² = ijk = −1
+<div class="tex" role="img" aria-label="i² = j² = k² = ijk = −1
 ij = k     jk = i     ki = j
-ji = −k    kj = −i    ik = −j          the order matters: ij ≠ ji
-```
+ji = −k    kj = −i    ik = −j          the order matters: ij ≠ ji">
+\[
+\begin{aligned}
+& i^2 = j^2 = k^2 = ijk = -1 \\
+& ij = k \qquad jk = i \qquad ki = j \\
+& ji = -k \qquad kj = -i \qquad ik = -j && \text{the order matters: } ij \ne ji
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -444,10 +536,12 @@ ji = −k    kj = −i    ik = −j          the order matters: ij ≠ ji
 
 With `q = (qv, qw)` and `r = (rv, rw)`, the rules multiply out to:
 
-```text
-q r = ( qw rv + rw qv + qv × rv ,    qw rw − qv · rv )
-        vector part                   scalar part
-```
+<div class="tex" role="img" aria-label="q r = ( qw rv + rw qv + qv × rv ,    qw rw − qv · rv )
+        vector part                   scalar part">
+\[
+q\,r = \Big(\underbrace{q_w r_v + r_w q_v + q_v \times r_v}_{\text{vector part}},\ \ \underbrace{q_w r_w - q_v \cdot r_v}_{\text{scalar part}}\Big)
+\]
+</div>
 
 Worked, `i j` with `i = (1, 0, 0, 0)` and `j = (0, 1, 0, 0)`: vector `0 + 0 + (1, 0, 0) × (0, 1, 0) = (0, 0, 1)`, scalar `0 − 0 = 0`, so `i j = (0, 0, 1, 0) = k`; swap the factors and the cross flips: `j i = −k`.
 
@@ -461,28 +555,42 @@ Worked, `i j` with `i = (1, 0, 0, 0)` and `j = (0, 1, 0, 0)`: vector `0 + 0 + (1
 
 The rule: a turn by `θ` about the unit axis `n` is the quaternion
 
-```text
-q = ( sin(θ/2) n ,  cos(θ/2) )          the half angle
-```
+<div class="tex" role="img" aria-label="q = ( sin(θ/2) n ,  cos(θ/2) )          the half angle">
+\[
+q = \big(\sin(\theta/2)\, n,\ \ \cos(\theta/2)\big) \qquad \text{the half angle}
+\]
+</div>
 
 - unit length: `sin²(θ/2) + cos²(θ/2) = 1`
 - no turn (`θ = 0`): `q = (0, 0, 0, 1)`, the **identity** quaternion
 
-```text
-90° about z:   half angle 45°:   q = (0, 0, 0.7071, 0.7071)
+<div class="tex" role="img" aria-label="90° about z:   half angle 45°:   q = (0, 0, 0.7071, 0.7071)
 30° about y:   half angle 15°:   q = (0, 0.259, 0, 0.966)            0.259² + 0.966² = 1
-90° about x:   q = (0.7071, 0, 0, 0.7071)        90° about y:   q = (0, 0.7071, 0, 0.7071)
-```
+90° about x:   q = (0.7071, 0, 0, 0.7071)        90° about y:   q = (0, 0.7071, 0, 0.7071)">
+\[
+\begin{aligned}
+90^\circ \text{ about } z\text{, half angle } 45^\circ\text{:} &\quad q = (0, 0, 0.7071, 0.7071) \\
+30^\circ \text{ about } y\text{, half angle } 15^\circ\text{:} &\quad q = (0, 0.259, 0, 0.966) && 0.259^2 + 0.966^2 = 1 \\
+90^\circ \text{ about } x\text{:} &\quad q = (0.7071, 0, 0, 0.7071) \\
+90^\circ \text{ about } y\text{:} &\quad q = (0, 0.7071, 0, 0.7071)
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## Conjugate and inverse
 
-```text
-q* = (−x, −y, −z, w)          the conjugate: flip the vector part
-q q* = (0, 0, 0, 1)            for a unit q: the conjugate is the inverse
-```
+<div class="tex" role="img" aria-label="q* = (−x, −y, −z, w)          the conjugate: flip the vector part
+q q* = (0, 0, 0, 1)            for a unit q: the conjugate is the inverse">
+\[
+\begin{aligned}
+q^* &= ({-x}, {-y}, {-z}, w) && \text{the conjugate: flip the vector part} \\
+q\,q^* &= (0, 0, 0, 1) && \text{for a unit } q\text{: the conjugate is the inverse}
+\end{aligned}
+\]
+</div>
 
 Worked, 90° about z: `q* = (0, 0, −0.7071, 0.7071)`, the turn by −90° about z. With the product rule: vector `0.7071 (0, 0, −0.7071) + 0.7071 (0, 0, 0.7071) + 0 = 0`, scalar `0.7071² + 0.7071² = 1`.
 
@@ -495,17 +603,30 @@ Worked, 90° about z: `q* = (0, 0, −0.7071, 0.7071)`, the turn by −90° abou
 
 The rule: write the vector as a quaternion with zero scalar part, `(v, 0)`, and multiply on both sides:
 
-```text
-v' = q (v, 0) q*
+<div class="tex" style="font-size:0.66em" role="img" aria-label="v' = q (v, 0) q*
 q = 90° about z = (0, 0, 0.7071, 0.7071),   v = (1, 0, 0)
-
 q (v, 0):   vector 0.7071 (1, 0, 0) + 0 + (0, 0, 0.7071) × (1, 0, 0) = (0.7071, 0.7071, 0)
             scalar 0.7071(0) − (0, 0, 0.7071) · (1, 0, 0) = 0
 (that) q*:  vector 0 + 0.7071 (0.7071, 0.7071, 0) + (0.7071, 0.7071, 0) × (0, 0, −0.7071)
                  = (0.5, 0.5, 0) + (−0.5, 0.5, 0) = (0, 1, 0)
             scalar 0 − 0 = 0
-v' = (0, 1, 0)                 x turned 90° about z lands on y
-```
+v' = (0, 1, 0)                 x turned 90° about z lands on y">
+\[
+v' = q\,(v, 0)\,q^*, \qquad q = 90^\circ \text{ about } z = (0, 0, 0.7071, 0.7071), \qquad v = (1, 0, 0)
+\]
+\[
+\begin{aligned}
+q\,(v, 0)\text{:} &\quad \text{vector } 0.7071\,(1, 0, 0) + 0 + (0, 0, 0.7071) \times (1, 0, 0) = (0.7071, 0.7071, 0) \\
+&\quad \text{scalar } 0.7071(0) - (0, 0, 0.7071) \cdot (1, 0, 0) = 0 \\
+(\text{that})\, q^*\text{:} &\quad \text{vector } 0 + 0.7071\,(0.7071, 0.7071, 0) + (0.7071, 0.7071, 0) \times (0, 0, {-0.7071}) \\
+&\quad \phantom{\text{vector }} = (0.5, 0.5, 0) + ({-0.5}, 0.5, 0) = (0, 1, 0) \\
+&\quad \text{scalar } 0 - 0 = 0
+\end{aligned}
+\]
+\[
+v' = (0, 1, 0) \qquad x \text{ turned } 90^\circ \text{ about } z \text{ lands on } y
+\]
+</div>
 
 
 ---
@@ -514,14 +635,29 @@ v' = (0, 1, 0)                 x turned 90° about z lands on y
 
 `q1` first, then `q2`: the product **`q2 q1`** (the right factor acts first, as with matrices).
 
-```text
-qx = 90° about x = (0.7071, 0, 0, 0.7071)       qy = 90° about y = (0, 0.7071, 0, 0.7071)
+<div class="tex" style="font-size:0.64em" role="img" aria-label="qx = 90° about x = (0.7071, 0, 0, 0.7071)       qy = 90° about y = (0, 0.7071, 0, 0.7071)
 qx qy:  vector 0.7071 (0, 0.7071, 0) + 0.7071 (0.7071, 0, 0) + (0.7071, 0, 0) × (0, 0.7071, 0)
              = (0, 0.5, 0) + (0.5, 0, 0) + (0, 0, 0.5) = (0.5, 0.5, 0.5)
         scalar 0.7071(0.7071) − 0 = 0.5
 qx qy = (0.5, 0.5, 0.5, 0.5):   cos(θ/2) = 0.5, θ = 120°, axis (1, 1, 1)/√3       on (1, 0, 0): (0, 1, 0)
-qy qx = (0.5, 0.5, −0.5, 0.5):  120° about (1, 1, −1)/√3                           on (1, 0, 0): (0, 0, −1)
-```
+qy qx = (0.5, 0.5, −0.5, 0.5):  120° about (1, 1, −1)/√3                           on (1, 0, 0): (0, 0, −1)">
+\[
+q_x = 90^\circ \text{ about } x = (0.7071, 0, 0, 0.7071) \qquad q_y = 90^\circ \text{ about } y = (0, 0.7071, 0, 0.7071)
+\]
+\[
+\begin{aligned}
+q_x q_y\text{:} &\quad \text{vector } 0.7071\,(0, 0.7071, 0) + 0.7071\,(0.7071, 0, 0) + (0.7071, 0, 0) \times (0, 0.7071, 0) \\
+&\quad \phantom{\text{vector }} = (0, 0.5, 0) + (0.5, 0, 0) + (0, 0, 0.5) = (0.5, 0.5, 0.5) \\
+&\quad \text{scalar } 0.7071(0.7071) - 0 = 0.5
+\end{aligned}
+\]
+\[
+\begin{aligned}
+q_x q_y = (0.5, 0.5, 0.5, 0.5)\text{:} &\quad \cos(\theta/2) = 0.5,\ \theta = 120^\circ\text{, axis } (1, 1, 1)/\sqrt{3}\text{; on } (1, 0, 0)\text{: } (0, 1, 0) \\
+q_y q_x = (0.5, 0.5, {-0.5}, 0.5)\text{:} &\quad 120^\circ \text{ about } (1, 1, {-1})/\sqrt{3}\text{; on } (1, 0, 0)\text{: } (0, 0, {-1})
+\end{aligned}
+\]
+</div>
 
 The two quarter turns of the order slide, a third time: the same answers as `R_x(90°) R_y(90°)` and Rodrigues.
 
@@ -533,11 +669,22 @@ The two quarter turns of the order slide, a third time: the same answers as `R_x
 - **renormalize**: products of many quaternions drift off length 1 in floating point; divide by the length now and then
 - **two quaternions per rotation**: `q` and `−q` give the same `v'` (the sandwich uses `q` twice, so the signs cancel)
 
-```text
-q  = (0, 0.259, 0, 0.966):        (1, 0, 0) turns to (0.866, 0, −0.5)
+<div class="tex" style="font-size:0.74em" role="img" aria-label="q  = (0, 0.259, 0, 0.966):        (1, 0, 0) turns to (0.866, 0, −0.5)
 −q = (0, −0.259, 0, −0.966):      (1, 0, 0) turns to (0.866, 0, −0.5)
-blending from q1 to q2: if q1 · q2 < 0 (the four-number dot), use −q2: the short way round
-```
+blending from q1 to q2: if q1 · q2 &lt; 0 (the four-number dot), use −q2: the short way round">
+\[
+\begin{aligned}
+q = (0, 0.259, 0, 0.966)\text{:} &\quad (1, 0, 0) \text{ turns to } (0.866, 0, {-0.5}) \\
+-q = (0, {-0.259}, 0, {-0.966})\text{:} &\quad (1, 0, 0) \text{ turns to } (0.866, 0, {-0.5})
+\end{aligned}
+\]
+\[
+\begin{aligned}
+&\text{blending from } q_1 \text{ to } q_2\text{: if } q_1 \cdot q_2 \lt 0 \text{ (the four-number dot),} \\
+&\text{use } {-q_2}\text{: the short way round}
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -548,12 +695,21 @@ blending from q1 to q2: if q1 · q2 < 0 (the four-number dot), use −q2: the sh
 
 Unit quaternions are the points of length 1: a **sphere in 4D**. **Slerp** (spherical linear interpolation) walks the shortest arc on it, from `q1` at `t = 0` to `q2` at `t = 1`, at constant speed:
 
-```text
-slerp(q1, q2, t) = ( sin((1 − t)Ω) q1 + sin(tΩ) q2 ) / sin Ω            cos Ω = q1 · q2
+<div class="tex" style="font-size:0.66em" role="img" aria-label="slerp(q1, q2, t) = ( sin((1 − t)Ω) q1 + sin(tΩ) q2 ) / sin Ω            cos Ω = q1 · q2
 q1 = identity (0, 0, 0, 1),  q2 = 120° about y = (0, 0.866, 0, 0.5):     cos Ω = 0.5, Ω = 60°
 t = 1/2:   (0, 0.5, 0, 0.866), the quaternion of 60° about y: halfway, and still a rotation
-plain average (q1 + q2)/2 = (0, 0.433, 0, 0.75): length 0.866, not a rotation
-```
+plain average (q1 + q2)/2 = (0, 0.433, 0, 0.75): length 0.866, not a rotation">
+\[
+\operatorname{slerp}(q_1, q_2, t) = \frac{\sin((1 - t)\Omega)\, q_1 + \sin(t\Omega)\, q_2}{\sin\Omega}, \qquad \cos\Omega = q_1 \cdot q_2
+\]
+\[
+\begin{aligned}
+& q_1 = \text{identity } (0, 0, 0, 1), \ \ q_2 = 120^\circ \text{ about } y = (0, 0.866, 0, 0.5)\text{:} \quad \cos\Omega = 0.5,\ \Omega = 60^\circ \\
+& t = 1/2\text{:} \quad (0, 0.5, 0, 0.866)\text{, the quaternion of } 60^\circ \text{ about } y\text{: halfway, and still a rotation} \\
+& \text{plain average } (q_1 + q_2)/2 = (0, 0.433, 0, 0.75)\text{: length } 0.866\text{, not a rotation}
+\end{aligned}
+\]
+</div>
 
 
 ---

@@ -42,7 +42,7 @@ Graded on the page's inputs and on a hidden set: a check scores only when both m
 
 ## Wrap
 
-A scene graph is a tree of local transforms, and each node's world matrix is the product of the locals from the root. Local to world is that product; world to local, and the camera's view matrix, are its inverse.
+A scene graph is a tree of nodes, each placing its children in its own frame: a node's world placement is its parent's, after its own local one. Move a parent and its whole subtree follows; reparenting keeps either the world pose or the local values; a camera is one more node, and the view undoes its placement.
 
 - **Read:** [Scene Graphs](../../textbook/scene-graphs.html), Sections 1 to 14
 - **Due:** HW3, Wednesday October 28, 11:59 PM

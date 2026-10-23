@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSS 551 · L06 · Vectors, Rotation, and the Scene Graph</title>
+  <title>CSS 551 · L06 · Vectors and Rotation</title>
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
@@ -49,6 +49,9 @@
     .reveal .credit { display: block; font-size: 0.5em; color: #66708a; margin-top: 0.2em; }
     /* football: the rail holds tabs (steps, throw, chain, stored), so it needs more than 270px */
     .reveal section.demo-full [data-demo="football"] .demo-shell-rail--embed { flex: 0 0 330px; }
+    /* MathJax display formulas (lib/deck-math.js): the ASCII form stays as aria-label */
+    .reveal .tex { font-size: 0.8em; margin: 0.3em auto; text-align: center; }
+    .reveal .tex mjx-container[display="true"] { margin: 0.15em 0 !important; }
   </style>
 </head>
 <body>
@@ -56,27 +59,22 @@
     <div class="slides">
       <!-- One section per file, in order: the lecture opening (L06-open.md),
            the three topics, then the wrap (L06-discuss.md). -->
-      <section data-markdown="L06-open.md?v=20261020b"
+      <section data-markdown="L06-open.md?v=20261022m"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/linear-algebra-recap.md?v=20261020b"
+      <section data-markdown="../../topics/linear-algebra-recap.md?v=20261022m"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/rotation-recap.md?v=20261020b"
+      <section data-markdown="../../topics/rotation-recap.md?v=20261022m"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/scene-graph-intro.md?v=20261020b"
-        data-separator="^\r?\n---\r?\n$"
-        data-separator-vertical="^\r?\n--\r?\n$"
-        data-separator-notes="^Note:">
-      </section>
-      <section data-markdown="L06-discuss.md?v=20261020b"
+      <section data-markdown="L06-discuss.md?v=20261022m"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -84,6 +82,7 @@
     </div>
   </div>
 
+  <script src="../../lib/deck-math.js?v=20261022a"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
@@ -101,6 +100,7 @@
       // Markdown slides exist in the DOM only after init resolves: build the
       // embedded [data-demo] hosts now (never on DOMContentLoaded).
       initDeckDemos();
+      typesetDeckMath();
 
       // Demo slider focus vs. deck navigation: when a demo's range input is set
       // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses
