@@ -6,10 +6,15 @@ namespace CSS551.HW03
 {
     public static class Inputs
     {
+        public static readonly Vector3 rot_p = new Vector3(1f, 2f, 3f);
+        public static readonly float rot_ry = 30f;
+        public static readonly float rot_rz = 40f;
+        public static readonly Vector3 pivot_p = new Vector3(6f, 3f, 0f);
+        public static readonly Vector3 pivot_pt = new Vector3(8f, 3f, 0f);
+        public static readonly float pivot_deg = 90f;
+        public static readonly Vector3 nodePoint = new Vector3(0.3f, 0.2f, 0.1f);
         public static readonly Vector3 order_s = new Vector3(2f, 1f, 1f);
         public static readonly Vector3 order_t = new Vector3(3f, 0f, 0f);
-        public static readonly Vector3 pivot_p = new Vector3(1.5f, 0f, 0f);
-        public static readonly float pivot_deg = 90f;
         public static readonly float rigid_ry = 90f;
         public static readonly Vector3 rigid_t = new Vector3(0f, 0f, -1f);
         public static readonly float pose_baseRy = 30f;

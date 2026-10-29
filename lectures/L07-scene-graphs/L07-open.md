@@ -1,21 +1,22 @@
 <!--
   CSS 551 · L07, Thursday October 22, 2026 (week 4, in person): Scene graphs.
-  Mounted by index.html: L07-open.md, ../../topics/scene-graph-intro.md (~28 min), ../../topics/scene-graph-concepts.md
+  EDITED 2026-10-25 (re-plan): L07 as given covered Quiz 2 and scene-graph-intro; scene-graph-concepts was not
+  reached and moved to L08 (Tuesday October 27), with affine. HW3 was rebuilt (scene graphs by operators, Part A,
+  this lecture; by matrices, Part B, L08) and goes out Tuesday October 27, due Wednesday November 4. The page now
+  mounts L07-open.md, ../../topics/scene-graph-intro.md and L07-discuss.md.
+  Mounted as built on 2026-10-22: L07-open.md, ../../topics/scene-graph-intro.md (~28 min), ../../topics/scene-graph-concepts.md
   (~30 min, 16 slides), L07-discuss.md. Re-composed 2026-10-22: L06 did not reach the scene graph and the affine
   lecture was not given, so L07 teaches the scene graph by concepts with the spiral pass as the running example
   (demo links open in a new tab); scene-graphs.md, the 4x4 matrix version, waits for the affine topic.
   55 slides after the 2026-10-08 cuts (exercise slides and discussion questions; re-sequenced 2026-10-06: kinematics and skinning moved to the animation topic,
   rigid bodies to the physics topic, both in L10).
 
-  Plan (120 min, Thu 5:45-7:45 PM in person):
-    0:00  Quiz 2, on paper (vectors, rotation)        20 min
+  Plan as given (120 min, Thu 5:45-7:45 PM in person):
+    0:00  Quiz 2, on paper (vectors, rotation)        20 min (students needed about twice that)
     0:20  Opening                                      2 min
     0:22  The scene graph: operators on points, the tree,
-          local and world, the spiral pass (intro)     40 min
-    1:02  Scene graphs in practice (concepts)          30 min
-    1:32  HW3 walk-through                            10 min
-    1:42  Wrap                                         3 min
-    1:45  HW3 setup help, both tracks; buffer         15 min
+          local and world, the spiral pass (intro)     to the end of class
+  (Planned and moved to L08: scene graphs in practice, the HW3 walk-through.)
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math; never two "_" on one
   markdown line outside a code fence; no em-dashes.
@@ -53,8 +54,6 @@
 - **Operators on points**: translate, rotate, scale; order matters; undo in reverse; rotate about a pivot
 - **The scene graph**: a tree of nodes, a local placement per node, the world placement up the tree, base-arm-hand live
 - **A spiral pass, frame by frame**: spin, wobble, aim, flight, and the catch as a change of parent
-- **Scene graphs in practice**: the camera as a node, reparenting, reuse, importing, dirty flags, bounds, transparency
-- the **HW3 walk-through**, then setup help
 
-Reading: [Scene Graphs](../../textbook/scene-graphs.html), Sections 1 to 14.
+Reading: [Scene Graphs](../../textbook/scene-graphs.html), Sections 1 to 5.
 

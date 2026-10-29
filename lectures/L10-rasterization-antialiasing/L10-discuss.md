@@ -1,0 +1,37 @@
+<!--
+  CSS 551 · Lecture 10, the HW4 walk-through and the wrap (~8 min). HW4 numbers are
+  quoted from numbers-pipeline.json and homework/hw04/index.html.
+  Re-sequenced 2026-10-25 (was Lecture 9): HW4 out Tuesday November 3, due Wednesday November 11.
+  CUT 2026-10-08: the two multiple-choice discussion questions (which value is
+  interpolated, perspective-correct u); the freed time goes to the buffer.
+-->
+
+### HW4, and the wrap
+
+<small>(~8 min)</small>
+
+
+---
+
+## HW4: viewing and rasterization
+
+Out tonight, due **Wednesday November 11, 11:59 PM**. Unity or WebGL, from the skeleton.
+
+- **`viewMatrix`, `perspectiveMatrix`**, every entry checked at the view-matrix demo's camera: V's translation (0, −0.4698, −7.171); P(45°, 16:9, 1, 8) third row (0, 0, −1.2857, −2.2857)
+- **`worldToPixel`**: the cube corner (0.5, 0.5, 0.5) lands at pixel **(702.505, 320.864)**, NDC depth **0.924**
+- **`edge`, `barycentric`, `rasterize`**: pixel (5, 6) weights **(0.3052, 0.259, 0.4358)**; **28** covered pixels at 12 × 12, **846** at 64 × 64; use the page's six-decimal vertices
+- **off limits**: Unity `Matrix4x4.LookAt`, `Perspective`, `WorldToScreenPoint`; three.js `lookAt`, `makePerspective`, `Vector3.project`: the answer key, not the tool
+
+The full specification and the rubric numbers: [HW4](../../homework/hw04/index.html).
+
+
+---
+
+## Wrap
+
+- Inside is **three edge functions ≥ 0**; the same three numbers, divided by the twice-area, are the **barycentric weights**; attributes are interpolated in **1/w**
+- One sample per pixel **aliases**: a frequency above Nyquist returns as `|f − k·fs|`. Supersample, prefilter, or accumulate over time
+- **Read**: [Rasterization](../../textbook/rasterization.html) and [Sampling and Antialiasing](../../textbook/antialiasing.html)
+- **Due**: HW3, tomorrow, Wednesday November 4, 11:59 PM. **Out**: HW4, due Wednesday November 11
+- **Quiz 4**, on Canvas: Thursday November 5, 8 PM to Sunday November 8, 11:59 PM; Lectures 9 and 10 and HW3
+

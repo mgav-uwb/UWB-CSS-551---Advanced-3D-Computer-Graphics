@@ -13,15 +13,20 @@ namespace CSS551.HW03
     public static class Expected
     {
         public static readonly Check[] Checks = {
-            new Check("ts", "T(3,0,0) · S(2,1,1): translation column", 8, 0.000001, new double[] { 3.0, 0.0, 0.0 }),
-            new Check("st", "S(2,1,1) · T(3,0,0): translation column", 8, 0.000001, new double[] { 6.0, 0.0, 0.0 }),
-            new Check("pivot", "pivotRotateY((1.5, 0, 0), 90): translation column (I − R)p", 12, 0.001, new double[] { 1.5, 0.0, 1.5 }),
-            new Check("pivotPt", "pivotRotateY: the image of the point one unit past the pivot in x", 6, 0.001, new double[] { 1.5, 0.0, -1.0 }),
-            new Check("rigidInv", "rigidInverse of T(0,0,−1) · R_y(90): all 16 entries", 14, 0.001, new double[] { 6.12323399574e-17, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 6.12323399574e-17, 0.0, -1.0, 0.0, 6.12323399574e-17, 1.0 }),
-            new Check("wHand", "worldMatrices at baseRy 30, armBend 40: W_hand, 16 entries", 20, 0.002, new double[] { 0.663413948169, 0.642787609687, -0.383022221559, 0.0, -0.556670399226, 0.766044443119, 0.321393804843, 0.0, 0.5, 0.0, 0.866025403784, 0.0, -0.779338558917, 1.47246222037, 0.449951326781, 1.0 }),
-            new Check("handPos", "hand origin in world space", 8, 0.002, new double[] { -0.779338558917, 1.47246222037, 0.449951326781 }),
-            new Check("armPos", "arm origin in world space", 8, 0.002, new double[] { -0.389669279458, 0.936231110183, 0.22497566339 }),
-            new Check("toLocal", "worldToLocal: world point (0, 1, 0) in the hand frame", 16, 0.002, new double[] { 0.385672565812, -0.940373334129, 0.0 }),
+            new Check("rot", "A1 rotateY((1, 2, 3), 30) and rotateZ((1, 2, 3), 40)", 6, 0.001, new double[] { 2.36602540378, 2.0, 2.09807621135, -0.519530776254, 2.17487649592, 3.0 }),
+            new Check("pivot", "A2 pivotRotateZ: (6, 3, 0) turned 90 about (8, 3, 0)", 6, 0.001, new double[] { 8.0, 1.0, 0.0 }),
+            new Check("toParent", "A3 toParent of (0.3, 0.2, 0.1) for the base, the arm and the hand", 8, 0.001, new double[] { 0.309807621135, 0.4, -0.0633974596216, -0.348695515782, 1.08227628171, 0.1, 0.3, 0.9, 0.1 }),
+            new Check("fromParent", "A4 fromParent of (0.3, 0.2, 0.1) for the base, the arm and the hand", 6, 0.001, new double[] { 0.209807621135, 0.0, 0.236602540378, 0.229813332936, -0.892836282906, 0.1, 0.3, -0.5, 0.1 }),
+            new Check("armWorld", "A5 toWorld: the arm origin in the world", 6, 0.002, new double[] { -0.389669279458, 0.936231110183, 0.22497566339 }),
+            new Check("handWorld", "A5 toWorld: the hand origin in the world", 6, 0.002, new double[] { -0.779338558917, 1.47246222037, 0.449951326781 }),
+            new Check("toNode", "A6 worldToNode: world point (0, 1, 0) in the hand frame", 6, 0.002, new double[] { 0.385672565812, -0.940373334129, 0.0 }),
+            new Check("elem", "B1 translation, rotationY, rotationZ, scaling: all 64 entries", 8, 0.001, new double[] { 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 3.0, 0.0, 0.0, 1.0, 0.866025403784, 0.0, -0.5, 0.0, 0.0, 1.0, 0.0, 0.0, 0.5, 0.0, 0.866025403784, 0.0, 0.0, 0.0, 0.0, 1.0, 0.766044443119, 0.642787609687, 0.0, 0.0, -0.642787609687, 0.766044443119, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 }),
+            new Check("ts", "B2 T(3,0,0) · S(2,1,1): translation column", 5, 0.000001, new double[] { 3.0, 0.0, 0.0 }),
+            new Check("st", "B2 S(2,1,1) · T(3,0,0): translation column", 5, 0.000001, new double[] { 6.0, 0.0, 0.0 }),
+            new Check("lArm", "B3 localMatrices: L_arm, 16 entries", 8, 0.002, new double[] { 0.766044443119, 0.642787609687, 0.0, 0.0, -0.642787609687, 0.766044443119, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -0.449951326781, 0.736231110183, 0.0, 1.0 }),
+            new Check("wHand", "B4 worldMatrices: W_hand, 16 entries (column 3 is the A5 hand origin)", 14, 0.002, new double[] { 0.663413948169, 0.642787609687, -0.383022221559, 0.0, -0.556670399226, 0.766044443119, 0.321393804843, 0.0, 0.5, 0.0, 0.866025403784, 0.0, -0.779338558917, 1.47246222037, 0.449951326781, 1.0 }),
+            new Check("rigidInv", "B5 rigidInverse of T(0,0,−1) · R_y(90): all 16 entries", 8, 0.001, new double[] { 6.12323399574e-17, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, -1.0, 0.0, 6.12323399574e-17, 0.0, -1.0, 0.0, 6.12323399574e-17, 1.0 }),
+            new Check("toLocal", "B6 worldToLocal: world point (0, 1, 0) in the hand frame (the A6 answer)", 8, 0.002, new double[] { 0.385672565812, -0.940373334129, 0.0 }),
         };
     }
 }

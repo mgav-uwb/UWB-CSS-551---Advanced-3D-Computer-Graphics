@@ -3,7 +3,7 @@
   Built 2026-10-20 at Marcel's request: a slow recap of the linear algebra, rotation finished, the
   scene graph introduced. As given, the class reached Rodrigues and touched quaternions; the scene
   graph (scene-graph-intro.md) was not reached and moved to L07 (2026-10-22), so it is unmounted here.
-  This lecture replaces the meshes lecture on this date; the meshes deck stays in ../L06-meshes/
+  This lecture replaces the meshes lecture on this date; the meshes deck moved to ../L11-meshes-textures/ (2026-10-25)
   until the schedule is rebuilt. Homogeneous coordinates and affine maps start next week.
   Mounts, in order: L06-open.md, ../../topics/linear-algebra-recap.md (~34 min),
   ../../topics/rotation-recap.md (~41 min), L06-discuss.md (the wrap).

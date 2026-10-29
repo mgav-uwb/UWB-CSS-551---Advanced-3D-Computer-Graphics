@@ -49,6 +49,9 @@
     [data-demo="trs-order"] .demo-panel .mat-panel td { padding: 1.5px 4px; min-width: 2.1em; }
     /* football: the rail holds tabs (steps, throw, chain, stored), so it needs more than 270px */
     .reveal section.demo-full [data-demo="football"] .demo-shell-rail--embed { flex: 0 0 330px; }
+    /* MathJax display formulas (lib/deck-math.js): the ASCII form stays as aria-label */
+    .reveal .tex { font-size: 0.8em; margin: 0.3em auto; text-align: center; }
+    .reveal .tex mjx-container[display="true"] { margin: 0.15em 0 !important; }
   </style>
 </head>
 <body>
@@ -57,22 +60,22 @@
       <!-- One section per file, in order: the lecture opening (L05-open.md),
            one or more ../../topics/*.md, then discussion and wrap (L05-discuss.md),
            then the supplement (../../topics/*-supplement.md), covered time permitting. -->
-      <section data-markdown="L05-open.md?v=20261015a"
+      <section data-markdown="L05-open.md?v=20261029a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/affine-transforms.md?v=20261015a"
+      <section data-markdown="../../topics/affine-transforms.md?v=20261029a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L05-discuss.md?v=20261015a"
+      <section data-markdown="L05-discuss.md?v=20261029a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/affine-transforms-supplement.md?v=20261015a"
+      <section data-markdown="../../topics/affine-transforms-supplement.md?v=20261029a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -80,6 +83,7 @@
     </div>
   </div>
 
+  <script src="../../lib/deck-math.js?v=20261029a"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
@@ -97,6 +101,7 @@
       // Markdown slides exist in the DOM only after init resolves: build the
       // embedded [data-demo] hosts now (never on DOMContentLoaded).
       initDeckDemos();
+      typesetDeckMath();
 
       // Demo slider focus vs. deck navigation: when a demo's range input is set
       // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses
