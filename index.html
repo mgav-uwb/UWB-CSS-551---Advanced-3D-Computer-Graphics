@@ -383,6 +383,8 @@ const HANDOUTS = {
 const DEMOS = {
   "raster": { title:"Rasterization: One Triangle Becomes Pixels",
     desc:"drag res/angle: a triangle sampled onto a coarse framebuffer; covered-pixel readout; grid/centers/outline toggles" },
+  "raster-walk": { title:"Pineda's Algorithm, Line by Line: A Triangle Filled Pixel by Pixel",
+    desc:"step the rasterizer's loop one line, pixel or row at a time: the code with every variable, and the image filling in" },
   "mesh-view": { title:"Meshes: Real Models, Wireframe to Solid",
     desc:"pick cube/teapot/bunny/dragon: drag wire to cross-fade solid ↔ wireframe; exact vertex/triangle readout + source credit" },
   "our-scene": { title:"Our Scene: A Cornell Box, Five Ways",
@@ -492,7 +494,7 @@ const WEEKS = [
   { id:"W4",  title:"Meshes and scene graphs", tue:"L06", thu:"L07", hw:HW(3), quiz:"Q2",
     handouts:["linalg","trig","scenegraphs","meshes","textures"], demos:["mesh-grid","uv-placement","fur","simplify-compare","scene-graph"] },
   { id:"W5",  title:"Viewing, rasterization, antialiasing", tue:"L08", thu:"L09", hw:HW(4), quiz:"Q3",
-    handouts:["viewing","interaction","raster","antialiasing"], demos:["view-matrix","projection","raster"] },
+    handouts:["viewing","interaction","raster","antialiasing"], demos:["view-matrix","projection","raster","raster-walk"] },
   { id:"W6",  title:"Animation and physics; illumination and texture mapping", tue:"L10", thu:"L11", hw:HW(5), quiz:"Q4",
     handouts:["animation","illumination","textures","unityshaders","webglshaders","curves"], demos:["keyframe","cloth","fluid","illumination","bump-map"] },
   { id:"W7",  title:"The bridge: light transport and ray tracing", tue:"L12", thu:"L13", hw:HW(6), quiz:"Midterm", bridge:true,
@@ -570,7 +572,7 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
 
 // the catalog in course order, grouped by part of the course
 const CATALOG = [
-  ["The big picture", ["our-scene", "raster", "mesh-view", "lod"]],
+  ["The big picture", ["our-scene", "raster", "raster-walk", "mesh-view", "lod"]],
   ["The interactive loop and physics", ["mvc-transform", "cloth", "fluid"]],
   ["Vectors and rotation", ["dot-cross", "vec-geometry", "rotation-ways", "axis-angle", "spin-step", "rot-compose", "quat-slerp", "euler-gimbal"]],
   ["Transformations and scene graphs", ["trs-order", "football", "scene-graph", "keyframe"]],

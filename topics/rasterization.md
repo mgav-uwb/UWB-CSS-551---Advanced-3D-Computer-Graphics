@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Rasterization, how a projected triangle becomes pixels (~46 min, 32 slides).
+  CSS 551 · TOPIC DECK: Rasterization, how a projected triangle becomes pixels (~48 min, 33 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/rasterization.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -16,10 +16,17 @@
   NEEDS:   the vectors-review topic (the perp-dot product, the cross product); the viewing
            topic (clip coordinates, the divide, NDC).
   DEMOS:   data-demo="raster" data-controls="res,angle" (under the page's crop).
+           data-demo="raster-walk" data-controls="res,angle" (a full slide): the Pineda slide's loop
+           run line by line (lib/demos/raster-walk.js holds the code; tools/test-demos.mjs checks it
+           against the slide).
   FIGURES: ../../textbook/figures/ras-*.svg (tools/gen-textbook-figures-pipeline.mjs).
   NUMBERS: textbook/figures/numbers-pipeline.json (ras.*).
   EDIT 2026-10-08: the perspective-correct slide's note derives why a/w and 1/w are linear on
            the screen. (L09's discussion questions were cut.)
+  EDIT 2026-10-29: the setup-and-step slide is named Pineda's algorithm (Pineda, SIGGRAPH 1988); its loop
+           keeps each edge's value and slopes in plain variables (no per-row array) and the slide
+           states the slopes as the derivatives of E; the note names the opposite sign convention. A new
+           slide, Pineda's algorithm pixel by pixel, embeds the raster-walk demo.
 
   reveal.js: FLAT; notes follow "Note:"; plain unicode math, no KaTeX; never two
   "_" on one markdown line outside a code fence (edge functions are written E12,
@@ -28,7 +35,7 @@
 
 ### Rasterization: from a triangle to pixels
 
-<small>(~46 min)</small>
+<small>(~48 min)</small>
 
 
 ---
@@ -117,27 +124,42 @@ In hardware the vertices snap to **1/256 pixel** (8 sub-pixel bits): every E is 
 
 ---
 
-## Setup, then three additions per pixel
+## Pineda's algorithm: setup, then three additions per pixel
 
 ```js
-// once per triangle, in pixel units: each edge's steps and its value at the box's first center
-for (const [a, b] of [[v1, v2], [v2, v0], [v0, v1]]) {
-  stepX.push(a.y - b.y);                     // E12: 5.748 − 10.296 = −4.548
-  stepY.push(b.x - a.x);                     // E12: 4.332 − 10.524 = −6.192
-  rowStart.push(edge(a, b, firstCenter));    // (xmin + ½, ymin + ½)
-}
+// once per triangle, in pixel units: each edge's slopes and its value at the box's first center
+const sx12 = v1.y - v2.y, sy12 = v2.x - v1.x;   // E12: −4.548, −6.192
+const sx20 = v2.y - v0.y, sy20 = v0.x - v2.x;   // E20:  8.580, −1.428
+const sx01 = v0.y - v1.y, sy01 = v1.x - v0.x;   // E01: −4.032,  7.620
+let row12 = edge(v1, v2, firstCenter);          // firstCenter = (xmin + ½, ymin + ½)
+let row20 = edge(v2, v0, firstCenter);
+let row01 = edge(v0, v1, firstCenter);
 // per pixel: a sign test and three additions
 for (let y = ymin; y <= ymax; y++) {
-  const e = rowStart.slice();
+  let e12 = row12, e20 = row20, e01 = row01;
   for (let x = xmin; x <= xmax; x++) {
-    if (e[0] >= 0 && e[1] >= 0 && e[2] >= 0) emit(x, y, e);   // e / twiceArea = the weights
-    e[0] += stepX[0]; e[1] += stepX[1]; e[2] += stepX[2];
+    if (e12 >= 0 && e20 >= 0 && e01 >= 0) emit(x, y, e12, e20, e01);   // ÷ twiceArea = the weights
+    e12 += sx12; e20 += sx20; e01 += sx01;
   }
-  rowStart[0] += stepY[0]; rowStart[1] += stepY[1]; rowStart[2] += stepY[2];
+  row12 += sy12; row20 += sy20; row01 += sy01;
 }
 ```
 
-No multiplication in the inner loop. Hardware runs the same arithmetic on **tiles** of pixels at once.
+The slopes are the derivatives of <span style="white-space:nowrap">E = (bx − ax)(py − ay) − (by − ay)(px − ax)</span>: <span style="white-space:nowrap">**∂E/∂x = ay − by**</span>, <span style="white-space:nowrap">**∂E/∂y = bx − ax**</span>. No multiplication in the inner loop and no pixel depends on another (Juan Pineda, 1988), so hardware runs the same arithmetic on **tiles** of pixels at once.
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Pineda's algorithm, pixel by pixel
+
+<div class="cockpit" data-demo="raster-walk" data-controls="res,angle"><pre class="viz-fallback">  the loop of the previous slide, one line at a time, on the raster demo's triangle
+  (corners as printed: v0 = (2.904, 1.716), v1 = (10.524, 5.748), v2 = (4.332, 10.296) at res 12)
+  -- setup: box x 2 to 10, y 1 to 10 (90 pixels) ----------------------------------
+     slopes  E12 (−4.548, −6.192)   E20 (8.580, −1.428)   E01 (−4.032, 7.620)
+  -- pixel (5, 6): e12 = 18.193, e20 = 15.442, e01 = 25.987, all ≥ 0: emitted ------
+  -- the end: 29 of 90 in the box, of 144 ------------------------------------------</pre></div>
 
 
 ---
