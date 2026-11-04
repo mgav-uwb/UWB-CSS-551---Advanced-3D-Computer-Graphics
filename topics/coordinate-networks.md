@@ -21,9 +21,9 @@
            mini-batches, the sinusoidal time code, overfitting). Mounted after it in L14.
   DEMOS:   data-demo="coord-net" data-controls="sigma,omega" (demo-full).
   FIGURES: ../../textbook/figures/nn-coordnet-{fits,sigma,omega}.png, computed by
-           lectures/L14-neural-nets-embeddings/analysis/coord-net-figures.mjs.
+           lectures/L15-neural-nets-embeddings/analysis/coord-net-figures.mjs.
   NUMBERS: every parameter count and PSNR is from
-           lectures/L14-neural-nets-embeddings/analysis/coord-net-numbers.mjs
+           lectures/L15-neural-nets-embeddings/analysis/coord-net-numbers.mjs
            (numbers-coord-net.json), which runs lib/core/coord-net.js with the demo's own settings
            (2 hidden layers of 48, Adam, 256 random pixels per step, seed 1): the demo shows the
            same values at the same step. PSNR ↔ MSE conversions and ratios are arithmetic on those.

@@ -29,7 +29,7 @@
   NUMBERS: textbook/figures/numbers-motion.json (rt.monteCarlo, rt.cornell, rt.softShadow, rt.thinLens,
            rt.media); textbook/figures/numbers.json (reSum); the densified extras (variance,
            stratification, Malley, area light, furnace, firefly) from tools/gen-lecture-figures-d1.mjs
-           (lectures/L16-diffusion-1/analysis/numbers-d1.json, key dense);
+           (lectures/L17-diffusion-1/analysis/numbers-d1.json, key dense);
            the path-throughput and roulette lines from tools/gen-lecture-figures-c.mjs,
            using the albedos of the textbook's Cornell scene.
 
@@ -46,7 +46,7 @@
 
 ## The integral, recalled
 
-Tuesday's rendering equation, at one surface point:
+The rendering equation, at one surface point:
 
 ```text
    Lo(ωo) = Le(ωo) + ∫ f(ωi, ωo) · Li(ωi) · cos θi  dωi          over the hemisphere

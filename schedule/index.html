@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- CSS 551 AU26 student-facing schedule: every meeting on the real calendar, per Plan C
-     (planning/css551-au26-plan-c-2026-09-29.md). Lecture links fill in as decks are built (null renders
+     (planning/css551-au26-plan-c-2026-09-29.md), re-planned 2026-10-25 (affine on Oct 27, no midterm,
+     Canvas quizzes from Quiz 3, inverse rendering dropped). Lecture links fill in as decks are built (null renders
      as plain text); the site syllabus governs. Styled like the hub. -->
 <html lang="en">
 <head>
@@ -51,7 +52,7 @@
 <header>
   <div class="sub">CSS 551 · Advanced 3D Computer Graphics</div>
   <h1>Schedule, Autumn 2026</h1>
-  <div class="meta">Tue 5:45–7:45 PM online · Thu 5:45–7:45 PM in person, UW2-305 · quiz in the first 20 minutes of Thursday from week 3 (Quiz 6 on Canvas, Thanksgiving week) · homework out Thursday, due the next Wednesday 11:59 PM on Canvas · <a href="../index.html">hub</a> · <a href="../syllabus/index.html">syllabus</a></div>
+  <div class="meta">Tue 5:45–7:45 PM online · Thu 5:45–7:45 PM in person, UW2-305 · Quizzes 1 and 2 on paper; Quizzes 3 to 8 on Canvas, Thursday 8:00 PM to Sunday 11:59 PM · homework due Wednesday 11:59 PM on Canvas (HW8 Friday, December 11) · no midterm · <a href="../index.html">hub</a> · <a href="../syllabus/index.html">syllabus</a></div>
 </header>
 <div data-quote style="margin:0 0 18px"></div>
 
@@ -79,42 +80,42 @@ const WEEKS = [
     read:[['vectors.html#displacements','Vectors, Sections 1 to 3 and 9'],['interaction.html#loop','Interactive Systems, Sections 1 to 4, 7 and 10'],['unity-basics.html#install','Unity for This Course, Sections 1 to 5 and 11'],['webgl-basics.html#serve','WebGL and three.js for This Course, Sections 1 to 5, 10 and 11']], quiz:null, hw:{ n:1, out:'Oct 8', due:'Wed Oct 14', what:'orientation: the loop and MVC' } },
   { wk:'3', kind:'',
     tue:{ date:'Oct 13', title:'Rotation', sub:'frames, lines, planes, barycentric weights; axis-angle, quaternions, Euler angles', href:'lectures/L04-rotation/index.html' },
-    thu:{ date:'Oct 15', title:'Affine transformations', sub:'over homogeneous coordinates', href:'lectures/L05-affine/index.html' },
-    read:[['vectors.html#frames','Vectors, Sections 4 to 8'],['rotation.html','Rotation, Sections 1 to 8'],['affine-transforms.html','Affine Transformations']], quiz:'Q1', hw:{ n:2, out:'Oct 15', due:'Wed Oct 28 (extended from Oct 21)', what:'vector geometry: EX1–EX6' } },
+    thu:{ date:'Oct 15', title:'Vectors: dot, cross, distances', sub:'the affine lecture moved to October 27', href:null },
+    read:[['vectors.html#frames','Vectors, Sections 4 to 8'],['rotation.html','Rotation, Sections 1 to 8']], quiz:'Q1', hw:{ n:2, out:'Oct 15', due:'Wed Oct 28 (extended from Oct 21)', what:'vector geometry: EX1–EX6' } },
   { wk:'4', kind:'',
-    tue:{ date:'Oct 20', title:'Vectors, rotation, and the scene graph', sub:'a linear algebra recap; Rodrigues, Euler angles, quaternions; hierarchical modeling', href:'lectures/L06-recap-rotation-scene-graphs/index.html' },
-    thu:{ date:'Oct 22', title:'Scene graphs', sub:'hierarchical modeling', href:'lectures/L07-scene-graphs/index.html' },
-    read:[['vectors.html','Vectors'],['rotation.html','Rotation'],['scene-graphs.html','Scene Graphs']], quiz:'Q2', hw:{ n:3, out:'Oct 22', due:'Wed Oct 28', what:'TRS by hand, pivots, a three-node chain' } },
+    tue:{ date:'Oct 20', title:'Vectors and rotation', sub:'a linear algebra recap; rotation from 2D through Rodrigues; Euler angles and quaternions', href:'lectures/L06-recap-rotation-scene-graphs/index.html' },
+    thu:{ date:'Oct 22', title:'Scene graphs', sub:'operators on points; the tree; local and world; the spiral pass', href:'lectures/L07-scene-graphs/index.html' },
+    read:[['vectors.html','Vectors'],['rotation.html','Rotation'],['scene-graphs.html','Scene Graphs, Sections 1 to 5']], quiz:'Q2', hw:null },
   { wk:'5', kind:'',
-    tue:{ date:'Oct 27', title:'Viewing', sub:'the camera frame, V, P, the chain; picking, dragging, the arcball', href:'lectures/L08-viewing/index.html' },
-    thu:{ date:'Oct 29', title:'Rasterization and antialiasing', sub:'', href:'lectures/L09-rasterization-antialiasing/index.html' },
-    read:[['viewing.html','Viewing'],['interaction.html#unproject','Interactive Systems, Sections 5, 6, 8 and 9'],['rasterization.html','Rasterization'],['antialiasing.html','Sampling and Antialiasing']], quiz:'Q3', hw:{ n:4, out:'Oct 29', due:'Wed Nov 4', what:'V and P by hand; one triangle rasterized' } },
+    tue:{ date:'Oct 27', title:'Affine transformations and the scene graph as matrices', sub:'scene graphs in practice; homogeneous coordinates, composition, the inverse; W = W_parent · L', href:'lectures/L08-affine-scene-graphs/index.html' },
+    thu:{ date:'Oct 29', title:'Viewing', sub:'the camera frame, V, P, the chain', href:'lectures/L09-viewing/index.html' },
+    read:[['scene-graphs.html','Scene Graphs'],['affine-transforms.html','Affine Transformations'],['viewing.html','Viewing']], quiz:'Q3 (Canvas)', hw:{ n:3, out:'Tue Oct 27', due:'Wed Nov 4', what:'the arm by operators on points, then by 4 × 4 matrices' } },
   { wk:'6', kind:'',
-    tue:{ date:'Nov 3', title:'Animation and physics', sub:'keyframes, easing, kinematics, skinning; particles, springs, cloth, fluids', href:'lectures/L10-animation-physics/index.html' },
-    thu:{ date:'Nov 5', title:'Surface appearance: illumination and texture mapping', sub:'Lambert, Phong, lights, tone mapping; filtering, mipmaps, bump, cube and shadow maps', href:'lectures/L11-illumination-textures/index.html' },
-    read:[['animation.html','Animation and Interpolation, Sections 1 to 14'],['illumination.html','Local Illumination'],['texture-mapping.html#magnification','Texture Mapping, Sections 5 to 11'],['unity-shaders.html','Unity Shaders']], quiz:'Q4', hw:{ n:5, out:'Nov 5', due:'Wed Nov 11', what:'the grid mesh, the placement matrix, a lit shader' } },
+    tue:{ date:'Nov 3', title:'Rasterization and antialiasing', sub:'edge functions, barycentric weights, the depth buffer; sampling and aliasing', href:'lectures/L10-rasterization-antialiasing/index.html' },
+    thu:{ date:'Nov 5', title:'Meshes and texture coordinates', sub:'vertex and index arrays, normals, the grid; UV, wrap modes, placement', href:'lectures/L11-meshes-textures/index.html' },
+    read:[['rasterization.html','Rasterization'],['antialiasing.html','Sampling and Antialiasing'],['meshes.html','Meshes, Sections 1 to 6'],['texture-mapping.html','Texture Mapping, Sections 1 to 4']], quiz:'Q4 (Canvas)', hw:{ n:4, out:'Tue Nov 3', due:'Wed Nov 11', what:'V and P by hand; one triangle rasterized' } },
   { wk:'7', kind:'bridge',
-    tue:{ date:'Nov 10', title:'Light transport, PBR, and ray tracing', sub:'the rendering equation, which the neural models approximate; midterm review in the discussion slot', href:'lectures/L12-light-transport-ray-tracing/index.html' },
-    thu:{ date:'Nov 12', title:'Midterm (first 75 min, weeks 1–6), then path tracing and the Cornell box', sub:'', href:'lectures/L13-path-tracing/index.html' },
-    read:[['light-transport-pbr.html','Light Transport and PBR'],['ray-tracing.html','Ray Tracing'],['color.html','Color']], quiz:'MIDTERM', hw:{ n:6, out:'Nov 12', due:'Wed Nov 18', what:'a Whitted ray tracer; the Cornell box lit directly' } },
+    tue:{ date:'Nov 10', title:'Surface appearance: illumination and texture sampling', sub:'Lambert, Phong, lights, tone mapping; filtering, mipmaps, bump, cube and shadow maps', href:'lectures/L12-illumination-textures/index.html' },
+    thu:{ date:'Nov 12', title:'Light transport, ray tracing and path tracing', sub:'the rendering equation; Whitted ray tracing; Monte Carlo path tracing and the Cornell box', href:'lectures/L13-ray-tracing-path-tracing/index.html' },
+    read:[['illumination.html','Local Illumination'],['texture-mapping.html#magnification','Texture Mapping, Sections 5 to 11'],['unity-shaders.html','Unity Shaders'],['light-transport-pbr.html','Light Transport and PBR'],['ray-tracing.html','Ray Tracing']], quiz:'Q5 (Canvas)', hw:[{ n:5, out:'Tue Nov 10', due:'Wed Nov 18', what:'the grid mesh, the placement matrix, a lit shader' }, { n:6, out:'Thu Nov 12', due:'Wed Nov 25', what:'a Whitted ray tracer; the Cornell box lit directly' }] },
   { wk:'8', kind:'neural',
-    tue:{ date:'Nov 17', title:'Neural networks and embeddings', sub:'', href:'lectures/L14-neural-nets-embeddings/index.html' },
-    thu:{ date:'Nov 19', title:'The space of images', sub:'', href:'lectures/L15-image-space/index.html' },
-    read:[['neural-nets-embeddings.html','Neural Networks and Embeddings'],['image-space.html','The Space of Images']], quiz:'Q5', hw:{ n:7, out:'Nov 19', due:'Wed Nov 25', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
+    tue:{ date:'Nov 17', title:'Animation and physics', sub:'keyframes, easing, kinematics, skinning; particles, springs, cloth, fluids', href:'lectures/L14-animation-physics/index.html' },
+    thu:{ date:'Nov 19', title:'Neural networks and embeddings', sub:'', href:'lectures/L15-neural-nets-embeddings/index.html' },
+    read:[['animation.html','Animation and Interpolation, Sections 1 to 14'],['neural-nets-embeddings.html','Neural Networks and Embeddings']], quiz:'Q6 (Canvas)', hw:{ n:7, out:'Thu Nov 19', due:'Wed Dec 2', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
   { wk:'9', kind:'neural',
-    tue:{ date:'Nov 24', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:'lectures/L16-diffusion-1/index.html' },
+    tue:{ date:'Nov 24', title:'The space of images', sub:'', href:'lectures/L16-image-space/index.html' },
     thu:{ date:'Nov 26', title:'Thanksgiving, no class', sub:'', href:null, off:true },
-    read:[['diffusion-models.html','Diffusion Models']], quiz:'Q6 (Canvas)', hw:null },
+    read:[['image-space.html','The Space of Images']], quiz:null, hw:null },
   { wk:'10', kind:'neural',
-    tue:{ date:'Dec 1', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:'lectures/L17-diffusion-2/index.html' },
-    thu:{ date:'Dec 3', title:'Learned scenes', sub:'neural radiance fields, 3D Gaussian splatting', href:'lectures/L18-learned-scenes/index.html' },
-    read:[['learned-scenes.html','Learned Scenes']], quiz:'Q7', hw:{ n:8, out:'Dec 3', due:'Wed Dec 9', what:'a DDIM stepper; one ray through a volume; one splat projected (JS or Python)' } },
+    tue:{ date:'Dec 1', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:'lectures/L17-diffusion-1/index.html' },
+    thu:{ date:'Dec 3', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:'lectures/L18-diffusion-2/index.html' },
+    read:[['diffusion-models.html','Diffusion Models']], quiz:'Q7 (Canvas)', hw:{ n:8, out:'Thu Dec 3', due:'Fri Dec 11 (no late token)', what:'a DDIM stepper; one ray through a volume; one splat projected (JS or Python)' } },
   { wk:'11', kind:'neural',
-    tue:{ date:'Dec 8', title:'Generative 3D and video, and where the field is going', sub:'', href:'lectures/L19-generative-3d-video/index.html' },
-    thu:{ date:'Dec 10', title:'Inverse rendering', sub:'differentiable rendering, the visibility problem, Mitsuba 3; not on the final', href:'lectures/L20-inverse-rendering/index.html' },
-    read:[['inverse-rendering.html','Inverse and Differentiable Rendering']], quiz:'Q8', hw:null },
+    tue:{ date:'Dec 8', title:'Learned scenes', sub:'neural radiance fields, 3D Gaussian splatting', href:'lectures/L19-learned-scenes/index.html' },
+    thu:{ date:'Dec 10', title:'Generative 3D and video, and where the field is going', sub:'', href:'lectures/L20-generative-3d-video/index.html' },
+    read:[['learned-scenes.html','Learned Scenes']], quiz:'Q8 (Canvas)', hw:null },
   { wk:'F', kind:'bridge', tue:null,
-    thu:{ date:'Dec 17', title:'Final examination', sub:'5:45 PM, in person, two hours, cumulative with weeks 7–11 weighted', href:null },
+    thu:{ date:'Dec 17', title:'Final examination', sub:'5:45 PM, in person, two hours, 25 questions, cumulative', href:null },
     read:[], quiz:'FINAL', hw:null },
 ];
 const lec = (m) => {
@@ -130,8 +131,8 @@ document.getElementById('weeks').innerHTML = `
       <td>${lec(w.tue)}</td>
       <td>${lec(w.thu)}</td>
       <td>${w.read.map(([h, t]) => `<a href="../${T}${h}">${t}</a>`).join('<br>') || '<span class="none">·</span>'}</td>
-      <td>${w.quiz ? `<span class="q${/MIDTERM|FINAL/.test(w.quiz) ? ' exam' : ''}">${w.quiz}</span>` : '<span class="none">·</span>'}</td>
-      <td>${w.hw ? `<a class="hw" href="../homework/hw0${w.hw.n}/index.html">HW${w.hw.n} <span class="d">out ${w.hw.out}, due ${w.hw.due}</span></a><div style="color:var(--dim);font-size:12.5px;margin-top:3px">${w.hw.what}</div>` : '<span class="none">·</span>'}</td>
+      <td>${w.quiz ? `<span class="q${/FINAL/.test(w.quiz) ? ' exam' : ''}">${w.quiz}</span>` : '<span class="none">·</span>'}</td>
+      <td>${[].concat(w.hw || []).map((h) => `<a class="hw" href="../homework/hw0${h.n}/index.html">HW${h.n} <span class="d">out ${h.out}, due ${h.due}</span></a><div style="color:var(--dim);font-size:12.5px;margin:3px 0 6px">${h.what}</div>`).join('') || '<span class="none">·</span>'}</td>
     </tr>`).join('')}
   </tbody>`;
 </script>

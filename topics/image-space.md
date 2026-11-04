@@ -33,7 +33,7 @@
   FIGURES: ../../textbook/figures/img-*.svg|png (computed by tools/gen-textbook-figures.mjs).
   NUMBERS: quoted from textbook/image-space.html (numbers.json keys interp, alias_k*, dctErr,
            distances, digitPcaExplained); the aliasing, PSNR, dimension and pyramid values are
-           recomputed by tools/gen-lecture-figures-d1.mjs (lectures/L16-diffusion-1/analysis/numbers-d1.json).
+           recomputed by tools/gen-lecture-figures-d1.mjs (lectures/L17-diffusion-1/analysis/numbers-d1.json).
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no

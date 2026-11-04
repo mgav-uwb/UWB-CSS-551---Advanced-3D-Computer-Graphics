@@ -409,7 +409,7 @@ Whitted rays go only in **mirror** and **refraction** directions, and to the lig
 - **soft indirect shadows** and light around corners
 - **glossy** reflection (a lobe, not a mirror)
 
-All are the rendering equation's integral over the **whole hemisphere**, which Whitted replaced by at most two directions. Path tracing, on Thursday, restores it.
+All are the rendering equation's integral over the **whole hemisphere**, which Whitted replaced by at most two directions. Path tracing restores it.
 
 
 ---

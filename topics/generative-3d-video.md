@@ -20,8 +20,8 @@
            pixels per degree; stereo disparity in pixels; check on vergence at 0.25 m. Numbers computed with
            lib/core/xform.js and lib/core/diffusion.js in node.
   DEMOS:   data-demo="diffusion-2d" data-controls="steps,stochastic" (demo-full). Media: ../../media/generative/video-strip.jpg, credit line verbatim from media/generative/CREDITS.md.
-  FIGURES: ../../lectures/L19-generative-3d-video/figures/{attention-cost,drift}.svg and numbers.json;
-           ../../lectures/L17-diffusion-2/figures/sds-toy.svg (tools/gen-lecture-figures-d2.mjs).
+  FIGURES: ../../lectures/L20-generative-3d-video/figures/{attention-cost,drift}.svg and numbers.json;
+           ../../lectures/L18-diffusion-2/figures/sds-toy.svg (tools/gen-lecture-figures-d2.mjs).
   PAPERS:  DreamFusion, Video Diffusion Models (Ho et al. 2022), NeRF, 3DGS; added 2026-09-29, every identifier
            confirmed on arXiv: Zero-1-to-3, LRM, LGM, CogVideoX, FVD, the FVD content-bias study, GameNGen, Genie,
            neural radiance caching, real-time neural appearance models.
@@ -31,7 +31,7 @@
            render-then-restyle, FVD, a world model's loop, GameNGen, context noising, Genie, frame generation, jitter,
            accumulation, paths per second, radiance caching, neural materials, the albedo-shading ambiguity,
            relightable captures, and a VR section (budget, motion to photon, reprojection, foveation, stereo, vergence
-           and focus, splats in a headset, half rate plus synthesis). Numbers: lectures/L19-generative-3d-video/figures/
+           and focus, splats in a headset, half rate plus synthesis). Numbers: lectures/L20-generative-3d-video/figures/
            numbers.json key "dense".
 
   reveal.js: FLAT (every slide a top-level "---" section). Notes follow "Note:".
@@ -39,6 +39,7 @@
   outside a code fence. No <small> on math. Paths are relative to the lecture page
   that mounts this topic (lectures/LNN-slug/index.html).
   CUT 2026-10-08: the two multiple-choice Check slides (more views same ratio, a close object); "Why" titles renamed; the view-count point folded into the unknowns slide's note.
+  PATHS 2026-10-25: the lecture re-sequence moved the figures to lectures/L18-diffusion-2 and lectures/L20-generative-3d-video.
 -->
 
 ### Generative 3D and video
@@ -81,7 +82,7 @@ A generated splat cloud or field is not yet an asset. An engine wants:
 
 ## Route 1: how score distillation fails
 
-<img src="../L17-diffusion-2/figures/sds-toy.svg" class="media-shot" style="max-height: 200px;" alt="score distillation pulling twelve starts to one clump near the spiral's center, against DDIM carrying them to twelve points on the spiral">
+<img src="../L18-diffusion-2/figures/sds-toy.svg" class="media-shot" style="max-height: 200px;" alt="score distillation pulling twelve starts to one clump near the spiral's center, against DDIM carrying them to twelve points on the spiral">
 
 - **averaging**: on the spiral, one point 0.122 off the data; in 3D, smooth, over-simple shapes
 - **saturation**: very high guidance makes the average recognizable, and guidance saturates
@@ -335,7 +336,7 @@ A clip is a **block of latents** `(t, y, x, channels)`; the recipe of the diffus
 
 ## The attention bill
 
-<img src="../L19-generative-3d-video/figures/attention-cost.svg" class="media-shot" style="max-height: 230px;" alt="bar chart on a log scale: one frame's attention 1,048,576 scores, factorized space-then-time 17,039,360, full space-time 268,435,456">
+<img src="../L20-generative-3d-video/figures/attention-cost.svg" class="media-shot" style="max-height: 230px;" alt="bar chart on a log scale: one frame's attention 1,048,576 scores, factorized space-then-time 17,039,360, full space-time 268,435,456">
 
 ```text
    full space-time:   16,384² = 268,435,456 scores per layer            (256× one frame)
@@ -387,7 +388,7 @@ Give the model the first frame and ask for the rest:
    denoise the other frames; the given one stays fixed
 ```
 
-- the concatenation mechanism of Tuesday's table, along the time axis
+- the concatenation mechanism of the conditioning table (Diffusion models II), along the time axis
 - the same idea animates a render: make a frame in your engine, let a video model continue it, and the first frame's composition is guaranteed
 
 
@@ -477,7 +478,7 @@ The video version of FID (Unterthiner et al. 2018, arXiv:1812.01717): embed clip
 
 A **world model** predicts the next frame from the previous frames and a controller input: a renderer with **no scene state**, whose errors feed its next input.
 
-<img src="../L19-generative-3d-video/figures/drift.svg" class="media-shot" style="max-height: 200px;" alt="a thrown ball's height over 60 frames: the renderer's exact arc, and a predictor with a one-percent velocity error per frame drifting above it">
+<img src="../L20-generative-3d-video/figures/drift.svg" class="media-shot" style="max-height: 200px;" alt="a thrown ball's height over 60 frames: the renderer's exact arc, and a predictor with a one-percent velocity error per frame drifting above it">
 
 ```text
    a ball thrown up at 5 m/s, 60 Hz; the predictor extrapolates from its own last two frames, 1 % velocity error

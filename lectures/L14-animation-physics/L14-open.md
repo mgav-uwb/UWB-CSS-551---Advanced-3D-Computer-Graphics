@@ -1,0 +1,48 @@
+<!--
+  CSS 551 · Lecture 14 (Tuesday November 17, week 8, online): Animation and Physics.
+  Mounts, in order: L14-open.md, ../../topics/animation.md (~46 min, 35 slides),
+  ../../topics/physics-simulation.md (~44 min, 36 slides), L14-discuss.md (the wrap).
+  Re-sequenced 2026-10-25 (was Lecture 10, Tuesday November 3): after ray and path tracing, the last
+  lecture before the neural weeks.
+
+  Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
+    0:00  opening                                     2 min
+    0:02  animation (topic)                          46 min
+    0:48  physics inside the frame loop (topic)      44 min
+    1:32  wrap                                        4 min
+    1:36  questions, HW5 and HW6 help; buffer        24 min
+    2:00  end
+  CUT 2026-10-08: the four discussion questions (L14-discuss.md); the predict-first slide
+  on the spring cloth (physics-simulation.md).
+  Demos: keyframe (t,ease), cloth (stiffness,substeps), fluid (viscosity,sound).
+  Numbers: numbers-motion.json anim.*, lib/core/sim-cloth.js and sim-fluid.js.
+
+  reveal.js: FLAT; notes follow "Note:"; plain-unicode math; never two "_" on one
+  markdown line outside a code fence; no em-dashes.
+-->
+
+## CSS 551
+
+### Advanced 3D Computer Graphics
+
+**Lecture 14: Animation and Physics**
+
+> Luxo Jr. (1986) was the first 3D computer-animated film nominated for an Academy Award.
+
+<small>59th Academy Awards, 1987</small>
+
+<small>Autumn 2026 · Tue 5:45–7:45 PM (online) · Dr. Marcel Gavriliu</small>
+
+
+---
+
+## Tonight
+
+- **Keyframes and timing**: in-betweening, the Catmull-Rom spline (live), Bézier channels, easing, squash
+- **Rotations and transforms**: no matrix lerp, slerp between keys, the Euler wrap, squad, TRS rebuilt
+- **Skeletons**: forward and inverse kinematics, skinning and the candy wrapper, blend shapes, motion capture, blend trees
+- **Physics in the loop**: one spring three ways, Verlet, substeps, cloth by springs and by constraints (live)
+- **Contacts, rigid bodies, hair, fluids**: one bounce, broad and narrow phase, stacking, strands, smoothed particles (live)
+
+Reading: [Animation and Interpolation](../../textbook/animation.html).
+

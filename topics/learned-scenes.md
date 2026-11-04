@@ -9,7 +9,7 @@
            against step size, the background; one density gradient by hand, training cost counted; Instant-NGP's hash
            grid and its collisions, Mip-NeRF's cones, Mip-NeRF 360's contraction, NeuS; a splat in bytes, the 0.3 px^2
            dilation, tiles and the sort key, harmonic counts, clone and split, popping, Mip-Splatting, 2DGS, marching
-           cubes' 256 cases; PSNR, SSIM, LPIPS; a reading list. Numbers: lectures/L18-learned-scenes/figures/numbers.json
+           cubes' 256 cases; PSNR, SSIM, LPIPS; a reading list. Numbers: lectures/L19-learned-scenes/figures/numbers.json
            key "dense" (tools/gen-lecture-figures-d2.mjs); constants quoted from the public NeRF and 3DGS code. Also:
            inverse rendering; a scene as a function (NeRF) and positional encoding; volume rendering, the integral and its discrete form, one ray worked by hand; the expected depth a field gives for free; the thin-surface sampling pitfall and hierarchical sampling by inverting the weights' cumulative sum; training through the renderer and what it cannot see; 3DGS back to primitives; a splat's footprint from its covariance; where the covariance comes from (scale and quaternion), the projection Jacobian worked at two depths, spherical-harmonic color worked from two directions; densification and pruning; three splats blended by hand; the live splat scene; from a field back to a mesh (marching squares, one cell); mesh against NeRF against splats; learned scene against learned image.
   EXPANDED 2026-10-05: the transmittance derived from absorption; one slab exact and the weights' telescoping sum;

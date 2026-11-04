@@ -464,22 +464,22 @@ const LECTURES = {
   L02:{ title:"The Big Picture, part 2", href:"lectures/L02-big-picture-2/index.html" },
   L03:{ title:"Building blocks: vectors, MVC, the main loop", href:"lectures/L03-building-blocks/index.html" },
   L04:{ title:"Rotation", href:"lectures/L04-rotation/index.html" },
-  L05:{ title:"Affine transformations", href:"lectures/L05-affine/index.html" },
+  L05:{ title:"Vectors: dot, cross, distances", href:null },
   L06:{ title:"Vectors and rotation", href:"lectures/L06-recap-rotation-scene-graphs/index.html" },
   L07:{ title:"Scene graphs", href:"lectures/L07-scene-graphs/index.html" },
-  L08:{ title:"Viewing", href:"lectures/L08-viewing/index.html" },
-  L09:{ title:"Rasterization and antialiasing", href:"lectures/L09-rasterization-antialiasing/index.html" },
-  L10:{ title:"Animation and physics", href:"lectures/L10-animation-physics/index.html" },
-  L11:{ title:"Surface appearance: illumination and texture mapping", href:"lectures/L11-illumination-textures/index.html" },
-  L12:{ title:"Light transport, PBR, and ray tracing", href:"lectures/L12-light-transport-ray-tracing/index.html" },
-  L13:{ title:"Midterm, then path tracing", href:"lectures/L13-path-tracing/index.html" },
-  L14:{ title:"Neural networks and embeddings", href:"lectures/L14-neural-nets-embeddings/index.html" },
-  L15:{ title:"The space of images", href:"lectures/L15-image-space/index.html" },
-  L16:{ title:"Diffusion models I", href:"lectures/L16-diffusion-1/index.html" },
-  L17:{ title:"Diffusion models II", href:"lectures/L17-diffusion-2/index.html" },
-  L18:{ title:"Learned scenes", href:"lectures/L18-learned-scenes/index.html" },
-  L19:{ title:"Generative 3D and video", href:"lectures/L19-generative-3d-video/index.html" },
-  L20:{ title:"Inverse rendering", href:"lectures/L20-inverse-rendering/index.html" },
+  L08:{ title:"Affine transformations and the scene graph as matrices", href:"lectures/L08-affine-scene-graphs/index.html" },
+  L09:{ title:"Viewing", href:"lectures/L09-viewing/index.html" },
+  L10:{ title:"Rasterization and antialiasing", href:"lectures/L10-rasterization-antialiasing/index.html" },
+  L11:{ title:"Meshes and texture coordinates", href:"lectures/L11-meshes-textures/index.html" },
+  L12:{ title:"Surface appearance: illumination and texture sampling", href:"lectures/L12-illumination-textures/index.html" },
+  L13:{ title:"Light transport, ray tracing and path tracing", href:"lectures/L13-ray-tracing-path-tracing/index.html" },
+  L14:{ title:"Animation and physics", href:"lectures/L14-animation-physics/index.html" },
+  L15:{ title:"Neural networks and embeddings", href:"lectures/L15-neural-nets-embeddings/index.html" },
+  L16:{ title:"The space of images", href:"lectures/L16-image-space/index.html" },
+  L17:{ title:"Diffusion models I", href:"lectures/L17-diffusion-1/index.html" },
+  L18:{ title:"Diffusion models II", href:"lectures/L18-diffusion-2/index.html" },
+  L19:{ title:"Learned scenes", href:"lectures/L19-learned-scenes/index.html" },
+  L20:{ title:"Generative 3D and video", href:"lectures/L20-generative-3d-video/index.html" },
 };
 const HW = n => ({ n, href:`homework/hw0${n}/index.html` });
 
@@ -489,24 +489,24 @@ const WEEKS = [
     handouts:["history","unity","webgl"], demos:["raster","lod","mesh-view","our-scene","keyframe","bump-map"] },
   { id:"W2",  title:"The Big Picture; building blocks: vectors, MVC, the loop", tue:"L02", thu:"L03", hw:HW(1), quiz:null,
     handouts:["history","vectors","linalg","trig","interaction","unity","webgl"], demos:["dot-cross","mvc-transform"] },
-  { id:"W3",  title:"Rotation and affine transformations", tue:"L04", thu:"L05", hw:HW(2), quiz:"Q1",
-    handouts:["vectors","rotation","affine","linalg","trig"], demos:["vec-geometry","rotation-ways","axis-angle","spin-step","rot-compose","quat-slerp","euler-gimbal","trs-order","football"] },
-  { id:"W4",  title:"Meshes and scene graphs", tue:"L06", thu:"L07", hw:HW(3), quiz:"Q2",
-    handouts:["linalg","trig","scenegraphs","meshes","textures"], demos:["mesh-grid","uv-placement","fur","simplify-compare","scene-graph"] },
-  { id:"W5",  title:"Viewing, rasterization, antialiasing", tue:"L08", thu:"L09", hw:HW(4), quiz:"Q3",
-    handouts:["viewing","interaction","raster","antialiasing"], demos:["view-matrix","projection","raster","raster-walk"] },
-  { id:"W6",  title:"Animation and physics; illumination and texture mapping", tue:"L10", thu:"L11", hw:HW(5), quiz:"Q4",
-    handouts:["animation","illumination","textures","unityshaders","webglshaders","curves"], demos:["keyframe","cloth","fluid","illumination","bump-map"] },
-  { id:"W7",  title:"The bridge: light transport and ray tracing", tue:"L12", thu:"L13", hw:HW(6), quiz:"Midterm", bridge:true,
-    handouts:["pbr","raytracing","color"], demos:["brdf-lobe"] },
-  { id:"W8",  title:"Networks, embeddings, the space of images", tue:"L14", thu:"L15", hw:HW(7), quiz:"Q5", neural:true,
-    handouts:["nets","images"], demos:["mlp-fit","embed-map","diffusion-image"] },
-  { id:"W9",  title:"Diffusion models I (Thanksgiving Thursday)", tue:"L16", thu:null, hw:null, quiz:"Q6 (Canvas)", neural:true,
+  { id:"W3",  title:"Rotation; vectors", tue:"L04", thu:"L05", hw:HW(2), quiz:"Q1",
+    handouts:["vectors","rotation","linalg","trig"], demos:["vec-geometry","rotation-ways","axis-angle","spin-step","rot-compose"] },
+  { id:"W4",  title:"Vectors and rotation; scene graphs", tue:"L06", thu:"L07", hw:null, quiz:"Q2",
+    handouts:["linalg","trig","rotation","scenegraphs"], demos:["axis-angle","quat-slerp","euler-gimbal","scene-graph","football"] },
+  { id:"W5",  title:"Affine transformations and the scene graph as matrices; viewing", tue:"L08", thu:"L09", hw:HW(3), quiz:"Q3 (Canvas)",
+    handouts:["affine","scenegraphs","viewing","interaction"], demos:["trs-order","scene-graph","football","view-matrix","projection"] },
+  { id:"W6",  title:"Rasterization and antialiasing; meshes and texture coordinates", tue:"L10", thu:"L11", hw:HW(4), quiz:"Q4 (Canvas)",
+    handouts:["raster","antialiasing","meshes","textures"], demos:["raster","raster-walk","mesh-grid","uv-placement","simplify-compare","fur"] },
+  { id:"W7",  title:"Illumination and texture sampling; light transport, ray and path tracing", tue:"L12", thu:"L13", hw:[HW(5), HW(6)], quiz:"Q5 (Canvas)", bridge:true,
+    handouts:["illumination","textures","unityshaders","webglshaders","pbr","raytracing","color"], demos:["illumination","bump-map","brdf-lobe"] },
+  { id:"W8",  title:"Animation and physics; networks and embeddings", tue:"L14", thu:"L15", hw:HW(7), quiz:"Q6 (Canvas)", neural:true,
+    handouts:["animation","curves","nets"], demos:["keyframe","cloth","fluid","mlp-fit","embed-map"] },
+  { id:"W9",  title:"The space of images (Thanksgiving Thursday)", tue:"L16", thu:null, hw:null, quiz:null, neural:true,
+    handouts:["images"], demos:["diffusion-image"] },
+  { id:"W10", title:"Diffusion models I and II", tue:"L17", thu:"L18", hw:HW(8), quiz:"Q7 (Canvas)", neural:true,
     handouts:["diffusion"], demos:["diffusion-image","diffusion-2d","diffusion-digits","diffusion-net"] },
-  { id:"W10", title:"Diffusion models II and learned scenes", tue:"L17", thu:"L18", hw:HW(8), quiz:"Q7", neural:true,
-    handouts:["diffusion","scenes"], demos:["gsplat"] },
-  { id:"W11", title:"Generative 3D and video; inverse rendering", tue:"L19", thu:"L20", hw:null, quiz:"Q8", neural:true,
-    handouts:["scenes","inverse"], demos:["inverse-render"] },
+  { id:"W11", title:"Learned scenes; generative 3D and video", tue:"L19", thu:"L20", hw:null, quiz:"Q8 (Canvas)", neural:true,
+    handouts:["scenes"], demos:["gsplat"] },
   { id:"F",   title:"Final examination, Thursday December 17, 5:45 PM", tue:null, thu:null, hw:null, quiz:"Final", handouts:[], demos:[] },
 ];
 
@@ -528,7 +528,7 @@ const sessionCell = w => `
         <div><div class="ctitle">${w.title}</div></div>
       </div>
       ${w.id === "F" ? "" : `<div class="pair">${lecChip("Tue", w.tue) + lecChip("Thu", w.thu)}</div>`}
-      <div class="marks">${w.hw ? `<a class="chip hwc" href="${w.hw.href}"><span class="t">HW${w.hw.n}</span></a>` : ""}${w.quiz ? `<span class="qm${/Midterm|Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</div>
+      <div class="marks">${[].concat(w.hw || []).map(h => `<a class="chip hwc" href="${h.href}"><span class="t">HW${h.n}</span></a>`).join("")}${w.quiz ? `<span class="qm${/Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</div>
     </div>
   </div>`;
 
@@ -565,7 +565,7 @@ document.getElementById("weeks").innerHTML = WEEKS.map(w => `
     <summary>
       <span class="wn">${weekName(w)}</span>
       <span class="wt">${topicLine(w)}</span>
-      <span class="wm">${w.id === weekNow ? '<span class="nowtag">this week</span>' : ""}${w.hw ? `<span class="hwtag">HW${w.hw.n}</span>` : ""}${w.quiz ? `<span class="qm${/Midterm|Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</span>
+      <span class="wm">${w.id === weekNow ? '<span class="nowtag">this week</span>' : ""}${[].concat(w.hw || []).map(h => `<span class="hwtag">HW${h.n}</span>`).join("")}${w.quiz ? `<span class="qm${/Final/.test(w.quiz) ? " exam" : ""}">${w.quiz}</span>` : ""}</span>
     </summary>
     <div class="wkbody">${sessionCell(w) + handoutCell(w) + demoCell(w)}</div>
   </details>`).join("");
@@ -591,6 +591,6 @@ const demoChip = (k) => DEMOS[k] ? `
 document.getElementById("alldemos").innerHTML = CATALOG.map(([name, ks]) => `
   <h3 class="dsec">${name}</h3><div class="dgrid">${ks.map(demoChip).join("")}</div>`).join("");
 </script>
-<script type="module">import { mountExtras } from "./lib/site-extras.js?v=26"; mountExtras({ base: "./" });</script>
+<script type="module">import { mountExtras } from "./lib/site-extras.js?v=27"; mountExtras({ base: "./" });</script>
 </body>
 </html>

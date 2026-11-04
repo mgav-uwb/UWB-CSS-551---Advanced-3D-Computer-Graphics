@@ -40,7 +40,7 @@
            "diffusion-digits" data-controls="steps" and data-controls="smooth"; "diffusion-net"
            data-controls="steps"; all demo-full.
   FIGURES: ../../textbook/figures/diff-*.svg|png (computed by tools/gen-textbook-figures.mjs).
-  NUMBERS: recomputed by tools/gen-lecture-figures-d1.mjs (lectures/L16-diffusion-1/analysis/numbers-d1.json:
+  NUMBERS: recomputed by tools/gen-lecture-figures-d1.mjs (lectures/L17-diffusion-1/analysis/numbers-d1.json:
            schedule, linear, exact2, exact3, ddim, flow, steps) and checked against
            textbook/figures/numbers.json; the digit and network figures' numbers are quoted from
            textbook/diffusion-models.html Sections 1, 3 and 6.
@@ -1017,7 +1017,7 @@ The demos' distance is the **root-mean-square** pixel difference, in [−1, 1] u
 
 ## A network has no ceiling
 
-A network is smooth between examples in the space of **functions**, not of pixels (lecture 14's approximator). Trained to approximate the posterior mean on 60,000 digits, it learns the regularities of strokes.
+A network is smooth between examples in the space of **functions**, not of pixels (the neural-networks topic's approximator). Trained to approximate the posterior mean on 60,000 digits, it learns the regularities of strokes.
 
 <img src="../../textbook/figures/diff-net-samples.png" class="media-shot" style="max-height: 250px;" alt="one hundred digits drawn by the course's network, ten per class">
 

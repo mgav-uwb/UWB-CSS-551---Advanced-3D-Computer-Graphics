@@ -34,7 +34,7 @@
            data-demo="embed-map" data-controls="highlight" (demo-full; reads lib/assets/mnist/mlp-denoiser.bin).
   FIGURES: ../../textbook/figures/nn-*.svg|png (computed by tools/gen-textbook-figures.mjs).
   NUMBERS: every value is recomputed by tools/gen-lecture-figures-d1.mjs
-           (lectures/L16-diffusion-1/analysis/numbers-d1.json) and agrees with
+           (lectures/L17-diffusion-1/analysis/numbers-d1.json) and agrees with
            textbook/figures/numbers.json; the rest are quoted from textbook/neural-nets-embeddings.html.
   Replaces, for Plan C, the networks half of topics/archive/learned-images-foundations.md (archived).
 

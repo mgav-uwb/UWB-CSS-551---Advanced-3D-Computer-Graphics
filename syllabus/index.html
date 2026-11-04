@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- CSS 551 AU26 syllabus: the authority for grading and policies (Canvas holds only submissions, grades and
-     announcements; see canvas/README.md). Points and policies decided 2026-09-30, mirroring CSS 343 AU26.
+     announcements; see canvas/README.md). Points and policies decided 2026-09-30, mirroring CSS 343 AU26;
+     re-planned 2026-10-25 (no midterm, Canvas quizzes from Quiz 3, final 500 / quizzes 250 / homework 250).
      Styled like the hub. -->
 <html lang="en">
 <head>
@@ -55,14 +56,13 @@
 <h2>The course</h2>
 <p>
   How a computer turns a description of a three-dimensional world into a picture, and, increasingly, how it
-  learns that world from pictures. The first half builds the foundation every renderer shares: vectors
-  and the interactive loop, rotations, affine transformations, meshes and texture coordinates, scene graphs,
-  cameras and projection, rasterization, animation and physics, and local illumination with texture
-  sampling, with the film pipeline along the way. A bridge
-  week states the rendering equation and the physically based materials and ray tracing that solve it. The
-  second half is the neural era: networks and embeddings, the space of images, diffusion models, learned
-  scenes (neural radiance fields and Gaussian splatting), and generative 3D and video. About 40 % of the
-  class is on the neural side.
+  learns that world from pictures. The first part builds the foundation every renderer shares: vectors
+  and the interactive loop, rotations, scene graphs, affine transformations, cameras and projection,
+  rasterization, meshes and texture coordinates, and local illumination with texture sampling, with the
+  film pipeline along the way; then the rendering equation, the physically based materials and ray and path
+  tracing that solve it, and animation and physics. The last part is the neural era: networks and
+  embeddings, the space of images, diffusion models, learned scenes (neural radiance fields and Gaussian
+  splatting), and generative 3D and video. About a third of the class is on the neural side.
 </p>
 <p>
   No prior graphics or Unity experience is assumed. Programming maturity in a C-family language and
@@ -90,13 +90,12 @@
 </ul>
 
 <h2>Grading</h2>
-<p>The course is worth <b>1000 points</b>, and a point is always 0.1 % of the grade: your points divided by 10 is your percentage. 80 % of the points are on paper, in person.</p>
+<p>The course is worth <b>1000 points</b>, and a point is always 0.1 % of the grade: your points divided by 10 is your percentage. Half the points (the final) are on paper, in person. There is no midterm.</p>
 <table>
   <tr><th>Component</th><th>Items</th><th>Points each</th><th>Counted</th><th>Points</th><th>Weight</th></tr>
-  <tr><td>Final exam</td><td>1</td><td>360 (45 questions, 8 each)</td><td>1</td><td>360</td><td>36 %</td></tr>
-  <tr><td>Weekly quizzes</td><td>8</td><td>40 (8 questions, 5 each)</td><td>best 6</td><td>240</td><td>24 %</td></tr>
-  <tr><td>Midterm exam</td><td>1</td><td>200 (25 questions, 8 each)</td><td>1</td><td>200</td><td>20 %</td></tr>
-  <tr><td>Homework</td><td>8</td><td>25</td><td>all 8</td><td>200</td><td>20 %</td></tr>
+  <tr><td>Final exam</td><td>1</td><td>500 (25 questions, 20 each)</td><td>1</td><td>500</td><td>50 %</td></tr>
+  <tr><td>Weekly quizzes</td><td>8</td><td>50 (8 questions)</td><td>best 5</td><td>250</td><td>25 %</td></tr>
+  <tr><td>Homework</td><td>8</td><td>31.25 (the rubric score out of 100 times 0.3125)</td><td>all 8</td><td>250</td><td>25 %</td></tr>
   <tr><th>Total</th><td></td><td></td><td></td><th>1000</th><th>100 %</th></tr>
 </table>
 <p>Grades are not curved. The percentage maps to grade points on the standard UW decimal scale (the minimum score for each grade point, below); a final score below 60 % is a 0.0.</p>
@@ -126,28 +125,35 @@
 <h2>How the course runs</h2>
 <h3>Lectures</h3>
 <p>
-  Two lectures a week: Tuesday online, Thursday in person. Each runs 80 to 90 minutes with the demos driven
-  together (predict the readout, then run it) and ends in discussion: a question is projected, you commit
+  Two lectures a week: Tuesday online, Thursday in person. Each uses the full two hours, with the demos driven
+  together (predict the readout, then run it), and ends in discussion: a question is projected, you commit
   to an answer, argue in pairs, and answer again. The slides, the course text and the demos are on the
   <a href="../index.html">course hub</a>. There are no recordings.
 </p>
 <h3>Weekly quizzes</h3>
 <p>
-  On paper, in the first 20 minutes of Thursday class, in weeks 3 to 6, 8, 10 and 11, and on Canvas in
-  week 9: eight quizzes of 8 multiple-choice questions, 5 points each. A quiz covers the previous
-  Thursday's lecture, that week's Tuesday lecture, and the homework due the day before, and some
-  questions ask what your homework computed. The history lectures (weeks 1 and 2) are on no quiz; the
-  midterm and the final assess them. Quiz 6 falls in Thanksgiving week, which has no Thursday class: it
-  is a Canvas quiz in the same format (8 questions, 20 minutes, one attempt), open from Thursday,
-  November 26, 12:00 AM to Sunday, November 29, 11:59 PM, taken alone and without notes. The best six
-  count. Quizzes are closed book: no notes, no sheet, no devices. There are no make-up quizzes: the two
-  dropped scores cover absences.
+  Eight quizzes of 8 multiple-choice questions, 50 points each; the best five count. Quizzes 1 and 2 were
+  on paper in class (8 questions, 5 points each); each counts as its percentage of 50. Quizzes 3 to 8 are
+  on Canvas: 8 questions, 6.25 points each, 45 minutes, one attempt, open from Thursday at 8:00 PM, after
+  class, to Sunday at 11:59 PM. There is no quiz in Thanksgiving week. A quiz covers the lectures since
+  the previous quiz and the homework due since then, and some questions ask what your homework computed.
+  The history lectures (weeks 1 and 2) are on no quiz; the final assesses them.
+</p>
+<p>
+  Canvas quizzes are <b>open book</b>: your notes, the course text and the slides. Every value is
+  <b>computed by hand</b>: pencil and paper, with a basic calculator for the arithmetic; no code, no math
+  or graphics software, no AI tools, and no help from another person. The first question of each quiz is
+  an honor statement that you work this way, and the quiz counts only when you affirm it. Results and the
+  correct answers are shown on the Monday after the window closes. There are no make-up quizzes: the
+  three dropped scores cover absences.
 </p>
 <h3>Homework: two tracks</h3>
 <p>
-  Eight assignments, out Thursday, due the next <b>Wednesday at 11:59 PM</b>, 25 points each. Each states
-  what to build and the numbers a correct build reproduces, and gives a skeleton in each of two tracks;
-  you choose per assignment.
+  Eight assignments, each due on a <b>Wednesday at 11:59 PM</b> (HW8 on Friday, December 11), 31.25 points
+  each: the rubric score out of 100 times 0.3125. The <a href="../schedule/index.html">schedule</a> and the
+  <a href="../homework/index.html">homework page</a> list the dates. Each assignment states what to build
+  and the numbers a correct build reproduces, and gives a skeleton in each of two tracks; you choose per
+  assignment.
 </p>
 <table>
   <tr><th>Track</th><th>What you get</th><th>What you submit</th></tr>
@@ -167,28 +173,27 @@
   three.js). You build the operation from primitives and check it against the engine's version: the engine
   is the answer key, not the tool.
 </div>
-<h3>Exams</h3>
+<h3>Final exam</h3>
 <p>
-  Multiple choice, on paper, in person. <b>Midterm</b> (200 points, 25 questions): Thursday, November 12, the
-  first 75 minutes of class, on weeks 1 to 6. <b>Final</b> (360 points, 45 questions): Thursday,
-  December 17, 5:45&ndash;7:45 PM, cumulative with weeks 7 to 11 weighted. No make-up exams, earlier or
-  later. Bring a pencil; no devices.
+  One exam, the final: multiple choice, on paper, in person, 500 points (25 questions, 20 points each),
+  Thursday, December 17, 5:45&ndash;7:45 PM, cumulative over the whole course. There is no midterm. No
+  make-up exam, earlier or later. Bring a pencil; no devices.
 </p>
 <div class="box warn">
-  <b>One handwritten cheat sheet per exam.</b> You may bring one sheet of US Letter paper, both sides,
+  <b>One handwritten cheat sheet.</b> You may bring one sheet of US Letter paper, both sides,
   written by hand by you: not printed, photocopied, typed, or printed from a tablet. <b>Everyone hands in
   a sheet with the exam</b>: your cheat sheet, or, if you did not use one, a sheet with your name and the
   written statement &ldquo;I did not use a cheat sheet.&rdquo; No sheet handed in, or a cheat sheet that is
-  not handwritten, costs <b>50 % of that exam's points</b>. Quizzes allow no sheet.
+  not handwritten, costs <b>50 % of the exam's points</b>.
 </div>
 
 <h2>Policies</h2>
 <h3>Late work and late tokens</h3>
 <p>
   Everyone has <b>2 late tokens</b> for the term. A token extends one homework deadline by 48 hours; declare
-  it in the submission comment. Tokens do not apply to quizzes or exams. Without a token, late work is not
-  accepted, and nothing is accepted after the last day of instruction, Friday, December 11. Submit on
-  Canvas, not by email.
+  it in the submission comment. Tokens do not apply to quizzes or the final. Without a token, late work is
+  not accepted, and nothing is accepted after the last day of instruction, Friday, December 11, so no token
+  extends HW8, which is due that day. Submit on Canvas, not by email.
 </p>
 <h3>Academic integrity</h3>
 <p>
@@ -203,7 +208,7 @@
 <p>
   AI tools may be used for learning, and for limited help on homework if you disclose it: cite the tool,
   summarize your prompts, and note any AI-assisted code in a comment. Using AI for a whole assignment is
-  misconduct, and AI is not allowed during quizzes or exams. If you used none, say so: &ldquo;I did not use
+  misconduct, and AI is not allowed during quizzes or the final. If you used none, say so: &ldquo;I did not use
   any AI tools for this assignment.&rdquo; Be ready to explain every line you submit; quiz questions ask
   about your homework.
 </p>
@@ -213,7 +218,8 @@
 <p>
   Contact <a href="https://depts.washington.edu/uwdrs/" target="_blank" rel="noopener">Disability Resources
   for Students</a> early, within the first two weeks, and have your DRS counselor contact the instructor.
-  Exam accommodations must be requested through DRS at least 10 business days before each exam.
+  Exam accommodations must be requested through DRS at least 10 business days before the final; extra
+  time on the Canvas quizzes is set from your DRS letter.
 </p>
 <h3>Grade questions</h3>
 <p>Bring any grading concern to the instructor within one week of the work being returned; after that, grades are final.</p>
@@ -226,8 +232,8 @@
 </p>
 
 <footer>
-  CSS 551 · Autumn 2026 · Dr. Marcel Gavriliu. Syllabus v2.2, 2026-10-05.
+  CSS 551 · Autumn 2026 · Dr. Marcel Gavriliu. Syllabus v3.0, 2026-10-25.
 </footer>
-<script type="module">import { mountExtras } from "../lib/site-extras.js?v=26"; mountExtras();</script>
+<script type="module">import { mountExtras } from "../lib/site-extras.js?v=27"; mountExtras();</script>
 </body>
 </html>

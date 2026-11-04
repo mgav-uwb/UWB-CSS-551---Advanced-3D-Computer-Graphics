@@ -22,8 +22,8 @@
   NUMBERS: the 2026-10-05 slides were computed with node scripts on lib/core/diffusion.js and lib/core/diffusion-nd.js
            (spiral exact denoiser, MNIST subset with the demo's seed 5); not yet in numbers.json.
   FIGURES: ../../textbook/figures/diff-*.svg|png (tools/gen-textbook-figures.mjs, numbers.json; diff-sampler-steps.svg added);
-           the densified slides' numbers: lectures/L17-diffusion-2/figures/numbers.json, key "dense";
-           ../../lectures/L17-diffusion-2/figures/{sds-toy,depth-buffer}.svg and numbers.json
+           the densified slides' numbers: lectures/L18-diffusion-2/figures/numbers.json, key "dense";
+           ../../lectures/L18-diffusion-2/figures/{sds-toy,depth-buffer}.svg and numbers.json
            (tools/gen-lecture-figures-d2.mjs). Media: ../../media/generative/{cfg-row,controlnet-depth}.jpg,
            credit lines verbatim from media/generative/CREDITS.md.
 
@@ -32,6 +32,7 @@
   outside a code fence. No <small> on math. Paths are relative to the lecture page
   that mounts this topic (lectures/LNN-slug/index.html).
   CUT 2026-10-08: the five multiple-choice Check slides (guidance clipping, another image token, tokens at 1024, the zero copy, two FIDs); "Why" titles renamed; the zero-copy and FID-ranking points folded into the preceding notes.
+  PATHS 2026-10-25: the lecture re-sequence moved the figures from lectures/L17-diffusion-2 to lectures/L18-diffusion-2.
 -->
 
 ### Diffusion models II: conditioning, guidance, latents, control, text to 3D
@@ -766,7 +767,7 @@ A **trainable copy** of the frozen model's encoder reads a structural image (dep
 
 ## Your depth buffer is not that depth map
 
-<img src="../L17-diffusion-2/figures/depth-buffer.svg" class="media-shot" style="max-height: 250px;" alt="the stored depth-buffer value rising steeply near the eye and flattening toward the far plane, against a straight line linear in distance">
+<img src="../L18-diffusion-2/figures/depth-buffer.svg" class="media-shot" style="max-height: 250px;" alt="the stored depth-buffer value rising steeply near the eye and flattening toward the far plane, against a straight line linear in distance">
 
 ```text
    n = 1, f = 8 (the viewing chapter's P):   A = −(f+n)/(f−n) = −1.2857    B = −2fn/(f−n) = −2.2857
@@ -948,7 +949,7 @@ Scene: a 3D point `θ = (0.5, 0.5, 0.2)`. Camera A renders `(θx, θy)`, camera 
 
 ## What score distillation converges to
 
-<img src="../L17-diffusion-2/figures/sds-toy.svg" class="media-shot" style="max-height: 290px;" alt="left: twelve points pulled by score distillation from scattered starts to one clump near the spiral's center; right: DDIM carries the same twelve starts onto twelve different places on the spiral">
+<img src="../L18-diffusion-2/figures/sds-toy.svg" class="media-shot" style="max-height: 290px;" alt="left: twelve points pulled by score distillation from scattered starts to one clump near the spiral's center; right: DDIM carries the same twelve starts onto twelve different places on the spiral">
 
 - 400 steps: all twelve collapse to **one point** (spread 0.035), **0.122 off the data**; DDIM: spread 0.48, 0.006 from the data
 - it seeks a θ likely **at every noise level at once**; at high noise the estimate is the data's mean, so it **averages**, it does not sample
@@ -984,7 +985,7 @@ From the paper (Poole et al. 2022, arXiv:2209.14988):
 | Zero-1-to-3 (Liu et al. 2023, arXiv:2303.11328) | an image model conditioned on a **relative camera change**: the step to the multi-view route |
 
 - all three keep the core loop: render, noise, ask a frozen image model, backpropagate through the renderer
-- the next lecture takes the multi-view route further
+- the generative 3D topic takes the multi-view route further
 
 
 ---
