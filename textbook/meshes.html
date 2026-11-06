@@ -221,7 +221,7 @@ console.log('V', m.positions.length / 3, 'E', cnt.size, 'F', m.indices.length / 
   'boundary', [...cnt.values()].filter((c) => c === 1).length);"
 V 454 E 1325 F 868 chi -3 boundary 46</pre>
           Change <code>l0</code> to <code>l3</code> for the full mesh (35,947 declared vertices, of which 1,113 are referenced by no triangle; Section 4 explains the count).</li>
-          <li>In the <a href="../lib/demo.html?demo=mesh-grid" target="_blank" rel="noopener">mesh-grid demo</a>, set \(n = 2\), turn on the normals overlay and drag the lift to 0.4: the six arrows around the center tilt inward and the center arrow stays vertical, the numbers of Section 5.</li>
+          <li>In the <a href="../lib/demo.html?demo=mesh-grid" target="_blank" rel="noopener">mesh-grid demo</a>, set \(n = 2\), turn on the normals overlay and drag the lift to 0.4: the arrows at the four mid-edge vertices lean away from the center and the center arrow stays vertical, the numbers of Section 5.</li>
         </ol>
       </div>
 
@@ -339,16 +339,16 @@ V 454 E 1325 F 868 chi -3 boundary 46</pre>
         <span class="tag">Worked example (two vertex normals)</span>
         Vertex 1 sits on faces \(t_0, t_1, t_2\), with face normals \((0, 2.25, 0)\), \((-0.6, 2.25, -0.6)\) and
         \((0, 2.25, -0.6)\). Their sum is \((-0.6, 6.75, -1.2)\), length 6.88, so
-        \(\mathbf{n}_1 = (-0.087, 0.981, -0.174)\): tilted \(11.2^\circ\) from vertical, toward the peak, the
-        direction a smooth tent surface would face there. Vertex 4 sits on all six tilted faces; their
+        \(\mathbf{n}_1 = (-0.087, 0.981, -0.174)\): tilted \(11.2^\circ\) from vertical, away from the peak, the
+        direction a smooth tent surface faces on its slope. Vertex 4 sits on all six tilted faces; their
         horizontal components cancel in pairs and the sum is \((0, 13.5, 0)\), so \(\mathbf{n}_4 = (0, 1, 0)\).
         The highest point of a symmetric tent faces straight up. The corners 0 and 8 each touch one flat
         face and keep \((0, 1, 0)\).
       </div>
       <figure>
-        <img src="figures/mesh-normals.svg" alt="Two views of the lifted grid: on the left one green arrow per triangle, the tilted face normals, with t1 in red; on the right one arrow per vertex, the averaged vertex normals, with v1 in orange leaning toward the peak and v4 in red pointing straight up." />
+        <img src="figures/mesh-normals.svg" alt="Two views of the lifted grid: on the left one green arrow per triangle, the tilted face normals, with t1 in red; on the right one arrow per vertex, the averaged vertex normals, with v1 in orange leaning away from the peak and v4 in red pointing straight up." />
         <figcaption>
-          Face normals (left) and vertex normals (right) of the lifted grid, computed by the demo&rsquo;s own accumulation code. The face normals lean away from the peak; the averaged vertex normals lean toward it, and the peak itself is vertical.
+          Face normals (left) and vertex normals (right) of the lifted grid, computed by the demo&rsquo;s own accumulation code. The face normals lean away from the peak, and so do the averaged vertex normals of the mid-edge vertices; the peak itself is vertical.
         </figcaption>
       </figure>
       <p>
@@ -610,6 +610,10 @@ V 454 E 1325 F 868 chi -3 boundary 46</pre>
           <tr><td>\(\mathbf{v}_1 = (0, 0, -1.5)\)</td><td>1.457</td><td>on \(t_0, t_1, t_2\); far below the four planes on the other side of the tent</td></tr>
           <tr><td>the minimum, \((0, 0.338, 0)\)</td><td>0.135</td><td>the linear solve: slightly below the peak, trading a little floor error for less tilt error</td></tr>
         </table>
+        These sums count each of the seven planes once. The algorithm adds the two vertices&rsquo; quadrics, which counts
+        the planes they share, \(t_1\) and \(t_2\), twice (Garland and Heckbert accept the double count). The first
+        three costs do not change, since the edge lies on both shared planes, and the minimum moves to
+        \((0, 0.348, -0.065)\), cost 0.139.
         Now the edge \((\mathbf{v}_0, \mathbf{v}_1)\): \(\mathbf{v}_0\) lies on \(t_0\) only, and \(t_0\) is one of
         \(\mathbf{v}_1\)&rsquo;s three planes, so collapsing to \(\mathbf{v}_1\) costs \(Q = 0\) exactly. The corner vertex is
         redundant: removing it changes the flat corner triangle into nothing and moves no surface. QEM collapses
@@ -785,7 +789,7 @@ f 6 8 9</pre>
         <span class="tag">Exercise 3 (a vertex normal)</span>
         On the lifted grid, vertex 2 sits on faces \(t_2\) and \(t_3\). Using the face normals of Section 5, compute \(\mathbf{n}_2\).
         <details><summary>Solution</summary>
-          \(t_2 = (1, 4, 2)\) has face normal \((0, 2.25, -0.6)\) and \(t_3 = (2, 4, 5)\) has \((0.6, 2.25, 0)\) (both from the tilt toward the raised center). Sum \((0.6, 4.5, -0.6)\), length \(4.579\), so \(\mathbf{n}_2 = (0.131, 0.983, -0.131)\): the corner leans toward the peak, by \(10.6^\circ\).
+          \(t_2 = (1, 4, 2)\) has face normal \((0, 2.25, -0.6)\) and \(t_3 = (2, 4, 5)\) has \((0.6, 2.25, 0)\) (both tilted by the raised center). Sum \((0.6, 4.5, -0.6)\), length \(4.579\), so \(\mathbf{n}_2 = (0.131, 0.983, -0.131)\): the corner leans toward the peak, by \(10.6^\circ\).
         </details>
       </div>
       <div class="ex">

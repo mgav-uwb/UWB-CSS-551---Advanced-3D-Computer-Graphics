@@ -4,6 +4,7 @@
   normal after the lift, across the seam, the tiling matrix) and the Discussion header
   slide; the freed time goes to questions on HW2 and the topics, and buffer.
   Re-sequenced 2026-10-25 (was L06, never given): Thursday November 5; HW4 due, Quiz 4 on Canvas.
+  EDIT 2026-11-05: the supplements follow this wrap in the lecture page.
 -->
 
 ## Wrap
