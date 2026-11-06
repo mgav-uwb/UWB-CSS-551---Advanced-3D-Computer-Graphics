@@ -32,6 +32,8 @@
   NEEDS:   nothing beyond high-school vectors; the demo state a=(2,1,0), b=(1,2,1) is reused in every worked example.
   DEMOS:   data-demo="dot-cross" data-controls="ax,ay,bx,by" on a demo-full slide (the default crop hid the readout card).
            Fallback numbers: a.b = 4, |a| = 2.24, |b| = 2.45, theta = 43.1 deg, a x b = (1, -2, 3).
+           data-demo="vector-basics" data-controls="view:dot.angle" on the last slide, added 2026-11-05 (Marcel: "add it to
+           the end of vectors"): the whole toolkit, including the frames, lines, planes and tests of vector-geometry.md.
   NUMBERS: textbook/figures/numbers-foundations.json (key vec) or recomputed by node against
            lib/core/xform.js, Math.fround and lib/vendor/three.module.js.
   FIGURES: ../../textbook/figures/vec-*.svg (tools/gen-textbook-figures-foundations.mjs) and
@@ -443,4 +445,18 @@ const a = new THREE.Vector3(2, 1, 0), b = new THREE.Vector3(1, 2, 1);
 const n = a.cross(b);   // n IS a, and a is now (1, -2, 3)
 a.dot(b);               // 0, not 4
 ```
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The vector toolkit, live
+
+<div class="cockpit" data-demo="vector-basics" data-controls="view:dot.angle"><pre class="viz-fallback">  drag a vector; the picture, the formula and the code follow
+  -- default state: a=(2,1,0), b=(1,2,1) ------------------
+     a . b = 2*1 + 1*2 + 0*1             = 4
+     |a||b|cos(theta) = 2.24 x 2.45 x 0.730 = 4
+     proj of a on b = (a . b / b . b) b  = (2/3, 4/3, 2/3)
+     a x b = (1, -2, 3), square to a and to b</pre></div>
 
