@@ -10,10 +10,10 @@
 
   Minute plan (120 min, Thu 5:45-7:45 PM in person):
     0:00  opening                                     2 min
-    0:02  meshes (topic)                             38 min
-    0:40  texture coordinates (topic)                43 min
-    1:23  wrap                                        3 min
-    1:26  questions (HW4, the topics); supplements   34 min
+    0:02  meshes (topic)                             50 min
+    0:52  texture coordinates (topic)                43 min
+    1:35  wrap                                        3 min
+    1:38  questions (HW4, the topics); supplements   22 min
     2:00  end
   Demos: mesh-view (wire,spin), mesh-grid (n,lift), simplify-compare (tris,wire), uv-placement (offU,tile),
   fur (lightAz); lod (level,dist) in the supplement. Numbers: numbers-surfaces.json mesh.* and tex.*,
@@ -42,11 +42,10 @@
 ## Tonight
 
 - **Meshes**: two arrays, a winding rule, the 2×2 grid by hand and live
-- **Structure**: half-edges, Euler's formula, valence
+- **Structure**: half-edges and how to walk them, Euler's formula, valence
 - **Normals**: cross products, averaging, hard edges that split vertices
 - **Processing**: sweeps, edge collapse and the quadric error, OBJ files
 - **Texture coordinates**: UVs, wrap modes, projections, seams and atlases, the placement matrix
 - **Fur and hair**: texels, shells and fins, tangent lighting, strands
 
 Reading: [Polygonal Meshes](../../textbook/meshes.html), [Texture Mapping](../../textbook/texture-mapping.html), Sections 1 to 4, and [Animation](../../textbook/animation.html), Section 14 (hair and fur).
-

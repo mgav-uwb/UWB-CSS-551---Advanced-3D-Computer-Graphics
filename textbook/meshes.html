@@ -15,6 +15,7 @@
       window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'global' } };
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+    <script defer src="../lib/code-tabs.js?v=20261008z"></script>
     <link rel="stylesheet" href="textbook.css" />
   </head>
   <body>
@@ -159,7 +160,9 @@
         Every operation of Sections 5 to 11 asks the others: which triangles touch this vertex, which
         triangle is across this edge, which vertices ring this one. Searching the index array for each
         answer costs \(O(T)\) per query. A mesh that is edited, smoothed or simplified needs the answers
-        in \(O(1)\), and the standard way to store them is the half-edge structure.
+        in \(O(1)\), and the standard way to store them is the half-edge structure. On the full bunny, one
+        pass in which every vertex asks for its triangles examines \(34{,}834 \times 69{,}451 = 2{,}419{,}256{,}134\)
+        triangles by scanning and \(3F = 208{,}353\) by walking half-edges, 11,611 times fewer.
       </p>
       <div class="def">
         <span class="tag">Definition (half-edge)</span>
@@ -170,35 +173,274 @@
         face one of its half-edges. A triangle mesh has exactly \(3T\) half-edges.
       </div>
       <figure>
+        <img src="figures/mshd-he-anatomy.svg" alt="Triangles t1 and t2 share the edge from v1 to v4. h5 runs from v4 to v1 inside t1, its twin h6 from v1 to v4 inside t2, and next of h5 is h3, from v1 to v3. Beside it the record of h5: to 1, face 1, next 3, twin 6." />
+        <figcaption>One edge, stored twice. The four fields of \(h_5\): the vertex it points at, its triangle, the next half-edge around that triangle, and the same edge reversed.</figcaption>
+      </figure>
+      <figure>
         <img src="figures/mesh-halfedge.svg" alt="The 2 by 2 grid from above with every half-edge drawn as an arrow just inside its triangle, the twelve arrows around the center vertex in red; beside it one half-edge record listing from, to, face, next and twin, and a note that twin equals minus one on the boundary." />
         <figcaption>
           The grid&rsquo;s 24 half-edges. The record for the half-edge leaving \(\mathbf{v}_4\) toward \(\mathbf{v}_1\) is written out; its twin is the half-edge of the same edge in the neighboring triangle.
         </figcaption>
       </figure>
-      <div class="ex">
-        <span class="tag">Worked example (the grid&rsquo;s half-edges, and one ring walk)</span>
-        The \(2\times2\) grid has \(V = 9\), \(F = 8\) and \(E = 16\) edges, of which 8 lie on the boundary
-        and 8 are interior. Its \(3F = 24\) half-edges pair into the 8 interior edges (two records each) and
-        the 8 boundary edges (one record each, twin \(= -1\)). Take \(h_5\), the half-edge from
-        \(\mathbf{v}_4\) to \(\mathbf{v}_1\) in triangle \(t_1 = (1, 3, 4)\): its <em>next</em> is \(h_3\), from
-        \(\mathbf{v}_1\) to \(\mathbf{v}_3\); its <em>twin</em> is \(h_6\), from \(\mathbf{v}_1\) to \(\mathbf{v}_4\) in
-        \(t_2\). To list the vertices around \(\mathbf{v}_4\), start at any outgoing half-edge and repeat
-        <em>next.next.twin</em>: each step crosses to the next triangle in the fan. From \(h_5\) the walk
-        visits \(\mathbf{v}_1, \mathbf{v}_3, \mathbf{v}_6, \mathbf{v}_7, \mathbf{v}_5, \mathbf{v}_2\) and returns
-        to \(h_5\) after six steps, the six triangles that Section 2 counted by scanning all 24 indices.
-        At a boundary vertex the walk hits a twin of \(-1\) and must restart in the other direction; the
-        valence of every vertex, read off the same walk, is \((2, 4, 3, 4, 6, 4, 3, 4, 2)\) for
-        \(\mathbf{v}_0\) to \(\mathbf{v}_8\).
-      </div>
+      <h3 id="he-adt">The data type</h3>
+      <p>
+        The grid has \(V = 9\), \(F = 8\) and \(E = 16\) edges, 8 on the boundary and 8 interior. Its \(3F = 24\)
+        half-edges pair into the 8 interior edges (two records each) and the 8 boundary edges (one record each,
+        twin \(= -1\)). Fields are integers, not pointers, and half-edge \(3t + k\) is corner \(k\) of triangle \(t\),
+        which is why \(h_3, h_4, h_5\) belong to \(t_1\). The two extra arrays are the entrances: every traversal
+        starts at <code>vertexOut</code> or <code>faceEdge</code>. The origin is not stored: on a triangle
+        <em>next.next</em> arrives at it, so its <code>to</code> is the origin.
+      </p>
+      <div class="code-tabs">
+<pre class="lang-csharp">class HalfEdge {
+    public int to;     // the vertex it points at
+    public int face;   // the triangle it belongs to
+    public int next;   // the next half-edge around that triangle
+    public int twin;   // the same edge reversed; -1 on a boundary
+}
+class HalfEdgeMesh {
+    public HalfEdge[] he;      // 3 per triangle
+    public int[] vertexOut;    // one half-edge leaving each vertex
+    public int[] faceEdge;     // one half-edge of each triangle
+}</pre>
+<pre class="lang-javascript">class HalfEdge {
+  to = -1;     // the vertex it points at
+  face = -1;   // the triangle it belongs to
+  next = -1;   // the next half-edge around that triangle
+  twin = -1;   // the same edge reversed; -1 on a boundary
+}
+class HalfEdgeMesh {
+  he = [];          // 3 per triangle
+  vertexOut = [];   // one half-edge leaving each vertex
+  faceEdge = [];    // one half-edge of each triangle
+}</pre>
+</div>
+      <h3 id="he-face">Edges of a triangle</h3>
+      <p>
+        Enter at <code>faceEdge</code> and follow <em>next</em> until the start comes round. For \(t_1 = (1, 3, 4)\) the
+        walk is \(h_3, h_4, h_5\), and reading <code>to</code> along it gives the corners 3, 4, 1.
+      </p>
+      <figure>
+        <img src="figures/mshd-he-face-walk.svg" alt="Triangle t1 with three numbered arrows: h3 from v1 to v3, h4 from v3 to v4, h5 from v4 to v1, whose next is h3 again." />
+        <figcaption>The walk around \(t_1\). The loop does not assume three sides, so it works unchanged on a polygon.</figcaption>
+      </figure>
+      <div class="code-tabs">
+<pre class="lang-csharp">static List&lt;int&gt; EdgesOfFace(HalfEdgeMesh m, int f) {
+    var edges = new List&lt;int&gt;();
+    int start = m.faceEdge[f];
+    int h = start;
+    do {
+        edges.Add(h);
+        h = m.he[h].next;
+    } while (h != start);
+    return edges;
+}</pre>
+<pre class="lang-javascript">function edgesOfFace(m, f) {
+  const edges = [];
+  const start = m.faceEdge[f];
+  let h = start;
+  do {
+    edges.push(h);
+    h = m.he[h].next;
+  } while (h !== start);
+  return edges;
+}</pre>
+</div>
+      <h3 id="he-vertex">Triangles at a vertex</h3>
+      <p>
+        One step takes a half-edge leaving a vertex to the one leaving it in the next triangle of the fan:
+      </p>
+      \[ h \;\leftarrow\; \text{twin}\big(\text{next}(\text{next}(h))\big). \]
+      <p>
+        Two <em>next</em>s go around the triangle and back into the vertex; <em>twin</em> crosses that edge, giving a
+        half-edge that leaves the vertex again, in the triangle on the other side.
+      </p>
+      <figure>
+        <img src="figures/mshd-he-ring-step.svg" alt="Four views of the grid around v4. Start: h5 leaves v4. Next: h3 runs on around t1. Next: h4 comes back into v4. Twin: h14 leaves v4, in t4." />
+        <figcaption>One step around \(\mathbf{v}_4\): from \(h_5\) in \(t_1\) to \(h_{14}\) in \(t_4\), three field reads and no search.</figcaption>
+      </figure>
+      <p>
+        Repeating it from \(h_5\) visits \(h_5, h_{14}, h_{15}, h_{18}, h_{10}, h_7\) and returns to \(h_5\) after six steps:
+        triangles \(t_1, t_4, t_5, t_6, t_3, t_2\), neighbors \(\mathbf{v}_1, \mathbf{v}_3, \mathbf{v}_6, \mathbf{v}_7,
+        \mathbf{v}_5, \mathbf{v}_2\), the six that Section 2 counted by scanning all 24 indices, now in order around the vertex.
+        The cost is the valence, not the size of the mesh.
+      </p>
+      <figure>
+        <img src="figures/mshd-he-ring.svg" alt="The fan around v4 with its six triangles numbered in walk order and the half-edges leaving v4 in red; a table lists step, half-edge, face, the vertex it points at, and the next half-edge." />
+        <figcaption>The whole ring around \(\mathbf{v}_4\). Returning to the start is also the test that the links are consistent.</figcaption>
+      </figure>
+      <div class="code-tabs">
+<pre class="lang-csharp">static List&lt;int&gt; FacesAtVertex(HalfEdgeMesh m, int v) {
+    var faces = new List&lt;int&gt;();
+    int start = m.vertexOut[v];
+    int h = start;
+    do {
+        faces.Add(m.he[h].face);
+        int back = m.he[m.he[h].next].next;   // comes back into v
+        h = m.he[back].twin;                  // leaves v, one triangle over
+    } while (h != start);
+    return faces;
+}</pre>
+<pre class="lang-javascript">function facesAtVertex(m, v) {
+  const faces = [];
+  const start = m.vertexOut[v];
+  let h = start;
+  do {
+    faces.push(m.he[h].face);
+    const back = m.he[m.he[h].next].next;   // comes back into v
+    h = m.he[back].twin;                    // leaves v, one triangle over
+  } while (h !== start);
+  return faces;
+}</pre>
+</div>
+      <h3 id="he-across">Across an edge, and around a vertex</h3>
+      <p>
+        The triangle across \(h\) is the <code>face</code> of its <em>twin</em>; the corner of a triangle not on \(h\) is the
+        <code>to</code> of <em>next</em>. An edge flip needs exactly these. The neighbors of a vertex are the ring walk
+        collecting <code>to</code>, and their count is its valence: \((2, 4, 3, 4, 6, 4, 3, 4, 2)\) for
+        \(\mathbf{v}_0\) to \(\mathbf{v}_8\), summing to \(2E = 32\).
+      </p>
+      <figure>
+        <img src="figures/mshd-he-across.svg" alt="Left: h5 in t1 and its twin h6 in t2, with v2 circled as the corner opposite. Right: the grid with each vertex labeled by its valence." />
+        <figcaption>Across \(h_5\): \(t_2\) and its opposite corner \(\mathbf{v}_2\). Valences come from the walk.</figcaption>
+      </figure>
+      <div class="code-tabs">
+<pre class="lang-csharp">static int FaceAcross(HalfEdgeMesh m, int h) {
+    int t = m.he[h].twin;
+    return t == -1 ? -1 : m.he[t].face;
+}
+static int OppositeVertex(HalfEdgeMesh m, int h) {
+    return m.he[m.he[h].next].to;
+}</pre>
+<pre class="lang-javascript">function faceAcross(m, h) {
+  const t = m.he[h].twin;
+  return t === -1 ? -1 : m.he[t].face;
+}
+function oppositeVertex(m, h) {
+  return m.he[m.he[h].next].to;
+}</pre>
+</div>
+      <h3 id="he-boundary">Boundaries</h3>
+      <p>
+        At the edge of a mesh <em>twin</em> is \(-1\) and the plain walk stops early. On the left border, starting from
+        <code>vertexOut[3]</code> \(= h_1\), the first step reaches \(h_0\), which has no twin, so only \(t_0\) is found. The cure is to
+        rotate back first (<em>twin</em>, then <em>next</em>) until there is no twin, at \(h_{12}\), then walk forward: \(t_4, t_1, t_0\).
+        An open fan has one more neighbor than it has triangles, so \(\mathbf{v}_3\) has three triangles and valence 4. The half-edges
+        with no twin chain into closed loops, one per hole: from one, take <em>next</em>, and while that has a twin, take <em>next</em> of
+        the twin. On the grid that is one loop of 8; on the bunny, five, of 80, 42, 40, 39 and 22 edges, the holes of Section 4.
+      </p>
+      <figure>
+        <img src="figures/mshd-he-boundary.svg" alt="Three views of the grid. The plain walk from h1 stops at h0, whose twin is minus one, having found only t0. Rotating back to h12 first finds t4, t1 and t0. The half-edges with no twin form one loop of eight around the rim." />
+        <figcaption>The walk at a boundary, and the rim of a hole.</figcaption>
+      </figure>
+      <div class="code-tabs">
+<pre class="lang-csharp">static int StartOfFan(HalfEdgeMesh m, int v) {
+    int first = m.vertexOut[v];
+    int h = first;
+    while (m.he[h].twin != -1) {
+        h = m.he[m.he[h].twin].next;     // one triangle the other way
+        if (h == first) return first;    // a closed ring: any start will do
+    }
+    return h;
+}
+static List&lt;int&gt; FacesAtAnyVertex(HalfEdgeMesh m, int v) {
+    var faces = new List&lt;int&gt;();
+    int start = StartOfFan(m, v);
+    int h = start;
+    do {
+        faces.Add(m.he[h].face);
+        h = m.he[m.he[m.he[h].next].next].twin;
+    } while (h != start &amp;&amp; h != -1);
+    return faces;
+}</pre>
+<pre class="lang-javascript">function startOfFan(m, v) {
+  const first = m.vertexOut[v];
+  let h = first;
+  while (m.he[h].twin !== -1) {
+    h = m.he[m.he[h].twin].next;     // one triangle the other way
+    if (h === first) return first;   // a closed ring: any start will do
+  }
+  return h;
+}
+function facesAtAnyVertex(m, v) {
+  const faces = [];
+  const start = startOfFan(m, v);
+  let h = start;
+  do {
+    faces.push(m.he[h].face);
+    h = m.he[m.he[m.he[h].next].next].twin;
+  } while (h !== start &amp;&amp; h !== -1);
+  return faces;
+}</pre>
+</div>
+      <h3 id="he-build">Building the links</h3>
       <p>
         Building the structure from the two arrays is one pass over the triangles, hashing each directed
         edge \((a, b)\) to find its twin \((b, a)\): \(O(T)\) time and about 4 integers per half-edge, so
-        roughly 12 integers per triangle on top of the 3 in the index array. The structure fails on
+        roughly 12 integers per triangle on top of the 3 in the index array. With the two entrance arrays the
+        bunny needs 937,697 integers against the index array's 208,353, 4.5 times as many. A directed edge that
+        arrives twice means a non-manifold edge or a flipped triangle, so a real builder reports it. The structure fails on
         exactly the meshes Section 4 calls non-manifold: an edge with three faces has no single twin.
         Alternatives store less (a vertex-to-triangle list, enough for normals and one-rings) or more (the
         winged-edge and quad-edge structures); the half-edge is the one in the libraries (OpenMesh, CGAL,
         Blender&rsquo;s BMesh) because every query of this chapter is a constant number of pointer follows.
       </p>
+      <figure>
+        <img src="figures/mshd-he-build.svg" alt="The directed edges of t1 and t2 as keys of a map: (4,1) to h5 and (1,4) to h6 are twins because each is the other reversed; (2,1) finds no (1,2), so h8 keeps twin minus one." />
+        <figcaption>Reversing each key finds its twin; a key with no reverse is a boundary edge.</figcaption>
+      </figure>
+      <div class="code-tabs">
+<pre class="lang-csharp">static HalfEdgeMesh Build(int[] tris, int vertexCount) {
+    var m = new HalfEdgeMesh();
+    m.he = new HalfEdge[tris.Length];
+    m.vertexOut = Enumerable.Repeat(-1, vertexCount).ToArray();
+    m.faceEdge = new int[tris.Length / 3];
+    var byEdge = new Dictionary&lt;(int, int), int&gt;();   // (a, b) -&gt; the half-edge from a to b
+    for (int h = 0; h &lt; tris.Length; h++) {
+        int t = h / 3, k = h % 3;
+        int a = tris[h], b = tris[3 * t + (k + 1) % 3];
+        m.he[h] = new HalfEdge { to = b, face = t, next = 3 * t + (k + 1) % 3, twin = -1 };
+        byEdge[(a, b)] = h;
+        if (m.vertexOut[a] == -1) m.vertexOut[a] = h;
+        m.faceEdge[t] = 3 * t;
+    }
+    foreach (var pair in byEdge) {                    // reverse each key to find the twin
+        int other;
+        if (byEdge.TryGetValue((pair.Key.Item2, pair.Key.Item1), out other)) m.he[pair.Value].twin = other;
+    }
+    return m;
+}</pre>
+<pre class="lang-javascript">function build(tris, vertexCount) {
+  const m = new HalfEdgeMesh();
+  m.vertexOut = new Array(vertexCount).fill(-1);
+  const byEdge = new Map();                 // "a,b" -&gt; the half-edge from a to b
+  for (let h = 0; h &lt; tris.length; h++) {
+    const t = Math.floor(h / 3), k = h % 3;
+    const a = tris[h], b = tris[3 * t + (k + 1) % 3];
+    const e = new HalfEdge();
+    e.to = b;  e.face = t;  e.next = 3 * t + (k + 1) % 3;
+    m.he[h] = e;
+    byEdge.set(a + ',' + b, h);
+    if (m.vertexOut[a] === -1) m.vertexOut[a] = h;
+    m.faceEdge[t] = 3 * t;
+  }
+  for (const [key, h] of byEdge) {          // reverse each key to find the twin
+    const [a, b] = key.split(',');
+    if (byEdge.has(b + ',' + a)) m.he[h].twin = byEdge.get(b + ',' + a);
+  }
+  return m;
+}</pre>
+</div>
+      <table>
+        <tr><th>Query</th><th>Walk</th><th>Steps</th></tr>
+        <tr><td>edges and corners of a triangle</td><td><em>next</em> until back at the start</td><td>3</td></tr>
+        <tr><td>where \(h\) starts</td><td><code>to</code> of <em>next.next</em></td><td>2</td></tr>
+        <tr><td>triangle across \(h\)</td><td><code>face</code> of <em>twin</em></td><td>2</td></tr>
+        <tr><td>corner opposite \(h\)</td><td><code>to</code> of <em>next</em></td><td>2</td></tr>
+        <tr><td>triangles, neighbors, valence of \(v\)</td><td><em>next.next.twin</em> from <code>vertexOut</code></td><td>valence</td></tr>
+        <tr><td>every edge once</td><td>\(h\) with \(h &lt; \text{twin}\), or no twin</td><td>\(3F\)</td></tr>
+        <tr><td>the rim of a hole</td><td><em>next</em>; while it has a twin, <em>next</em> of the twin</td><td>rim length</td></tr>
+      </table>
       <div class="hands">
         <span class="tag">Hands-on</span>
         Run these from the course root (<code>css551/</code>); each prints what the text quotes.
@@ -816,9 +1058,9 @@ f 6 8 9</pre>
 
       <div class="ex">
         <span class="tag">Exercise 7 (half-edges)</span>
-        Starting from \(h_6\) (\(\mathbf{v}_1 \to \mathbf{v}_4\) in \(t_2 = (1, 4, 2)\)), list the vertices the walk <em>next.next.twin</em> visits around \(\mathbf{v}_1\), and say where it stops.
+        Starting from \(h_6\) (\(\mathbf{v}_1 \to \mathbf{v}_4\) in \(t_2 = (1, 4, 2)\)), follow <em>next.next.twin</em> around \(\mathbf{v}_1\) and say where it stops. Then find all of \(\mathbf{v}_1\)&rsquo;s triangles and its valence.
         <details><summary>Solution</summary>
-          \(h_6\)&rsquo;s next is \(\mathbf{v}_4 \to \mathbf{v}_2\), next again \(\mathbf{v}_2 \to \mathbf{v}_1\), whose twin is \(\mathbf{v}_1 \to \mathbf{v}_2\) in \(t_3\); then \(\mathbf{v}_2 \to \mathbf{v}_5\)? No: \(t_3 = (2, 4, 5)\) does not contain \(\mathbf{v}_1\). Check the fan: around \(\mathbf{v}_1\) the faces are \(t_0 = (0,3,1)\), \(t_1 = (1,3,4)\), \(t_2 = (1,4,2)\), so the walk from \(h_6\) visits \(\mathbf{v}_4\), then crosses into \(t_1\) (\(\mathbf{v}_3\)), then \(t_0\) (\(\mathbf{v}_0\)), and the next twin is the boundary edge \(\mathbf{v}_0\mathbf{v}_1\) with twin \(-1\): the walk stops after three faces, having found the three neighbors \(\mathbf{v}_4, \mathbf{v}_3, \mathbf{v}_0\); \(\mathbf{v}_2\) is reached by restarting in the other direction. Valence 4, as the list in Section 3 says.
+          \(h_6\)&rsquo;s next is \(h_7\) (\(\mathbf{v}_4 \to \mathbf{v}_2\)), next again \(h_8\) (\(\mathbf{v}_2 \to \mathbf{v}_1\)), whose twin is \(-1\): \(\mathbf{v}_1\) is on the boundary and the walk stops after one triangle. Rotating back instead, <em>twin</em> then <em>next</em>: \(h_6\)&rsquo;s twin is \(h_5\), its next \(h_3\) (\(\mathbf{v}_1 \to \mathbf{v}_3\)); \(h_3\)&rsquo;s twin is \(h_1\), its next \(h_2\) (\(\mathbf{v}_1 \to \mathbf{v}_0\)), which has no twin. Walking forward from \(h_2\) finds \(t_0, t_1, t_2\). Three triangles, so four neighbors, \(\mathbf{v}_0, \mathbf{v}_3, \mathbf{v}_4, \mathbf{v}_2\): valence 4.
         </details>
       </div>
       <div class="ex">

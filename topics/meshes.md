@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~38 min, 29 slides).
+  CSS 551 · TOPIC DECK: Polygonal meshes, built by hand (~50 min, 41 slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/meshes.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -7,7 +7,9 @@
   TEACHES: triangles (planar, convex); a mesh is a vertex array plus an index array;
   winding picks the front face, in both tracks; the 2×2 grid built by hand (row-major index, the
   split, all eight triangles); the other diagonal; the counts (n+1)², 2n², 6n²; the
-  half-edge structure; Euler's formula as a validator; valence 6; face normals as
+  half-edge structure: the problem it solves, the ADT, edges of a triangle, triangles at a vertex (one step,
+  the whole ring), across an edge, boundaries and open fans, building the links, the interface and its cost;
+  Euler's formula as a validator; valence 6; face normals as
   cross products (flat (0, 2.25, 0), lifted (−0.6, 2.25, −0.6)); averaged vertex normals;
   what a lift does to them; flat, Gouraud and Phong shading; hard edges split
   vertices (a cube has 24); a surface of revolution as a profile crossed with rotations;
@@ -21,6 +23,9 @@
   the fan's diagonal; mid-edge vertex normals lean away from the peak, not toward it; the half-edge ring
   1, 3, 6, 7, 5, 2 is next.next.twin, not twin then next; Sung's code weights faces equally, not by area;
   the winding slide now states Unity's rule.
+  EDIT 2026-11-05 (Marcel: "we need a better exposition of half-edge models: how to traverse edges of a
+  triangle, how to traverse triangles at vertex, etc., with visuals, and simple code (ADT)"): one slide became
+  the half-edge stretch; its code runs in tools/gen-lecture-figures-meshes.mjs on the grid and the full bunny.
   NEEDS:   the vectors topic (cross product); the rotation topic (R_y); the rasterization topic
            (edge functions, interpolation).
   COMPANION: meshes-supplement.md, mounted after the wrap.
@@ -39,7 +44,7 @@
 
 ### Polygonal meshes: everything is triangles
 
-<small>(~38 min) · reading: <a href="../../textbook/meshes.html">Polygonal Meshes</a></small>
+<small>(~50 min) · reading: <a href="../../textbook/meshes.html">Polygonal Meshes</a></small>
 
 
 ---
@@ -214,15 +219,362 @@ indices   = 6 n²          3 per triangle → 3 · 2n²">
 
 ---
 
-## The half-edge structure
+### The half-edge structure
 
-<img src="../../textbook/figures/mesh-halfedge.svg" class="media-shot" style="height:278px" alt="the 2 by 2 grid with each edge split into two opposite half-edges; the ring around the center vertex highlighted; half-edge record h5 = (v4 → v1): from 4, to 1, face 1, next 3, twin 6">
+<small>(~13 min) · reading: <a href="../../textbook/meshes.html#adjacency">Polygonal Meshes</a>, Section 3</small>
 
-Editing needs **neighbors**, which index arrays do not give. Store each edge twice, once per side:
 
-- links: `to`, `face`, `next` (around the face), `twin` (the opposite half)
-- the grid: `$E = 16$`, **24** half-edges; the 8 boundary edges have one side
-- the ring around vertex 4, by `next.next.twin`: 1, 3, 6, 7, 5, 2 (valence 6)
+---
+
+## Two arrays cannot find neighbors
+
+Editing, smoothing and simplifying keep asking:
+
+- which **triangles** touch this vertex? which **vertices** ring it?
+- which triangle is **across** this edge? is the edge on a **boundary**?
+
+The index array has one way to answer: scan every triangle.
+
+| one pass over the bunny, every vertex asking for its triangles | triangles examined |
+| -------------------------------------------------------------- | ------------------ |
+| scan the index array each time: `$34{,}834 \times 69{,}451$` | 2,419,256,134 |
+| walk half-edges: `$3F$` | 208,353 |
+
+11,611 times fewer, for the same answers.
+
+
+---
+
+## An edge, stored twice
+
+<img src="../../textbook/figures/mshd-he-anatomy.svg" style="height:262px" alt="triangles t1 = (1, 3, 4) and t2 = (1, 4, 2) share the edge v1–v4.
+h5 runs from v4 to v1 inside t1; its twin h6 runs from v1 to v4 inside t2; next of h5 is h3, from v1 to v3.
+h5: to = 1, face = 1, next = 3, twin = 6">
+
+- each edge splits into two **half-edges**, one per triangle, each directed the way its triangle winds
+- a triangle has exactly 3, so the grid has `$3F = 24$`
+- its 8 interior edges have two; its 8 boundary edges have one, with `twin` = −1
+
+
+---
+
+## The half-edge ADT
+
+<div class="code-tabs">
+
+```csharp
+class HalfEdge {
+    public int to;     // the vertex it points at
+    public int face;   // the triangle it belongs to
+    public int next;   // the next half-edge around that triangle
+    public int twin;   // the same edge reversed; -1 on a boundary
+}
+class HalfEdgeMesh {
+    public HalfEdge[] he;      // 3 per triangle
+    public int[] vertexOut;    // one half-edge leaving each vertex
+    public int[] faceEdge;     // one half-edge of each triangle
+}
+```
+
+```javascript
+class HalfEdge {
+  to = -1;     // the vertex it points at
+  face = -1;   // the triangle it belongs to
+  next = -1;   // the next half-edge around that triangle
+  twin = -1;   // the same edge reversed; -1 on a boundary
+}
+class HalfEdgeMesh {
+  he = [];          // 3 per triangle
+  vertexOut = [];   // one half-edge leaving each vertex
+  faceEdge = [];    // one half-edge of each triangle
+}
+```
+
+</div>
+
+| `h` | from → to | `face` | `next` | `twin` |
+| --- | --------- | ------ | ------ | ------ |
+| 3 | 1 → 3 | 1 | 4 | 1 |
+| 4 | 3 → 4 | 1 | 5 | 14 |
+| 5 | 4 → 1 | 1 | 3 | 6 |
+| 6 | 1 → 4 | 2 | 7 | 5 |
+| 7 | 4 → 2 | 2 | 8 | 9 |
+| 8 | 2 → 1 | 2 | 6 | −1 |
+
+
+---
+
+## Edges of a triangle: follow next
+
+<img src="../../textbook/figures/mshd-he-face-walk.svg" style="height:205px" alt="triangle t1: faceEdge[1] = h3. h3 from v1 to v3, next h4. h4 from v3 to v4, next h5. h5 from v4 to v1, next h3, back at the start">
+
+<div class="code-tabs">
+
+```csharp
+static List<int> EdgesOfFace(HalfEdgeMesh m, int f) {
+    var edges = new List<int>();
+    int start = m.faceEdge[f];
+    int h = start;
+    do {
+        edges.Add(h);
+        h = m.he[h].next;
+    } while (h != start);
+    return edges;
+}
+```
+
+```javascript
+function edgesOfFace(m, f) {
+  const edges = [];
+  const start = m.faceEdge[f];
+  let h = start;
+  do {
+    edges.push(h);
+    h = m.he[h].next;
+  } while (h !== start);
+  return edges;
+}
+```
+
+</div>
+
+Reading `to` along the walk gives the corners: 3, 4, 1.
+
+
+---
+
+## Triangles at a vertex: one step
+
+<img src="../../textbook/figures/mshd-he-ring-step.svg" style="height:248px" alt="around v4, one step. start: h5 leaves v4. next: h3 runs on around t1. next: h4 comes back into v4. twin: h14 leaves v4, in t4">
+
+<div class="tex" role="img" aria-label="h ← twin( next( next(h) ) )">
+\[ h \;\leftarrow\; \text{twin}\big(\text{next}(\text{next}(h))\big) \]
+</div>
+
+- two `next`s go around the triangle, **back into** the vertex
+- `twin` crosses that edge: a half-edge **leaving** the vertex again, in the **next triangle** of the fan
+
+
+---
+
+## Triangles at a vertex: the whole ring
+
+<img src="../../textbook/figures/mshd-he-ring.svg" style="height:270px" alt="the ring around v4: step 1 h5 in t1 to v1; step 2 h14 in t4 to v3; step 3 h15 in t5 to v6; step 4 h18 in t6 to v7; step 5 h10 in t3 to v5; step 6 h7 in t2 to v2; then back to h5">
+
+<div class="code-tabs">
+
+```csharp
+static List<int> FacesAtVertex(HalfEdgeMesh m, int v) {
+    var faces = new List<int>();
+    int start = m.vertexOut[v];
+    int h = start;
+    do {
+        faces.Add(m.he[h].face);
+        int back = m.he[m.he[h].next].next;   // comes back into v
+        h = m.he[back].twin;                  // leaves v, one triangle over
+    } while (h != start);
+    return faces;
+}
+```
+
+```javascript
+function facesAtVertex(m, v) {
+  const faces = [];
+  const start = m.vertexOut[v];
+  let h = start;
+  do {
+    faces.push(m.he[h].face);
+    const back = m.he[m.he[h].next].next;   // comes back into v
+    h = m.he[back].twin;                    // leaves v, one triangle over
+  } while (h !== start);
+  return faces;
+}
+```
+
+</div>
+
+
+---
+
+## Across an edge; around a vertex
+
+<img src="../../textbook/figures/mshd-he-across.svg" style="height:270px" alt="across an edge: h5 in t1, twin = h6, its face = t2, the corner opposite = v2. valence, from the walk: 2, 4, 3, 4, 6, 4, 3, 4, 2 for v0 to v8; the sum, 32, is 2E, each edge counted at both ends">
+
+<div class="code-tabs">
+
+```csharp
+static int FaceAcross(HalfEdgeMesh m, int h) {
+    int t = m.he[h].twin;
+    return t == -1 ? -1 : m.he[t].face;
+}
+static int OppositeVertex(HalfEdgeMesh m, int h) {
+    return m.he[m.he[h].next].to;
+}
+```
+
+```javascript
+function faceAcross(m, h) {
+  const t = m.he[h].twin;
+  return t === -1 ? -1 : m.he[t].face;
+}
+function oppositeVertex(m, h) {
+  return m.he[m.he[h].next].to;
+}
+```
+
+</div>
+
+Neighbors of a vertex: the ring walk, collecting `to`: 1, 3, 6, 7, 5, 2. Their count is the **valence**.
+
+
+---
+
+## Boundaries: where the walk stops
+
+<img src="../../textbook/figures/mshd-he-boundary.svg" style="height:290px" alt="the plain walk from h1 at v3: h0 has twin −1, only t0 is found. rotate back first, to h12: now all of them: t4, t1, t0. half-edges with no twin: one loop of 8: 3, 6, 7, 8, 5, 2, 1, 0">
+
+- at the edge of a mesh `twin` is −1, and the plain ring loop would read `he[-1]`
+- rotate **back** first (`twin`, then `next`) to the half-edge with no twin, then walk forward
+- half-edges with no twin chain into closed **loops**, one per hole: the bunny's five, 80, 42, 40, 39 and 22 edges long
+
+
+---
+
+## Walking an open fan
+
+<div class="code-tabs">
+
+```csharp
+static int StartOfFan(HalfEdgeMesh m, int v) {
+    int first = m.vertexOut[v];
+    int h = first;
+    while (m.he[h].twin != -1) {
+        h = m.he[m.he[h].twin].next;     // one triangle the other way
+        if (h == first) return first;    // a closed ring: any start will do
+    }
+    return h;
+}
+static List<int> FacesAtAnyVertex(HalfEdgeMesh m, int v) {
+    var faces = new List<int>();
+    int start = StartOfFan(m, v);
+    int h = start;
+    do {
+        faces.Add(m.he[h].face);
+        h = m.he[m.he[m.he[h].next].next].twin;
+    } while (h != start && h != -1);
+    return faces;
+}
+```
+
+```javascript
+function startOfFan(m, v) {
+  const first = m.vertexOut[v];
+  let h = first;
+  while (m.he[h].twin !== -1) {
+    h = m.he[m.he[h].twin].next;     // one triangle the other way
+    if (h === first) return first;   // a closed ring: any start will do
+  }
+  return h;
+}
+function facesAtAnyVertex(m, v) {
+  const faces = [];
+  const start = startOfFan(m, v);
+  let h = start;
+  do {
+    faces.push(m.he[h].face);
+    h = m.he[m.he[m.he[h].next].next].twin;
+  } while (h !== start && h !== -1);
+  return faces;
+}
+```
+
+</div>
+
+One loop for both cases: a closed ring ends at `start`, an open fan at −1.
+
+
+---
+
+## Building the links from two arrays
+
+<img src="../../textbook/figures/mshd-he-build.svg" style="height:186px" alt="t1: (1,3) → h3, (3,4) → h4, (4,1) → h5. t2: (1,4) → h6, (4,2) → h7, (2,1) → h8. reverse the key: (4,1) finds (1,4), so h5 and h6 are twins. (2,1) finds no (1,2), so h8 keeps twin −1">
+
+- one pass over the corners: each half-edge is filed under its directed edge `(a, b)`
+- one pass over the edges: reverse the key; if `(b, a)` exists, those two are **twins**; if not, it is a **boundary** edge
+- `$O(F)$` with a hash map, from the two arrays any mesh file holds
+- a directed edge that arrives **twice** means a non-manifold edge or a flipped triangle: report it
+
+
+---
+
+## Building the links: the code
+
+<div class="code-tabs">
+
+```csharp
+static HalfEdgeMesh Build(int[] tris, int vertexCount) {
+    var m = new HalfEdgeMesh();
+    m.he = new HalfEdge[tris.Length];
+    m.vertexOut = Enumerable.Repeat(-1, vertexCount).ToArray();
+    m.faceEdge = new int[tris.Length / 3];
+    var byEdge = new Dictionary<(int, int), int>();   // (a, b) -> the half-edge from a to b
+    for (int h = 0; h < tris.Length; h++) {
+        int t = h / 3, k = h % 3;
+        int a = tris[h], b = tris[3 * t + (k + 1) % 3];
+        m.he[h] = new HalfEdge { to = b, face = t, next = 3 * t + (k + 1) % 3, twin = -1 };
+        byEdge[(a, b)] = h;
+        if (m.vertexOut[a] == -1) m.vertexOut[a] = h;
+        m.faceEdge[t] = 3 * t;
+    }
+    foreach (var pair in byEdge) {                    // reverse each key to find the twin
+        int other;
+        if (byEdge.TryGetValue((pair.Key.Item2, pair.Key.Item1), out other)) m.he[pair.Value].twin = other;
+    }
+    return m;
+}
+```
+
+```javascript
+function build(tris, vertexCount) {
+  const m = new HalfEdgeMesh();
+  m.vertexOut = new Array(vertexCount).fill(-1);
+  const byEdge = new Map();                 // "a,b" -> the half-edge from a to b
+  for (let h = 0; h < tris.length; h++) {
+    const t = Math.floor(h / 3), k = h % 3;
+    const a = tris[h], b = tris[3 * t + (k + 1) % 3];
+    const e = new HalfEdge();
+    e.to = b;  e.face = t;  e.next = 3 * t + (k + 1) % 3;
+    m.he[h] = e;
+    byEdge.set(a + ',' + b, h);
+    if (m.vertexOut[a] === -1) m.vertexOut[a] = h;
+    m.faceEdge[t] = 3 * t;
+  }
+  for (const [key, h] of byEdge) {          // reverse each key to find the twin
+    const [a, b] = key.split(',');
+    if (byEdge.has(b + ',' + a)) m.he[h].twin = byEdge.get(b + ',' + a);
+  }
+  return m;
+}
+```
+
+</div>
+
+
+---
+
+## The half-edge interface
+
+| query | walk | steps |
+| ----- | ---- | ----- |
+| edges and corners of a triangle | `next` until back at the start | 3 |
+| where `h` starts | `to` of `next.next` | 2 |
+| triangle across `h` | `face` of `twin` | 2 |
+| corner opposite `h` | `to` of `next` | 2 |
+| triangles, neighbors, valence of `v` | `next.next.twin` from `vertexOut` | valence |
+| every edge once | `h` where `h < twin`, or no twin | `$3F$` |
+| the rim of a hole | `next`; while it has a twin, `next` of the twin | rim length |
+
+The cost is storage: 4 integers per half-edge, `$12F + V + F$`. For the bunny, 937,697 integers against the index array's 208,353: 4.5 times. GPUs never see it; they get the two arrays.
 
 
 ---
@@ -453,4 +805,3 @@ Wavefront **OBJ**: text, one vertex or face per line, indices starting at **1**.
 - `f 1 4 2` is the triangle `(0, 3, 1)`: add 1 to every index
 - normals and texture coordinates are separate lists, joined per corner as `f 1/1/1 4/4/4 2/2/2`
 - no binary form, no scene graph, no animation; readable everywhere
-
