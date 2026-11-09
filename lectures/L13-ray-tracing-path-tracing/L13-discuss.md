@@ -2,8 +2,8 @@
   CSS 551 · Lecture 13, the HW6 walk-through and the wrap (~5 min); the light-transport supplement
   follows, time permitting. Numbers from numbers-motion.json rt.camera, rt.whittedRender, rt.cornell.
   Re-sequenced 2026-10-25: merged from the Lecture 12 wrap and the Lecture 13 HW6 walk-through and wrap
-  (../archive/L13-path-tracing-pre-merge-2026-10-25/); HW6 out Thursday November 12, due Wednesday
-  November 25.
+  (../archive/L13-path-tracing-pre-merge-2026-10-25/); HW6 out Tuesday November 17 (moved 2026-11-09 from
+  November 12, one release a week), due Wednesday November 25; the walk-through stays here.
 -->
 
 ### HW6, and the wrap
@@ -45,7 +45,7 @@ Graded on the page's inputs and on a hidden set: a check scores only when both m
 - Light at a point obeys **Lo = Le + ∫ f · Li · cos**; the BRDF is the material, and a matte one is ρ/π
 - A ray tracer **searches** per pixel: three intersection routines, shadow and secondary rays, and a **BVH** to make the search logarithmic
 - A path tracer **samples**: `(1/N) Σ f/p`, a random walk from the eye ended by **Russian roulette**, error falling as **1/√N**
-- **Due**: HW5, Wednesday November 18, 11:59 PM. **Out**: HW6, due Wednesday November 25
+- **Due**: HW5, Wednesday November 18, 11:59 PM. HW6 goes out Tuesday November 17, due Wednesday November 25
 - **Quiz 5**, on Canvas: tonight 8 PM to Sunday November 15, 11:59 PM; Lectures 11 and 12 and HW4
 - The slides after this one, light transport further, are covered time permitting, or reading
 

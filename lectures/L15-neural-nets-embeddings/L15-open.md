@@ -3,8 +3,8 @@
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
   tonight), ../../topics/neural-nets-embeddings.md (~66 min), ../../topics/coordinate-networks.md
   (~27 min), L15-discuss.md (the HW7 walk-through and the wrap).
-  Re-sequenced 2026-10-25 (was L14, Tuesday November 17): a Thursday in person; HW7 goes out tonight,
-  so its walk-through moved here from the image-space lecture.
+  Re-sequenced 2026-10-25 (was L14, Tuesday November 17): a Thursday in person; its HW7 walk-through moved here from the image-space lecture. HW7 goes out with
+  Lecture 16 (moved 2026-11-09, one release a week).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
   markdown line outside a code fence.

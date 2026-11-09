@@ -3,10 +3,12 @@
   CUT 2026-10-08: the five multiple-choice discussion questions (swap the nonlinearity, the first Adam
   step, the temperature, which network to ship, the NaN) and the Discussion header slide; the freed
   time is open questions and buffer.
-  Re-sequenced 2026-10-25 (was L14): HW7 goes out tonight (due Wednesday December 2), so the HW7
+  Re-sequenced 2026-10-25 (was L14): HW7 was to go out tonight (due Wednesday December 2), so the HW7
   walk-through and rules slides moved here from the image-space lecture's wrap. HW7 numbers from
   tools/gen-lecture-figures-d1.mjs (lectures/L17-diffusion-1/analysis/numbers-d1.json keys tiny, fit,
   dctPsnr); ../../homework/hw07/index.html is the specification and governs if the two differ.
+  2026-11-09: HW7 goes out with Lecture 16 (Tuesday November 24, one release a week); the
+  walk-through stays here, after the hand step it starts from.
 -->
 
 ### HW7, and the wrap
@@ -53,6 +55,6 @@ Specification and skeletons: [HW7](../../homework/hw07/index.html)
 - a coordinate network is one signal as a function; its encoding decides which frequencies training can reach
 
 - **Read:** [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), all sections
-- **Due:** HW6, Wednesday November 25, 11:59 PM. **Out:** HW7, due Wednesday December 2
+- **Due:** HW6, Wednesday November 25, 11:59 PM. HW7 goes out Tuesday November 24, due Wednesday December 2
 - **Quiz 6**, on Canvas: tonight 8 PM to Sunday November 22, 11:59 PM; Lectures 13 and 14 and HW5
 

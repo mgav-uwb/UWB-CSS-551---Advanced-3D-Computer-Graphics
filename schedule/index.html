@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- CSS 551 AU26 student-facing schedule: every meeting on the real calendar, per Plan C
      (planning/css551-au26-plan-c-2026-09-29.md), re-planned 2026-10-25 (affine on Oct 27, no midterm,
-     Canvas quizzes from Quiz 3, inverse rendering dropped). Lecture links fill in as decks are built (null renders
+     Canvas quizzes from Quiz 3, inverse rendering dropped; 2026-11-09: HW6 out Nov 17, HW7 out Nov 24, one release a week). Lecture links fill in as decks are built (null renders
      as plain text); the site syllabus governs. Styled like the hub. -->
 <html lang="en">
 <head>
@@ -97,15 +97,15 @@ const WEEKS = [
   { wk:'7', kind:'bridge',
     tue:{ date:'Nov 10', title:'Surface appearance: illumination and texture sampling', sub:'Lambert, Phong, lights, tone mapping; filtering, mipmaps, bump, cube and shadow maps', href:'lectures/L12-illumination-textures/index.html' },
     thu:{ date:'Nov 12', title:'Light transport, ray tracing and path tracing', sub:'the rendering equation; Whitted ray tracing; Monte Carlo path tracing and the Cornell box', href:'lectures/L13-ray-tracing-path-tracing/index.html' },
-    read:[['illumination.html','Local Illumination'],['texture-mapping.html#magnification','Texture Mapping, Sections 5 to 11'],['unity-shaders.html','Unity Shaders'],['light-transport-pbr.html','Light Transport and PBR'],['ray-tracing.html','Ray Tracing']], quiz:'Q5 (Canvas)', hw:[{ n:5, out:'Tue Nov 10', due:'Wed Nov 18', what:'the grid mesh, the placement matrix, a lit shader' }, { n:6, out:'Thu Nov 12', due:'Wed Nov 25', what:'a Whitted ray tracer; the Cornell box lit directly' }] },
+    read:[['illumination.html','Local Illumination'],['texture-mapping.html#magnification','Texture Mapping, Sections 5 to 11'],['unity-shaders.html','Unity Shaders'],['light-transport-pbr.html','Light Transport and PBR'],['ray-tracing.html','Ray Tracing']], quiz:'Q5 (Canvas)', hw:{ n:5, out:'Tue Nov 10', due:'Wed Nov 18', what:'the grid mesh, the placement matrix, a lit shader' } },
   { wk:'8', kind:'neural',
     tue:{ date:'Nov 17', title:'Animation and physics', sub:'keyframes, easing, kinematics, skinning; particles, springs, cloth, fluids', href:'lectures/L14-animation-physics/index.html' },
     thu:{ date:'Nov 19', title:'Neural networks and embeddings', sub:'', href:'lectures/L15-neural-nets-embeddings/index.html' },
-    read:[['animation.html','Animation and Interpolation, Sections 1 to 14'],['neural-nets-embeddings.html','Neural Networks and Embeddings']], quiz:'Q6 (Canvas)', hw:{ n:7, out:'Thu Nov 19', due:'Wed Dec 2', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
+    read:[['animation.html','Animation and Interpolation, Sections 1 to 14'],['neural-nets-embeddings.html','Neural Networks and Embeddings']], quiz:'Q6 (Canvas)', hw:{ n:6, out:'Tue Nov 17', due:'Wed Nov 25', what:'a Whitted ray tracer; the Cornell box lit directly' } },
   { wk:'9', kind:'neural',
     tue:{ date:'Nov 24', title:'The space of images', sub:'', href:'lectures/L16-image-space/index.html' },
     thu:{ date:'Nov 26', title:'Thanksgiving, no class', sub:'', href:null, off:true },
-    read:[['image-space.html','The Space of Images']], quiz:null, hw:null },
+    read:[['image-space.html','The Space of Images']], quiz:null, hw:{ n:7, out:'Tue Nov 24', due:'Wed Dec 2', what:'a gradient step; a digit’s DCT and PSNR (JS or Python)' } },
   { wk:'10', kind:'neural',
     tue:{ date:'Dec 1', title:'Diffusion models I', sub:'the forward process, the denoiser, DDPM and DDIM', href:'lectures/L17-diffusion-1/index.html' },
     thu:{ date:'Dec 3', title:'Diffusion models II', sub:'guidance, latent diffusion, ControlNet, text-to-3D', href:'lectures/L18-diffusion-2/index.html' },

@@ -3,7 +3,7 @@
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
   tonight), ../../topics/image-space.md (~82 min), L16-discuss.md (the wrap).
   Re-sequenced 2026-10-25 (was L15, Thursday November 19, opened by paper Quiz 5): a Tuesday online
-  meeting with no quiz; the HW7 walk-through moved to Lecture 15, when HW7 goes out.
+  meeting with no quiz; the HW7 walk-through moved to Lecture 15; HW7 goes out tonight (moved here 2026-11-09).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
   markdown line outside a code fence.
