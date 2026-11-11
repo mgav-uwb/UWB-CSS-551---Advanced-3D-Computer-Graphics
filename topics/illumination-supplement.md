@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK (supplement): Local illumination, further (~20 min, 16 slides).
+  CSS 551 · TOPIC DECK (supplement): Local illumination, further (~22 min, 17 slides).
   Mounted after the wrap of a lecture that mounts illumination.md, and covered time permitting: no
   homework or quiz needs it. Split from illumination.md 2026-11-10, text unchanged but for typeset
   formulas and tables.
@@ -109,7 +109,7 @@ the same highlight as Phong: 0.969^s = 0.021  →  s = ln 0.0208 / ln 0.9689 ≈
 \[ \begin{aligned} \text{Blinn, } H \cdot N = 0.969:\quad & 0.969^{30} = 0.387 \\ \text{Phong, } R \cdot V = 0.879:\quad & 0.879^{30} = 0.021 \\ \text{Blinn matching Phong:}\quad & 0.969^{s} = 0.021 \;\Rightarrow\; s = \frac{\ln 0.0208}{\ln 0.9689} \approx 122 \approx 4 \times 30 \end{aligned} \]
 </div>
 
-HW5's `phong` checks both: specular 0.0208 and Blinn 0.3873.
+H from the unit L = (0.633, 0.446, 0.633) and V = (0.370, 0.370, 0.852): `$H = \operatorname{normalize}(1.003,\ 0.816,\ 1.485)$`. HW5's `phong` checks both: specular 0.0208 and Blinn 0.3873.
 
 
 ---
@@ -155,17 +155,34 @@ Per pixel costs **7 times** more here and is universal now. Per-vertex lighting 
 
 ---
 
-## Sky light, better than a constant: ambient occlusion
+## Ambient occlusion: the sky a point sees
 
-<img src="../../textbook/figures/ill-ao.svg" class="media-shot" style="max-height: 200px;" alt="a unit sphere resting on a floor; the fraction of sky visible from floor points, low near the contact and rising with distance">
+The ambient constant lights every point the same, so an object on a floor looks **pasted on**. Fill light comes from all around; a point in a crease or under an object gets **less**:
 
-Ambient occlusion: the fraction of the sky a point can see. A unit sphere on a floor, 4,000 rays per point:
+<img src="../../textbook/figures/illd-ao-rays.svg" class="media-shot" style="max-height: 200px;" alt="Side view of a unit sphere resting on a floor. From three floor points, at 0.5, 1.5 and 3 radii from the contact, a fan of rays over the upper hemisphere: green where the direction escapes, red where the sphere blocks it. The point at 0.5 is mostly blocked toward the sphere (AO 0.28), the point at 1.5 partly (AO 0.83), the point at 3 only near the horizon (AO 0.97).">
 
-| distance from contact | 0.05 | 0.25 | 0.5 | 1 | 2 | 4 |
-| --------------------- | ---- | ---- | --- | - | - | - |
+<div class="tex" role="img" aria-label="AO(p) = (1/π) ∫ over the hemisphere of visible(ω) cos θ dω,  between 0 (buried) and 1 (open sky);   ambient = k_a · k_d · AO(p)">
+\[ \text{AO}(p) = \frac{1}{\pi} \int_{\text{hemisphere}} \text{visible}(\omega)\, \cos\theta \; d\omega \qquad \text{ambient} = k_a\, k_d\, \text{AO}(p) \]
+</div>
+
+AO: the cosine-weighted fraction of rays over the hemisphere that **escape**; 1 in the open, 0 buried.
+
+
+---
+
+## Contact shadows from ambient occlusion
+
+<img src="../../textbook/figures/ill-ao.svg" class="media-shot" style="max-height: 165px;" alt="AO on the floor plotted against the distance from the contact point of a resting unit sphere: near 0 at the contact, rising through 0.65 at one radius to nearly 1 by four radii.">
+
+The floor beside a unit sphere resting on it, 4,000 rays per point:
+
+| distance from contact (radii) | 0.05 | 0.25 | 0.5 | 1 | 2 | 4 |
+| ----------------------------- | ---- | ---- | --- | - | - | - |
 | AO | 0.003 | 0.088 | 0.282 | 0.647 | 0.908 | 0.988 |
 
-Multiply the ambient term by it: contact shadows appear. A 90° crease sees half the sky: 0.5.
+- under the contact the sphere hides almost the whole sky: the dark ring that **seats** the sphere on the floor
+- a point in a 90° crease sees exactly **half** its hemisphere, AO 0.5: the wall hides the half on its side
+- computed once for static objects (baked into a texture), or each frame from the depth buffer (screen-space AO)
 
 
 ---
@@ -186,7 +203,7 @@ The physical law drops **100 times** from 1 to 10; the tuned polynomial drops 4.
 
 ## The spot cone, worked at 20°
 
-Inner angle 15° (full strength), outer 25° (zero), Sung's soft edge between:
+Inner angle 15° (full strength), outer 25° (zero), the shader's soft edge between:
 
 <div class="tex" style="font-size:0.74em" role="img" aria-label="α = 20°:  n = 15 − 20 = −5,  range = 25 − 15 = 10,  x = n² / range² = 25 / 100 = 0.25
 smoothstep(1, 0, x):  t = (x − 1) / (0 − 1) = 0.75,  S = 3t² − 2t³ = 1.688 − 0.844 = 0.844">

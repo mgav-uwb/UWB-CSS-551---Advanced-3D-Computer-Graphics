@@ -227,7 +227,10 @@
       </figure>
       <p>
         Jim Blinn&rsquo;s 1977 variant replaces the mirror test with a half-vector test. Let
-        \(\mathbf{H} = \mathrm{normalize}(\mathbf{L} + \mathbf{V})\), the direction bisecting light and eye; the
+        \(\mathbf{H} = \mathrm{normalize}(\mathbf{L} + \mathbf{V})\), the direction bisecting light and eye. The
+        sum bisects the angle only when \(\mathbf{L}\) and \(\mathbf{V}\) are both unit vectors, so normalize them
+        first: a light vector left at its raw length (the point-to-light difference) tilts \(\mathbf{H}\) toward
+        the light and moves the highlight. The
         surface mirrors the light into the eye exactly when \(\mathbf{N} = \mathbf{H}\), so
         \(\max(0, \mathbf{H}\cdot\mathbf{N})^s\) peaks in the same place as Phong&rsquo;s term. It needs no
         reflection vector, behaves better at grazing angles, and for a directional light and a distant eye

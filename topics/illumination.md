@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~50 min, 35 slides, incl. a short color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~52 min, 37 slides, incl. a short color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -15,7 +15,8 @@
            model matrix); the meshes topic (per-vertex normals).
   DEMOS:   data-demo="shading-lab" data-controls="view:disk.ball,lock" (the opening: disk or ball);
            data-demo="illumination", four embeds: ambient alone (terms:a), diffuse alone (terms:d),
-           specular alone (terms:s), all three with a switch per term (terms:ads,toggles).
+           specular alone (terms:s), all three with a switch per term (terms:ads,toggles);
+           data-demo="light-lab" data-controls="view:local.point" (Phong or Blinn).
   FIGURES: ../../textbook/figures/illd-local-global.svg (tools/gen-lecture-figures-light.mjs), ill-vectors.svg, ill-lambert.svg, ill-normal-transform.svg,
            ill-shininess.svg, ill-lights.svg, ill-tonemap.svg, col-transfer.svg, ill-sphere-terms.png
            (the textbook's surfaces and systems generators; the ASCII they replace is their alt).
@@ -60,6 +61,17 @@ Texture a sphere and freeze the shading: it reads as a flat **disk**, a sticker.
 A lighting model computes that brightness at every point, from the point's normal, the lights and the eye.
 
 
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Disk or ball, live
+
+<div class="cockpit" data-demo="shading-lab" data-controls="view:disk.ball,lock"><pre class="viz-fallback">  one texture on a flat disk and on a sphere, side by side; light at az 40°, el 35°
+  frozen (no shading): brightness 1 everywhere, and the sphere reads as a disk
+  plain and frozen: the two pictures are identical, 0 of 57,600 pixels differ
+  lit: the disk is 0.66 everywhere; the sphere runs from 0.10 to 0.84
+  presets: "lit", "plain and frozen"</pre></div>
 
 
 ---
@@ -304,15 +316,44 @@ Bigger s, **tighter** highlight: 28.5° off the mirror direction, s = 1 still gi
 
 ## Blinn's half vector
 
-Most engines, three.js's `MeshPhongMaterial` among them, use **Blinn's** variant: the **half vector** between the light and the eye, dotted with the normal:
+Most engines use **Blinn's** variant (1977): take the direction **halfway** between the light and the eye, and ask how close the **normal** is to it:
 
-<div class="tex" role="img" aria-label="Phong: max(0, R · V)^s        Blinn: max(0, H · N)^s,  H = normalize(L + V)">
-\[ \begin{aligned} \text{Phong:}\quad & \max(0,\ R \cdot V)^s \\ \text{Blinn:}\quad & \max(0,\ H \cdot N)^s,\quad H = \operatorname{normalize}(L + V) \end{aligned} \]
+<div class="tex" role="img" aria-label="H = (L + V) / |L + V|   with L and V unit vectors;   specular = k_s · max(0, N · H)^s">
+\[ H = \frac{L + V}{\lVert L + V \rVert} \quad (L,\ V \text{ unit}) \qquad\qquad \text{specular} = k_s \max(0,\ N \cdot H)^s \]
 </div>
 
-- `H·N = 1` exactly when `R·V = 1`: the highlight sits in the **same place**
-- the angle between H and N is about **half** the angle between R and V, so Blinn needs about **four times** the exponent for the same highlight
-- an exponent tuned for one model is four times too glossy, or too dull, in the other
+<img src="../../textbook/figures/illd-half-vector.svg" class="media-shot" style="max-height: 230px;" alt="Two side views of a surface with normal N. Left: L 40 degrees to the left of N, V 15 degrees to the right, R the mirror of L; R and V are 25 degrees apart and H, halfway between L and V, is 12.5 degrees from N. Right: the same L at length 3 and V at length 1: H = normalize(L + V) leans toward the light, 27.1 degrees from N instead of 12.5.">
+
+- **normalize L and V first**: only two unit vectors add up to their bisector
+- `N·H = 1` exactly when `R·V = 1`: the **same place**; but N to H is **half** the angle R to V, so about **4 times** the exponent
+
+
+---
+
+## Phong or Blinn-Phong
+
+| | Phong | Blinn-Phong |
+| - | ----- | ----------- |
+| the specular term | `max(0, R·V)^s` | `max(0, N·H)^s` |
+| work per light and point | `R = 2(N·L)N − L` | `H`: add, normalize; one `H` for the whole surface if the light is directional and the viewer far |
+| the same highlight | exponent s | exponent about 4s |
+| eye more than 90° from R | cut to 0: with a low exponent the highlight's edge shows | `N·H` stays positive while L and V are above the surface: a smooth fade |
+| grazing light and view | the highlight stays round | the highlight stretches along the surface, as on a wet road; closer to measured materials |
+
+Blinn-Phong is the real-time default; its H returns in physically based shading as the microfacet normal.
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Phong or Blinn, live
+
+<div class="cockpit" data-demo="light-lab" data-controls="view:local.point"><pre class="viz-fallback">  one point lit by one light, seen from one eye: N, L, V, and R (Phong) or H (Blinn)
+  preset "the marked point (deck)": Phong, s = 30: R·V = 0.879, specular 0.021
+  preset "Blinn, same s": H·N = 0.969, specular 0.387, eighteen times brighter
+  preset "Blinn, s = 123": back to about Phong's 0.021
+  drag the light or the eye: the highlight's center agrees, its width does not</pre></div>
 
 
 ---
@@ -378,7 +419,7 @@ practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadr
 \[ \text{physical: } \frac{1}{d^2} \qquad\qquad \text{practical: } \frac{1}{k_c + k_l\, d + k_q\, d^2} \]
 </div>
 
-- double the distance, **a quarter** of the light; `$k_c$` avoids a divide-by-zero at `$d = 0$`; a cutoff radius (Sung's `Near`/`Far`) makes distant lights free
+- double the distance, **a quarter** of the light; `$k_c$` avoids a divide-by-zero at `$d = 0$`; a cutoff radius makes distant lights free
 - the light a surface receives from a point light: `$E = I \cos\theta / d^2$`, the cosine from Lambert and the square from distance
 
 
@@ -386,7 +427,7 @@ practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadr
 
 ## The spot cone, in real code
 
-A spotlight is a point light **masked by a cone**. Kelvin Sung's `9.4.PointLightSource` shader builds the mask by hand: the angle **α** to the spot's aim, faded between an inner and outer cone:
+A spotlight is a point light **masked by a cone**. This Unity shader builds the mask by hand: the angle **α** to the spot's aim, faded between an inner and outer cone:
 
 ```csharp [1-12]
 float ComputeDiffuse(v2f i) {
