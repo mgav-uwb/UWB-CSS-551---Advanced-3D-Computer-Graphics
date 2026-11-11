@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~50 min, 36 slides, incl. a short color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~53 min, 38 slides, incl. a color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -9,13 +9,14 @@
   clamped; the worked marked point (N·L = 0.988); the mirror vector R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's
   half vector (H·N = 0.969, 0.387 at s = 30); ambient; the sum per channel; directional, point and spot
   lights; attenuation and irradiance (1.25); several lights summed; HDR and Reinhard tone mapping;
-  shading in linear light (Rec. 709 luminance), the sRGB curve.
+  why images store sRGB codes (the eye's sensitivity, 256 levels), the curve (code 128 = 0.216 of the light),
+  decode-shade-encode, a blend both ways (Rec. 709 luminance), the pitfall.
   NEEDS:   the vectors topic (dot product, projection split); the affine topic (the
            model matrix); the meshes topic (per-vertex normals).
   DEMOS:   data-demo="shading-lab" data-controls="view:disk.ball,lock" (the opening: disk or ball);
            data-demo="illumination", four embeds: ambient alone (terms:a), diffuse alone (terms:d),
            specular alone (terms:s), all three with a switch per term (terms:ads,toggles);
-           data-demo="light-lab" data-controls="view:local.point" (Phong or Blinn).
+           data-demo="light-lab" data-controls="view:local.point" (the whole local model, last).
   FIGURES: ../../textbook/figures/illd-local-global.svg (tools/gen-lecture-figures-light.mjs), ill-vectors.svg, ill-lambert.svg, ill-normal-transform.svg,
            ill-shininess.svg, ill-lights.svg, ill-tonemap.svg, col-transfer.svg, ill-sphere-terms.png
            (the textbook's surfaces and systems generators; the ASCII they replace is their alt).
@@ -332,19 +333,6 @@ Blinn-Phong is the real-time default; its H returns in physically based shading 
 
 ---
 
-<!-- .slide: class="demo-full" -->
-
-## Phong or Blinn, live
-
-<div class="cockpit" data-demo="light-lab" data-controls="view:local.point"><pre class="viz-fallback">  one point lit by one light, seen from one eye: N, L, V, and R (Phong) or H (Blinn)
-  preset "the marked point (deck)": Phong, s = 30: R·V = 0.879, specular 0.021
-  preset "Blinn, same s": H·N = 0.969, specular 0.387, eighteen times brighter
-  preset "Blinn, s = 123": back to about Phong's 0.021
-  drag the light or the eye: the highlight's center agrees, its width does not</pre></div>
-
-
----
-
 ## The Phong sum
 
 Add the three terms, **per color channel**, and per light:
@@ -496,35 +484,68 @@ Midtones barely change; bright values stay **distinct** (cloud 4 → 0.80, sky 6
 
 ### Color in rendering
 
-<small>(~5 min)</small>
+<small>(~8 min)</small>
 
 
 ---
 
-## Shade in linear light
+## Why an image stores codes, not light
 
-The lighting sums are **light**: twice the number, twice the photons. The **codes** stored in an 8-bit image are not; they are encoded by the sRGB curve. Blend yellow and black 50/50:
+A pixel has **256 levels** per channel. The eye notices a step in light **in proportion to the light already there**: a small step is plain in the darks and invisible in the brights.
 
-| blended in | per channel | luminance |
-| ---------- | ----------- | --------- |
-| codes: (128, 128, 0) | linear **0.216** | **0.200** |
-| light: 0.5 per channel | code (188, 188, 0) | **0.464** |
-| a fine checker of the two, seen from afar | | **0.464** |
+<img src="../../textbook/figures/col-ramps.png" class="media-shot" style="max-height: 200px;" alt="Four horizontal gray ramps: the first, codes from 0 to 255, looks evenly spaced; the second, linear light from 0 to 1, brightens quickly and spends most of its length in light grays; the third, 32 levels quantized in linear light, shows wide dark bands at the left and fine steps at the right; the fourth, 32 levels quantized in sRGB, shows even bands throughout.">
 
-Luminance is computed on linear values (Rec. 709): `$Y = 0.2126\,R + 0.7152\,G + 0.0722\,B$`. Only the linear blend matches what the eye averages.
+- third strip: levels **evenly spaced in light**: wide bands in the darks, wasted steps in the brights
+- fourth strip: the same number of levels **evenly spaced in sRGB codes**: even to the eye
+
+So a stored **code** is an encoded value, spent where the eye can see the difference; it is **not** an amount of light.
 
 
 ---
 
-## The sRGB curve: codes are not light
+## The sRGB curve: from code to light
 
-<img src="../../textbook/figures/col-transfer.svg" class="media-shot" style="max-height: 210px;" alt="the sRGB transfer function mapping code values to linear light, with code 128 marked at 0.216">
+<img src="../../textbook/figures/col-transfer.svg" class="media-shot" style="max-height: 200px;" alt="Linear light against encoded value: the sRGB decode curve rises slowly then steeply, nearly on top of a dashed gamma 2.2 curve, with code 128 marked at linear 0.216 and linear 0.5 marked at code 188.">
 
-- code 128 → **0.216** of full light; linear 0.5 → code **188**
-- one code step near black: sRGB 0.0003, linear 8-bit 0.0039 (12.9 times finer)
-- codes below 1 % of full light, counting 0: sRGB **26**, linear 8-bit **3**
+<div class="tex" role="img" aria-label="light ≈ code^2.2 (decode),   code ≈ light^(1/2.2) (encode),   both in [0, 1]; the exact curve has a short straight piece near black">
+\[ \text{light} \approx \text{code}^{2.2} \ \ \text{(decode)} \qquad \text{code} \approx \text{light}^{1/2.2} \ \ \text{(encode)} \qquad \text{both in } [0, 1] \]
+</div>
 
-The curve spends codes where the eye is sensitive, in the darks. That is why 8-bit images store encoded values, and why shaders must **decode on read** and **encode on write**.
+- the **middle** code, 128, is only **22 %** of full light; **half** the light is code **188**
+- below 1 % of full light there are **26** sRGB codes, against **3** if the byte stored light
+
+
+---
+
+## Decode, shade, encode
+
+Light **adds**: two lights add, a surface reflects a fraction, a filter averages. Codes do not add, so every such operation must happen on **light**:
+
+<div class="tex" role="img" aria-label="texture codes → decode → light → shade, blend, filter (in light) → encode → framebuffer codes → the display turns them back into light">
+\[ \text{codes} \xrightarrow{\ \text{decode}\ } \text{light} \xrightarrow{\ \text{shade, blend, filter}\ } \text{light} \xrightarrow{\ \text{encode}\ } \text{codes} \xrightarrow{\ \text{display}\ } \text{light} \]
+</div>
+
+- the GPU does both conversions when the texture and the framebuffer are declared **sRGB**: in Unity, the **Linear** color space (Player settings) and the sRGB box on color textures; in three.js, `texture.colorSpace = THREE.SRGBColorSpace` and the renderer's sRGB output
+- **data** textures, normal maps and height maps, are not colors: never decode them
+
+
+---
+
+## A blend, both ways
+
+Mix red and green half and half. Which is the mix: the average of the **codes**, or the average of the **light**?
+
+<div style="display:flex; gap:28px; justify-content:center; margin:0.3em 0;" role="img" aria-label="Two swatches: left, the average of the codes, (128, 128, 0), a dark olive; right, the average of the light, encoded, (188, 188, 0), a bright yellow."><div><div style="width:190px; height:90px; background:rgb(128,128,0); border-radius:4px;"></div><div style="font-size:0.55em;">codes averaged (128, 128, 0)</div></div><div><div style="width:190px; height:90px; background:rgb(188,188,0); border-radius:4px;"></div><div style="font-size:0.55em;">light averaged (188, 188, 0)</div></div></div>
+
+A fine red and green checker, seen from afar, is the ground truth: the eye averages **photons**.
+
+| averaged | per channel | luminance |
+| -------- | ----------- | --------- |
+| the codes: (128, 128, 0) | light **0.216** | **0.200**: too dark |
+| the light: 0.5 each | code (188, 188, 0) | **0.464** |
+| the checker, seen from afar | | **0.464** |
+
+Luminance is computed on light (Rec. 709): `$Y = 0.2126\,R + 0.7152\,G + 0.0722\,B$`. Only the blend done in light matches the checker.
 
 
 ---
@@ -539,3 +560,17 @@ An albedo texel of code 200, lit at N·L = 0.5:
 | wrong | 200 × 0.5 | 0.127 | 100 |
 
 The wrong one delivers **44 %** of the correct light. Shading on codes makes every partly lit surface **too dark** and every falloff **too steep**; artists then brighten the lights to compensate, and the highlights blow out.
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The whole local model, live
+
+<div class="cockpit" data-demo="light-lab" data-controls="view:local.point"><pre class="viz-fallback">  one point lit by up to two lights, seen from one eye: N, L, V, and R (Phong) or H (Blinn)
+  sliders: shininess s, k_a, k_s, a second light; switches: Phong R·V or Blinn H·N, raw or normalized lobe, material
+  the swatches: ambient + diffuse + specular = the pixel
+  preset "the marked point (deck)": Phong, s = 30, specular 0.021
+  "Blinn, same s": 0.387, eighteen times brighter; "Blinn, s = 123": back to about 0.021
+  tabs Lights, Tone and Gamma: the light types, tone mapping and the sRGB encoding, one view each</pre></div>
