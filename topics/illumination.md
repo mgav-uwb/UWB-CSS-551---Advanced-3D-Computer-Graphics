@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~53 min, 38 slides, incl. a color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~56 min, 42 slides, incl. a color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
@@ -8,7 +8,8 @@
   bounced light, reflections); the light, normal and eye directions; Lambert's projected area and N·L,
   clamped; the worked marked point (N·L = 0.988); the mirror vector R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's
   half vector (H·N = 0.969, 0.387 at s = 30); ambient; the sum per channel; directional, point and spot
-  lights; attenuation and irradiance (1.25); several lights summed; HDR and Reinhard tone mapping;
+  lights; attenuation and irradiance (1.25); several lights summed; HDR tone mapping as a camera's two steps
+  (exposure alone, then Reinhard's curve alone at one exposure; where it runs, in Unity and three.js);
   why images store sRGB codes (the eye's sensitivity, 256 levels), the curve (code 128 = 0.216 of the light),
   decode-shade-encode, a blend both ways (Rec. 709 luminance), the pitfall.
   NEEDS:   the vectors topic (dot product, projection split); the affine topic (the
@@ -16,9 +17,12 @@
   DEMOS:   data-demo="shading-lab" data-controls="view:disk.ball,lock" (the opening: disk or ball);
            data-demo="illumination", four embeds: ambient alone (terms:a), diffuse alone (terms:d),
            specular alone (terms:s), all three with a switch per term (terms:ads,toggles);
+           data-demo="light-lab" data-controls="view:tone.hdr" (tone mapping, live);
            data-demo="light-lab" data-controls="view:local.point" (the whole local model, last).
-  FIGURES: ../../textbook/figures/illd-local-global.svg (tools/gen-lecture-figures-light.mjs), ill-vectors.svg, ill-lambert.svg, ill-normal-transform.svg,
-           ill-shininess.svg, ill-lights.svg, ill-tonemap.svg, col-transfer.svg, ill-sphere-terms.png
+  FIGURES: ../../textbook/figures/illd-local-global.svg, illd-tonemap-exposure.svg, illd-tonemap-curves.svg,
+           illd-tonemap-curve.svg
+           (tools/gen-lecture-figures-light.mjs), ill-vectors.svg, ill-lambert.svg, ill-normal-transform.svg,
+           ill-shininess.svg, ill-lights.svg, col-transfer.svg, ill-sphere-terms.png
            (the textbook's surfaces and systems generators; the ASCII they replace is their alt).
   NUMBERS: textbook/figures/numbers-surfaces.json (ill.*), recomputed by node 2026-11-10.
   SUPPLEMENT: topics/illumination-supplement.md (the marked point worked, for HW5; energy, per vertex or per pixel, ambient occlusion,
@@ -38,6 +42,10 @@
   lightEl so the light-behind numbers can be reached; fixes: the marked point is at the edge of the
   highlight, not its center; a light costs two dot products, not three; linear 0.216 and luminance 0.200
   for code 128; 26 sRGB codes below 1 %. Seven slides no homework or quiz needs moved to the supplement.
+  EDIT 2026-11-10 (Marcel: "the tone mapping slides need a better explanation too"): HDR rebuilt problem first as a
+  camera's two steps, each figure changing one thing (exposure alone, then the curve alone at exposure 0.5, rendered
+  from the light lab's own HDR scene); where the curve runs and how Unity and three.js turn it on; the light lab's
+  Tone view live. The light lab's image cells now keep their size inside a demo-full slide.
 
   reveal.js: FLAT (every slide a top-level "---" section). Notes follow "Note:".
   Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js; TeX inside, the
@@ -446,38 +454,89 @@ Two dot products per light, summed: the whole local lighting model, end to end.
 
 ### High dynamic range and tone mapping
 
-<small>(~5 min)</small>
-
----
-
-## Brightness has no ceiling; the screen does
-
-Several lights and a bright specular easily push the computed color past **1**: but a display maxes out at **1** (full white). Naively **clipping** above 1 **destroys** bright detail:
-
-| | sky | cloud | sun |
-| - | --- | ----- | --- |
-| computed (high dynamic range) | 6.0 | 4.0 | 40.0 |
-| clipped to 1 | 1 | 1 | 1 |
-
-- a lighting sum is naturally **HDR**: values above 1 are normal, not a bug
-- **clipping** flattens every bright value to the same white, losing the differences
-
-We need to **compress** the high range into `[0,1]` while **keeping** the differences: tone mapping.
+<small>(~8 min)</small>
 
 
 ---
 
-## Reinhard: squash it smoothly
+## The sum has no ceiling; the screen does
 
-The simplest respectable tone-map is the **Reinhard** curve: divide each value by **one plus itself**:
+- the lighting sum is an amount of **light**: lights add, a highlight concentrates, nothing stops it at 1
+- values above 1 are **correct**: the sum is *high dynamic range* (HDR)
+- a display has a **ceiling**, its white, and the framebuffer stores 0 to 1 per channel
 
-<div class="tex" role="img" aria-label="display = x / (1 + x)">
-\[ \text{display} = \frac{x}{1 + x} \]
+| in one scene | ground | cloud | sky | sun |
+| ------------ | ------ | ----- | --- | --- |
+| light | about 0.1 | 4 | up to 6 | 40 |
+| clipped at 1 | about 0.1 | 1 | 1 | 1 |
+
+Clipping keeps the ground and turns every bright value into the **same** white. **Tone mapping** fits the whole range on the screen and keeps it in order.
+
+
+---
+
+## Exposure: one scale for all the light
+
+A camera's aperture and shutter set how much light reaches the sensor. A renderer multiplies every value by an **exposure** `$k$` before display.
+
+<img src="../../textbook/figures/illd-tonemap-exposure.svg" class="media-shot" style="max-height: 255px;" alt="The same scene twice, clipped at 1. Left, exposure 4: the green ground is well lit, while the sky, the clouds, the sun and the lit side of a sphere are one flat white. Right, exposure 0.15: a blue sky with gray clouds and a white sun, and the ground near black.">
+
+- `$k$` chooses which brightness lands **mid-screen**; it keeps every ratio
+- so one `$k$` cannot fit this scene: expose for the ground and the sky is white; expose for the sky and the ground is near black
+- **auto exposure** measures the frame's average brightness and sets `$k$`: the eye adapting as you leave a tunnel
+
+
+---
+
+## A curve: squeeze the brights
+
+Film does not cut off at white: its response **bends** toward it. The simplest such curve, Reinhard's, runs after the exposure:
+
+<div class="tex" role="img" aria-label="display = x / (1 + x),   where x = k × light">
+\[ \text{display} = \frac{x}{1 + x}, \qquad x = k \cdot \text{light} \]
 </div>
 
-<img src="../../textbook/figures/ill-tonemap.svg" class="media-shot" style="max-height: 230px;" alt="Display value against computed brightness from 0 to 10: clipping goes flat at 1; Reinhard bends toward 1 without reaching it; a lower curve for exposure 0.5; cloud 4 at 0.80, sky 6 at 0.86.">
+<img src="../../textbook/figures/illd-tonemap-curves.svg" class="media-shot" style="max-height: 190px;" alt="Display value against x = k × light from 0 to 8: clipping rises along the diagonal and goes flat at 1; Reinhard rises with slope 1 and bends toward 1 without reaching it, with cloud 4 at 0.80 and sky 6 at 0.86 marked; the ACES film curve rises faster through the midtones and reaches 1 near x = 7.">
 
-Midtones barely change; bright values stay **distinct** (cloud 4 → 0.80, sky 6 → 0.86, where clipping gave both 1). **Exposure** scales `x` first; apply the curve **last**, after all lighting.
+- small `$x$`: nearly `$x$`, so the darks are almost unchanged
+- large `$x$`: near 1, never 1, so bright values stay **distinct** and in order
+- engines use film-like S curves (ACES is the common one): deeper blacks, more midtone contrast, a similar shoulder
+
+
+---
+
+## The curve alone: one exposure, two ways
+
+<img src="../../textbook/figures/illd-tonemap-curve.svg" class="media-shot" style="max-height: 280px;" alt="The same scene at exposure 0.5, twice. Left, clipped at 1: the sky, the clouds and the sun are one white, and the sphere's highlight a flat white patch. Right, Reinhard: a pale sky with gray clouds, a bright sun disk, a sphere whose highlight fades smoothly; labels sky 0.75, cloud 0.67, sun 0.95.">
+
+- clipped: the sky, the clouds and the sun are one white; the sphere's highlight is a flat patch
+- Reinhard: three grays in order, a visible sun, a highlight that fades; the ground barely changes
+- the price: bright values sit **closer together**, so the sky loses contrast and color
+
+
+---
+
+## Where it runs: last
+
+<div class="tex" role="img" aria-label="the sum of all lights → times k → x → x/(1+x) → a value in [0, 1) → encode → the display">
+\[ \text{all lights, summed} \xrightarrow{\ \times\, k\ } x \xrightarrow{\ x/(1+x)\ } [0, 1) \xrightarrow{\ \text{encode}\ } \text{the display} \]
+</div>
+
+- once per pixel, after **every** light is summed; the encode is the next section's subject
+- Unity (URP): HDR on in the pipeline asset, then a Volume with **Tonemapping** (Neutral or ACES) and **Post Exposure** for `$k$`
+- three.js: `renderer.toneMapping = THREE.ACESFilmicToneMapping`, and `renderer.toneMappingExposure` for `$k$`
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Tone mapping, live
+
+<div class="cockpit" data-demo="light-lab" data-controls="view:tone.hdr"><pre class="viz-fallback">  the scene of this section, three times: clipped at 1, Reinhard x/(1+x), and a film curve (ACES)
+  slider: exposure k; presets exposure 1, 0.5 and 0.1
+  click a pixel (presets: the sun, the sky, a cloud, the highlight): its light, and what each curve shows
+  chart: the three curves against x = k × light, on a log axis</pre></div>
 
 
 ---
@@ -574,3 +633,4 @@ The wrong one delivers **44 %** of the correct light. Shading on codes makes eve
   preset "the marked point (deck)": Phong, s = 30, specular 0.021
   "Blinn, same s": 0.387, eighteen times brighter; "Blinn, s = 123": back to about 0.021
   tabs Lights, Tone and Gamma: the light types, tone mapping and the sRGB encoding, one view each</pre></div>
+

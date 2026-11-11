@@ -1,6 +1,6 @@
 <!--
   CSS 551 · Lecture 12 (Tuesday November 10, online): Illumination and texture sampling.
-  Mounts, in order: L12-open.md, ../../topics/illumination.md (~50 min, 35 slides),
+  Mounts, in order: L12-open.md, ../../topics/illumination.md (~56 min, 42 slides),
   ../../topics/texture-sampling.md (~20 min), L12-discuss.md (HW5 walk-through, wrap), then
   the supplements ../../topics/illumination-supplement.md and texture-sampling-supplement.md,
   time permitting (no homework or quiz needs them).
@@ -53,3 +53,4 @@
 - the **HW5** walk-through
 
 Reading: [Local Illumination](../../textbook/illumination.html); [Color](../../textbook/color.html), Sections 5 and 6; [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11; for the Unity track, [Unity Shaders](../../textbook/unity-shaders.html).
+

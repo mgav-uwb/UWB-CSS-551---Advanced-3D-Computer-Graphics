@@ -543,6 +543,23 @@ N.L 0.988 R.V 0.879 H.N 0.969 spec30 0.021</pre></li>
         <em>tone-mapping</em> curve compresses the unbounded range into \([0, 1)\) while keeping bright values
         ordered.
       </p>
+      <p>
+        A camera meets the same problem and answers it in two steps, and tone mapping copies both. The
+        <em>exposure</em> \(k\) multiplies every value, as the aperture and shutter scale the light that reaches
+        the sensor: it chooses which brightness lands mid-screen and keeps every ratio, so a scene whose sky is
+        fifty times as bright as its ground does not fit by exposure alone. Games set \(k\) from the average of
+        the log of luminance over the frame and move it there over a second or so, the adaptation seen when a
+        character leaves a tunnel. The <em>curve</em> then bends the scaled value toward 1 instead of cutting it
+        off there, as film does.
+      </p>
+      <figure>
+        <img src="figures/illd-tonemap-exposure.svg" alt="The same scene twice, clipped at 1. Left, exposure 4: the green ground is well lit, while the sky, the clouds, the sun and the lit side of a sphere are one flat white. Right, exposure 0.15: a blue sky with gray clouds and a white sun, and the ground near black." />
+        <figcaption>The light lab&rsquo;s HDR scene (ground about 0.1, clouds 4, sky up to 6, sun 40), clipped at two exposures. Exposed for the ground, everything in the sky is one white; exposed for the sky, the ground is near black.</figcaption>
+      </figure>
+      <figure>
+        <img src="figures/illd-tonemap-curve.svg" alt="The same scene at exposure 0.5, twice. Left, clipped at 1: the sky, the clouds and the sun are one white, and the sphere's highlight a flat white patch. Right, Reinhard: a pale sky with gray clouds, a bright sun disk, a sphere whose highlight fades smoothly; labels sky 0.75, cloud 0.67, sun 0.95." />
+        <figcaption>One exposure, two curves. Reinhard keeps the sky, the clouds and the sun apart, closer together than in the scene; applied per channel, it also pulls the bright sky toward gray.</figcaption>
+      </figure>
       <figure>
         <img src="figures/ill-tonemap.svg" alt="Display value against computed brightness from 0 to 10: the clip curve rises to 1 and stays flat; the Reinhard curve rises steeply then bends toward 1 without reaching it; a lower curve for exposure 0.5; the cloud at 4 and sky at 6 marked at 0.80 and 0.86." />
         <figcaption>Reinhard&rsquo;s \(x/(1+x)\) against clipping, and the same curve at half exposure. Values that clipping would merge stay distinct.</figcaption>
