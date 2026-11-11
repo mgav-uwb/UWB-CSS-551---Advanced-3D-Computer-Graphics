@@ -1,11 +1,12 @@
 <!--
-  CSS 551 · TOPIC DECK (supplement): Local illumination, further (~22 min, 17 slides).
+  CSS 551 · TOPIC DECK (supplement): Local illumination, further (~26 min, 19 slides).
   Mounted after the wrap of a lecture that mounts illumination.md, and covered time permitting: no
   homework or quiz needs it. Split from illumination.md 2026-11-10, text unchanged but for typeset
   formulas and tables.
 
   TEACHES: the marked point worked (N·L 0.988, R·V 0.879, 0.021, Blinn 0.969 and 0.387, the sum per channel),
-  the numbers HW5's phong checks; the normalized Phong lobe; per-vertex against per-pixel lighting; ambient occlusion; falloff by
+  the numbers HW5's phong checks; normals under a non-uniform scale and the inverse transpose; the
+  normalized Phong lobe; per-vertex against per-pixel lighting; ambient occlusion; falloff by
   the numbers; the spot cone's smoothstep worked; the cost of many lights (forward, deferred, tiled); area
   lights against point lights.
   NEEDS:   illumination.md, mounted before it.
@@ -126,6 +127,32 @@ The terms are **per channel**: a red plastic sphere at the marked point, `$k_a =
 | **sum** | | **0.964** | **0.409** | **0.343** |
 
 The highlight is **white** because ks is white: plastic reflects the light's color at the surface. A metal's highlight takes the metal's color.
+
+
+---
+
+## Scaling a model bends its normals
+
+Stretch a sphere into an ellipsoid with the model matrix, `$M = \operatorname{diag}(2, 1)$`. The **positions** land where they should. The **normals** stored with the mesh were perpendicular to the sphere; pushed through the same `M`, they are no longer perpendicular to the ellipsoid:
+
+<img src="../../textbook/figures/ill-normal-transform.svg" class="media-shot" style="max-height: 230px;" alt="A unit circle scaled 2 times in x becomes an ellipse. At the point that was at 45 degrees: the gray tangent of the ellipse, the red normal pushed through M, which leans off the surface, and the green inverse-transpose normal, perpendicular to the tangent.">
+
+At the point that was at 45°, the pushed normal (red) is **36.9°** off the true one (green). Every `N·L` there uses the wrong direction, and the ellipsoid shades like a different shape.
+
+
+---
+
+## The fix: the inverse transpose
+
+A **tangent** lies in the surface, so it moves like the positions: `$t' = M\,t$`. The new normal must stay perpendicular to every new tangent, and `$(M^{-1})^{\mathsf T} n$` does:
+
+<div class="tex" role="img" aria-label="n' = (M⁻¹)ᵀ n:   n'ᵀ t' = nᵀ M⁻¹ M t = nᵀ t = 0   for every tangent t">
+\[ n' = (M^{-1})^{\mathsf T} n: \qquad n'^{\mathsf T}\, t' = n^{\mathsf T} M^{-1} M\, t = n^{\mathsf T}\, t = 0 \]
+</div>
+
+- a **rotation** has `$(M^{-1})^{\mathsf T} = M$`; a **uniform** scale changes only the length: both are fixed by renormalizing
+- only **non-uniform** scale and shear need the inverse transpose, so the bug hides until a model is squashed
+- engines compute this **normal matrix** once per object (three.js's `normalMatrix`, Unity's `UnityObjectToWorldNormal`), then renormalize
 
 
 ---

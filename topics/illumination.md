@@ -1,13 +1,12 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~52 min, 37 slides, incl. a short color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~50 min, 36 slides, incl. a short color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
 
   TEACHES: local against global illumination (what a local model cannot show: cast shadows, hard or soft,
   bounced light, reflections); the light, normal and eye directions; Lambert's projected area and N·L,
-  clamped; the worked marked point (N·L = 0.988); normals under a non-uniform scale (the inverse
-  transpose, 36.9°); the mirror vector R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's
+  clamped; the worked marked point (N·L = 0.988); the mirror vector R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's
   half vector (H·N = 0.969, 0.387 at s = 30); ambient; the sum per channel; directional, point and spot
   lights; attenuation and irradiance (1.25); several lights summed; HDR and Reinhard tone mapping;
   shading in linear light (Rec. 709 luminance), the sRGB curve.
@@ -33,7 +32,8 @@
   specular, each with the demo showing it alone; the marked point's arithmetic moved to the supplement;
   "Local and global illumination" now second, with the table; the formulas typeset (lib/deck-math.js);
   the three ASCII drawings replaced by the chapter's figures; the normal-transform slide restored (ray
-  tracing's instancing relies on it); "The same sum, in color" moved after ambient; the embed gains
+  tracing's instancing relies on it; then moved to the supplement with a problem-first setup, Marcel: "it
+  feels out of place"); "The same sum, in color" moved after ambient; the embed gains
   lightEl so the light-behind numbers can be reached; fixes: the marked point is at the edge of the
   highlight, not its center; a light costs two dot products, not three; linear 0.216 and luminance 0.200
   for code 128; 26 sRGB codes below 1 %. Seven slides no homework or quiz needs moved to the supplement.
@@ -240,19 +240,6 @@ The whole diffuse term: clamp the cosine, scale by the surface color and the lig
   bright where the surface faces the light, falling off as the cosine, black past 90°
   drag the light: the bright side follows it; behind the sphere the near side goes black
   drag kd or hue: the brightness or the color of the lit side changes; the eye does not matter</pre></div>
-
-
----
-
-## Normals under a non-uniform scale
-
-The normal is stored in the model's own frame. Positions go to the world through `M`; a normal pushed through `M` **leans off the surface** once `M` scales unevenly:
-
-<img src="../../textbook/figures/ill-normal-transform.svg" class="media-shot" style="max-height: 170px;" alt="A unit circle scaled 2 times in x becomes an ellipse. At the point that was at 45 degrees: the tangent, the normal pushed through M (wrong, 36.9 degrees off, leaning off the surface), and the inverse-transpose normal (right, perpendicular to the tangent).">
-
-- normals transform by the **inverse transpose** `$(A^{-1})^{\mathsf T}$`, then renormalize
-- a rotation leaves it equal to `A`: the bug hides until a model is **squashed**
-- stretched 2 times in x, the wrong normal is **36.9°** off, and every cosine above inherits the error
 
 
 ---
