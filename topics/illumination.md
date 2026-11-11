@@ -427,24 +427,27 @@ practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadr
 
 ## The spot cone, in real code
 
-A spotlight is a point light **masked by a cone**. This Unity shader builds the mask by hand: the angle **α** to the spot's aim, faded between an inner and outer cone:
+A spotlight is a point light **masked by a cone**: the angle **α** to the spot's aim, faded between an inner and an outer cone. In a Unity shader:
 
-```csharp [1-12]
+```csharp [1-15]
 float ComputeDiffuse(v2f i) {
     float3 l = normalize(SlightPos - i.vertexWC);  // direction to the spotlight
     float strength = 0;
     float alpha = acos(dot(l, LightDirection));    // angle α to the spot's aim
     float ndotl = clamp(dot(i.normal, l), 0, 1);   // the diffuse cosine
     if (alpha < _MaxTheta) {                        // inside the outer cone
-        if (alpha > _MinTheta)                      // soft edge: fade
-            strength = smoothstep(1, 0, ... );
+        if (alpha > _MinTheta) {                    // soft edge: fade
+            float n = _MinTheta - alpha;            // how far past the inner cone
+            float range = _MaxTheta - _MinTheta;    // width of the soft edge
+            strength = smoothstep(1, 0, (n * n) / (range * range));
+        }
         else strength = 1;                          // inner cone: full
     }
     return ndotl * strength;                        // diffuse, masked by the cone
 }
 ```
 
-The cone is a **second** angular test layered on `N·L`: `acos` for the angle, `smoothstep` for the soft edge.
+The cone is a **second** angular test layered on `N·L`: `acos` for the angle, `smoothstep` for the soft edge, on the **squared** fraction of the way through it.
 
 
 ---
