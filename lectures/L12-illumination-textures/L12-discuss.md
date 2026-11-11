@@ -42,9 +42,8 @@ Graded on the page's inputs and on a hidden set; the shader is graded by eye.
 
 ## Wrap
 
-A lit point is three dot products per light, `max(0, N·L)`, `max(0, R·V)^s` and a constant ambient, summed over the lights and tone-mapped for display. A texture lookup filters: bilinear when magnified, the mipmap level log₂ of the footprint when minified.
+A lit point is two dot products per light, `max(0, N·L)` and `max(0, R·V)^s`, plus a constant ambient, summed over the lights and tone-mapped for display; a local model casts no shadows. A texture lookup filters: bilinear when magnified, the mipmap level log₂ of the footprint when minified.
 
-- **Read**: [Local Illumination](../../textbook/illumination.html); [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11; for the Unity track, [Unity Shaders](../../textbook/unity-shaders.html)
+- **Read**: [Local Illumination](../../textbook/illumination.html); [Color](../../textbook/color.html), Sections 5 and 6; [Texture Mapping](../../textbook/texture-mapping.html), Sections 5 to 11; for the Unity track, [Unity Shaders](../../textbook/unity-shaders.html)
 - **Due**: HW4, tomorrow, Wednesday November 11, 11:59 PM. **Out**: HW5, due Wednesday November 18, 11:59 PM
 - **Quiz 5**, on Canvas: Thursday November 12, 8 PM to Sunday November 15, 11:59 PM; Lectures 11 and 12 and HW4
-

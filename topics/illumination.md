@@ -1,39 +1,51 @@
 <!--
-  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~60 min, 44 slides, incl. a short color section).
+  CSS 551 · TOPIC DECK: Local illumination, from Lambert to tone mapping (~50 min, 35 slides, incl. a short color section).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/illumination.md"> among others; it carries
   no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
 
-  TEACHES: the light, normal and eye directions; local scope; Lambert's projected
-  area and N·L, clamped; the worked marked point (N·L = 0.988); the mirror vector
-  R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's half vector
-  (H·N = 0.969); ambient; directional, point and spot lights; attenuation;
-  several lights summed; HDR and Reinhard tone mapping.
+  TEACHES: local against global illumination (what a local model cannot show: cast shadows, hard or soft,
+  bounced light, reflections); the light, normal and eye directions; Lambert's projected area and N·L,
+  clamped; the worked marked point (N·L = 0.988); normals under a non-uniform scale (the inverse
+  transpose, 36.9°); the mirror vector R = 2(N·L)N − L and R·V to a power (0.879^30 = 0.021); Blinn's
+  half vector (H·N = 0.969, 0.387 at s = 30); ambient; the sum per channel; directional, point and spot
+  lights; attenuation and irradiance (1.25); several lights summed; HDR and Reinhard tone mapping;
+  shading in linear light (Rec. 709 luminance), the sRGB curve.
   NEEDS:   the vectors topic (dot product, projection split); the affine topic (the
            model matrix); the meshes topic (per-vertex normals).
-  DEMOS:   data-demo="illumination" data-controls="lightAz,shine" (under the page's
-           crop). Fallback numbers are the textbook's numbers-surfaces.json ill.default.
-  NUMBERS: textbook/figures/numbers-surfaces.json (ill.*), all recomputed by the
-           surfaces generator against the demo's own vector math.
+  DEMOS:   data-demo="shading-lab" data-controls="view:disk.ball,lock" (the opening: disk or ball);
+           data-demo="illumination", four embeds: ambient alone (terms:a), diffuse alone (terms:d),
+           specular alone (terms:s), all three with a switch per term (terms:ads,toggles).
+  FIGURES: ../../textbook/figures/illd-local-global.svg (tools/gen-lecture-figures-light.mjs), ill-vectors.svg, ill-lambert.svg, ill-normal-transform.svg,
+           ill-shininess.svg, ill-lights.svg, ill-tonemap.svg, col-transfer.svg, ill-sphere-terms.png
+           (the textbook's surfaces and systems generators; the ASCII they replace is their alt).
+  NUMBERS: textbook/figures/numbers-surfaces.json (ill.*), recomputed by node 2026-11-10.
+  SUPPLEMENT: topics/illumination-supplement.md (the marked point worked, for HW5; energy, per vertex or per pixel, ambient occlusion,
+           falloff by the numbers, the spot cone worked, the cost of many lights, area lights).
 
-  Condensed 2026-10-06 (twelve slides to the chapter only: the vectors and Lambert
-  figures, the normal transform (taught in the affine topic), the shininess table,
-  four models in eleven years, the nine-number sky, the uniform sky, the light-types
-  figure, the second light, tone mapping a real scene).
-  EDIT 2026-10-08: slide titles and text without editorializing ("honest scope", "confession
-  term", "sanity check", "a point is a lie") and without a title starting "why".
-  Derived from the Plan B single-file deck sessions/S09-illumination (retired);
-  the studio logistics, the light-to-shader globals slide and the CDP plan are gone.
+  Condensed 2026-10-06 (twelve slides to the chapter only). EDIT 2026-10-08: slide titles and text
+  without editorializing.
+  EDIT 2026-11-10 (Marcel: "move the local illumination slide earlier, before any details. define local
+  vs. global and have a table what is gained lost. slides mention soft shadows. how about hard shadows?";
+  then "let's present concepts not calculations, unless the calculations reveal something about the concepts",
+  and one demo view per term, then all three with on/off switches): the terms now run ambient, diffuse,
+  specular, each with the demo showing it alone; the marked point's arithmetic moved to the supplement;
+  "Local and global illumination" now second, with the table; the formulas typeset (lib/deck-math.js);
+  the three ASCII drawings replaced by the chapter's figures; the normal-transform slide restored (ray
+  tracing's instancing relies on it); "The same sum, in color" moved after ambient; the embed gains
+  lightEl so the light-behind numbers can be reached; fixes: the marked point is at the edge of the
+  highlight, not its center; a light costs two dot products, not three; linear 0.216 and luminance 0.200
+  for code 128; 26 sRGB codes below 1 %. Seven slides no homework or quiz needs moved to the supplement.
 
   reveal.js: FLAT (every slide a top-level "---" section). Notes follow "Note:".
-  Plain unicode math, no KaTeX; never two "_" on one markdown line outside a code
-  fence; no <small> on math. Paths are relative to the lecture page that mounts
-  this topic (lectures/LNN-slug/index.html).
+  Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js; TeX inside, the
+  ASCII form as aria-label, no blank line inside); inline math is a code span written `$...$`. Never
+  two "_" on one markdown line outside a code fence or code span; paths relative to the lecture page.
 -->
 
 ### Local illumination: light, normal, eye
 
-<small>(~60 min)</small>
+<small>(~50 min)</small>
 
 
 ---
@@ -45,7 +57,37 @@ Texture a sphere and freeze the shading: it reads as a flat **disk**, a sticker.
 - geometry (the mesh) sets the **shape**; a texture sets the **base color**
 - neither, alone, produces the **shading** that makes a surface look solid and curved
 
-Here: compute that brightness, a **local**, **cheap** model, a few dot products per point.
+A lighting model computes that brightness at every point, from the point's normal, the lights and the eye.
+
+
+
+
+---
+
+## Local and global illumination
+
+- **local**: a point's color comes from its own position and normal, the lights and the eye; **no other surface** is consulted
+- **global**: what reaches a point depends on the **rest of the scene**: what blocks the light, what reflects light onto it
+
+<img src="../../textbook/figures/illd-local-global.svg" class="media-shot" style="max-height: 245px;" alt="Side view, two panels. A floor with point P, a gray box between P and a point light, a red wall at the left. Left, local: the light direction from P passes straight through the box, P is lit with N·L = 0.73, and the floor has no shadow anywhere. Right, global: the shadow ray from P stops at the box (visibility 0), the floor behind the box is dark, and a dashed path from the light off the red wall to P carries a red tint.">
+
+Local gains speed: a few dot products per light per point, **however large the scene**, each point independent of the rest. It loses everything that needs a second surface.
+
+
+---
+
+## What a local model cannot show
+
+| effect | the local model | what it takes |
+| ------ | ----------- | ------------- |
+| direct light: matte, highlights | computed | one or two dot products per light |
+| the side turned away from a light | dark, from `max(0, N·L)` | nothing extra |
+| **hard shadow** from another object | **none**: lit as if nothing were in the way | one **visibility test** per light per point: a shadow map or a shadow ray |
+| **soft shadow**, from a light with area | **none** | many visibility tests per light |
+| light bounced off other surfaces | **one constant**: ambient | following light from surface to surface |
+| mirror reflection, refraction | **none** | a reflected or refracted ray; an environment map fakes it |
+
+A local model has **no cast shadows at all**, hard or soft; real-time renderers multiply each light's terms by a visibility factor, 0 or 1.
 
 
 ---
@@ -54,31 +96,18 @@ Here: compute that brightness, a **local**, **cheap** model, a few dot products 
 
 Every local lighting model is built from **three** directions meeting at a surface point:
 
-```text
-     light                 eye
+<img src="../../textbook/figures/ill-vectors.svg" class="media-shot" style="max-height: 215px;" alt="     light                 eye
         ↖    N (normal)    ↗
           \      ↑       /
         L   \    |     /   V
               ──●──────────      the shaded point
-```
+The marked point on the demo's sphere, with arrows N, L toward the light at (1.84, 1.50, 1.84), V toward the eye, the mirror direction R and the half vector H.">
 
 - **L**: direction to the light (where illumination comes from)
 - **N**: the surface **normal** (the per-vertex normal of the meshes topic)
 - **V**: direction to the eye (the camera)
 
-Shading is a function of the **angles** between these three: the whole geometry of the problem.
-
-
----
-
-## Local illumination: what it covers
-
-This model shades each point using **only** the lights, the normal, and the eye: **never** the other surfaces in the scene. That buys enormous speed, and it costs realism:
-
-- **captured**: direct light on a point: matte shading, highlights, per-light falloff
-- **ignored**: light **bouncing** between surfaces: color bleeding, soft shadows, mirror reflections of the room, a surface lighting its neighbor
-
-A red wall next to a white one does not tint the white one here: that needs light **bounces**, a far larger computation and **its own subject**. The local assumption trades bounced light for speed, and covers most real-time shading.
+Shading is a function of the **angles** between these three (R and H, also drawn, come with the specular term).
 
 
 ---
@@ -87,16 +116,15 @@ A red wall next to a white one does not tint the white one here: that needs ligh
 
 The **Phong** model sums **three** terms at each point, built one at a time below:
 
-```text
-   color  =   ambient      +      diffuse       +      specular
-              (constant)      (matte, on N·L)      (glint, on R·V)
-```
+<div class="tex" role="img" aria-label="color = ambient (constant) + diffuse (matte, on N·L) + specular (glint, on R·V)">
+\[ \text{color} \;=\; \underbrace{\text{ambient}}_{\text{constant}} \;+\; \underbrace{\text{diffuse}}_{\text{matte, on } N\cdot L} \;+\; \underbrace{\text{specular}}_{\text{glint, on } R\cdot V} \]
+</div>
 
 - **ambient**: a constant fill so shadows are not pure black
 - **diffuse**: matte: bright facing the light, dark facing away (next)
 - **specular**: the sharp highlight where the surface mirrors the light to your eye (after that)
 
-Three terms, each a dot product; add and clamp to the display range. That is Phong.
+Diffuse and specular are one dot product each per light; ambient is a constant. Add them, then map the sum into the display's range.
 
 
 ---
@@ -105,14 +133,41 @@ Three terms, each a dot product; add and clamp to the display range. That is Pho
 
 <img src="../../textbook/figures/ill-sphere-terms.png" class="media-shot" style="max-height: 290px;" alt="the demo's sphere rendered four times: ambient only, diffuse only, specular only, and their sum">
 
-Ambient is flat, diffuse follows the cosine, specular is a small bright spot; the sum is the image. The marked point, whose numbers the next slides compute, sits near the diffuse peak and at the edge of the highlight.
+Ambient is flat, diffuse follows the cosine, specular is a small bright spot; the sum is the image. Each needs one more direction than the last: ambient none, diffuse the light's, specular the light's and the eye's.
 
 
 ---
 
-### Diffuse reflection
+### The three terms, one at a time
 
-<small>(~16 min)</small>
+<small>(~28 min)</small>
+
+
+---
+
+## Ambient: a constant for bounced light
+
+Where no light reaches directly, real surfaces are still not **pure black**: light bounced off everything else fills them. The local model cannot follow those bounces, so it adds a **constant**:
+
+<div class="tex" role="img" aria-label="ambient = k_a · k_d     (no L, no N, no V)">
+\[ \text{ambient} = k_a \cdot k_d \qquad \text{(no } L\text{, no } N\text{, no } V\text{)} \]
+</div>
+
+- `$k_d$` is the surface's color; `$k_a$` says how much fill light the scene has
+- **no direction**: move the light, turn the surface, move the eye, and ambient does not change
+- a stand-in for bounced light: too high and everything flattens; too low and shadows go inky
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Ambient alone, live
+
+<div class="cockpit" data-demo="illumination" data-controls="terms:a,lightAz,lightEl,ka,kd,hue"><pre class="viz-fallback">  ambient only: diffuse and specular off
+  the sphere is one flat color, ka times the surface color, and reads as a disk
+  drag the light: nothing changes; drag ka or kd: the whole disk brightens or darkens; drag hue: its color changes</pre></div>
+
 
 ---
 
@@ -120,15 +175,14 @@ Ambient is flat, diffuse follows the cosine, specular is a small bright spot; th
 
 A **matte** surface (chalk, paper, unfinished wood) scatters incoming light **equally in all directions**: so its brightness does **not** depend on where you look from. It depends only on how much light the patch **catches**, and that is a **projected-area** question:
 
-```text
-   light straight on (N ∥ L)        light at a grazing angle
+<img src="../../textbook/figures/ill-lambert.svg" class="media-shot" style="max-height: 230px;" alt="   light straight on (N ∥ L)        light at a grazing angle
       │ │ │ │ │  same beam            ╲ ╲ ╲ ╲ ╲  same beam,
       ▼ ▼ ▼ ▼ ▼  hits a small          ▽  ▽  ▽    spread over a
    ───────────  patch fully         ────────────  LARGER patch
      full brightness                  dim: energy per area drops
-```
+Right: the clamped cosine of the angle between N and L from 0 to 180 degrees, with the demo's marked point at 8.8 degrees, 0.988.">
 
-A fixed beam of light striking a surface **head-on** is concentrated on a small patch; striking at a **grazing** angle, the **same** beam smears over a larger patch, so each bit of surface catches **less**. Brightness tracks the **angle** the surface makes to the light.
+The **same** beam at 60° covers **twice** the patch, so each bit of surface catches **half**. Brightness tracks the **angle** the surface makes to the light.
 
 
 ---
@@ -137,15 +191,14 @@ A fixed beam of light striking a surface **head-on** is concentrated on a small 
 
 The fraction of the beam a patch catches is the **cosine** of the angle θ between the surface normal **N** and the light direction **L**. For **unit** vectors, that cosine is just their **dot product** (the vectors topic):
 
-```text
-   diffuse  =  cos θ  =  N · L            (N, L unit vectors)
+<div class="tex" role="img" aria-label="diffuse = cos θ = N · L   (N, L unit vectors)
+N ∥ L (facing the light):  cos 0° = 1    full brightness
+θ = 60°:                   cos 60° = 0.5 half
+N ⊥ L (edge-on):           cos 90° = 0   no light caught">
+\[ \begin{gathered} \text{diffuse} = \cos\theta = N \cdot L \qquad (N,\ L \text{ unit vectors}) \\[6pt] \begin{array}{lll} N \parallel L \text{ (facing the light)} & \cos 0^\circ = 1 & \text{full brightness} \\ \theta = 60^\circ & \cos 60^\circ = 0.5 & \text{half} \\ N \perp L \text{ (edge-on)} & \cos 90^\circ = 0 & \text{no light caught} \end{array} \end{gathered} \]
+</div>
 
-   N ∥ L   (facing the light)   → cos 0°  = 1     full brightness
-   θ = 60°                       → cos 60° = 0.5   half
-   N ⊥ L   (edge-on)            → cos 90° = 0     no light caught
-```
-
-The projected-area shrink **is** a cosine, and the vectors topic already told us a cosine of two unit vectors is their dot product. No new machinery: the diffuse term is one dot product, `N · L`.
+No new machinery: the diffuse term is one dot product, `N · L`.
 
 
 ---
@@ -154,133 +207,41 @@ The projected-area shrink **is** a cosine, and the vectors topic already told us
 
 Past 90°, the surface faces **away** from the light and `N · L` goes **negative**: but there is no such thing as **negative** light. A back-facing patch simply gets **none**, so we **clamp** at zero:
 
-```text
-   diffuse  =  k_d · lightColor · max(0, N · L)
-```
+<div class="tex" role="img" aria-label="diffuse = k_d · lightColor · max(0, N · L)">
+\[ \text{diffuse} = k_d \cdot \text{lightColor} \cdot \max(0,\ N \cdot L) \]
+</div>
 
 - `max(0, · )`: negative cosines (surface turned away) become **0**, not a dark glow
-- `k_d`: the surface's **diffuse color / reflectance** (how much of each channel it reflects)
+- `$k_d$`: the surface's **diffuse color / reflectance** (how much of each channel it reflects)
 - `lightColor`: the light's color and intensity
 
-The whole diffuse term: clamp the cosine, scale by the surface color and the light. Matte shading, done.
-
-
----
-
-## Our worked point: a marked spot on a sphere
-
-The demo (in a moment) lights a sphere of radius **1.2**, centered at the origin, and marks **one** point where it shows the live numbers. The marked point sits where the normal is `N = normalize(1, 1, 1)`:
-
-```text
-   N     = normalize(1, 1, 1) = (0.577, 0.577, 0.577)     the surface normal
-   point = 1.2 · N            = (0.693, 0.693, 0.693)     on the sphere
-```
-
-For a sphere centered at the origin, the outward **normal at any point is just the normalized point**: so N does not depend on the radius we chose. We will now light this exact point with the default light and get the diffuse number by hand, then read it off the live panel.
-
-
----
-
-## Step 1: the light and L
-
-The demo's **default** light orbits at radius **3**, at azimuth **45°** and elevation **30°** (the same cos/sin orbit formula as the viewing topic's camera). That puts it at:
-
-```text
-   lightPos = 3·(cos30°·sin45°,  sin30°,  cos30°·cos45°)
-            = 3·(0.6124, 0.5000, 0.6124)
-            = (1.837, 1.500, 1.837)
-
-   L = normalize(lightPos − point)
-     = normalize(1.144, 0.807, 1.144)
-     = (0.633, 0.446, 0.633)
-```
-
-**L** points from the marked point **toward** the light: subtract the point from the light position, then normalize to unit length. Three carried decimals; every digit is checked against the demo's own vector code.
-
-
----
-
-## Step 2: N·L, the diffuse number
-
-Now dot the normal with the light direction:
-
-```text
-   N · L = (0.577)(0.633) + (0.577)(0.446) + (0.577)(0.633)
-         = 0.577 · (0.633 + 0.446 + 0.633)
-         = 0.577 · 1.712
-         = 0.988
-
-   diffuse = max(0, N·L) = 0.988
-```
-
-The marked point faces **almost straight into** the light (`N·L` near 1), so it is **near full** diffuse brightness: `0.988`. Hold that number: the live panel reads exactly **`0.988`** at the default light, because the demo runs this same arithmetic.
-
-
----
-
-## The same sum, in color
-
-The terms are **per channel**: a red plastic sphere at the marked point.
-
-```text
-   ka = 0.12   kd = (0.86, 0.36, 0.30)   ks = 0.5 (white highlight)   N·L = 0.988   (R·V)^30 = 0.021
-
-   ambient    0.12 × kd            = (0.103, 0.043, 0.036)
-   diffuse    kd × 0.988           = (0.850, 0.356, 0.297)
-   specular   0.5 × 0.021          = (0.010, 0.010, 0.010)
-   sum                             = (0.964, 0.409, 0.343)
-```
-
-The highlight is **white** because ks is white: plastic reflects the light's color at the surface. A metal's highlight takes the metal's color.
-
-
----
-
-## Meet the demo: light a sphere
-
-The `illumination` demo lights **one** sphere with **one** orbiting point light and marks the spot we just computed. As you drag the light, the panel shows the live **classic-Phong** numbers at that point:
-
-- **`lightAz`**: swing the light around the sphere (azimuth); watch `N·L` and the shading move together
-- **`shine`**: the specular exponent (the specular stretch); watch the highlight tighten as it climbs
-
-The panel reads **`N·L`**, **`R·V`**, **`diffuse`**, and **`specular`**: all computed in our own vector math, not read off the GPU. The full sandbox adds `lightEl` and the diffuse/specular toggles.
+The whole diffuse term: clamp the cosine, scale by the surface color and the light.
 
 
 ---
 
 <!-- .slide: class="demo-full" -->
 
-## The lighting, live
+## Diffuse alone, live
 
-<div class="cockpit" data-demo="illumination" data-controls="lightAz,shine"><pre class="viz-fallback">  one sphere (r = 1.2), one orbiting point light, one marked point n = normalize(1,1,1)
-  -- default light: lightAz = 45°, lightEl = 30°, shine = 30 ----------------------
-     N·L      = 0.988        diffuse  = max(0, N·L)      = 0.988
-     R·V      = 0.879        specular = max(0, R·V)^30   = 0.021
-     (classic Phong at the marked point; three renders Blinn-Phong internally)
-     swing the light behind (az = 225°, el = −30°): N·L = −0.998 → diffuse = 0.000
-     drag lightAz → N·L and the shading move together; drag shine → the highlight tightens</pre></div>
+<div class="cockpit" data-demo="illumination" data-controls="terms:d,lightAz,lightEl,kd,hue"><pre class="viz-fallback">  diffuse only: ambient and specular off
+  bright where the surface faces the light, falling off as the cosine, black past 90°
+  drag the light: the bright side follows it; behind the sphere the near side goes black
+  drag kd or hue: the brightness or the color of the lit side changes; the eye does not matter</pre></div>
 
 
 ---
 
-## Light behind: the clamp gives 0
+## Normals under a non-uniform scale
 
-Swing the light to the **far** side, azimuth 225°, elevation −30°, and the marked point now faces **away** from it:
+The normal is stored in the model's own frame. Positions go to the world through `M`; a normal pushed through `M` **leans off the surface** once `M` scales unevenly:
 
-```text
-   lightPos = (−1.837, −1.500, −1.837)
-   N · L    = −0.998          (normal and light nearly opposite)
-   diffuse  = max(0, −0.998) = 0.000
-```
+<img src="../../textbook/figures/ill-normal-transform.svg" class="media-shot" style="max-height: 170px;" alt="A unit circle scaled 2 times in x becomes an ellipse. At the point that was at 45 degrees: the tangent, the normal pushed through M (wrong, 36.9 degrees off, leaning off the surface), and the inverse-transpose normal (right, perpendicular to the tangent).">
 
-`N·L` is almost `−1` (the point faces directly **away**), so the clamp makes the diffuse term exactly **0**: the marked point is unlit, and the sphere's near side goes dark the instant the light passes behind it in the demo.
+- normals transform by the **inverse transpose** `$(A^{-1})^{\mathsf T}$`, then renormalize
+- a rotation leaves it equal to `A`: the bug hides until a model is **squashed**
+- stretched 2 times in x, the wrong normal is **36.9°** off, and every cosine above inherits the error
 
-
----
-
-### Specular and ambient
-
-<small>(~16 min)</small>
 
 ---
 
@@ -292,7 +253,7 @@ A **shiny** surface (polished metal, wet plastic, an apple) shows a compact **br
 - it is **view-dependent** (diffuse was not): a function of **V**, the eye direction
 - **tight** on a mirror-smooth surface, **broad** on a rough one
 
-So specular needs the light's **mirror direction** and how close the **eye** sits to it.
+So specular needs the light's **mirror direction** and how close the **eye** sits to it: the first term that reads V.
 
 
 ---
@@ -301,153 +262,91 @@ So specular needs the light's **mirror direction** and how close the **eye** sit
 
 The mirror direction **R** is **L reflected about the normal N**. Build it with the vectors topic's **projection split**: decompose L into the part **along N** and the part **in the surface**, then flip the in-surface part:
 
-```text
-   L  =  (N·L) N   +   [ L − (N·L) N ]        along N  +  in the surface
-   R  =  (N·L) N   −   [ L − (N·L) N ]        keep along-N, FLIP in-surface
-
-     ⇒   R  =  2 (N·L) N  −  L
-```
+<div class="tex" role="img" aria-label="L = (N·L) N + [ L − (N·L) N ]     along N + in the surface
+R = (N·L) N − [ L − (N·L) N ]     keep along-N, FLIP in-surface
+  = 2 (N·L) N − L">
+\[ \begin{aligned} L &= \underbrace{(N\cdot L)\,N}_{\text{along } N} + \underbrace{\big[L - (N\cdot L)\,N\big]}_{\text{in the surface}} \\ R &= (N\cdot L)\,N - \big[L - (N\cdot L)\,N\big] \\ &= 2\,(N\cdot L)\,N - L \end{aligned} \]
+</div>
 
 - `(N·L) N` is L's **projection onto N**: the projection of one vector onto another
 - reflecting **keeps** the along-normal part and **negates** the tangential part
-- the same **decompose-then-reassemble** move as the rotation topic's Rodrigues formula: projection is the reusable tool
-
-
----
-
-## Worked R and the highlight R·V
-
-At the marked point, with `N·L = 0.988` and the default light, `R = 2(N·L)N − L`:
-
-```text
-   R = 2(0.988)(0.577, 0.577, 0.577) − (0.633, 0.446, 0.633)
-     = (0.508, 0.695, 0.508)                    the mirror direction
-
-   V = normalize(cameraPos − point),  camera (3, 3, 6)
-     = (0.370, 0.370, 0.852)                    toward the eye
-
-   R · V = 0.879                                how aligned mirror & eye are
-```
-
-`R·V = 0.879`: the eye sits fairly close to the mirror direction (cosine near 1), so this point is near the **center** of the highlight. The panel reads exactly **`0.879`**. Next: raise it to a power to make the highlight **tight**.
+- the same **decompose-then-reassemble** move as the rotation topic's Rodrigues formula
 
 
 ---
 
 ## Shininess: R·V to a power
 
-A raw cosine `R·V` gives a highlight **too broad** for a shiny surface. Raise it to a **shininess exponent** s and the falloff sharpens: high powers of a number below 1 collapse fast:
+A raw cosine `R·V` gives a highlight **too broad** for a shiny surface. Raise it to a **shininess exponent** s and the falloff sharpens:
 
-```text
-   specular  =  k_s · lightColor · max(0, R·V)^s
+<div class="tex" role="img" aria-label="specular = k_s · max(0, R·V)^s">
+\[ \text{specular} = k_s \cdot \max(0,\ R \cdot V)^{s} \]
+</div>
 
-   at our point, R·V = 0.879:
-      s = 1    → 0.879        broad, washed-out sheen
-      s = 30   → 0.021        a tight, plausible highlight   ← demo default
-      s = 128  → 0.00000007    a pinpoint glint (near mirror)
-```
+<img src="../../textbook/figures/ill-shininess.svg" class="media-shot" style="max-height: 215px;" alt="Four curves of cosine to the power s against the angle between R and V from 0 to 60 degrees, for s = 1, 8, 30 and 128, each tighter than the last; at 28.5 degrees the s = 30 curve reads 0.021.">
 
-`0.879^30 = 0.021`: the panel's specular reading. Bigger s ⇒ **tighter, sharper** highlight (glossier surface); smaller s ⇒ **broad, soft** sheen (rougher). `k_s` is the specular color, usually the light's color (white glints on colored plastic).
+Bigger s, **tighter** highlight: 28.5° off the mirror direction, s = 1 still gives 0.88, s = 30 gives 0.02. `$k_s$` is the highlight's color, usually white: plastic.
 
 
 ---
 
-## The demo renders Blinn, not Phong
+<!-- .slide: class="demo-full" -->
 
-The panel computes **classic Phong** (`R·V`). But three.js's `MeshPhongMaterial` shades with **Blinn's** variant: the **half-vector** `H = normalize(L + V)`, dotted with the **normal**:
+## Specular alone, live
 
-```text
-   Phong (our panel):   max(0, R · V)^s
-   Blinn (the pixels):  max(0, H · N)^s        H = normalize(L + V)
-   at our point:  R·V = 0.879      H·N = 0.969   (different numbers!)
-```
-
-- `H·N = 1` exactly when `R·V = 1`, so the highlight sits in the **same place**
-- not numerically equal (Blinn needs a **larger** exponent), but they **peak together**: the highlight agrees in place, not in value
+<div class="cockpit" data-demo="illumination" data-controls="terms:s,lightAz,lightEl,ks,shine"><pre class="viz-fallback">  specular only: ambient and diffuse off, the body black
+  one bright spot where the surface mirrors the light toward the eye
+  drag the light, or orbit the camera: the spot moves with both
+  drag shine: the spot tightens; drag ks: it dims or brightens</pre></div>
 
 
 ---
 
-## Matching Blinn to Phong
+## Blinn's half vector
 
-The angle between H and N is about **half** the angle between R and V, so Blinn needs about **four times** the exponent for the same highlight:
+Most engines, three.js's `MeshPhongMaterial` among them, use **Blinn's** variant: the **half vector** between the light and the eye, dotted with the normal:
 
-```text
-   Phong at s = 30:        0.879^30  = 0.021
-   Blinn with the same:    0.969^s = 0.021   →   s = ln 0.021 / ln 0.969 = 122.6     (≈ 4 × 30)
-```
+<div class="tex" role="img" aria-label="Phong: max(0, R · V)^s        Blinn: max(0, H · N)^s,  H = normalize(L + V)">
+\[ \begin{aligned} \text{Phong:}\quad & \max(0,\ R \cdot V)^s \\ \text{Blinn:}\quad & \max(0,\ H \cdot N)^s,\quad H = \operatorname{normalize}(L + V) \end{aligned} \]
+</div>
 
-A material authored for one model and rendered with the other is **four times too glossy** or **four times too dull**.
-
-
----
-
-
-## Energy: a shininess slider should not change brightness
-
-Raising s narrows the lobe, and a narrow lobe also **reflects less total light**. The normalized Phong lobe fixes it:
-
-```text
-   normalized specular = (s + 2) / (2π) · (R·V)^s
-      s = 30:   factor 5.093
-      s = 128:  factor 20.69
-```
-
-With the factor, a sharper highlight is **brighter and smaller** with the same total, the way a polished surface looks.
+- `H·N = 1` exactly when `R·V = 1`: the highlight sits in the **same place**
+- the angle between H and N is about **half** the angle between R and V, so Blinn needs about **four times** the exponent for the same highlight
+- an exponent tuned for one model is four times too glossy, or too dull, in the other
 
 
 ---
 
+## The Phong sum
 
-## Per vertex or per pixel?
+Add the three terms, **per color channel**, and per light:
 
-```text
-   Gouraud: light each vertex, interpolate colors      the full bunny: 35,947 lighting evaluations
-   Phong:   interpolate normals, light each pixel       the bunny on screen: about 250,000
-```
+<div class="tex" role="img" aria-label="color = k_a·k_d + k_d·max(0, N·L) + k_s·max(0, R·V)^s     (each light's color multiplies its two terms)">
+\[ \text{color} = k_a\, k_d \;+\; k_d \max(0,\ N\cdot L) \;+\; k_s \max(0,\ R\cdot V)^s \]
+</div>
 
-Per pixel costs **7 times** more here and is universal now. Per-vertex lighting **misses highlights** that fall between vertices: a highlight smaller than a triangle is either smeared or lost entirely.
-
-
----
-
-## Ambient: a constant for bounced light
-
-Diffuse and specular go to **0** where no light directly reaches: but real shadows are never **pure black**, because bounced light fills them. The local model stands in for it with a single constant:
-
-```text
-   ambient  =  k_a · ambientColor            (same everywhere, no direction)
-
-   color  =  ambient  +  diffuse  +  specular
-          =  k_a·amb  +  k_d·light·max(0,N·L)  +  k_s·light·max(0,R·V)^s
-```
-
-- a **constant** floor on every point, lit or not: so shadows read as **dark**, not **void**
-- a **stand-in** for the bounced light this model will not trace (too high → flat; too low → inky)
-
-That is the whole **Phong sum**: three terms, added up.
+- `$k_d$` colors the ambient and the diffuse terms: the body color
+- `$k_s$` colors the highlight: **white** for plastic (the light reflects off a clear coat), the **metal's own color** for gold or copper
+- the light's color multiplies its diffuse and specular terms
 
 
 ---
 
-## Sky light, better than a constant: ambient occlusion
+<!-- .slide: class="demo-full" -->
 
-<img src="../../textbook/figures/ill-ao.svg" class="media-shot" style="max-height: 200px;" alt="a unit sphere resting on a floor; the fraction of sky visible from floor points, low near the contact and rising with distance">
+## All three, live
 
-Ambient occlusion: the fraction of the sky a point can see. A unit sphere on a floor, 4,000 rays per point:
-
-| distance from contact | 0.05 | 0.25 | 0.5 | 1 | 2 | 4 |
-| --------------------- | ---- | ---- | --- | - | - | - |
-| AO | 0.003 | 0.088 | 0.282 | 0.647 | 0.908 | 0.988 |
-
-Multiply the ambient term by it: contact shadows appear. A 90° crease sees half the sky: 0.5.
+<div class="cockpit" data-demo="illumination" data-controls="terms:ads,toggles,lightAz,lightEl,ka,kd,ks,shine"><pre class="viz-fallback">  all three terms, each with its own switch
+  ambient alone: a flat disk; + diffuse: a lit ball with a black-free shadow side; + specular: the glint
+  drag the light: diffuse and specular follow it, ambient stays; orbit: only specular moves
+  drag ka, kd, ks, shine: each changes only its own term</pre></div>
 
 
 ---
 
 ### Light sources
 
-<small>(~14 min)</small>
+<small>(~8 min)</small>
 
 ---
 
@@ -455,51 +354,32 @@ Multiply the ambient term by it: contact shadows appear. A 90° crease sees half
 
 `L` and the light's intensity come from a **light source**, and there are three workhorse kinds:
 
-```text
-   directional          point                    spot
+<img src="../../textbook/figures/ill-lights.svg" class="media-shot" style="max-height: 200px;" alt="   directional          point                    spot
    ═══════════          ·  ·  ·                   ╲   │   ╱
    ═══> ═══>           ·   ●   ·  radiates          ╲  │  ╱   a cone from
    ═══> ═══>            ·  ·  ·   in all              ╲ │ ╱    a point, aimed
    parallel rays,        directions,                  ╲│╱     in a direction
    infinitely far        from a position               ●
-```
+Below: attenuation against distance, inverse square against a gentler polynomial; spot strength against the angle to its axis, 1 inside 15 degrees, 0 beyond 25, 0.844 at 20.">
 
 - **directional**: parallel rays, no position (the **sun**): `L` is a **constant** everywhere, no falloff
 - **point**: a position radiating in **all** directions (a **bulb**): `L` points toward it, intensity **falls off** with distance
 - **spot**: a point light **restricted to a cone** (a **flashlight**): a point light plus a direction and a cone angle
-
-The demo used a **point** light. Real scenes mix all three.
 
 
 ---
 
 ## Distance attenuation
 
-A point or spot light gets **dimmer** with distance. Light spreads over a sphere whose area grows as `d²`, so ideal falloff is **inverse-square**; in practice a tunable polynomial is common:
+A point or spot light gets **dimmer** with distance. Light spreads over a sphere whose area grows as `$d^2$`, so ideal falloff is **inverse-square**; in practice a tunable polynomial is common:
 
-```text
-   physical:   attenuation = 1 / d²                     (inverse-square)
-   practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadratic)
-```
+<div class="tex" role="img" aria-label="physical:   attenuation = 1 / d²                     (inverse-square)
+practical:  attenuation = 1 / (kc + kl·d + kq·d²)    (constant, linear, quadratic)">
+\[ \text{physical: } \frac{1}{d^2} \qquad\qquad \text{practical: } \frac{1}{k_c + k_l\, d + k_q\, d^2} \]
+</div>
 
-- **inverse-square** is the physical law: double the distance, **quarter** the brightness
-- the **polynomial** form tunes the falloff; `kc` avoids a divide-by-zero at `d = 0`; a hard **cutoff** radius (Sung's `Near`/`Far`) makes distant lights free
-
-Multiply the light's intensity by the attenuation before the Phong sum.
-
-
----
-
-## Falloff, by the numbers
-
-| distance d | inverse square 1/d² | a polynomial falloff |
-| ---------- | ------------------- | -------------------- |
-| 1 | 1 | 0.891 |
-| 2 | 0.25 | 0.765 |
-| 4 | 0.0625 | 0.534 |
-| 10 | 0.01 | 0.196 |
-
-The physical law drops **100 times** from 1 to 10; the tuned polynomial drops 4.5 times. Artists liked the second because rooms stayed lit; physically based engines use the first, with **real** light intensities and exposure.
+- double the distance, **a quarter** of the light; `$k_c$` avoids a divide-by-zero at `$d = 0$`; a cutoff radius (Sung's `Near`/`Far`) makes distant lights free
+- the light a surface receives from a point light: `$E = I \cos\theta / d^2$`, the cosine from Lambert and the square from distance
 
 
 ---
@@ -528,67 +408,19 @@ The cone is a **second** angular test layered on `N·L`: `acos` for the angle, `
 
 ---
 
-## The spot cone, worked at 20°
-
-Inner angle 15° (full strength), outer 25° (zero), Sung's soft edge between:
-
-```text
-   α = 20°:   n = 15 − 20 = −5,   range = 25 − 15 = 10
-             x = n² / range² = 25 / 100 = 0.25
-             smoothstep(1, 0, x):  t = (x − 1) / (0 − 1) = 0.75,   S = 3t² − 2t³ = 1.688 − 0.844 = 0.844
-```
-
-| angle | 10° | 15° | 18° | 20° | 22° | 25° |
-| ----- | --- | --- | --- | --- | --- | --- |
-| strength | 1 | 1 | 0.977 | **0.844** | 0.515 | 0 |
-
-
----
-
 ## Many lights: just add them
 
 One surface, several lights? The reflection model is **linear** in the lights, so the answer is the simplest possible: **sum** each light's contribution:
 
-```text
-   color  =  ambient  +  Σ over lights [ diffuse_i  +  specular_i ]
-```
+<div class="tex" role="img" aria-label="color = ambient + Σ over lights [ diffuse_i + specular_i ]">
+\[ \text{color} = \text{ambient} + \sum_{i \,\in\, \text{lights}} \big(\text{diffuse}_i + \text{specular}_i\big) \]
+</div>
 
-- each light `i` contributes its **own** `diffuse_i` (its `N·L_i`) and `specular_i` (its `R_i·V`), with its own color and attenuation
+- each light `i` contributes its **own** diffuse (its `N·L`) and specular (its `R·V`), with its own color and attenuation
 - **ambient** is added **once** (it is the scene fill, not per-light)
 - more lights ⇒ more terms ⇒ more cost: the reason real-time budgets **cap** the light count per object
 
-Three dot products per light, summed. That is the entire local lighting model, end to end.
-
-
----
-
-
-## Many lights, the cost
-
-A 1080p frame, overdraw 3, 32 lights:
-
-```text
-   forward, every light at every fragment:        199,065,600 evaluations
-   deferred, every light at every pixel once:      66,355,200     (G-buffer 41.5 MB)
-   tiled deferred, 16×16 tiles, about 6 lights reach each tile:
-                                                   12,441,600     (16 times fewer than forward)
-```
-
-
----
-
-
-## Area lights: a point fails up close
-
-<img src="../../textbook/figures/ill-area-light.svg" class="media-shot" style="max-height: 200px;" alt="irradiance under a disc light of radius 0.5 as a function of height, compared with a point light of the same power">
-
-A disc light of radius 0.5 and radiance 1, straight above a point at height h, against a point light of the same power:
-
-| h | 0.25 | 0.5 | 1 | 2 | 4 |
-| - | ---- | --- | - | - | - |
-| disc (exact) | 2.513 | 1.571 | 0.628 | 0.185 | 0.048 |
-| point | 12.566 | 3.142 | 0.785 | 0.196 | 0.049 |
-| point / disc | **5.0** | 2.0 | 1.25 | 1.06 | 1.02 |
+Two dot products per light, summed: the whole local lighting model, end to end.
 
 
 ---
@@ -603,10 +435,10 @@ A disc light of radius 0.5 and radiance 1, straight above a point at height h, a
 
 Several lights and a bright specular easily push the computed color past **1**: but a display maxes out at **1** (full white). Naively **clipping** above 1 **destroys** bright detail:
 
-```text
-   sky = 6.0, cloud = 4.0, sun = 40.0          real (high-dynamic-range) values
-   clip to 1:   sky → 1,  cloud → 1,  sun → 1   all pure white, detail GONE
-```
+| | sky | cloud | sun |
+| - | --- | ----- | --- |
+| computed (high dynamic range) | 6.0 | 4.0 | 40.0 |
+| clipped to 1 | 1 | 1 | 1 |
 
 - a lighting sum is naturally **HDR**: values above 1 are normal, not a bug
 - **clipping** flattens every bright value to the same white, losing the differences
@@ -620,20 +452,16 @@ We need to **compress** the high range into `[0,1]` while **keeping** the differ
 
 The simplest respectable tone-map is the **Reinhard** curve: divide each value by **one plus itself**:
 
-```text
-   display  =  x / (1 + x)
-      x = 0.5 → 0.33     x = 4 → 0.80
-      x = 1   → 0.50     x = 8 → 0.89
-      x = 2   → 0.67     x → ∞ → 1  (approaches, never clips hard)
-```
+<div class="tex" role="img" aria-label="display = x / (1 + x)">
+\[ \text{display} = \frac{x}{1 + x} \]
+</div>
 
-- small values pass **almost unchanged** (`0.5 → 0.33`), so shadows and midtones keep their look
-- large values are **squeezed** toward, never past, 1, so bright regions **stay distinct** (`4 → 0.80`, `8 → 0.89`, not both 1)
-- one line, no parameters (film curves are fancier, and **exposure** scales `x` first); apply it **last**, after all lighting
+<img src="../../textbook/figures/ill-tonemap.svg" class="media-shot" style="max-height: 230px;" alt="Display value against computed brightness from 0 to 10: clipping goes flat at 1; Reinhard bends toward 1 without reaching it; a lower curve for exposure 0.5; cloud 4 at 0.80, sky 6 at 0.86.">
+
+Midtones barely change; bright values stay **distinct** (cloud 4 → 0.80, sky 6 → 0.86, where clipping gave both 1). **Exposure** scales `x` first; apply the curve **last**, after all lighting.
 
 
 ---
-
 
 ### Color in rendering
 
@@ -642,48 +470,41 @@ The simplest respectable tone-map is the **Reinhard** curve: divide each value b
 
 ---
 
-
 ## Shade in linear light
 
-The lighting sums are **light**: twice the number, twice the photons. The **codes** stored in an 8-bit image are not; they are encoded by the sRGB curve.
+The lighting sums are **light**: twice the number, twice the photons. The **codes** stored in an 8-bit image are not; they are encoded by the sRGB curve. Blend yellow and black 50/50:
 
-```text
-   blend yellow and black 50/50:
-      in codes:   (128, 128, 0)   → linear 0.214 per channel → luminance 0.199
-      in light:   0.5 per channel → code (188, 188, 0)      → luminance 0.464
-   a fine checker of the two, viewed from afar:                luminance 0.464
-```
+| blended in | per channel | luminance |
+| ---------- | ----------- | --------- |
+| codes: (128, 128, 0) | linear **0.216** | **0.200** |
+| light: 0.5 per channel | code (188, 188, 0) | **0.464** |
+| a fine checker of the two, seen from afar | | **0.464** |
 
-Only the linear blend matches what the eye averages.
+Luminance is computed on linear values (Rec. 709): `$Y = 0.2126\,R + 0.7152\,G + 0.0722\,B$`. Only the linear blend matches what the eye averages.
 
 
 ---
-
 
 ## The sRGB curve: codes are not light
 
 <img src="../../textbook/figures/col-transfer.svg" class="media-shot" style="max-height: 210px;" alt="the sRGB transfer function mapping code values to linear light, with code 128 marked at 0.216">
 
-```text
-   code 128  →  0.216 of full light          linear 0.5  →  code 188
-   one code step near black:  sRGB 0.0003,   linear 8-bit 0.0039    (12.9 times finer)
-   codes below 1 % of full light:  sRGB 25,   linear 8-bit 3
-```
+- code 128 → **0.216** of full light; linear 0.5 → code **188**
+- one code step near black: sRGB 0.0003, linear 8-bit 0.0039 (12.9 times finer)
+- codes below 1 % of full light, counting 0: sRGB **26**, linear 8-bit **3**
 
 The curve spends codes where the eye is sensitive, in the darks. That is why 8-bit images store encoded values, and why shaders must **decode on read** and **encode on write**.
 
 
 ---
 
-
 ## Pitfall: lighting the codes
 
 An albedo texel of code 200, lit at N·L = 0.5:
 
-```text
-   correct: decode 200 → 0.578,  × 0.5 = 0.289 light,  encode → code 146
-   wrong:   200 × 0.5 = code 100 → 0.127 light              44 % of the correct light
-```
+| | the arithmetic | light | stored code |
+| - | -------------- | ----- | ----------- |
+| correct | decode 200 → 0.578, × 0.5 | 0.289 | 146 |
+| wrong | 200 × 0.5 | 0.127 | 100 |
 
-Shading on codes makes every partly lit surface **too dark** and every falloff **too steep**; artists then brighten the lights to compensate, and the highlights blow out.
-
+The wrong one delivers **44 %** of the correct light. Shading on codes makes every partly lit surface **too dark** and every falloff **too steep**; artists then brighten the lights to compensate, and the highlights blow out.
