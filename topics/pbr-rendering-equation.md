@@ -110,21 +110,12 @@ Radiance is **constant along a ray** in empty space; irradiance depends on how t
 
 ## Solid angle: the steradian
 
-A **radian** measures an angle by the **arc** it cuts on a circle; a **steradian** (sr) measures a **solid angle**, a cone of directions, by the **area** it cuts on a sphere:
+A **radian** measures an angle by the **arc** it cuts on a circle; a **steradian** (sr) measures a **solid angle**, a cone of directions, by the **area** it cuts on a sphere.
 
-<div class="tex" role="img" aria-label="θ = l / r radians (arc length over radius);  Ω = A / r² steradians (area over radius squared)">
-\[ \theta = \frac{l}{r}\ \text{rad} \qquad\qquad \Omega = \frac{A}{r^2}\ \text{sr} \]
-</div>
+<img src="../../textbook/figures/pbrr-steradian.svg" class="media-shot" style="max-height: 290px;" alt="Left: a circle of radius r with a wedge whose arc is as long as the radius, labeled l = r and 1 rad; theta = l / r; an arc as long as r is 1 radian, 57.3 degrees; a whole circle is 2 pi radians. Right: a sphere of radius r with a cone from its center to a cap whose area is r squared, labeled area A = r squared and 1 sr; Omega = A / r squared; an area of r squared is 1 steradian, a cone of half-angle 32.8 degrees; a whole sphere is 4 pi steradians.">
 
-- **one steradian** cuts an area **r²**: a cone of half-angle **32.8°**
-- both are ratios (m/m, m²/m²), so they have no unit; **sr** is written to mark a solid angle
-
-| directions | solid angle |
-| ---------- | ----------- |
-| the whole sphere | 4π = **12.57** sr |
-| a hemisphere: every direction above a surface | 2π = **6.28** sr |
-| a cone of half-angle α | 2π(1 − cos α) |
-| the sun from Earth, α = 0.2666° | **0.000068** sr |
+- both are ratios (m/m, m²/m²): no unit; **sr** marks a solid angle
+- a hemisphere, every direction above a surface: **2π = 6.28 sr**; a cone of half-angle α: **2π(1 − cos α)**; the sun from Earth: **0.000068 sr**
 
 
 ---
