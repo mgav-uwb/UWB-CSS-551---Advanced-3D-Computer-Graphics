@@ -10,7 +10,7 @@
   sphere (t = 6.228; a miss at pixel (20, 20)); Möller–Trumbore on one triangle
   (det 4, u = v = 0.25, t = 1); the slab test on a box (t ∈ [1.02, 2.04]);
   instancing by transforming the ray, and the normal through the inverse transpose
-  (33° error otherwise); Whitted recursion (13 segments for two primary rays),
+  (33° error otherwise); Whitted recursion and the shadow ray (12 segments for two primary rays),
   reflection, Snell refraction and Fresnel for glass; shadow acne; the BVH
   (4.3 × 10¹¹ tests to about 2 × 10⁸ for the bunny at 1080p); distributed rays
   and the soft shadow's penumbra.
@@ -36,6 +36,11 @@
   and the hardware slide moved in order, text unchanged, to ray-tracing-supplement.md; "Fog and smoke" deleted
   (the path-tracing core teaches fog once). "The ray through a pixel" names HW6's camera (φ = 28°, S = 150), not
   the illumination demo's (50°). The ray and the sphere's quadratic typeset by MathJax.
+
+  EDIT 2026-11-12 (Marcel: "seems shadow rays are not well defined"): the Whitted slide defines the shadow ray
+  and shows rtl-whitted-shadow.svg (tools/gen-lecture-figures-rt.mjs) in place of rt-whitted-2d.svg, which drew
+  x and y at different scales, put the eye below the floor and drew blocked shadow rays through their blocker;
+  the pseudocode tests N·L > 0 before the shadow ray; the counts are the new figure's (12 segments, 5 shadow).
 
   reveal.js: FLAT; notes follow "Note:"; plain unicode math; never two "_" on one
   markdown line outside a code fence. Paths relative to the lecture page.
@@ -161,19 +166,21 @@ Enter at the **largest** lower bound, leave at the **smallest** upper bound. Thi
 
 ## Whitted: the hit point sends rays
 
-<img src="../../textbook/figures/rt-whitted-2d.svg" class="media-shot" style="max-height: 230px;" alt="two primary rays traced to depth 2 in a flat scene: shadow rays toward the light, a reflection off a mirror sphere, and refraction into and out of a glass sphere; thirteen ray segments">
+A **shadow ray** runs from a hit point to a light: blocked by anything **between**, the point is in **shadow**; unblocked, it is **lit**.
+
+<img src="../../textbook/figures/rtl-whitted-shadow.svg" class="media-shot" style="max-height: 280px;" alt="A side view drawn to scale: a gray mirror circle and a blue glass circle resting on a floor, a light above, the eye at the upper left. Two black primary rays. The first hits the mirror where the light is behind the surface (an open dot: unlit, no shadow ray), reflects to the floor, and that floor point's dashed gray shadow ray toward the light is stopped by the mirror, marked with a red cross: in shadow. The second hits the glass from the front, and its dashed orange shadow ray reaches the light: lit. It reflects up and out, refracts through the glass and out to the floor, where its shadow ray reaches the light; the two hit points inside the glass have shadow rays blocked by the glass. Six hit points, twelve segments: 2 primary, 3 reflected, 2 refracted, 5 shadow rays (3 blocked, 2 lit).">
 
 ```text
    shade(ray, depth):
       hit = nearest intersection;  if none: return background
       color = ambient
-      for each light:  if the shadow ray to it hits nothing:  color += diffuse + specular
+      for each light:  if N·L > 0 and its shadow ray hits nothing:  color += diffuse + specular
       if mirror and depth < max:  color += kr · shade(reflected ray, depth + 1)
       if glass  and depth < max:  color += F · shade(reflected) + (1 − F) · shade(refracted)
       return color
 ```
 
-Two primary rays to depth 2: **13 segments**, 6 of them shadow rays. One recursion; the image is a tree of rays per pixel.
+One recursion; the image is a **tree of rays** per pixel.
 
 
 ---
@@ -211,10 +218,10 @@ A window is nearly invisible face-on and a **mirror** at a grazing angle. Whitte
 
 ## How many rays does Whitted need?
 
-Each hit on a glass surface spawns a **reflected** and a **refracted** ray, and each hit sends a **shadow** ray toward each light:
+Each hit on a glass surface spawns a **reflected** and a **refracted** ray, and each hit lit from the front sends a **shadow** ray toward each light:
 
 ```text
-   the 2D figure:   13 segments: 2 primary, 3 reflected, 2 refracted, 6 shadow (5 blocked)
+   the figure:   12 segments: 2 primary, 3 reflected, 2 refracted, 5 shadow (3 blocked)
    the 320 × 200 render:   64,000 primary rays, depth limit 4
       worst case per pixel:  1 + 2 + 4 + 8 + 16 = 31 rays (without shadow rays)
       worst case per frame:  1,984,000 rays, plus a shadow ray at every hit
