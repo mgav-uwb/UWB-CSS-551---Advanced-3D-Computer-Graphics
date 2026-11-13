@@ -4,6 +4,8 @@
   Re-sequenced 2026-10-25: merged from the Lecture 12 wrap and the Lecture 13 HW6 walk-through and wrap
   (../archive/L13-path-tracing-pre-merge-2026-10-25/); HW6 out Tuesday November 17 (moved 2026-11-09 from
   November 12, one release a week), due Wednesday November 25; the walk-through stays here.
+  EDIT 2026-11-12: "Out tonight" corrected to Tuesday November 17; the camera is the slides' (HW6's), not the
+  illumination demo's; the wrap names the three supplements that follow it.
 -->
 
 ### HW6, and the wrap
@@ -15,9 +17,9 @@
 
 ## HW6: a ray tracer
 
-Out tonight, due **Wednesday November 25, 11:59 PM**. Unity (C# writing a `Texture2D`) or WebGL, from the skeleton.
+Out **Tuesday November 17**, due **Wednesday November 25, 11:59 PM**. Unity (C# writing a `Texture2D`) or WebGL, from the skeleton.
 
-- **`cameraRay`, `hitSphere`, `hitTriangle`, `reflect`**: pixel **(89, 62)** of 150 × 150 at the illumination demo's camera gives `d = (−0.372, −0.3696, −0.8515)`; the r = 1.2 sphere is hit at **t = 6.2281**; Möller–Trumbore gives **(t, u, v) = (1, 0.25, 0.25)**
+- **`cameraRay`, `hitSphere`, `hitTriangle`, `reflect`**: pixel **(89, 62)** of 150 × 150 at the camera of the slides gives `d = (−0.372, −0.3696, −0.8515)`; the r = 1.2 sphere is hit at **t = 6.2281**; Möller–Trumbore gives **(t, u, v) = (1, 0.25, 0.25)**
 - **`trace`**: a shadow ray toward one point light, and one mirror bounce (depth up to 3)
 - **the Cornell box, lit directly**, 96 × 72: lit floor **0.6933**, floor in shadow **0.08**, red wall **(0.5834, 0.1167, 0.0933)**, and the red wall seen in the mirror sphere **(0.456, 0.0912, 0.073)**
 
@@ -47,5 +49,4 @@ Graded on the page's inputs and on a hidden set: a check scores only when both m
 - A path tracer **samples**: `(1/N) Σ f/p`, a random walk from the eye ended by **Russian roulette**, error falling as **1/√N**
 - **Due**: HW5, Wednesday November 18, 11:59 PM. HW6 goes out Tuesday November 17, due Wednesday November 25
 - **Quiz 5**, on Canvas: tonight 8 PM to Sunday November 15, 11:59 PM; Lectures 11 and 12 and HW4
-- The slides after this one, light transport further, are covered time permitting, or reading
-
+- The slides after this one (ray tracing, path tracing and light transport, further) are covered time permitting, or reading

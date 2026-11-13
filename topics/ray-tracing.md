@@ -1,5 +1,6 @@
 <!--
-  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~45 min, 26 slides).
+  CSS 551 · TOPIC DECK: Ray tracing, rays, intersections, Whitted, the BVH (~28 min, 16 slides; more in
+  ray-tracing-supplement.md).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/ray-tracing.md"> among others; no lecture
   logistics, no "Part N" numbering.
@@ -29,13 +30,20 @@
   the center ray, the BVH depth and the penumbra's dependence on light height moved into the notes of the
   slides they check. 26 slides.
 
+  CUT 2026-11-12 (L13 polish, the meeting ran about 50 minutes over): the core keeps the 16 slides HW6 and path
+  tracing build on; the dates, the three triangle outcomes, instancing (it needs the normal transform, which is
+  in the illumination supplement), the worked refraction and total internal reflection, the SAH, depth of field
+  and the hardware slide moved in order, text unchanged, to ray-tracing-supplement.md; "Fog and smoke" deleted
+  (the path-tracing core teaches fog once). "The ray through a pixel" names HW6's camera (φ = 28°, S = 150), not
+  the illumination demo's (50°). The ray and the sphere's quadratic typeset by MathJax.
+
   reveal.js: FLAT; notes follow "Note:"; plain unicode math; never two "_" on one
   markdown line outside a code fence. Paths relative to the lecture page.
 -->
 
 ### Ray tracing
 
-<small>(~45 min)</small>
+<small>(~28 min)</small>
 
 
 ---
@@ -56,29 +64,16 @@ Appel cast rays for visibility and shadows in 1968; Whitted made the hit point a
 
 ---
 
-## Ray tracing, in five dates
-
-| year | who | what |
-| ---- | --- | ---- |
-| 1968 | Appel (IBM) | rays from the eye to find visible surfaces and shadows |
-| 1980 | Whitted | recursive rays: reflection, refraction, shadows (74 minutes for the famous image, VAX-11/780) |
-| 1984 | Cook, Porter, Carpenter | distributed rays: soft shadows, glossy reflection, depth of field, motion blur |
-| 1986 | Kajiya | the rendering equation; path tracing solves it by Monte Carlo |
-| 2018 | NVIDIA Turing | ray tracing hardware in consumer GPUs |
-
-
----
-
 ## The ray through a pixel
 
 A ray: `r(t) = o + t·d`, `t ≥ 0`. From the viewing topic's camera (eye e, basis u right, v up, w backward, vertical field of view φ, S × S pixels):
 
-```text
-   sx = 2(px + ½)/S − 1        sy = 1 − 2(py + ½)/S
-   d  = normalize( sx·tan(φ/2)·u + sy·tan(φ/2)·v − w ),    o = e
-```
+<div class="tex" role="img" aria-label="sx = 2(px + ½)/S − 1,  sy = 1 − 2(py + ½)/S,  d = normalize(sx·tan(φ/2)·u + sy·tan(φ/2)·v − w),  o = e">
+\[ s_x = \frac{2(p_x + \frac12)}{S} - 1, \quad s_y = 1 - \frac{2(p_y + \frac12)}{S} \qquad \mathbf o = \mathbf e \]
+\[ \mathbf d = \operatorname{normalize}\big(s_x \tan\tfrac{\varphi}{2}\, \mathbf u + s_y \tan\tfrac{\varphi}{2}\, \mathbf v - \mathbf w\big) \]
+</div>
 
-The illumination demo's camera: e = (3, 3, 6), φ = 28°, S = 150, tan 14° = 0.2493.
+HW6's camera: e = (3, 3, 6), φ = 28°, S = 150, tan 14° = 0.2493.
 
 ```text
    u = (0.894, 0, −0.447)   v = (−0.183, 0.913, −0.365)   w = (0.408, 0.408, 0.816)
@@ -95,14 +90,16 @@ The projection matrix run **backward**: a pixel to the line of points that proje
 
 Substitute the ray into `|p − c|² = r²`. With `m = o − c` and unit d:
 
-```text
-   t² + 2 b t + c' = 0,     b = m·d,   c' = m·m − r²,     t = −b ± √(b² − c')
+<div class="tex" role="img" aria-label="t² + 2 b t + c' = 0,  b = m·d,  c' = m·m − r²,  t = −b ± √(b² − c')">
+\[ t^2 + 2bt + c' = 0, \quad b = \mathbf m \cdot \mathbf d, \quad c' = \mathbf m \cdot \mathbf m - r^2, \quad t = -b \pm \sqrt{b^2 - c'} \]
+</div>
 
+```text
    the demo's sphere, r = 1.2 at the origin, m = e = (3, 3, 6):
    b  = 3(−0.372) + 3(−0.370) + 6(−0.852) = −7.334
    c' = 54 − 1.44 = 52.56
    b² − c' = 53.78 − 52.56 = 1.222 > 0:    t = 7.334 ∓ 1.106 → entry 6.228, exit 8.439
-   hit = e + 6.228 d = (0.683, 0.698, 0.697)    within 0.012 of the marked point
+   hit = e + 6.228 d = (0.683, 0.698, 0.697)    within 0.012 of the illumination topic's marked point
 ```
 
 Pixel (20, 20): b² − c' = −1.887, no real root: a **miss**, the ray sees the background. The normal at a hit is (p − c)/r.
@@ -145,19 +142,6 @@ From (1.5, 1.5, 1): u = v = 0.75, u + v = 1.5 > 1, **outside**. The weights are 
 
 ---
 
-## Three outcomes of one triangle test
-
-```text
-   hit:       o = (0.5, 0.5, 1), d = (0, 0, −1):     u = 0.25, v = 0.25, u + v = 0.5,  t = 1    inside
-   miss:      o = (1.5, 1.5, 1):                      u = 0.75, v = 0.75, u + v = 1.5 > 1       outside
-   parallel:  d = (1, 0, 0), in the triangle's plane:  det = e1 · (d × e2) = 0                   no hit
-```
-
-A robust tracer tests `|det| < ε`, not `det = 0`: a ray **almost** parallel gives a huge t from a tiny determinant.
-
-
----
-
 ## Ray against a box: three slabs
 
 An axis-aligned box is three slabs. Per axis, the ray is inside for `t ∈ [(x0 − ox)/dx, (x1 − ox)/dx]` (sorted); the box is hit when the three intervals **overlap**.
@@ -171,22 +155,6 @@ An axis-aligned box is three slabs. Per axis, the ray is inside for `t ∈ [(x0 
 ```
 
 Enter at the **largest** lower bound, leave at the **smallest** upper bound. This test is what the acceleration tree runs millions of times.
-
-
----
-
-## Instancing: transform the ray, not the object
-
-A thousand chairs: one chair and a thousand matrices. Pull the ray into object space by M⁻¹, intersect there, carry the answer back.
-
-```text
-   o' = M⁻¹ o (a point),   d' = M⁻¹ d (a vector, NOT renormalized: t stays the world t)
-
-   ellipsoid = unit sphere scaled by S = diag(2, 1, 1);  ray o = (4, 0.5, 0), d = (−1, 0, 0)
-   o' = (2, 0.5, 0),  d' = (−0.5, 0, 0):   a = 0.25,  b = −1,  c = 3.25,  disc = 0.1875
-   t = 2.268,   object hit (0.866, 0.5, 0),   world hit (1.732, 0.5, 0)
-   normal: (S⁻¹)ᵀ·(0.866, 0.5, 0) → (0.655, 0.756, 0)       through S instead: (0.961, 0.277, 0), 33° off
-```
 
 
 ---
@@ -225,37 +193,6 @@ Two primary rays to depth 2: **13 segments**, 6 of them shadow rays. One recursi
 ```
 
 A window is nearly invisible face-on and a **mirror** at a grazing angle. Whitted weights the reflected ray by F and the refracted ray by 1 − F.
-
-
----
-
-## Worked: the refracted direction
-
-Air into glass, `η = 1/1.5`. The ray `d = (0.5, −0.866, 0)` hits a glass surface with normal `n = (0, 1, 0)` at 30°:
-
-```text
-   cos θ1 = −d·n = 0.866
-   k = 1 − η² (1 − cos² θ1) = 1 − 0.444 × 0.25 = 0.889         √k = 0.943
-   t = η d + (η cos θ1 − √k) n
-     = (0.333, −0.577, 0) + (0.577 − 0.943) (0, 1, 0)  =  (0.333, −0.943, 0)
-   angle from −n:  asin 0.333 = 19.47°          |t| = 1: no renormalizing
-   reflected ray:  d − 2 (d·n) n = (0.5, 0.866, 0)
-```
-
-
----
-
-## Worked: total internal reflection
-
-Glass to air, `η = 1.5`: the square root's argument is `k = 1 − 2.25 sin² θ1`.
-
-```text
-   θ1 = 30°:      k = 1 − 2.25 × 0.25  =  0.438     θ2 = asin(1.5 × 0.5) = 48.6°      bends away from n
-   θ1 = 41.81°:   k ≈ 0                              θ2 = 90°: the critical angle, asin(1/1.5)
-   θ1 = 50°:      k = 1 − 2.25 × 0.587 = −0.320     no refracted ray: all of it reflects
-```
-
-A tracer tests `k < 0` and sends only the reflected ray, with weight 1, not F.
 
 
 ---
@@ -333,21 +270,6 @@ A binary tree of boxes: each node holds the box of everything below it. A ray de
 
 ---
 
-## Building a good BVH: the surface area heuristic
-
-Where to split a node? The probability that a random ray hitting the parent also hits a child is the ratio of their **surface areas**. The expected cost of a split (MacDonald and Booth, 1990):
-
-```text
-   cost = C_trav + (A_left / A) · N_left · C_tri + (A_right / A) · N_right · C_tri       (C = 1 each)
-
-   14 triangles, no split:                       14
-   split into 7 + 7, children with area 0.6, 0.5:   1 + 0.6·7 + 0.5·7 = 8.7     good
-   split into 7 + 7, overlapping children 0.9, 0.9: 1 + 0.9·7 + 0.9·7 = 13.6    barely worth it
-```
-
-
----
-
 ## Distributed rays: soft shadows
 
 <img src="../../textbook/figures/rt-soft-shadow.png" class="media-shot" style="max-height: 230px;" alt="a sphere over a floor lit by a square area light: one shadow ray per pixel gives a hard shadow, sixteen give a soft penumbra with noise at its edge">
@@ -366,40 +288,6 @@ The same idea on the lens gives **depth of field**, on the shutter **motion blur
 
 ---
 
-## Depth of field: sample the lens
-
-<img src="../../textbook/figures/rt-thin-lens.png" class="media-shot" style="max-height: 220px;" alt="three spheres at different depths rendered through a thin lens: the middle one sharp, the near and far ones blurred">
-
-A pinhole camera is always in focus. A **thin lens** of radius 0.12 focused at 3.482 blurs everything else:
-
-```text
-   sphere at depth 2.31:    blur circle 6.71 px
-   sphere at depth 3.482:   0 px               (in focus)
-   sphere at depth 5.044:   4.1 px
-   32 rays per pixel, each from a random point on the lens, aimed at the pixel's point on the focal plane
-```
-
-
----
-
-
-## Fog and smoke: rays through a medium
-
-<img src="../../textbook/figures/rt-media.svg" class="media-shot" style="max-height: 180px;" alt="transmittance falling exponentially with distance through a medium, and light scattered into a ray along its length">
-
-In a medium, a ray loses light by **extinction** and gains it by **in-scattering**:
-
-```text
-   σt = 0.5:   T(d) = e^(−σt d):   d = 1 → 0.607,   d = 2 → 0.368,   d = 4 → 0.135;   half at 1.386
-   light fog, σt = 0.05:   contrast falls to 2 % at 78.2 units: the visibility distance
-```
-
-The volume rendering of NeRF, later in the course, is this equation, with σ and color learned by a network.
-
-
----
-
-
 ## What Whitted cannot see
 
 Whitted rays go only in **mirror** and **refraction** directions, and to the lights. Missing:
@@ -414,7 +302,6 @@ All are the rendering equation's integral over the **whole hemisphere**, which W
 
 ---
 
-
 ## Rasterize or trace?
 
 | | rasterization | ray tracing |
@@ -426,16 +313,3 @@ All are the rendering equation's integral over the **whole hemisphere**, which W
 | data structure | none needed (streams triangles) | a BVH, rebuilt when things move |
 
 Games in 2026 do **both**: rasterize what the camera sees, trace rays for shadows, reflections and indirect light.
-
-
----
-
-
-## Ray tracing in hardware, and denoising
-
-- **RT cores** (NVIDIA Turing, 2018; AMD and Intel since): fixed-function BVH traversal and ray–triangle tests, exposed through DirectX Raytracing and Vulkan
-- real-time budgets allow about **1 or 2 rays per pixel per effect**, far too few for a clean image
-- a **denoiser** reconstructs the image from those samples: spatial and temporal filters guided by normals and depth (SVGF, Schied et al., 2017), or a trained network (NVIDIA's OptiX denoiser, film renderers)
-
-The ray tracer produces noise; the denoiser, like TAA, borrows from neighbors in space and time.
-

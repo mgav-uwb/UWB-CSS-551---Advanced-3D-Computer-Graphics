@@ -503,9 +503,10 @@ console.log({b:+b.toFixed(4), c:+c.toFixed(2), disc:+disc.toFixed(4), t:+t.toFix
         density \(p_A\). With cosine-weighted bounces (density \(\cos\theta/\pi\)) and a diffuse BRDF
         \(k/\pi\), the bounce weight is \((k/\pi)\cos\theta / (\cos\theta/\pi) = k\): each bounce simply
         multiplies by the albedo. The path&rsquo;s indirect contribution to the pixel is
-        \(k_1 \cdot \bigl[\text{direct at the wall}\bigr] = k_1\, k_2\, L_e\, G / p_A\), and if roulette with
-        \(q = 0.7\) let the bounce happen, the value is divided by 0.7 to compensate for the 30 % of paths
-        that were stopped. Averaged over hundreds of such paths, the floor near the red wall comes out pink:
+        \(k_1 \cdot \bigl[\text{direct at the wall}\bigr] = k_1\, (k_2/\pi)\, L_e\, G / p_A\), the wall&rsquo;s
+        BRDF times the light&rsquo;s term. Roulette starts after two bounces, so this bounce is not divided by
+        \(q\); had it run here with \(q = 0.7\), the survivors would be divided by 0.7 to make up for the 30 % of
+        paths stopped. Averaged over hundreds of such paths, the floor near the red wall comes out pink:
         color bleeding, which the direct-only panel cannot show because its paths stop at the floor.
       </div>
       <p>

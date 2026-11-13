@@ -93,6 +93,20 @@
         the hemisphere with each direction weighted by \(\mathbf{n}\cdot\omega_i\),
         \(E = \int_\Omega L_i(\omega_i)\,(\mathbf{n}\cdot\omega_i)\,d\omega_i\).
       </p>
+      <p>
+        The steradian (sr) is to a sphere what the radian is to a circle. An
+        angle in radians is the arc it cuts on a circle divided by the radius,
+        \(\theta = l / r\); a solid angle, a cone of directions, is the area it
+        cuts on a sphere divided by the radius squared,
+        \(\Omega = A / r^2\) steradians. One steradian cuts an area \(r^2\): a
+        cone of half-angle 32.8&deg;. Both are ratios of like quantities, so
+        neither has a unit; the symbol sr is written to mark a solid angle.
+        The whole sphere is \(4\pi \approx 12.57\) sr and a hemisphere, every
+        direction above a surface, \(2\pi \approx 6.28\) sr; a cone of
+        half-angle \(\alpha\) covers \(2\pi(1 - \cos\alpha)\), so the sun
+        (\(\alpha = 0.2666^\circ\)) covers 0.000068 sr. On the unit sphere a
+        solid angle is simply an area.
+      </p>
       <figure>
         <img src="figures/pbr-geometry.svg" alt="Hemisphere above a surface point x with the normal n, an incoming light direction omega-i at angle theta-i, the outgoing direction omega-o toward the eye at angle theta-o, and the half-vector h between them." />
         <figcaption>
@@ -130,9 +144,12 @@
         Replace the continuous sky by three small distant lights, so the
         integral becomes a sum, and take a matte (Lambertian) surface with
         albedo \(\rho = 0.6\), whose BRDF is the constant \(f_r = \rho/\pi = 0.191\)
-        (Section 3 says why the \(\pi\) is there). The point does not emit.
+        (Section 3 says why the \(\pi\) is there). The point does not emit. A
+        small light gives its radiance \(L_i\) over a small solid angle
+        \(\Delta\omega\), so it enters the sum as the product
+        \(L_i\,\Delta\omega\), in watts per square meter.
         <table>
-          <tr><th>light</th><th>\(L_i\)</th><th>angle to \(\mathbf{n}\)</th><th>\(\mathbf{n}\cdot\omega_i\)</th><th>\(f_r\, L_i\, (\mathbf{n}\cdot\omega_i)\)</th></tr>
+          <tr><th>light</th><th>\(L_i\,\Delta\omega\)</th><th>angle to \(\mathbf{n}\)</th><th>\(\mathbf{n}\cdot\omega_i\)</th><th>\(f_r\, L_i\,\Delta\omega\, (\mathbf{n}\cdot\omega_i)\)</th></tr>
           <tr><td>1</td><td>2.0</td><td>20&deg;</td><td>0.940</td><td>\(0.191\times2.0\times0.940 = 0.359\)</td></tr>
           <tr><td>2</td><td>0.8</td><td>60&deg;</td><td>0.500</td><td>\(0.191\times0.8\times0.500 = 0.076\)</td></tr>
           <tr><td>3</td><td>0.5</td><td>75&deg;</td><td>0.259</td><td>\(0.191\times0.5\times0.259 = 0.025\)</td></tr>
@@ -142,11 +159,11 @@
         light 3 nearly irrelevant: it is grazing. And \(L_o\) does not depend on
         \(\omega_o\) at all, because a Lambertian BRDF is constant; that is the
         definition of matte. Add a glossy term and the third column would gain a
-        factor that peaks near the mirror direction of each light. The three
-        lights carry the units too: if \(L_i\) is in watts per square meter per
-        steradian and each light subtends a small solid angle \(\Delta\omega\),
-        the sum is really \(\sum f_r L_i (\mathbf{n}\cdot\omega_i)\,\Delta\omega\),
-        and the table has set every \(\Delta\omega\) to 1.
+        factor that peaks near the mirror direction of each light. The units
+        close: \(f_r\) is per steradian, \(L_i\) watts per square meter per
+        steradian, \(\Delta\omega\) steradians, so the sum
+        \(\sum f_r L_i\,\Delta\omega\,(\mathbf{n}\cdot\omega_i)\) is a radiance,
+        as \(L_o\) must be.
       </div>
 
 <!-- ============================================================ -->

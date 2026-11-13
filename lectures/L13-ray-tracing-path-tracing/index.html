@@ -37,6 +37,9 @@
     [data-demo] canvas { height: 200px !important; width: auto !important; }
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
+    /* MathJax display formulas (lib/deck-math.js): the ASCII form stays as aria-label */
+    .reveal .tex { font-size: 0.88em; margin: 0.3em auto; text-align: center; }
+    .reveal .tex mjx-container[display="true"] { margin: 0.15em 0 !important; }
 
     /* curated figures from the course text */
     .reveal .media-shot { max-height: 420px; width: auto; }
@@ -59,33 +62,43 @@
     <div class="slides">
       <!-- One section per file, in order: the lecture opening (L13-open.md),
            the light-transport core, ray tracing, path tracing, then the HW6 walk-through
-           and wrap (L13-discuss.md), then the light-transport supplement, time permitting. -->
-      <section data-markdown="L13-open.md?v=20261025a"
+           and wrap (L13-discuss.md), then the ray-tracing, path-tracing and light-transport supplements, time permitting. -->
+      <section data-markdown="L13-open.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/pbr-rendering-equation.md?v=20261025a"
+      <section data-markdown="../../topics/pbr-rendering-equation.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/ray-tracing.md?v=20261025a"
+      <section data-markdown="../../topics/ray-tracing.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/path-tracing.md?v=20261025a"
+      <section data-markdown="../../topics/path-tracing.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L13-discuss.md?v=20261025a"
+      <section data-markdown="L13-discuss.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/pbr-rendering-equation-supplement.md?v=20261025a"
+      <section data-markdown="../../topics/ray-tracing-supplement.md?v=20261112a"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/path-tracing-supplement.md?v=20261112a"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/pbr-rendering-equation-supplement.md?v=20261112a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -97,6 +110,8 @@
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+  <script src="../../lib/deck-math.js?v=20261029a"></script>
 
   <script type="module">
     import { initDeckDemos } from '../../lib/deck.js';
@@ -110,6 +125,7 @@
       // Markdown slides exist in the DOM only after init resolves: build the
       // embedded [data-demo] hosts now (never on DOMContentLoaded).
       initDeckDemos();
+      typesetDeckMath();
 
       // Demo slider focus vs. deck navigation: when a demo's range input is set
       // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses

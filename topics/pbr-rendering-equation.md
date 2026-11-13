@@ -6,7 +6,7 @@
   carries no lecture logistics (no title, homework, wrap) and no "Part N" numbering.
 
   TEACHES: why a local model is wrong (energy, reciprocity, bounces); irradiance and radiance (a uniform
-  sky of radiance 1 gives E = π); the solid angle, and that of a small patch (dA cos θ / r²); the
+  sky of radiance 1 gives E = π); the steradian defined (Ω = A/r², by analogy with θ = l/r) and the solid angle, and that of a small patch (dA cos θ / r²); the
   rendering equation term by term, pictured, worked as a three-light sum (Lo = 0.460) and read as a
   self-reference; bounces as a geometric series (1/(1 − ρ)); the BRDF and its laws; the cosine over the
   hemisphere integrated (π, so a matte BRDF is ρ/π); BRDF lobes. The rest (radiometry worked further,
@@ -47,9 +47,14 @@
   pbr-rendering-equation-supplement.md, mounted after the lecture's wrap. Three notes reworded (the
   path-tracing topic twice, the lobe demo in the supplement); one supplement note likewise.
 
+  EDIT 2026-11-12 (Marcel: "make sure we define steradians properly"): "Solid angle: the steradian" defines it
+  next to the radian (θ = l/r, Ω = A/r²; one steradian is a cone of half-angle 32.77°; no unit, sr marks it).
+  The display formulas typeset by MathJax (lib/deck-math.js; the ASCII form stays as aria-label): the
+  irradiance integral, the rendering equation, the bounce series, the cosine integral and ρ/π.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
-  follow "Note:". Math is plain unicode text or fenced ```text blocks (no KaTeX
-  plugin). Never two "_" on one markdown line outside a code fence; backtick names
+  follow "Note:". Display formulas are MathJax blocks (lib/deck-math.js); the rest
+  is plain unicode text or fenced ```text blocks. Never two "_" on one markdown line outside a code fence; backtick names
   with underscores. No <small> on math. Paths are relative to the page that mounts
   this topic (lectures/LNN-slug/index.html).
 -->
@@ -88,28 +93,38 @@ One gap behind all three: Phong never **balances the light energy** at a point. 
 
 Irradiance is radiance summed over every direction above the patch, each weighted by its **cosine** (Lambert's foreshortening):
 
-```text
-   E = ∫ Li(ωi) · (n·ωi) dωi        over the hemisphere Ω above the point
+<div class="tex" role="img" aria-label="E = ∫ Li(ωi) (n·ωi) dωi over the hemisphere Ω above the point">
+\[ E = \int_{\Omega} L_i(\omega_i)\,(\mathbf n \cdot \omega_i)\,d\omega_i \]
+</div>
 
-   a uniform sky of radiance 1:    E = ∫ cos θ dω = π = 3.1416
-```
+A uniform sky of radiance 1 gives
+
+<div class="tex" role="img" aria-label="E = ∫ cos θ dω = π">
+\[ E = \int_{\Omega} \cos\theta\, d\omega = \pi \]
+</div>
 
 Radiance is **constant along a ray** in empty space; irradiance depends on how the patch is turned.
 
 
 ---
 
-## Solid angle: area on the unit sphere
+## Solid angle: the steradian
 
-A **solid angle** is to a sphere what an angle is to a circle: the area it covers on the **unit** sphere, in **steradians**.
+A **radian** measures an angle by the **arc** it cuts on a circle; a **steradian** (sr) measures a **solid angle**, a cone of directions, by the **area** it cuts on a sphere:
 
-```text
-   the whole sphere          4π  = 12.566 sr
-   a hemisphere              2π  =  6.283 sr         (every direction above a surface)
-   the sun, seen from Earth  2π(1 − cos 0.2666°) = 0.000068 sr
-```
+<div class="tex" role="img" aria-label="θ = l / r radians (arc length over radius);  Ω = A / r² steradians (area over radius squared)">
+\[ \theta = \frac{l}{r}\ \text{rad} \qquad\qquad \Omega = \frac{A}{r^2}\ \text{sr} \]
+</div>
 
-Radiance is per steradian because a light's effect depends on **how big it looks**, not how big it is: the sun covers 0.000068 sr and still outshines the whole sky.
+- **one steradian** cuts an area **r²**: a cone of half-angle **32.8°**
+- both are ratios (m/m, m²/m²), so they have no unit; **sr** is written to mark a solid angle
+
+| directions | solid angle |
+| ---------- | ----------- |
+| the whole sphere | 4π = **12.57** sr |
+| a hemisphere: every direction above a surface | 2π = **6.28** sr |
+| a cone of half-angle α | 2π(1 − cos α) |
+| the sun from Earth, α = 0.2666° | **0.000068** sr |
 
 
 ---
@@ -127,10 +142,9 @@ Two facts the illumination topic used without proof, from one formula: **Lambert
 
 Kajiya, 1986: the balance of light at a surface point `p`, for the outgoing direction `ωo` toward the eye:
 
-```text
-   Lo(p, ωo) = Le(p, ωo) + ∫  f(p, ωi, ωo) · Li(p, ωi) · (n·ωi) dωi
-                            Ω
-```
+<div class="tex" role="img" aria-label="Lo(p, ωo) = Le(p, ωo) + ∫ over Ω of f(p, ωi, ωo) · Li(p, ωi) · (n·ωi) dωi">
+\[ L_o(p, \omega_o) = L_e(p, \omega_o) + \int_{\Omega} f(p, \omega_i, \omega_o)\, L_i(p, \omega_i)\, (\mathbf n \cdot \omega_i)\, d\omega_i \]
+</div>
 
 - **Lo(p, ωo)**: outgoing radiance from `p` toward the eye (**what the pixel gets**)
 - **Le(p, ωo)**: light `p` **emits** itself (nonzero only on a light source)
@@ -187,10 +201,11 @@ Li on the right is **some other point's Lo**. The unknown appears on **both side
 
 <img src="../../textbook/figures/pbrr-bounces.svg" alt="Two bar charts of the light carried by the direct term and by bounces 1 to 7. Left, every surface reflecting 0.5: bars 1, 0.5, 0.25, 0.13 and so on, summing to 2 times the direct light, the first four terms 1.875. Right, every surface reflecting 0.8: bars 1, 0.8, 0.64, 0.51 and so on, summing to 5 times the direct light, the first four terms 2.952" style="height:300px">
 
-```text
-   every surface reflects a fraction ρ:
-   L = Ldirect (1 + ρ + ρ² + ρ³ + …) = Ldirect / (1 − ρ)
-```
+Every surface reflects a fraction ρ:
+
+<div class="tex" role="img" aria-label="L = Ldirect (1 + ρ + ρ² + ρ³ + …) = Ldirect / (1 − ρ)">
+\[ L = L_{\text{direct}}\,(1 + \rho + \rho^2 + \rho^3 + \cdots) = \frac{L_{\text{direct}}}{1 - \rho} \]
+</div>
 
 A light room is mostly **indirect** light: at ρ = 0.8, four of every five parts.
 
@@ -219,13 +234,15 @@ A **physical** BRDF must obey exactly the rules Phong broke:
 
 Write a direction by its angle θ from the normal and its azimuth φ; the patch of solid angle is `dω = sin θ dθ dφ`:
 
-```text
-   ∫Ω cos θ dω  =  ∫ from φ = 0 to 2π  ∫ from θ = 0 to π/2   cos θ sin θ dθ dφ
-                =  2π · [ sin² θ / 2 ] from 0 to π/2
-                =  2π · ½  =  π  =  3.1416          (a midpoint sum of 100,000 strips: 3.1415927)
+<div class="tex" role="img" aria-label="∫Ω cos θ dω = ∫ from 0 to 2π ∫ from 0 to π/2 of cos θ sin θ dθ dφ = 2π · [sin² θ / 2] from 0 to π/2 = π">
+\[ \int_{\Omega} \cos\theta\, d\omega = \int_0^{2\pi}\!\!\int_0^{\pi/2} \cos\theta \sin\theta\, d\theta\, d\varphi = 2\pi \Big[ \tfrac{\sin^2\theta}{2} \Big]_0^{\pi/2} = \pi \]
+</div>
 
-   a matte surface reflecting a fraction ρ:   ∫ f cos dω = f · π = ρ    ⇒    f = ρ / π
-```
+A matte surface reflecting a fraction ρ:
+
+<div class="tex" role="img" aria-label="∫ f cos θ dω = f · π = ρ, so f = ρ / π">
+\[ \int_{\Omega} f \cos\theta\, d\omega = f\,\pi = \rho \quad\Longrightarrow\quad f = \frac{\rho}{\pi} \]
+</div>
 
 The π in every Lambertian shader is this integral, not a convention.
 
@@ -241,4 +258,3 @@ For light from one direction, the BRDF's value in every outgoing direction:
 - **Lambertian**: a half-circle, the same everywhere: matte
 - **glossy**: a lobe around the mirror direction: roughness sets its width
 - **mirror**: a spike: all the light in one direction
-
