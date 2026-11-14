@@ -1,0 +1,22 @@
+<!doctype html>
+<!-- CSS 551: ray lab, WebGL track. Serve the course folder (python3 -m http.server) and open
+     lib/programs/ray-lab/webgl/; a page opened from disk cannot load modules. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ray lab, WebGL</title>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: #0b0c10; color: #c7cdda; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+    #wrap { display: flex; gap: 16px; padding: 12px; align-items: flex-start; flex-wrap: wrap; }
+    canvas { width: 576px; height: 360px; image-rendering: pixelated; border: 1px solid #2c3140; cursor: crosshair; }
+    #status { padding: 4px 12px; }
+    #tree { margin: 0; white-space: pre; flex: 1 1 360px; min-width: 0; overflow: auto; }
+  </style>
+</head>
+<body>
+  <div id="status"></div>
+  <div id="wrap"><canvas id="image" width="96" height="60"></canvas><pre id="tree">Click a pixel to see its tree of rays.</pre></div>
+  <script type="module" src="scene.js"></script>
+</body>
+</html>
