@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- CSS 551: volume lab, WebGL track. Serve the course folder (python3 -m http.server) and open
+     lib/programs/volume-lab/webgl/; a page opened from disk cannot load modules. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Volume lab, WebGL</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0c10; color: #c7cdda; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    canvas { width: 512px; height: 512px; image-rendering: pixelated; border: 1px solid #262a35; cursor: crosshair; }
+    #status { max-width: 640px; text-align: center; padding: 4px 8px; }
+  </style>
+</head>
+<body>
+  <canvas id="image" width="128" height="128"></canvas>
+  <div id="status"></div>
+  <script type="module" src="scene.js"></script>
+</body>
+</html>

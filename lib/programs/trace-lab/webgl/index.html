@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- CSS 551: trace lab, WebGL track. Serve the course folder (python3 -m http.server) and open
+     lib/programs/trace-lab/webgl/; a page opened from disk cannot load modules. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trace lab, WebGL</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0b0c10; color: #c7cdda; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+    #images { display: flex; gap: 12px; }
+    figure { margin: 0; text-align: center; }
+    canvas { width: 384px; height: 288px; image-rendering: pixelated; border: 1px solid #262a35; cursor: crosshair; }
+    #status, #pixel { max-width: 800px; text-align: center; padding: 4px 8px; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div id="images">
+    <figure><canvas id="whitted" width="64" height="48"></canvas><figcaption>Whitted</figcaption></figure>
+    <figure><canvas id="path" width="64" height="48"></canvas><figcaption>path tracer</figcaption></figure>
+  </div>
+  <div id="status"></div>
+  <div id="pixel">Click a pixel of either image.</div>
+  <script type="module" src="scene.js"></script>
+</body>
+</html>
