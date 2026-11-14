@@ -9,6 +9,7 @@
   dctPsnr); ../../homework/hw07/index.html is the specification and governs if the two differ.
   2026-11-09: HW7 goes out with Lecture 16 (Tuesday November 24, one release a week); the
   walk-through stays here, after the hand step it starts from.
+  2026-11-13: "Out tonight" corrected to Tuesday November 24; the supplements after the wrap named.
 -->
 
 ### HW7, and the wrap
@@ -20,7 +21,7 @@
 
 ## HW7: networks and images
 
-Out tonight, due **Wednesday December 2, 11:59 PM**. JavaScript (the WebGL track) or a Python notebook.
+Out **Tuesday November 24**, due **Wednesday December 2, 11:59 PM**. JavaScript (the WebGL track) or a Python notebook.
 
 ```text
    1  forward, gradients, sgdStep: the tiny net, x = 0.4, y = 0.3, lr = 0.1
@@ -38,8 +39,8 @@ The specification, skeletons and the run-and-compare rubric: [HW7](../../homewor
 
 ## HW7: tracks and what is off limits
 
-- **JavaScript** (the WebGL track's language): plain arrays and loops; any machine-learning or signal-processing library is off limits
-- **Python notebook**: NumPy arrays and products are allowed; `scipy`, `torch`, `jax` and any autodiff, `np.fft` and any DCT routine are off limits
+- **JavaScript**: plain arrays and loops; no machine-learning or signal-processing library
+- **Python notebook**: NumPy arrays and products are allowed; no `scipy`, `torch`, `jax` or other autodiff, no `np.fft` or other DCT routine
 - a library routine may be used to **check** your own result, never in the submission
 - graded on the page's inputs and on a hidden input set: a check scores only when both match
 
@@ -54,7 +55,7 @@ Specification and skeletons: [HW7](../../homework/hw07/index.html)
 - embeddings put similar things near each other; contrastive training puts words and pictures in **one space**
 - a coordinate network is one signal as a function; its encoding decides which frequencies training can reach
 
-- **Read:** [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), all sections
-- **Due:** HW6, Wednesday November 25, 11:59 PM. HW7 goes out Tuesday November 24, due Wednesday December 2
-- **Quiz 6**, on Canvas: tonight 8 PM to Sunday November 22, 11:59 PM; Lectures 13 and 14 and HW5
-
+- **Read:** [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), Sections 1 to 9
+- **Due:** HW6, Wednesday November 25, 11:59 PM; HW7 goes out Tuesday November 24
+- **Quiz 6**, on Canvas: tonight 8 PM to Sunday November 22, 11:59 PM; Lectures 13, 14, HW5
+- **After this slide**: further slides, time permitting, or reading

@@ -174,7 +174,7 @@
         \(w^{(1)} = (0.9902, -0.9851)\), \(b^{(1)} = (0.4756, 0.5372)\),
         \(w^{(2)} = (0.7551, -0.6062)\), \(b_2 = 0.0374\). Rerun the forward pass
         with the new weights: \(f = 0.4814\), loss \(0.0329\), down from
-        \(0.0981\). One step took the output a third of the way to the target;
+        \(0.0981\). One step closed 42&nbsp;% of the gap to the target and cut the loss to a third;
         the sign of every change was decided by the chain rule, not by anyone
         looking at the problem. Repeat a few thousand times over a few thousand
         examples and that is all training is.
@@ -244,12 +244,13 @@
           <tr><td>\(\partial/\partial W^{(2)}\)</td><td>\(\boldsymbol\delta^{(2)}\mathbf{a}^{(1)\top} = \begin{pmatrix} 0.0341 & 0.0047 \\ -0.0293 & -0.0041 \end{pmatrix}\); \(\partial/\partial\mathbf{b}^{(2)} = (0.0476, -0.0410)\)</td></tr>
           <tr><td>\(\boldsymbol\delta^{(1)}\)</td><td>\(W^{(2)\top}\boldsymbol\delta^{(2)} = (0.6(0.0476) + 0.3(-0.0410),\; -0.4(0.0476) + 0.9(-0.0410)) = (0.0163, -0.0559)\), times \((1 - \mathbf{a}^{(1)2}) = (0.4869, 0.9901)\): \((0.0079, -0.0553)\)</td></tr>
           <tr><td>\(\partial/\partial W^{(1)}\)</td><td>\(\boldsymbol\delta^{(1)}\,x = (0.0032, -0.0221)\); \(\partial/\partial\mathbf{b}^{(1)} = (0.0079, -0.0553)\)</td></tr>
-          <tr><td>after the step</td><td>\(f = 0.3126\), loss \(0.0002\): down by a factor of six</td></tr>
+          <tr><td>after the step</td><td>\(f = 0.3126\), loss \(0.0002\): down by a factor of 7.5</td></tr>
         </table>
-        Thirteen weights, one backward sweep, and the deepest weights got the
-        smallest gradients: \(\boldsymbol\delta\) was multiplied by \(w^{(3)}\), then by
-        \(W^{(2)}\), and at each layer by a \(\tanh'\) below 1. Ten layers of
-        that and the first layer would barely move, which is the vanishing
+        Thirteen weights, one backward sweep. At every layer \(\boldsymbol\delta\) was
+        multiplied by a weight and by a \(\tanh'\): the first unit&rsquo;s error shrank six-fold
+        (\(0.0476\) to \(0.0079\)), the second&rsquo;s grew (\(-0.0410\) to \(-0.0553\)) because
+        \(W^{(2)}\)&rsquo;s \(0.9\) outweighs its slope. Depth multiplies such factors; where they
+        stay below 1 layer after layer, ten layers of it and the first layer would barely move, which is the vanishing
         gradient of Section 1 seen in numbers, and the reason for the
         rectifiers, for careful initialization, and for the skip connections
         that let \(\boldsymbol\delta\) bypass layers in every deep network built since
@@ -530,9 +531,9 @@
         denoising. Nobody told it that a 4 looks like a 9.
       </p>
       <figure>
-        <img src="figures/nn-embed-map.svg" alt="Left: eleven labeled dots, the class embeddings of the trained digit denoiser projected onto their two principal axes; 4 and 9 sit together, 3 and 5 close, 7 near 9, 1 far from everything. Right: a 10 by 10 matrix of cosine similarities between the ten digit vectors, darker where larger." />
+        <img src="figures/nn-embed-map.svg" alt="Left: eleven labeled dots, the class embeddings of the trained digit denoiser projected onto their two principal axes; 4 and 9 sit together, 3 and 5 close, 7 near 9; the 1 has the weakest nearest neighbor. Right: a 10 by 10 matrix of cosine similarities between the ten digit vectors, darker where larger." />
         <figcaption>
-          Read straight from the weight file. Left: the eleven vectors projected onto their two principal axes (18 % and 18 % of the variance; the picture is a shadow of a 64-dimensional arrangement). Right: every pairwise cosine, computed in all 64 dimensions. The nearest neighbor of 4 is 9 (0.54), of 3 is 5 (0.52), of 7 is 9 (0.48), of 2 is 3 (0.39); the 1, which shares strokes with nothing, is far from everything. The network placed digits that share strokes together because a denoiser that knows &ldquo;this is a 4&rdquo; and &ldquo;this is a 9&rdquo; must do nearly the same work for both.
+          Read straight from the weight file. Left: the eleven vectors projected onto their two principal axes (18 % and 18 % of the variance; the picture is a shadow of a 64-dimensional arrangement). Right: every pairwise cosine, computed in all 64 dimensions. The nearest neighbor of 4 is 9 (0.54), of 3 is 5 (0.52), of 7 is 9 (0.48), of 2 is 3 (0.39); the 1, a single stroke, has the weakest nearest neighbor of the ten, 3 at 0.31. The network placed digits that share strokes together because a denoiser that knows &ldquo;this is a 4&rdquo; and &ldquo;this is a 9&rdquo; must do nearly the same work for both.
         </figcaption>
       </figure>
       <div class="ex">
@@ -969,7 +970,7 @@
       </div>
 
       <footer>
-        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.1 &middot; prepared by Dr. Marcel
+        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.2 &middot; prepared by Dr. Marcel
         Gavriliu. Figures computed by <code>tools/gen-textbook-figures.mjs</code>; the coordinate-network figures by <code>lectures/L15-neural-nets-embeddings/analysis/coord-net-figures.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>

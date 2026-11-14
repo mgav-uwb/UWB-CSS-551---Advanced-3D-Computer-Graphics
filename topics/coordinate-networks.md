@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Coordinate networks (~27 min, 18 content slides).
+  CSS 551 · TOPIC DECK · Coordinate networks (the core, ~30 min, 12 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/coordinate-networks.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -35,6 +35,16 @@
   EDIT 2026-10-08: the two multiple-choice Check slides cut (region ranking, the blobs picture); the region
   table and the exhibit already carry their numbers, and the exhibit's note gains the Fourier-on-blobs point.
 
+  GOALS: function approximation in graphics terms: one image as f(x, y), spectral bias, frequency encodings;
+    the bridge to NeRF in the learned-scenes lecture.
+  OUTCOMES (students can): explain spectral bias from a per-region PSNR table; compute a positional (octave)
+    encoding of one coordinate; predict the effect of the frequency scale (too low blurs, too high is noise
+    between the samples).
+  CUT 2026-11-13: the scale pitfall, SIREN's initialization and its omega table, the two hash-grid slides and
+    the papers moved, in order, to coordinate-networks-supplement.md (after the wrap); the learned-scenes lecture
+    teaches hash grids again. Corrected: the SIREN trains at a tenth of the others' learning rate; hash levels
+    776 and 2048.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -45,7 +55,7 @@
 
 ### Coordinate networks
 
-<small>(~27 min)</small>
+<small>(~30 min) · reading: <a href="../../textbook/neural-nets-embeddings.html">Neural Networks and Embeddings</a>, Section 9</small>
 
 
 ---
@@ -176,7 +186,7 @@ NeRF (neural radiance fields; Mildenhall et al., ECCV 2020, arXiv:2003.08934) us
 
 ## Fourier features fix the blur
 
-PSNR of the whole image, same picture, same optimizer, same batches:
+PSNR of the whole image, same picture, same Adam optimizer and batches (the SIREN at a tenth of the learning rate, 0.0005):
 
 | step | 0 | 100 | 300 | 1000 | 2000 | 4000 |
 | ---- | - | --- | --- | ---- | ---- | ---- |
@@ -206,21 +216,6 @@ PSNR of the whole image, same picture, same optimizer, same batches:
 
 ---
 
-## Pitfall: choosing the scale by the training error
-
-```text
-            on the pixels    between them
-   σ = 24   15.55 dB         9.12 dB          6.4 dB worse between
-   σ = 3    20.04 dB         22.58 dB         no gap
-```
-
-- the score on the training pixels says nothing about the function **between** them, and a coordinate network is evaluated between pixels whenever the image is zoomed, resampled or rendered from a new view
-- check a coordinate network off its training grid: shifted samples, a higher resolution render, or held-out pixels
-- the same failure in 3D: a radiance field with too-high frequencies shows "floaters" and grain in views between the training cameras
-
-
----
-
 ## SIREN: sine as the activation
 
 A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv:2006.09661) replaces ReLU with a sine in every hidden layer:
@@ -234,41 +229,6 @@ A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv
 - the derivative of sin is a shifted sin, so **the derivative of a SIREN is a SIREN**: gradients and Laplacians of the fitted signal are smooth and meaningful
 - a ReLU network's second derivative is zero almost everywhere: it cannot be fitted to a gradient or a differential equation
 - the paper fits images, audio, video, signed distance functions (SDFs), and solutions of the Poisson, Helmholtz and wave equations
-
-
----
-
-## Pitfall: SIREN without its initialization
-
-```text
-   first layer    W ~ U(−1/n, 1/n), n = 2:    |W| ≤ 0.5
-                  phases ω₀ |W p + b| up to 51 rad (8 periods)
-   hidden layer   W ~ U(−√(6/n)/ω₀, √(6/n)/ω₀), n = 48:
-                  |W| ≤ 0.0118,   ω₀ |W| ≤ 0.354
-
-                          paper's init    without the 1/ω₀
-   mean |ω₀ z|, layer 2   2.35 rad        23.87 rad
-   PSNR at step 2000      18.89 dB        13.27 dB
-```
-
-- the bound √(6/n) keeps each layer's input to the sine spread over about one period whatever the depth; dividing by ω₀ cancels the factor inside the sine
-- without it every hidden sine sees phases spread over many periods: its output is effectively random in the input, and training starts from noise
-
-
----
-
-## The SIREN's frequency plays the same role
-
-<img src="../../textbook/figures/nn-coordnet-omega.png" class="media-shot" style="max-height: 150px;" alt="SIREN fits at omega zero 1, 30 and 90 after 2000 steps: a smooth blur, sharp, and speckled">
-<span class="credit">SIREN at ω₀ = 1, 30, 90; 2000 steps each</span>
-
-| ω₀ | 1 | 5 | 10 | 30 | 90 |
-| -- | - | - | -- | -- | -- |
-| PSNR on the pixels | 11.05 | 11.87 | 13.34 | **18.89** | 17.95 |
-| PSNR between the pixels | 12.86 | 14.16 | 16.26 | **22.56** | 17.82 |
-
-- ω₀ = 1: the sines stay near their linear part; the network is a smooth function like the plain ReLU one
-- ω₀ = 90: speckle between the pixels, the large-σ failure again; the paper's 30 is best here
 
 
 ---
@@ -287,47 +247,6 @@ A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv
 
 ---
 
-## Multiresolution hash encoding
-
-Instant NGP (neural graphics primitives; Müller et al., *ACM TOG* 41(4), 2022, arXiv:2201.05989) **trains** the encoding itself:
-
-```text
-   L grids, resolutions N_l = ⌊N_min · bˡ⌋
-   N_min = 16, N_max = 2048, L = 16:   b = 1.3819
-   level l:  the cell around p;  its 4 corners (8 in 3D) index a table
-             of T feature vectors (F = 2 numbers);  interpolate bilinearly
-   concatenate L · F = 32 features  →  a small MLP  →  colour
-
-   spatial hash  h(v) = ( v₁ · 1  XOR  v₂ · 2654435761 ) mod T,  T = 2¹⁴
-   (37, 12) → 13417    (38, 12) → 13418
-   (37, 13) → 11736    (38, 13) → 11739
-```
-
-- coarse levels fit in the table one entry per vertex; fine levels have more vertices than T entries and **collide**
-- a shared entry receives the gradients of every vertex hashed to it; the other levels and the MLP tell the colliding points apart
-
-
----
-
-## What the hash grid changes
-
-```text
-   one configuration:  L = 16,  F = 2,  T = 2¹⁹ entries per level
-                       (the paper's range: T from 2¹⁴ to 2²⁴)
-   table parameters    at most 16 × 2¹⁹ × 2 = 16,777,216
-   the MLP             a few thousand
-
-   2D, N_min = 16 → N_max = 2048, dense where (N_l + 1)² ≤ 2¹⁹:
-   the first 12 levels (16 … 561) dense;  the last 4 (775 … 2047) hashed
-```
-
-- most parameters sit in the **tables**, and each pixel touches only 4 entries per level: training updates a tiny fraction of them per step
-- the high frequencies come from the fine grids, not from sines, so the MLP can be very small
-- the paper's result: "training of high-quality neural graphics primitives in a matter of seconds, and rendering in tens of milliseconds at a resolution of 1920 × 1080"
-
-
----
-
 ## One recipe, many signals
 
 | signal | coordinate network | output | fitted to |
@@ -339,17 +258,3 @@ Instant NGP (neural graphics primitives; Müller et al., *ACM TOG* 41(4), 2022, 
 
 - all four use the same parts: an encoding (Fourier, octaves, sines or hash grids), an MLP, a loss, Adam
 - a radiance field is a coordinate network whose loss compares **rendered** pixels with photographs; the learned-scenes lecture renders one
-
-
----
-
-## The papers, 2019 to 2022
-
-| Year | Paper | What it added |
-| ---- | ----- | ------------- |
-| 2019 | Rahaman et al., ICML, arXiv:1806.08734 | spectral bias: networks learn low frequencies first |
-| 2020 | Mildenhall et al., ECCV, arXiv:2003.08934 | NeRF, with positional encoding of coordinates |
-| 2020 | Tancik et al., NeurIPS, arXiv:2006.10739 | Fourier features; σ as the kernel's bandwidth |
-| 2020 | Sitzmann et al., NeurIPS, arXiv:2006.09661 | SIREN: sine activations and their initialization |
-| 2022 | Müller et al., *ACM TOG* 41(4), DOI 10.1145/3528223.3530127 | Instant NGP: multiresolution hash encoding |
-
