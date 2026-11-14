@@ -1,8 +1,14 @@
 <!--
-  CSS 551 · TOPIC DECK: Physics inside the frame loop (~44 min).
+  CSS 551 · TOPIC DECK: Physics inside the frame loop (the core, ~46 min, 18 slides).
   Mounted as <section data-markdown="../../topics/physics-simulation.md">. No logistics.
 
-  TEACHES: a particle as position, velocity and mass; forces to acceleration;
+  GOALS: a simulation is a state plus a step rule, and the step must respect the stiffness.
+  OUTCOMES (students can): take one step of explicit Euler, semi-implicit Euler and Verlet on a spring;
+    use h·sqrt(k/m) to judge stability and scale substeps with stiffness; carry out one distance-
+    constraint projection and say why it cannot explode and what it costs; resolve a contact (push out,
+    reflect the normal velocity with restitution) and compute the per-step travel that tunnels.
+  TEACHES (before the 2026-11-13 cut; the core keeps the integrators, the cloth, contacts, the rigid
+    body as a node, one bounce, and the method map): a particle as position, velocity and mass; forces to acceleration;
   explicit versus semi-implicit Euler worked by hand on one spring; energy growth
   (1 + (h omega)^2 per step) and the stability limit h omega < 2; the fixed step and
   substeps; stiffness versus stability; cloth as springs or as constraints (XPBD),
@@ -17,8 +23,8 @@
     (Baraff, SIGGRAPH 1989), kinematic vs dynamic and ragdolls, Unity PhysX vs three.js
     libraries, film vs games; media ../../media/icons/sim-rigid.webp. HAIR STRANDS slide moved
     from the texture-mapping topic (media ../../media/icons/sim-hair.webp).
-  DEMOS:   cloth (stiffness,substeps) and fluid (viscosity,sound), each on a
-    demo-full slide.
+  DEMOS:   cloth (stiffness,substeps) twice, on demo-full slides: first before anything is defined, again
+    after the tables; fluid (viscosity,sound) is in physics-simulation-supplement.md.
   NUMBERS, all from node against lib/core/sim-cloth.js, lib/core/sim-fluid.js and
     lib/tests/sim.test.mjs:
     - spring k = 100 N/m, m = 1 kg, h = 0.1 s, x0 = 1 m at rest: omega = 10 rad/s
@@ -33,6 +39,14 @@
       springs: explode at 16 substeps, 1.2 % stretch at 64 (24.8 ms per frame in node)
       constraints (2 passes per substep): stretch 125.3 / 5.3 / 2.0 / 1.2 % at 1 / 4 / 16 / 64 substeps
         (0.45 / 1.64 / 6.96 / 27.8 ms per frame in node)
+      Those stretches were without wind. Re-measured 2026-11-13 as the demo runs (wind 1.2, damping 0.4,
+      sphere and floor of lib/demos/cloth.js), readout's median over 2 to 8 s and its peak:
+        springs k = 1995: explode at 1, 4, 16, 32 substeps; hold at 64 (0.9 %, peak 2.8 %)
+        springs, 16 substeps: hold at k = 200 (h sqrt(k/m) = 0.64), explode at k = 224 (0.68)
+        constraints k = 1995: 157 / 15.2 / 1.6 / 1.2 % (peaks 260 / 25.1 / 4.3 / 2.9 %) at 1 / 4 / 16 / 64
+      The cloth's limit: in its fastest mode neighbors move oppositely; 2 axis links (2u stretch each)
+        and 4 diagonals give 8k on a particle, omega_max = sqrt(8) sqrt(k/m), limit 2 / sqrt(8) = 0.71.
+      Costs kept from the quiet-machine run above (2026-11-13 timings ran on a machine at load 28).
     - one XPBD projection: masses 1 kg (w = 1), rest 1 m, now 1.2 m, h = 1/60 s,
       k = 1000 N/m: alpha~ = 1/(k h^2) = 3.6; dlambda = -0.2 / 5.6 = -0.0357;
       each particle moves 0.0357 m; new length 1.1286 m. k infinite: each moves 0.1, length 1.
@@ -45,31 +59,62 @@
     2003; Jakobsen GDC 2001 (Hitman); Mueller et al. 2007 (PBD); Macklin, Mueller and
     Chentanez MIG 2016 (XPBD); Macklin et al. SCA 2019 (small steps); Stomakhin et al.
     SIGGRAPH 2013 (Frozen snow); Brave's Taz hair solver (fxguide).
-  READING: ../../textbook/animation.html, Sections 8 to 14 (stepping a spring to hair and fur).
+  READING: ../../textbook/animation.html, Sections 8 to 10, 12 and 13.
+  CUT 2026-11-13 (Marcel: "what are we actually teaching ... be specific on goals and outcomes"): the core
+    keeps the slides the outcomes above need; implicit Euler, damping, the XPBD code, particle rigid
+    bodies and hair, the engine's broad and narrow phase, response, tumbling cubes, stacking, engines,
+    fluids and film against games moved, in order, to physics-simulation-supplement.md (after the wrap).
+    The cloth now opens the topic, unexplained, as the keyframe demo opens animation. The cloth tables
+    re-measured with the demo's wind; the cloth's own limit (about 0.7, not 2) explained; the demo's
+    driving order corrected (springs explode at the default stiffness at once).
   EDIT 2026-10-08: the energy factor derived in three steps on its slide (retitled "Energy growth and
     the stability limit"); "Why stacking is hard" retitled "Stacking: contact every frame"; the
     multiple-choice predict-first slide on the spring cloth cut (its question moved to the table
     slide's note); the viscosity prediction asked open, without lettered options.
 
-  reveal.js: FLAT; notes follow "Note:"; plain text math, no KaTeX; never two
-  "_" on one markdown line outside a code fence; paths relative to the lecture page.
+  EDIT 2026-11-03 (Marcel): every formula typeset; the cloth's links drawn
+    (textbook/figures/phys-cloth-links.svg, tools/gen-lecture-figures-physics.mjs); the fixed-step
+    loop is real code.
+
+  reveal.js: FLAT; notes follow "Note:" and stay plain text. Display math is a raw <div class="tex">
+  block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form as aria-label, no blank line
+  inside); inline math is a code span written `$...$`. Code identifiers stay plain code spans. Never
+  two "_" on one markdown line outside a code fence or code span; paths relative to the lecture page.
 -->
 
 ### Physics inside the frame loop
 
-<small>(~44 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 8 to 14</small>
+<small>(~46 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 8 to 10, 12 and 13</small>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## A cloth, live
+
+<div class="cockpit" data-demo="cloth" data-controls="stiffness,substeps"><pre class="viz-fallback">  a 24 × 24 cloth, 0.3 kg, pinned at two corners, over a sphere, in a gusting wind
+  controls:  stiffness k (N/m), substeps per 1/60 s frame, links = constraints | springs
+  readout:   step h, h·√(k/m), max stretch, kinetic energy, step time, state</pre></div>
 
 
 ---
 
 ## A particle is three numbers and a rule
 
-```text
-   state:   position x = (x, y, z)      velocity v = (vx, vy, vz)      mass m
-   forces:  gravity  m·(0, −9.81, 0)     springs     wind     contact
-   rule:    acceleration a = F / m                       (Newton, 1687)
-   step h:  new v  from a,    new x  from v
-```
+<div class="tex" style="font-size:0.76em" role="img" aria-label="state:   position x = (x, y, z)      velocity v = (vx, vy, vz)      mass m
+forces:  gravity  m·(0, −9.81, 0)     springs     wind     contact
+rule:    acceleration a = F / m                       (Newton, 1687)
+step h:  new v  from a,    new x  from v">
+\[
+\begin{aligned}
+\text{state:} &\quad \text{position } \mathbf{x} = (x, y, z), \quad \text{velocity } \mathbf{v} = (v_x, v_y, v_z), \quad \text{mass } m \\
+\text{forces:} &\quad \text{gravity } m\,(0,\ {-9.81},\ 0), \quad \text{springs, wind, contact} \\
+\text{rule:} &\quad \text{acceleration } \mathbf{a} = \mathbf{F} / m \qquad \text{(Newton, 1687)} \\
+\text{step } h\text{:} &\quad \text{new } \mathbf{v} \text{ from } \mathbf{a}, \quad \text{new } \mathbf{x} \text{ from } \mathbf{v}
+\end{aligned}
+\]
+</div>
 
 - a cloth, a splash, a crowd of dice, a head of hair: **thousands of particles**, each with this state
 - the physics is two lines; everything interesting is in **which forces** and **how you step**
@@ -79,26 +124,34 @@
 
 ## One spring, by hand
 
-A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **h = 0.1 s**.
+A 1 kg mass on a spring, `$k = 100$` N/m, pulled to `$x = 1$` m and released; `$h = 0.1$` s.
 
-```text
-   a = −k·x / m = −100 · 1 / 1 = −100 m/s²
-
-   explicit Euler       (both updates use the OLD state)
-      x ← x + h·v     = 1 + 0.1 · 0      = 1
-      v ← v + h·a     = 0 + 0.1 · (−100) = −10
-
-   semi-implicit Euler  (velocity first, then position with the NEW velocity)
-      v ← v + h·a     = −10
-      x ← x + h·v     = 1 + 0.1 · (−10)  = 0
-```
+<div class="tex" style="font-size:0.74em" role="img" aria-label="a = −k·x / m = −100 · 1 / 1 = −100 m/s²
+explicit Euler       (both updates use the OLD state)
+   x ← x + h·v     = 1 + 0.1 · 0      = 1
+   v ← v + h·a     = 0 + 0.1 · (−100) = −10
+semi-implicit Euler  (velocity first, then position with the NEW velocity)
+   v ← v + h·a     = −10
+   x ← x + h·v     = 1 + 0.1 · (−10)  = 0">
+\[
+\begin{aligned}
+a &= -k x / m = -100 \cdot 1 / 1 = -100 \text{ m/s}^2 \\[8pt]
+&\textbf{explicit Euler} \quad \text{(both updates use the old state)} \\
+x &\leftarrow x + h v = 1 + 0.1 \cdot 0 = 1 \\
+v &\leftarrow v + h a = 0 + 0.1 \cdot (-100) = -10 \\[8pt]
+&\textbf{semi-implicit Euler} \quad \text{(velocity first, then position with the new velocity)} \\
+v &\leftarrow v + h a = -10 \\
+x &\leftarrow x + h v = 1 + 0.1 \cdot (-10) = 0
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## Five steps later
 
-| t (s) | exact x = cos 10t | explicit x | explicit energy (J) | semi-implicit x | semi-implicit energy (J) |
+| `$t$` (s) | exact `$x = \cos 10t$` | explicit `$x$` | explicit energy (J) | semi-implicit `$x$` | semi-implicit energy (J) |
 | --- | --- | --- | --- | --- | --- |
 | 0.0 | 1.000 | 1 | 50 | 1 | 50 |
 | 0.1 | 0.540 | 1 | 100 | 0 | 50 |
@@ -107,57 +160,53 @@ A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **
 | 0.4 | −0.654 | −4 | 800 | 0 | 50 |
 
 - explicit Euler **doubles** the energy every step: the spring gains energy from nowhere
-- semi-implicit Euler is **wrong in phase** but its energy stays near 50 J
+- semi-implicit Euler is **wrong in phase**; its energy swings between 50 and 100 J but does **not grow**
 
 
 ---
 
 ## Energy growth and the stability limit
 
-```text
-   explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
-      1. x' = x + h·v              v' = v − h·ω²·x
-      2. v'² + ω²x'² = (1 + (h·ω)²)(v² + ω²x²)       the 2h·ω²·x·v terms cancel
-      3. so every step multiplies E by 1 + (h·ω)²
-
-      h = 0.1,  ω = 10:   × 2      per step
-      h = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
-
-   semi-implicit Euler:
-      bounded while h·ω < 2      (h < 0.2 s here)
-      h = 0.19:  energy stays under 1,000 J over 200 steps
-      h = 0.21:  energy reaches 9 × 10¹¹¹ J
-```
-
-
----
-
-## A third way: step with the future force
-
-**Implicit (backward) Euler** uses the acceleration at the **end** of the step. For one spring it solves exactly:
-
-```text
-   v₁ = (v₀ − h·k·x₀/m) / (1 + h²·k/m)          x₁ = x₀ + h·v₁
-   same spring, h = 0.1:   v₁ = (0 − 10) / 2 = −5      x₁ = 1 + 0.1·(−5) = 0.5
-```
-
-| t (s) | 0.0 | 0.1 | 0.2 | 0.3 | 0.4 |
-| --- | --- | --- | --- | --- | --- |
-| x | 1 | 0.5 | 0 | −0.25 | −0.25 |
-| energy (J) | 50 | 25 | 12.5 | 6.25 | 3.125 |
-
-- **stable at any step**, but it **drains** energy: here, half per step
-- for a cloth it means solving one linear system per step: Baraff and Witkin's **Large Steps** (1998)
+<div class="tex" style="font-size:0.72em" role="img" aria-label="explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
+   1. x' = x + h·v              v' = v − h·ω²·x
+   2. v'² + ω²x'² = (1 + (h·ω)²)(v² + ω²x²)       the 2h·ω²·x·v terms cancel
+   3. so every step multiplies E by 1 + (h·ω)², the amplitude by √(1 + (h·ω)²)
+   h = 0.1,  ω = 10:   × 2      per step
+   h = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
+semi-implicit Euler:
+   bounded while h·ω &lt; 2      (h &lt; 0.2 s here)
+   h = 0.19:  bounded, peaks at 1,000 J over 200 steps
+   h = 0.21:  energy reaches 9 × 10¹¹¹ J">
+\[
+\begin{aligned}
+&\textbf{explicit Euler}, \text{ spring with } \omega = \sqrt{k/m}, \text{ energy } E = \tfrac{m}{2}(v^2 + \omega^2 x^2)\text{:} \\
+&\quad 1.\ \ x' = x + h v, \qquad v' = v - h\,\omega^2 x \\
+&\quad 2.\ \ v'^2 + \omega^2 x'^2 = \big(1 + (h\omega)^2\big)(v^2 + \omega^2 x^2) \qquad \text{the } 2h\,\omega^2 x v \text{ terms cancel} \\
+&\quad 3.\ \ \text{so every step multiplies } E \text{ by } 1 + (h\omega)^2, \text{ the amplitude by } \sqrt{1 + (h\omega)^2} \\[4pt]
+&\quad h = 0.1,\ \omega = 10\text{:} \ \times 2 \text{ per step} \\
+&\quad h = 0.01,\ \omega = 10\text{:} \ \times 1.01 \text{ per step}, \ \times 2.705 \text{ after 1 s (100 steps)} \\[8pt]
+&\textbf{semi-implicit Euler}\text{:} \\
+&\quad \text{bounded while } h\omega \lt 2 \quad (h \lt 0.2 \text{ s here}) \\
+&\quad h = 0.19\text{:} \ \text{bounded, peaks at } 1{,}000 \text{ J over 200 steps} \\
+&\quad h = 0.21\text{:} \ \text{energy reaches } 9 \times 10^{111} \text{ J}
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## Verlet: positions only
 
-```text
-   x(n+1) = 2·x(n) − x(n−1) + a(n)·h²          the velocity is implied: (x(n) − x(n−1)) / h
-   same spring, starting at rest (x(−1) = x(0) = 1):   1, 0, −1, −1, 0, 1
-```
+<div class="tex" role="img" aria-label="x(n+1) = 2·x(n) − x(n−1) + a(n)·h²          the velocity is implied: (x(n) − x(n−1)) / h
+same spring, starting at rest (x(−1) = x(0) = 1):   1, 0, −1, −1, 0, 1">
+\[
+\begin{gathered}
+x_{n+1} = 2x_n - x_{n-1} + a_n h^2 \qquad \text{the velocity is implied: } \frac{x_n - x_{n-1}}{h} \\[6pt]
+\text{same spring, starting at rest } (x_{-1} = x_0 = 1)\text{:} \quad 1,\ 0,\ {-1},\ {-1},\ 0,\ 1
+\end{gathered}
+\]
+</div>
 
 - the **same positions** as semi-implicit Euler on this spring, with no velocity stored
 - a constraint can then move a position directly and the velocity follows: the basis of **position-based** methods
@@ -168,41 +217,27 @@ A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **
 
 ## The step is fixed; the frame is not
 
-```text
-   each displayed frame (16.7 ms at 60 Hz):
-      for s in 1 … substeps:
-         h = (1/60) / substeps
-         apply forces, step velocities, step positions, resolve contacts
+```js
+// each displayed frame (16.7 ms at 60 Hz)
+const h = (1 / 60) / substeps;
+for (let s = 0; s < substeps; s++) {
+  applyForces();
+  stepVelocities(h);
+  stepPositions(h);
+  resolveContacts();
+}
 ```
 
 - the **accumulator** from the loop topic keeps the step fixed however long the frame took
-- **substeps** shorten h without shortening the frame: 16 substeps at 60 Hz is h = 1.04 ms
+- **substeps** shorten `$h$` without shortening the frame: 16 substeps at 60 Hz is `$h = 1.04$` ms
 - the price is compute: 16 substeps cost about 16 times one step
-
-
----
-
-## Damping, and its own limit
-
-- real materials lose energy: a spring gets a **damper**, force −c · (relative velocity)
-- **critical damping** c = 2·√(k·m): for the 1 kg, 100 N/m spring, **c = 20 N·s/m**
-- a damper is stiffness in velocity: stepped explicitly it is stable only while **h·c/m** stays small
-
-**The pitfall, measured**: in this course's cloth, a fixed damper of 0.4 N·s/m on each link made **every** spring cloth explode, even at k = 50 with 16 substeps, because each particle weighs 0.000521 kg. Scaling it to 2 % of critical per link fixed it.
 
 
 ---
 
 ## A cloth is a grid of links
 
-```text
-   24 × 24 particles                      links in the course's cloth
-     o───o───o      structural  ─ │           1,104   hold the length
-     │ ╲ │ ╱ │      shear       ╲ ╱           1,058   resist shearing into a diamond
-     o───o───o      bend        over 2          1,056   resist folding (5× softer here)
-                                            ───────
-                                            3,218 links for 576 particles
-```
+<img src="../../textbook/figures/phys-cloth-links.svg" alt="three panels drawing the links on a 4 by 4 patch of the cloth grid. Structural links join each particle to its four neighbors: 1,104 in the 24 by 24 cloth, they hold the length. Shear links cross each cell's diagonals: 1,058, they resist shearing into a diamond. Bend links skip one particle: 1,056, they resist folding, 5 times softer here. In all, 3,218 links for 576 particles." style="height:330px">
 
 - one material, three jobs: without shear links a square **collapses** into a rhombus; without bend links it **crumples** like paper tissue
 
@@ -211,16 +246,18 @@ A 1 kg mass on a spring, **k = 100 N/m**, pulled to **x = 1 m** and released; **
 
 ## Stiffness against the step
 
-A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. Links at **k = 2000 N/m**:
+A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. Links at `$k = 2000$` N/m:
 
-| substeps | h (ms) | h·√(k/m) | springs |
+| substeps | `$h$` (ms) | `$h\sqrt{k/m}$` | springs |
 | --- | --- | --- | --- |
-| 4 | 4.167 | 8.16 | explode |
-| 16 | 1.042 | 2.04 | explode |
-| 64 | 0.260 | 0.51 | hold, 1.2 % stretch |
+| 4 | 4.167 | 8.16 | explode at once |
+| 16 | 1.042 | 2.04 | explode at once |
+| 32 | 0.521 | 1.02 | explode at once |
+| 64 | 0.260 | 0.51 | hold, about 1 % stretch |
 
-- a cloth node pulls on up to 12 links, so it goes unstable **below** the single-spring limit of 2
-- 64 substeps: **24.8 ms** per frame on a laptop, already over the whole 16.7 ms budget
+- the cloth fails far **below** one spring's limit of 2: neighbors swing against each other, a particle feels about `$8k$`, and the limit falls to about **0.7**
+- **4 times stiffer, twice the substeps**: the same `$h\sqrt{k/m}$` needs `$h \propto 1/\sqrt{k}$`
+- 64 substeps: about **25&nbsp;ms** per frame on a laptop, over the 16.7&nbsp;ms budget
 
 
 ---
@@ -229,50 +266,40 @@ A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. L
 
 Instead of a force proportional to the stretch, **move the two particles back** toward the rest length:
 
-```text
-   two particles, 1 kg each, rest length 1 m, now 1.2 m apart:   C = 1.2 − 1 = 0.2
-
-   rigid link:   each moves 0.1 toward the other        → length 1.0
-   XPBD, k = 1000 N/m, h = 1/60 s:
-      α̃ = 1 / (k·h²) = 3.6
-      Δλ = −C / (1 + 1 + α̃) = −0.2 / 5.6 = −0.0357
-      each moves 0.0357 toward the other                 → length 1.1286
-   then:  velocity = (new position − old position) / h
-```
-
-
----
-
-## XPBD, one substep in code
-
-```js
-for (const p of particles) { p.prev = p.x; p.v += h * g; p.x += h * p.v; }   // predict
-collide(particles);                                                          // contacts
-for (let it = 0; it < 2; it++) for (const L of links) {                     // project, 2 passes
-  const d = sub(L.b.x, L.a.x), len = length(d), C = len - L.rest;
-  const alpha = 1 / (k * h * h);
-  const dl = -C / (L.a.w + L.b.w + alpha);
-  L.a.x -= L.a.w * dl * d / len;   L.b.x += L.b.w * dl * d / len;
-}
-for (const p of particles) p.v = (p.x - p.prev) / h;                         // velocities
-```
-
-(`w` = 1/m, 0 for a pinned particle; `lib/core/sim-cloth.js` is this with arrays)
+<div class="tex" style="font-size:0.74em" role="img" aria-label="two particles, 1 kg each, rest length 1 m, now 1.2 m apart:   C = 1.2 − 1 = 0.2
+rigid link:   each moves 0.1 toward the other        → length 1.0
+XPBD, k = 1000 N/m, h = 1/60 s:
+   α̃ = 1 / (k·h²) = 3.6
+   Δλ = −C / (1 + 1 + α̃) = −0.2 / 5.6 = −0.0357
+   each moves 0.0357 toward the other                 → length 1.1286
+then:  velocity = (new position − old position) / h">
+\[
+\begin{aligned}
+&\text{two particles, 1 kg each, rest length 1 m, now 1.2 m apart:} \quad C = 1.2 - 1 = 0.2 \\[6pt]
+&\textbf{rigid link:} \ \text{each moves } 0.1 \text{ toward the other} \ \to\ \text{length } 1.0 \\[6pt]
+&\textbf{XPBD},\ k = 1000 \text{ N/m},\ h = 1/60 \text{ s}\text{:} \\
+&\quad \tilde\alpha = \frac{1}{k h^2} = 3.6 \\
+&\quad \Delta\lambda = \frac{-C}{1 + 1 + \tilde\alpha} = \frac{-0.2}{5.6} = -0.0357 \\
+&\quad \text{each moves } 0.0357 \text{ toward the other} \ \to\ \text{length } 1.1286 \\[6pt]
+&\text{then: velocity} = (\text{new position} - \text{old position}) / h
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## Constraints: the same cloth, the same k
 
-| substeps | h (ms) | max stretch | cost per frame |
-| --- | --- | --- | --- |
-| 1 | 16.67 | 125.3 % | 0.66 ms |
-| 4 | 4.167 | 5.3 % | 1.79 ms |
-| 16 | 1.042 | 2.0 % | 7.47 ms |
-| 64 | 0.260 | 1.2 % | 29.3 ms |
+| substeps | `$h$` (ms) | stretch while it flutters | peak | cost per frame |
+| --- | --- | --- | --- | --- |
+| 1 | 16.67 | about 160 % | 260 % | 0.5 ms |
+| 4 | 4.167 | about 15 % | 25 % | 1.6 ms |
+| 16 | 1.042 | about 1.6 % | 4.3 % | 7 ms |
+| 64 | 0.260 | about 1.2 % | 2.9 % | 28 ms |
 
 - **never explodes**, at any setting; too few substeps make it **rubbery**, not dangerous
-- 16 substeps: a cloth that holds its size at about 7.5 ms
+- 16 substeps: a cloth that holds its size within a few percent at about 7 ms
 
 
 ---
@@ -284,53 +311,31 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 <div class="cockpit" data-demo="cloth" data-controls="stiffness,substeps"><pre class="viz-fallback">  a 24 × 24 cloth, 0.3 kg, pinned at two corners, over a sphere, in a gusting wind
   controls:  stiffness k (N/m), substeps per 1/60 s frame, links = constraints | springs
   readout:   step h, h·√(k/m), max stretch, kinetic energy, step time, state
-  k = 2000:  springs explode at 16 substeps and hold at 64;
-             constraints stretch 125.3 % at 1 substep, 2.0 % at 16</pre></div>
+  default k = 1995:  springs explode at 16 and 32 substeps, hold at 64
+  16 substeps:       springs hold at k = 200 (h·√(k/m) = 0.64), explode at k = 224 (0.68)
+  constraints:       about 160 % stretch at 1 substep, 1.6 % at 16</pre></div>
 
 
 ---
 
 ## Contacts: push the particle out
 
-```text
-   sphere at c, radius r;   particle at p;   d = |p − c|
-   if d < r:   p ← c + (p − c) · r / d          (straight out along the normal)
-   floor y = y0:   if p.y < y0:   p.y ← y0
-
-   friction: keep only part of this step's sliding motion along the surface
-```
+<div class="tex" role="img" aria-label="sphere at c, radius r;   particle at p;   d = |p − c|
+if d &lt; r:   p ← c + (p − c) · r / d          (straight out along the normal)
+floor y = y0:   if p.y &lt; y0:   p.y ← y0
+friction: keep only part of this step's sliding motion along the surface">
+\[
+\begin{aligned}
+&\text{sphere at } c, \text{ radius } r; \ \text{particle at } p; \quad d = \lvert p - c \rvert \\
+&\text{if } d \lt r\text{:} \quad p \leftarrow c + (p - c)\,\frac{r}{d} \qquad \text{(straight out along the normal)} \\
+&\text{floor } y = y_0\text{:} \quad \text{if } p_y \lt y_0\text{:} \ \ p_y \leftarrow y_0 \\[6pt]
+&\text{friction: keep only part of this step's sliding motion along the surface}
+\end{aligned}
+\]
+</div>
 
 - **tunneling**: at 5 m/s a particle moves **8.33 cm per frame** at 60 Hz, past any thinner obstacle
 - 16 substeps: **0.52 cm** per step, so thin walls stop it
-
-
----
-
-## Rigid bodies and hair from the same parts
-
-- **a cube**: 8 particles and all **28** links between them, solved as rigid constraints; it lands, tumbles and stays a cube (within 2 % in the tests)
-- **a ragdoll**: particles at the joints, links as bones; Jakobsen's **Hitman** (GDC 2001) ran its characters and cloth this way
-- **a hair**: a chain of 14 links pinned at the root, with links over every second particle for bending
-- production engines treat rigid bodies with their own solvers (positions, orientations, impulses), but the idea carries
-
-
----
-
-## Hair that moves: strands you simulate
-
-- model hair as **strands**: chains of particles joined by links, rooted on the scalp
-- simulate a few thousand **guide hairs**; draw many more **children** interpolated between guides
-- each frame: gravity and **wind** push the particles, links keep each hair its length, particles that enter the head are **pushed back out**
-- **follow the leader** (Müller, Kim and Chentanez, VRIPHYS 2012): fix each particle's distance to its parent, root to tip, so hair never stretches
-
-<img src="../../media/icons/sim-hair.webp" class="media-shot" style="max-height: 190px;" alt="a pastel figure's long hair streaming back in a gusting wind">
-
-
----
-
-### Rigid bodies in an engine
-
-<small>(~15 min)</small>
 
 
 ---
@@ -345,66 +350,25 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 
 ---
 
-## Collisions, step one: who might touch?
-
-- testing every pair is **n²**: 1,000 bodies make about 500,000 pairs
-- **broad phase**: wrap each body in a simple **bounding volume** (a box or sphere) and keep only pairs whose volumes overlap
-- boxes are kept in a structure (a sorted list, a grid or a **tree**) so overlaps are found without checking every pair
-- the tree of boxes is a **bounding volume hierarchy** (BVH), the structure ray tracers also use
-
-
----
-
-## Collisions, step two: where exactly?
-
-- **narrow phase**: for each surviving pair, compute the actual **contact**: the points, the direction to separate them (the **contact normal**) and how deep they overlap
-- simple shapes have exact tests: sphere against sphere, box against box, capsule against mesh
-- complex meshes are approximated by **convex pieces** or simple collider shapes, never tested triangle by triangle every frame
-
-
----
-
-## Response: bounce, slide, stop
-
-- **restitution**: how much of the approach speed comes back as bounce (0 for clay, near 1 for a rubber ball)
-- **friction**: resists sliding along the contact; high friction makes objects stick and tumble, low friction makes them skate
-- engines apply short **impulses** (instant velocity changes) at the contact points, which is how a box hit on its corner starts to **spin**
-
-
----
-
 ## Worked: one bounce
 
-A ball arrives at **v = (3, −4, 0)** on a floor with normal **n = (0, 1, 0)**, restitution **e = 0.5**, no friction:
+A ball arrives at `$v = (3, -4, 0)$` on a floor with normal `$n = (0, 1, 0)$`, restitution `$e = 0.5$` (the share of the approach speed along the normal that comes back), no friction:
 
-```text
-   normal part:   (v · n) n = (0, −4, 0)        tangential part:  (3, 0, 0)
-   after:         tangential kept, normal reversed and scaled by e
-                  v' = (3, 0, 0) − 0.5 · (0, −4, 0) = (3, 2, 0)
-   speed 5 → 3.606;   kinetic energy kept: 13 / 25 = 52 %
-   it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)
-```
-
-
----
-
-## Tumbling cubes, simulated for this course
-
-<img src="../../media/icons/sim-rigid.webp" class="media-shot" style="max-height: 300px;" alt="nine pastel cubes falling, colliding with the floor and each other, and settling on a pastel checkerboard">
-
-- nine cubes fall, hit the floor and **each other**, tumble and settle
-- each cube is a cluster of particles kept rigid by **shape matching**, the approach of NVIDIA's unified particle solver
-- a check confirms no two cubes overlap by more than **1 % of an edge** at rest
-
-
----
-
-## Stacking: contact every frame
-
-- a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
-- small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
-- engines add tricks: **sleeping** (freeze bodies that stopped moving), many **solver iterations**, a small allowed overlap (a contact **slop**)
-- Baraff (SIGGRAPH 1989) treated resting contact analytically, as forces found all at once for bodies that touch at many points
+<div class="tex" style="font-size:0.76em" role="img" aria-label="normal part:   (v · n) n = (0, −4, 0)        tangential part:  (3, 0, 0)
+after:         tangential kept, normal reversed and scaled by e
+               v' = (3, 0, 0) − 0.5 · (0, −4, 0) = (3, 2, 0)
+speed 5 → 3.606;   kinetic energy kept: 13 / 25 = 52 %
+it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)">
+\[
+\begin{aligned}
+\text{normal part:} &\quad (v \cdot n)\,n = (0,\ {-4},\ 0) \qquad \text{tangential part: } (3,\ 0,\ 0) \\
+\text{after:} &\quad \text{tangential kept, normal reversed and scaled by } e \\
+&\quad v' = (3,\ 0,\ 0) - 0.5 \cdot (0,\ {-4},\ 0) = (3,\ 2,\ 0) \\
+\text{speed:} &\quad 5 \to 3.606; \quad \text{kinetic energy kept: } 13 / 25 = 52\,\% \\
+\text{contact:} &\quad \text{ended the step } 0.05 \text{ inside the floor: push out by } (0,\ 0.05,\ 0)
+\end{aligned}
+\]
+</div>
 
 
 ---
@@ -419,102 +383,12 @@ A ball arrives at **v = (3, −4, 0)** on a floor with normal **n = (0, 1, 0)**,
 
 ---
 
-## Physics engines you will meet
-
-| | Unity (the Unity track) | three.js (the WebGL track) |
-| --- | --- | --- |
-| built in | **yes**: NVIDIA PhysX | **no** physics |
-| a body | add a `Rigidbody` component | a library body, e.g. cannon-es or Rapier |
-| a shape | a `Collider` (box, sphere, capsule, mesh) | the library's shapes |
-| who moves the node | the engine writes the `Transform` | you copy the body's position and quaternion to the mesh each frame |
-
-
----
-
-## Fluids as particles
-
-Smoothed particle hydrodynamics (Müller, Charypar and Gross, 2003):
-
-```text
-   density    ρᵢ = Σⱼ m · W(|xᵢ − xⱼ|)        W: a bump of radius H around each particle
-   pressure   pᵢ = k · (ρᵢ − ρ₀)             above rest density → push
-   forces     pressure (push apart) + viscosity (match neighbors' velocity) + gravity
-   step       aᵢ = Fᵢ / ρᵢ,  then the same Euler step as the cloth
-```
-
-- a particle only feels neighbors within **H**: a grid of cell size H finds them in 9 cells
-- course demo: spacing **8 px**, H = **16 px**: on the rest lattice, 8 neighbors plus itself
-
-
----
-
-## The kernel and the neighbor grid
-
-```text
-   W(r) = 4 / (π·H⁸) · (H² − r²)³   for r < H,  0 beyond       (integrates to 1 over the plane)
-   H = 16 px:   W(0) = 4.97 × 10⁻³     W(8 px) = 2.10 × 10⁻³ (42 % of the peak)     W(16 px) = 0
-
-   900 particles, all pairs:   404,550 distance checks per step
-   grid of 16 px cells:        9 cells per particle, about 9 particles within H at rest
-```
-
-- the rest density ρ₀ is the sum of W over the resting lattice, so the dam starts **at rest**, not exploding
-
-
----
-
-## The fluid's step limit
-
-```text
-   pressure waves travel at the speed of sound c; a step must not skip a neighbor:
-      dt ≤ 0.4 · H / c                      (the CFL condition)
-
-      c = 1800 px/s:  dt = 3.556 ms          c = 900 px/s:  dt = 7.111 ms
-
-   stiffer (larger c) → less compression, shorter steps, more steps per frame
-```
-
-- this SPH is only **weakly** incompressible: the demo's densest particle sits **20 to 30 %** above rest in a dam break
-- real water compresses by a fraction of a percent: film solvers enforce incompressibility with a pressure solve
-
-
----
-
-## Predict: viscosity
-
-The dam breaks with viscosity **2.5**. Drop it to **0.2**: what changes first, and what does not?
-
-
----
-
-<!-- .slide: class="demo-full" -->
-
-## The fluid, live
-
-<div class="cockpit" data-demo="fluid" data-controls="viscosity,sound"><pre class="viz-fallback">  a 2D SPH fluid: a dam of 900 particles collapsing across an 800 × 600 px box
-  controls:  viscosity, stiffness (speed of sound c)
-  readout:   particles, step dt = 0.4 H / c, sim time, peak compression, max speed, compute per frame
-  at c = 1800 px/s: dt = 3.556 ms; peak compression about 20 to 30 %</pre></div>
-
-
----
-
 ## Where each method lives
 
 | material | real-time (games) | offline (film) |
 | --- | --- | --- |
-| cloth | position-based constraints, few substeps | implicit integration (Baraff and Witkin, 1998) |
+| cloth | position-based constraints, few substeps | implicit integration: stable at any step, one linear solve per step (Baraff and Witkin, 1998) |
 | rigid bodies | impulse and constraint solvers (Unity uses NVIDIA PhysX) | the same, with smaller steps and more contacts |
 | liquids | particles, or a height field for a surface | grid and hybrid solvers with a pressure solve (Stam, 1999, onward) |
 | snow, sand | rare | material point method (Disney, Frozen, 2013) |
 | hair | strands of links, few per character | every strand: Merida (Brave, 2012) has about 111,700 hairs |
-
-
----
-
-## Film and games want different physics
-
-- **games**: a few milliseconds per frame, must never explode, must respond to the player; approximations are fine if they look plausible
-- **film**: no frame budget, but close-ups, directors and continuity; accuracy, many substeps, and **art direction** (the simulation is re-run until the shot looks right)
-- both simulate **what cannot be keyframed** economically: debris, stacks, crowds of objects
-

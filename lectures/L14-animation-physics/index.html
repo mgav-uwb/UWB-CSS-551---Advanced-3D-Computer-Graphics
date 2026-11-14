@@ -50,29 +50,43 @@
     section.demo-full [data-demo] canvas { height: 520px !important; width: auto !important; }
     .reveal .media-shot { max-height: 420px; width: auto; }
     .reveal .credit { display: block; font-size: 12px; color: #8b93a7; margin-top: 4px; }
+    /* MathJax display formulas (lib/deck-math.js): the ASCII form stays as aria-label */
+    .reveal .tex { font-size: 0.8em; margin: 0.3em auto; text-align: center; }
+    .reveal .tex mjx-container[display="true"] { margin: 0.15em 0 !important; }
   </style>
 </head>
 <body>
   <div class="reveal">
     <div class="slides">
       <!-- One section per file, in order: the lecture opening (L14-open.md),
-           one or more ../../topics/*.md, then the wrap (L14-discuss.md). -->
-      <section data-markdown="L14-open.md?v=20261025a"
+           one or more ../../topics/*.md, then the wrap (L14-discuss.md), then the
+           supplements, time permitting. -->
+      <section data-markdown="L14-open.md?v=20261113a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/animation.md?v=20261025a"
+      <section data-markdown="../../topics/animation.md?v=20261113a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/physics-simulation.md?v=20261025a"
+      <section data-markdown="../../topics/physics-simulation.md?v=20261113a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L14-discuss.md?v=20261025a"
+      <section data-markdown="L14-discuss.md?v=20261113a"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/animation-supplement.md?v=20261113a"
+        data-separator="^\r?\n---\r?\n$"
+        data-separator-vertical="^\r?\n--\r?\n$"
+        data-separator-notes="^Note:">
+      </section>
+      <section data-markdown="../../topics/physics-simulation-supplement.md?v=20261113a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -80,6 +94,7 @@
     </div>
   </div>
 
+  <script src="../../lib/deck-math.js?v=20261029a"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
@@ -97,6 +112,7 @@
       // Markdown slides exist in the DOM only after init resolves: build the
       // embedded [data-demo] hosts now (never on DOMContentLoaded).
       initDeckDemos();
+      typesetDeckMath();
 
       // Demo slider focus vs. deck navigation: when a demo's range input is set
       // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses

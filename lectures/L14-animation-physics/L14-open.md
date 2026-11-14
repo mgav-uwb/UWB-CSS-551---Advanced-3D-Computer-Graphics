@@ -1,24 +1,39 @@
 <!--
   CSS 551 · Lecture 14 (Tuesday November 17, week 8, online): Animation and Physics.
-  Mounts, in order: L14-open.md, ../../topics/animation.md (~46 min, 35 slides),
-  ../../topics/physics-simulation.md (~44 min, 36 slides), L14-discuss.md (the wrap).
+  Mounts, in order: L14-open.md, ../../topics/animation.md (the core, ~50 min, 19 slides),
+  ../../topics/physics-simulation.md (the core, ~46 min, 18 slides), L14-discuss.md (the wrap), then, after
+  the wrap, time permitting: ../../topics/animation-supplement.md (~25 min, 17 slides) and
+  ../../topics/physics-simulation-supplement.md (~30 min, 18 slides).
   Re-sequenced 2026-10-25 (was Lecture 10, Tuesday November 3): after ray and path tracing, the last
   lecture before the neural weeks.
 
-  Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
+  Goals: motion is interpolation in the right representation (blend the parts of a transform, never the
+  matrix); a skeleton is a scene graph that deforms a mesh; a simulation is a state plus a step rule, and
+  the step must respect the stiffness. The outcomes are in each topic's header. Graded: Quiz 6 (opens
+  Thursday) asks a slerp angle and substeps for a stiffer cloth; the final asks a linear in-between and a
+  Verlet step. No homework covers this lecture.
+
+  Minute plan (120 min, Tue 5:45-7:45 PM synchronous online), at the room's pace (about 2.4 min a slide;
+  40 core slides):
     0:00  opening                                     2 min
-    0:02  animation (topic)                          46 min
-    0:48  physics inside the frame loop (topic)      44 min
-    1:32  wrap                                        4 min
-    1:36  questions, HW5 and HW6 help; buffer        24 min
+    0:02  animation, the core (topic)                50 min
+    0:52  physics inside the frame loop, the core    46 min   (start by 1:00: both graded physics
+                                                               items sit in its first eleven slides)
+    1:38  wrap                                        2 min
+    1:40  questions, HW5 and HW6 help; buffer        20 min
     2:00  end
+  If animation runs long, skip "Real code: skinning on the GPU", then "Pitfall: yaw keys at 350° and 10°".
   CUT 2026-10-08: the four discussion questions (L14-discuss.md); the predict-first slide
   on the spring cloth (physics-simulation.md).
-  Demos: keyframe (t,ease), cloth (stiffness,substeps), fluid (viscosity,sound).
+  CUT 2026-11-13 (Marcel: "what are we actually teaching in the animation and physics lectures. let's be
+  specific on goals and outcomes"): both topics cut to cores of 19 and 18 slides from 36 and 35; the rest moved
+  in order to two supplements after the wrap; the cloth demo now opens physics; errata (see the topic headers).
+  Demos: keyframe (t,path) twice, cloth (stiffness,substeps) twice; fluid (viscosity,sound) in the supplement.
   Numbers: numbers-motion.json anim.*, lib/core/sim-cloth.js and sim-fluid.js.
 
-  reveal.js: FLAT; notes follow "Note:"; plain-unicode math; never two "_" on one
-  markdown line outside a code fence; no em-dashes.
+  reveal.js: FLAT; notes follow "Note:" and stay plain text; formulas typeset by lib/deck-math.js
+  (see the topic headers); never two "_" on one markdown line outside a code fence or code span;
+  no em-dashes.
 -->
 
 ## CSS 551
@@ -38,11 +53,10 @@
 
 ## Tonight
 
-- **Keyframes and timing**: in-betweening, the Catmull-Rom spline (live), Bézier channels, easing, squash
-- **Rotations and transforms**: no matrix lerp, slerp between keys, the Euler wrap, squad, TRS rebuilt
-- **Skeletons**: forward and inverse kinematics, skinning and the candy wrapper, blend shapes, motion capture, blend trees
-- **Physics in the loop**: one spring three ways, Verlet, substeps, cloth by springs and by constraints (live)
-- **Contacts, rigid bodies, hair, fluids**: one bounce, broad and narrow phase, stacking, strands, smoothed particles (live)
+- **Keyframes**: in-betweening, the Catmull-Rom spline (live), easing
+- **Transforms in motion**: never blend the matrix; slerp between keys; interpolate the parts, then rebuild
+- **Skeletons**: forward and inverse kinematics, linear blend skinning and the candy wrapper
+- **Physics in the loop**: one spring stepped two ways, energy and the stability limit, Verlet, substeps
+- **Cloth and contacts**: springs against constraints (live), pushing a particle out, one bounce
 
-Reading: [Animation and Interpolation](../../textbook/animation.html).
-
+Reading: [Animation and Interpolation](../../textbook/animation.html), Sections 1, 3 to 10, 12 and 13.
