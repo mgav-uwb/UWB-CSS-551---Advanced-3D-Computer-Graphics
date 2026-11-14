@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · L15 HW7 walk-through and wrap (~7 min). Mounted by index.html AFTER the topics.
+  CSS 551 · L15 HW7 walk-through, Parts 1 and 2, and wrap (~6 min). Mounted by index.html AFTER the topics.
   CUT 2026-10-08: the five multiple-choice discussion questions (swap the nonlinearity, the first Adam
   step, the temperature, which network to ship, the NaN) and the Discussion header slide; the freed
   time is open questions and buffer.
@@ -10,11 +10,13 @@
   2026-11-09: HW7 goes out with Lecture 16 (Tuesday November 24, one release a week); the
   walk-through stays here, after the hand step it starts from.
   2026-11-13: "Out tonight" corrected to Tuesday November 24; the supplements after the wrap named.
+  2026-11-13: Part 3 (the DCT) is walked in Lecture 16, after the cosine basis it needs; Parts 1 and 2,
+  the hand step and the fit, stay here (Marcel: "ok" to the split).
 -->
 
 ### HW7, and the wrap
 
-<small>(~7 min)</small>
+<small>(~6 min)</small>
 
 
 ---
@@ -28,8 +30,8 @@ Out **Tuesday November 24**, due **Wednesday December 2, 11:59 PM**. JavaScript 
         before:  f = 0.61324, loss 0.09812        after one step:  f = 0.48142
    2  the fit: 12 hidden units on the course's 12 wave samples, lr = 0.05
         loss after 400 steps: 0.008355
-   3  dct2, idct2Truncated, psnr: the 20 × 20 digit 3, rebuilt from its k × k block
-        C[0][0] = 6.85706;  k = 5: PSNR 10.3045 dB;  k = 8: PSNR 16.5246 dB
+   3  dct2, idct2Truncated, psnr: a digit's cosine transform
+        walked in Lecture 16, after the cosine basis
 ```
 
 The specification, skeletons and the run-and-compare rubric: [HW7](../../homework/hw07/index.html)

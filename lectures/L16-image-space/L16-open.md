@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L16 · Tuesday November 24, 2026 (week 9, online): The space of images.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/image-space.md (~82 min), L16-discuss.md (the wrap).
+  tonight), ../../topics/image-space.md (~82 min), L16-discuss.md (HW7 Part 3 and the wrap).
   Re-sequenced 2026-10-25 (was L15, Thursday November 19, opened by paper Quiz 5): a Tuesday online
   meeting with no quiz; the HW7 walk-through moved to Lecture 15; HW7 goes out tonight (moved here 2026-11-09).
 
@@ -13,8 +13,9 @@
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
     0:02  The space of images (topic, 53 slides)             82 min
-    1:24  Wrap                                                2 min
-    1:26  Questions, HW6 and HW7 help; buffer                34 min
+    1:24  HW7 Part 3 walk-through (Parts 1 and 2 in L15)      3 min
+    1:27  Wrap                                                2 min
+    1:29  Questions, HW6 and HW7 help; buffer                31 min
   CUT 2026-10-08: the three multiple-choice discussion questions and four topic Check slides.
 -->
 
@@ -43,4 +44,3 @@
 - the sheet of meaningful images, **measured**; inverse problems, null spaces and priors; why a concept has **no inverse**
 
 Reading: [The Space of Images](../../textbook/image-space.html)
-

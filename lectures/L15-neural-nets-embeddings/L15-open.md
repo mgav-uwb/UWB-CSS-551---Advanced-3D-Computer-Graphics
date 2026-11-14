@@ -2,8 +2,8 @@
   CSS 551 · L15 · Thursday November 19, 2026 (week 8, in person): Neural networks and embeddings.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
   tonight), ../../topics/neural-nets-embeddings.md (the core, ~60 min, 25 slides),
-  ../../topics/coordinate-networks.md (the core, ~30 min, 13 slides), L15-discuss.md (the HW7 walk-through
-  and the wrap), then, after the wrap, time permitting: ../../topics/neural-nets-embeddings-supplement.md
+  ../../topics/coordinate-networks.md (the core, ~30 min, 13 slides), L15-discuss.md (the HW7 walk-through,
+  Parts 1 and 2, and the wrap), then, after the wrap, time permitting: ../../topics/neural-nets-embeddings-supplement.md
   (~38 min, 27 slides) and ../../topics/coordinate-networks-supplement.md (~10 min, 6 slides).
   Re-sequenced 2026-10-25 (was L14, Tuesday November 17): a Thursday in person; its HW7 walk-through moved here from the image-space lecture. HW7 goes out with
   Lecture 16 (moved 2026-11-09, one release a week).
@@ -27,9 +27,9 @@
     0:00  Title and tonight                                    2 min
     0:02  Neural networks and embeddings, the core            60 min
     1:02  Coordinate networks, the core                        30 min   (two exhibit runs, not four)
-    1:32  HW7 walk-through                                      5 min
-    1:37  Wrap                                                  2 min
-    1:39  Open questions; buffer                               21 min
+    1:32  HW7 walk-through, Parts 1 and 2 (Part 3 in L16)       4 min
+    1:36  Wrap                                                  2 min
+    1:38  Open questions; buffer                               22 min
   If it runs late, drop in this order: the contrastive batch of two, the cost of attention, mini-batches.
   CUT 2026-10-08: the five multiple-choice discussion questions.
 -->
@@ -57,6 +57,6 @@
 - **convolution** and **attention**, one output each
 - **embeddings**, autoencoders, and **CLIP**'s shared space
 - **coordinate networks**: one image as a function of (x, y)
-- the **HW7** walk-through
+- the **HW7** walk-through, Parts 1 and 2
 
 Reading: [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), Sections 1 to 9
