@@ -689,6 +689,29 @@ public static class RigLab
     }
     #endregion
 
+    #region Blend trees: sample a looping clip
+    // A looping clip is a list of poses keyed at evenly spaced phases of one stride: key i at phase i / n. Between two keys each joint's
+    // angle follows the Catmull-Rom spline through the four nearest keys, wrapping past the last key to the first, so the loop has no seam.
+    public static float[] SampleClip(float[][] keys, float phase)
+    {
+        int n = keys.Length;
+        float u = (phase - Mathf.Floor(phase)) * n;
+        int i = (int)Mathf.Floor(u) % n;
+        float s = u - Mathf.Floor(u);
+        float[] k0 = keys[(i + n - 1) % n];
+        float[] k1 = keys[i];
+        float[] k2 = keys[(i + 1) % n];
+        float[] k3 = keys[(i + 2) % n];
+        float[] pose = new float[k1.Length];
+        for (int j = 0; j < k1.Length; j++)
+        {
+            float a = k0[j], b = k1[j], c = k2[j], d = k3[j];
+            pose[j] = 0.5f * (2 * b + (c - a) * s + (2 * a - 5 * b + 4 * c - d) * s * s + (3 * b - a - 3 * c + d) * s * s * s);
+        }
+        return pose;
+    }
+    #endregion
+
     #region Blend trees: blend a pose
     // A pose is one angle per joint, each a rotation about z. Each joint's two rotations are blended as quaternions with slerp, and
     // the blended quaternion is read back as an angle. About one shared axis this equals interpolating the angles.
