@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Animation: keyframes, interpolation, skeletons, skinning (the core, ~50 min, 19 slides).
+  CSS 551 · TOPIC DECK: Animation: keyframes, interpolation, skeletons, skinning (the core, ~55 min, 22 slides).
   Mounted as <section data-markdown="../../topics/animation.md">. No logistics.
 
   GOALS: motion is interpolation in the right representation (blend the parts of a transform, never
@@ -17,7 +17,9 @@
   NEEDS:   the rotation topic (quaternions, slerp, the q and -q sign check), TRS and the composite rule
     (the scene-graph topic; HW3).
   DEMOS:   keyframe (t,ease) on two demo-full slides: first before anything is defined, again
-    after the worked numbers.
+    after the worked numbers; keyframe (t,ease,timing) after the easing slide; rig-lab
+    (view:ik2) after "IK has two answers, or none"; rig-lab (view:wrapper) after the
+    candy wrapper pitfall.
   NUMBERS: textbook/figures/numbers-motion.json key anim (keys, easing, editor, squash,
     matrixLerp, slerp, squad, ik, bind, skinning), all reproduced in node. Computed for this
     deck by node against lib/core/xform.js:
@@ -171,6 +173,19 @@ CSS ease-in-out Bézier (0,0) (0.42,0) (0.58,1) (1,1), read as s against t">
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Easing, live
+
+<div class="cockpit" data-demo="keyframe" data-controls="t,ease,timing"><pre class="viz-fallback">  the same three keys; timing = none | smoothstep | smootherstep | cubic in-out
+  the position is path(s(t)); 21 dots mark equal steps of time along the path
+  readout: progress s and the position
+  t = 0.35, smoothstep:  s = 0.282 (35 % of the time, 28 % of the way)
+  play: t from 0 to 1 in 2.5 s</pre></div>
+
+
+---
+
 ## Never lerp the matrices
 
 Blend the identity and `$R_z(90^\circ)$` entry by entry at `$t = 0.5$`:
@@ -313,6 +328,19 @@ Solvers pick a branch (a pole vector for knees and elbows) and **clamp** unreach
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Inverse kinematics, live
+
+<div class="cockpit" data-demo="rig-lab" data-controls="view:ik2"><pre class="viz-fallback">  a two-link arm, l1 = 1 and l2 = 0.8; drag the target, or a preset
+  the lecture's target (1.2, 0.9):  cos θ2 = 0.381, θ1 = 7.3°, θ2 = 67.6°
+  the other elbow:                  θ1 = 66.4°, θ2 = −67.6°
+  out of reach (2, 0.5):            cos θ2 = 1.631, the arm points at the target, stretched
+  stretched (1.8, 0), folded (0.2, 0), inside the fold (0.05, 0)</pre></div>
+
+
+---
+
 ## Skinning: one mesh, many bones
 
 <img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms" style="height:210px">
@@ -360,6 +388,18 @@ Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## The candy wrapper, live
+
+<div class="cockpit" data-demo="rig-lab" data-controls="view:wrapper"><pre class="viz-fallback">  a tube skinned to two bones; bone B twists about the tube's axis
+  linear blend skinning against dual quaternion skinning, side by side
+  ring radius at the joint (linear, dual quaternion):
+    0°: 1.000, 1.000    90°: 0.707, 1.000    180°: 0.000, 1.000    270°: 0.707, 1.000</pre></div>
+
+
+---
+
 ## Real code: skinning on the GPU
 
 ```glsl
@@ -375,3 +415,4 @@ gl_Position = proj * view * skin * vec4(position, 1.0);
 | per-vertex data | `Mesh.boneWeights` | attributes `skinIndex`, `skinWeight` |
 | inverse bind matrices | `Mesh.bindposes` | `skeleton.boneInverses` |
 | influences | `quality = SkinQuality.Bone4` | four, fixed |
+
