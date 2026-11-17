@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Physics inside the frame loop (the core, ~46 min, 18 slides).
+  CSS 551 · TOPIC DECK: Physics inside the frame loop (the core, ~54 min, 22 slides).
   Mounted as <section data-markdown="../../topics/physics-simulation.md">. No logistics.
 
   GOALS: a simulation is a state plus a step rule, and the step must respect the stiffness.
@@ -24,7 +24,9 @@
     libraries, film vs games; media ../../media/icons/sim-rigid.webp. HAIR STRANDS slide moved
     from the texture-mapping topic (media ../../media/icons/sim-hair.webp).
   DEMOS:   cloth (stiffness,substeps) twice, on demo-full slides: first before anything is defined, again
-    after the tables; fluid (viscosity,sound) is in physics-simulation-supplement.md.
+    after the tables; fluid (viscosity,sound) is in physics-simulation-supplement.md. particle-lab
+    (one particle, one spring) on four: view:spring after "Five steps later", view:phase after
+    Verlet, view:stepping after the fixed-step slide, view:wall after the contacts slide.
   NUMBERS, all from node against lib/core/sim-cloth.js, lib/core/sim-fluid.js and
     lib/tests/sim.test.mjs:
     - spring k = 100 N/m, m = 1 kg, h = 0.1 s, x0 = 1 m at rest: omega = 10 rad/s
@@ -165,6 +167,19 @@ x &\leftarrow x + h v = 1 + 0.1 \cdot (-10) = 0
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## One spring, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:spring"><pre class="viz-fallback">  a 1 kg mass on a k = 100 N/m spring, released at x = 1 m; h = 0.1 s
+  integrator: explicit | semi-implicit | Verlet | implicit; step, back, play; the step table
+  by hand, one step:   explicit x = 1, E = 100 J;   semi-implicit x = 0, E = 50 J
+  five steps (t = 0.4): explicit x = -4, E = 800 J;  semi-implicit x = 0, E = 50 J
+  Verlet: 1, 0, -1, -1, 0, 1;  implicit: x = -0.25, E = 3.125 J at t = 0.4</pre></div>
+
+
+---
+
 ## Energy growth and the stability limit
 
 <div class="tex" style="font-size:0.72em" role="img" aria-label="explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
@@ -215,6 +230,19 @@ x_{n+1} = 2x_n - x_{n-1} + a_n h^2 \qquad \text{the velocity is implied: } \frac
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Energy and the step limit, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:phase"><pre class="viz-fallback">  the phase plane: x against v / omega, where the exact motion is a circle; energy against step
+  h = 0.1, omega = 10 (h omega = 1): explicit x2 energy per step, semi-implicit bounded
+  h = 0.01: explicit x1.01 per step, x2.705 after 100 steps
+  semi-implicit at h = 0.19 (h omega = 1.9): bounded; at h = 0.21 (2.1): grows
+  the Step limit view: growth per step against h omega for all four integrators</pre></div>
+
+
+---
+
 ## The step is fixed; the frame is not
 
 ```js
@@ -231,6 +259,19 @@ for (let s = 0; s < substeps; s++) {
 - the **accumulator** from the loop topic keeps the step fixed however long the frame took
 - **substeps** shorten `$h$` without shortening the frame: 16 substeps at 60 Hz is `$h = 1.04$` ms
 - the price is compute: 16 substeps cost about 16 times one step
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The fixed step, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:stepping"><pre class="viz-fallback">  the same spring stepped two ways while the frames vary: one step per frame (h = the frame's
+  length) against a fixed 10 ms step from the accumulator; the readout is how far each ends from
+  the exact motion
+  steady 60 Hz: 0.096 against 0.055;  jittery frames: 0.15;  a 100 ms hitch: 0.23
+  a 250 ms stall: 0.94 against 0.056;  the stall with 16 substeps per frame: 0.043</pre></div>
 
 
 ---
@@ -340,6 +381,18 @@ friction: keep only part of this step's sliding motion along the surface">
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Tunneling, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:wall"><pre class="viz-fallback">  a particle at 5 m/s toward a wall 2 cm thick, one dot per step
+  1 substep per 1/60 s frame: 8.33 cm per step, it jumps the wall
+  16 substeps: 0.52 cm per step, a step ends inside the wall and is pushed back out: stopped
+  a 10 cm wall stops it at 1 substep; at 1 m/s (1.67 cm per step) it does not reach the wall here</pre></div>
+
+
+---
+
 ## A rigid body is a node that physics moves
 
 - **state**: position, orientation (a quaternion), **linear** velocity, **angular** velocity
@@ -392,3 +445,4 @@ it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)">
 | liquids | particles, or a height field for a surface | grid and hybrid solvers with a pressure solve (Stam, 1999, onward) |
 | snow, sand | rare | material point method (Disney, Frozen, 2013) |
 | hair | strands of links, few per character | every strand: Merida (Brave, 2012) has about 111,700 hairs |
+
