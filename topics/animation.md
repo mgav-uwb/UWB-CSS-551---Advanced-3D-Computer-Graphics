@@ -1,53 +1,36 @@
 <!--
-  CSS 551 · TOPIC DECK: Animation: keyframes, interpolation, skeletons, skinning (the core, ~55 min, 22 slides).
+  CSS 551 · TOPIC DECK: Animation: a survey of methods (the core, ~45 min, 19 slides).
   Mounted as <section data-markdown="../../topics/animation.md">. No logistics.
 
-  GOALS: motion is interpolation in the right representation (blend the parts of a transform, never
-    the matrix); a skeleton is a scene graph that deforms a mesh.
-  OUTCOMES (students can): compute a linear in-between and say why the direction snaps at a key; state
-    the Catmull-Rom tangent rule and why it removes the corner; separate path from timing with an
-    easing s(t); predict what blending matrices does to a rotation and pick each TRS part's blend;
-    compute how far a slerp has turned and apply the sign check; solve a two-link arm for both elbows
-    and detect an unreachable target; compute a linear-blend-skinned vertex and explain the candy wrapper.
-  TEACHES: a keyframe and an animation channel; linear in-betweening and its corner; the Catmull-Rom
-    tangent rule; easing as retiming; why matrices are never blended, keyed rotations by slerp, the
-    Euler wrap pitfall; interpolating TRS parts and rebuilding; skeletons as scene graphs, forward
-    kinematics, two-link inverse kinematics (both branches, unreachable targets); linear blend skinning,
-    the candy wrapper, skinning on the GPU.
-  NEEDS:   the rotation topic (quaternions, slerp, the q and -q sign check), TRS and the composite rule
-    (the scene-graph topic; HW3).
-  DEMOS:   keyframe (t,ease) on two demo-full slides: first before anything is defined, again
-    after the worked numbers; keyframe (t,ease,timing) after the easing slide; rig-lab
-    (view:ik2) after "IK has two answers, or none"; rig-lab (view:wrapper) after the
-    candy wrapper pitfall.
-  NUMBERS: textbook/figures/numbers-motion.json key anim (keys, easing, editor, squash,
-    matrixLerp, slerp, squad, ik, bind, skinning), all reproduced in node. Computed for this
-    deck by node against lib/core/xform.js:
-    - spline speed per unit t on the demo's Catmull-Rom (reflected end points):
-      piece 1 at s = 0, 0.25, 0.5, 0.75, 1: 5.35, 5.91, 5.79, 5.07, 4.40; piece 2: 4.40,
-      4.90, 5.56, 5.67, 5.15; lengths 2.715 and 2.620
-    - TRS halfway, A = identity, B = T(2,0,0) R_y(90) S(2): matrix lerp has column 0 =
-      (0.5, 0, -1), length 1.118, angle 63.4 degrees, sends (1,0,0) to (1.5, 0, -1);
-      parts (t = (1,0,0), R_y(45), s = 1.5) send it to (2.061, 0, -1.061)
-    - Euler wrap: yaw keys 350 and 10 degrees; Euler lerp sweeps 340 degrees; quaternions
-      (0, 0.0872, 0, -0.9962) and (0, 0.0872, 0, 0.9962), dot -0.985, after the sign check
-      the arc is 20 degrees
-    - blend tree: walk 1.5 m/s, run 4 m/s, speed 2.5: run weight 0.4; knee 20 and 60
-      degrees about one axis: slerp gives 36 degrees
-    - retargeting: thigh 0.45 m against 0.36 m at 30 degrees from vertical: knee 0.225 m
-      against 0.18 m forward; copying positions stretches the thigh by 25 %
-    - motion capture: 60 joints x 3 rotation channels x 120 frames per second = 21,600 keys per second
+  GOALS: know the methods that move a character, what problem each solves, how it works in one picture,
+    where it breaks and who uses it: keyframes and in-betweening, easing, blending transforms by their
+    parts, slerp, skeletons, forward against inverse kinematics and the IK solver families, skinning,
+    blend shapes, motion capture and blend trees.
+  OUTCOMES (students can): say which method fits a task (a gesture, a foot on a stair, a face, a
+    crowd of walk cycles); give a linear in-between; say why a linear path jerks at a key and a spline
+    does not; separate path from timing; say why matrices are never blended and what is blended instead;
+    say how far a slerp has turned (u times the angle) and why yaw keys at 350 and 10 degrees spin;
+    contrast FK and IK and name what each IK solver family does and how IK fails (two answers, none,
+    popping); say what linear blend skinning averages and why a twisting joint pinches.
+  TEACHES: the same as OUTCOMES, qualitatively. The worked numbers (the in-between and the spline at
+    t = 0.35, the matrix midpoint, the yaw quaternions, the two-link solution, the skinning formula and
+    the candy wrapper's coordinates, skinning code) are in animation-supplement.md, after the wrap.
+  NEEDS:   the rotation topic (quaternions, slerp), TRS and the composite rule (the scene-graph topic).
+  GRADED from this topic: Quiz 6 (a slerp angle: "Rotations: slerp, the short way round"); the final
+    (a linear in-between: "Keyframes and in-betweening"). Both rules stay on those slides.
+  DEMOS:   keyframe (t,ease) before anything is defined; keyframe (t,ease,timing) after easing; rig-lab
+    view:fk after the skeleton; rig-lab view:ik2 and view:ccd after the IK solvers; rig-lab view:wrapper
+    after the candy wrapper. Bare view ids (view:ik2, never view:ik.ik2).
+  NUMBERS: textbook/figures/numbers-motion.json key anim (keys, slerp, ik, skinning); smoothstep(0.35)
+    = 0.282; the matrix midpoint of I and R_z(90) has columns of length 0.707, of I and R_z(180) is 0.
   READING: ../../textbook/animation.html, Sections 1 and 3 to 7.
-  CUT 2026-11-13 (Marcel: "what are we actually teaching ... be specific on goals and outcomes"): the core
-    keeps the slides the outcomes above need; the curve editor, the spline's speed, worked smoothstep, the
-    animator's principles, squash, squad, long chains, one skinned vertex, blend shapes, motion capture,
-    retargeting and blend trees moved, in order, to animation-supplement.md (after the wrap). The demo's
-    "ease" switch is now "path" (linear | spline): easing means retiming. The Catmull-Rom slide states the
-    cubic by its four conditions; the supplement writes the Hermite basis and the Bezier.
-  EDIT 2026-10-08: the easing code slide in Unity/WebGL code tabs.
-  EDIT 2026-11-03 (Marcel): the keyframe demo opens the topic, before it is talked about; every
-    formula typeset; "Worked: reading a value" corrected (the second key's slope is -1, not flat;
-    anim.editor.slopeAtKey1 and anim.editor.peak).
+  REWRITTEN 2026-11-17 (Marcel: "can we make the lecture more a qualitative review of methods for the
+    more advanced topics: forward vs inverse kinematics, springs and particles, level sets, collision
+    detections, etc. the math is too advanced for this audience to cover in any detail"): every slide
+    states a method's problem, idea, failure and users in words; the worked slides moved, unchanged, to
+    the front of animation-supplement.md; new: "Where motion comes from", "Forward or inverse
+    kinematics", "How IK solvers work", "Forward kinematics, live", "IK by iteration, live", "Faces,
+    performances and blended clips". The 2026-11-13 cut's history is in git.
 
   reveal.js: FLAT; notes follow "Note:" and stay plain text. Display math is a raw <div class="tex">
   block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form as aria-label, no blank line
@@ -55,9 +38,9 @@
   two "_" on one markdown line outside a code fence or code span; paths relative to the lecture page.
 -->
 
-### Animation: keyframes, interpolation, skeletons, skinning
+### Animation: a survey of methods
 
-<small>(~50 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 1 and 3 to 7</small>
+<small>(~45 min) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 1 and 3 to 7</small>
 
 
 ---
@@ -73,102 +56,55 @@
 
 ---
 
-## A keyframe is a value at a time
+## Where motion comes from
 
-- a **keyframe**: one animated quantity at a stated time (a position, an angle, a color)
-- **in-betweening** (interpolation): the value at every other time, from the keys on either side
-- an **animation channel**: one scalar against time; a position is three channels, a TRS node ten (3 translation, 4 quaternion, 3 scale)
-- the demo's three keys, at times `$0$`, `$\tfrac12$`, `$1$`:
-
-<div class="tex" role="img" aria-label="K0 = (−2.2, 0.5, 0)      K1 = (0, 1.9, −0.6)      K2 = (2.2, 0.7, 0)">
-\[
-K_0 = (-2.2,\ 0.5,\ 0) \qquad K_1 = (0,\ 1.9,\ {-0.6}) \qquad K_2 = (2.2,\ 0.7,\ 0)
-\]
-</div>
+| method | who decides the pose | good at | weak at |
+| --- | --- | --- | --- |
+| **keyframing** | an animator, at a few moments | full control, style | slow to author; contacts drift |
+| **inverse kinematics** | a goal: "hand here, foot there" | contacts, reaching, aiming | two answers, or none |
+| **motion capture** | a performer in a suit | realistic motion, fast | cleanup; other body sizes |
+| **simulation** | physical laws and settings | cloth, hair, debris, water | hard to direct; can explode |
+| **blending clips** | the game: speed, direction | responsive characters | only as good as its clips |
 
 
 ---
 
-## Worked: linear in-betweening
+## Keyframes and in-betweening
 
-At `$t = 0.35$` the point is on the first segment, `$0.35 \times 2 = 0.7$` of the way from `$K_0$` to `$K_1$`:
-
-<div class="tex" style="font-size:0.74em" role="img" aria-label="K0 + 0.7 · (K1 − K0) = (−2.2 + 1.54,  0.5 + 0.98,  −0.42) = (−0.66, 1.48, −0.42)
-velocity, segment 1:  2 (K1 − K0) = (4.4,  2.8, −1.2)    per unit t
-velocity, segment 2:  2 (K2 − K1) = (4.4, −2.4,  1.2)
-angle between them:   66°, all at once, at t = ½">
-\[
-\begin{gathered}
-K_0 + 0.7\,(K_1 - K_0) = (-2.2 + 1.54,\ 0.5 + 0.98,\ {-0.42}) = (-0.66,\ 1.48,\ {-0.42}) \\[8pt]
-\begin{aligned}
-\text{velocity, segment 1:} &\quad 2\,(K_1 - K_0) = (4.4,\ 2.8,\ {-1.2}) \text{ per unit } t \\
-\text{velocity, segment 2:} &\quad 2\,(K_2 - K_1) = (4.4,\ {-2.4},\ 1.2) \\
-\text{angle between them:} &\quad 66^\circ, \text{ all at once, at } t = \tfrac12
-\end{aligned}
-\end{gathered}
-\]
-</div>
-
-- the position is continuous; the **direction snaps** at the key, and the eye reads the corner as a jerk
+- a **keyframe**: one value at a stated time (a position, an angle, a color)
+- **in-betweening**: the value at every other time, computed from the keys on either side
+- an **animation channel**: one number against time; glTF and FBX store a translation, a rotation and a scale channel per node
+- **linear** in-betweening: a share of the time between two keys is the same share of the way between their values; the demo's `$t = 0.35$` is 70&nbsp;% of the way from the key at `$0$` to the key at `$0.5$`
 
 
 ---
 
-## A spline through the keys: Catmull-Rom
+## Straight lines, or a curve through the keys
 
-Each piece is a **cubic** between two keys, set by its end points and its tangents, with tangent `$m = \tfrac12(\text{next key} - \text{previous key})$`:
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 50%; font-size:0.78em;">
 
-<div class="tex" style="font-size:0.74em" role="img" aria-label="open end: reflect a neighbor     p₋₁ = 2 K0 − K1 = (−4.4, −0.9, 0.6)
-m0 = ½ (K1 − p₋₁) = (2.2, 1.4, −0.6)        m1 = ½ (K2 − K0) = (2.2, 0.1, 0)
-each piece: the cubic with c(0) = K0, c(1) = K1, c′(0) = m0, c′(1) = m1, for s from 0 to 1">
-\[
-\begin{gathered}
-\text{open end, reflect a neighbor:}\quad p_{-1} = 2K_0 - K_1 = (-4.4,\ {-0.9},\ 0.6) \\[4pt]
-m_0 = \tfrac12 (K_1 - p_{-1}) = (2.2,\ 1.4,\ {-0.6}) \qquad m_1 = \tfrac12 (K_2 - K_0) = (2.2,\ 0.1,\ 0) \\[8pt]
-\text{each piece: the cubic with } c(0) = K_0,\ c(1) = K_1,\ c'(0) = m_0,\ c'(1) = m_1
-\end{gathered}
-\]
-</div>
+- **linear**: the position is continuous, but the direction **snaps** at every key, and the eye reads the corner as a jerk
+- **spline** (Catmull and Rom, 1974): a smooth curve **through** every key; at each key it heads from the previous key toward the next, so there is no corner
+- animation tools draw each channel as a curve with handles at the keys: the **curve editor** of Maya, Blender and Unity
 
-- the curve passes **through** every key, and its velocity at `$K_1$` is the same on both sides: `$2m_1 = (4.4,\ 0.2,\ 0)$`
-
-
----
-
-<!-- .slide: class="demo-full" -->
-
-## The worked numbers, live
-
-<div class="cockpit" data-demo="keyframe" data-controls="t,ease"><pre class="viz-fallback">  three keys K0 = (-2.2, 0.5, 0), K1 = (0, 1.9, -0.6), K2 = (2.2, 0.7, 0) at t = 0, 0.5, 1
-  controls:  t (0 to 1), path = linear | spline (Catmull-Rom)
-  readout:   mode, x, y, z of the in-between
-  t = 0.35:  linear (-0.66, 1.48, -0.42); spline (-0.66, 1.671, -0.508)</pre></div>
+</div><div style="flex:1 1 50%;">
+<img src="../../textbook/figures/anim-keyframes.svg" alt="the keyframe demo's three keys joined two ways: straight hops in amber that turn by 66 degrees at the middle key, and the Catmull-Rom spline in blue that passes through every key with no corner" style="width:100%; max-height:430px;">
+</div></div>
 
 
 ---
 
 ## Easing: the same path, retimed
 
-An **easing function** `$s(t)$` maps normalized time to normalized progress; the position is `$\text{path}(s(t))$`.
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 48%; font-size:0.80em;">
 
-<div class="tex" style="font-size:0.76em" role="img" aria-label="smoothstep      s = 3t² − 2t³              zero velocity at both ends
-smootherstep    s = 6t⁵ − 15t⁴ + 10t³      zero acceleration at the ends too
-cubic in-out    s = 4t³  (first half)
-CSS ease-in-out Bézier (0,0) (0.42,0) (0.58,1) (1,1), read as s against t">
-\[
-\begin{gathered}
-\begin{aligned}
-\text{smoothstep} &\quad s = 3t^2 - 2t^3 && \text{zero velocity at both ends} \\
-\text{smootherstep} &\quad s = 6t^5 - 15t^4 + 10t^3 && \text{zero acceleration at the ends too} \\
-\text{cubic in-out} &\quad s = 4t^3 && \text{first half}
-\end{aligned} \\[8pt]
-\text{CSS ease-in-out: Bézier } (0,0),\ (0.42,0),\ (0.58,1),\ (1,1), \text{ read as } s \text{ against } t
-\end{gathered}
-\]
-</div>
+- the path fixes **where**; easing fixes **when**: it maps time to progress along the path
+- Disney's animators called it **slow in and slow out**: real things start from rest and come to rest
+- smoothstep, smootherstep, ease-in-out: the same S, with sharper or softer ends
 
-- at `$t = 0.35$`, smoothstep gives `$s = 0.282$`: 35&nbsp;% of the time gone, 28&nbsp;% of the way along, because it started from rest
-- Disney's animators called it **slow in and slow out**: real things start from rest and stop
+</div><div style="flex:1 1 52%;">
+<img src="../../textbook/figures/anim-easing.svg" alt="progress against time for five easing curves, a straight line and four S shapes of increasing steepness, all through (0, 0), (0.5, 0.5) and (1, 1)" style="width:100%; max-height:430px;">
+</div></div>
 
 
 ---
@@ -186,80 +122,22 @@ CSS ease-in-out Bézier (0,0) (0.42,0) (0.58,1) (1,1), read as s against t">
 
 ---
 
-## Never lerp the matrices
+## Blend the parts, never the matrix
 
-Blend the identity and `$R_z(90^\circ)$` entry by entry at `$t = 0.5$`:
-
-<div class="tex" role="img" aria-label="M = ½ I + ½ R = [ 0.5  −0.5 ]
-                [ 0.5   0.5 ]
-columns of length 0.707, det 0.5:   the object shrinks to half its area
-half turn, R_z(180):                the blend is the zero matrix, det 0: gone">
-\[
-\begin{gathered}
-M = \tfrac12 I + \tfrac12 R = \begin{bmatrix} 0.5 & -0.5 \\ 0.5 & 0.5 \end{bmatrix} \\[8pt]
-\text{columns of length } 0.707,\ \det M = 0.5\text{:} \text{ the object shrinks to half its area} \\
-\text{half turn, } R_z(180^\circ)\text{:} \text{ the blend is the zero matrix, } \det M = 0\text{:} \text{ gone}
-\end{gathered}
-\]
-</div>
-
-- a matrix blend is not a rotation; the columns stop being unit and orthogonal
-- blend **the parts**: translations by lerp, rotations by slerp or nlerp, scales by lerp (or in log space)
+- average "no turn" and "a quarter turn" as matrices, entry by entry: the object **shrinks to 71&nbsp;%** in each direction; average across a half turn and it **vanishes**
+- an average of rotation matrices is not a rotation
+- so animation stores **translation, rotation and scale** separately and blends each by its own rule: positions and scales along straight lines, rotations along the sphere
+- the matrix is rebuilt from the blended parts every frame; a camera blends its position and its orientation, then rebuilds its view
 
 
 ---
 
-## Keyed rotations: slerp between keys
+## Rotations: slerp, the short way round
 
-- each pair of orientation keys is blended by the rotation topic's **slerp**: constant angular speed along the shortest arc, so at parameter `$u$` it has turned `$u$` times the whole angle
-- the chapter's pair: identity to `$120^\circ$` about `$y$`; at `$t = 0.25$` slerp gives `$30^\circ$` exactly; normalized lerp gives `$27.8^\circ$`
-- games use normalized lerp between dense keys: the speed error is invisible over a few degrees
-
-
----
-
-## Pitfall: yaw keys at 350° and 10°
-
-Two keys `$20^\circ$` apart across the wrap of the angle:
-
-<div class="tex" style="font-size:0.74em" role="img" aria-label="Euler channel, linear:  350 → 10   sweeps  340°   the long way round, through 180
-quaternions:  q(350°) = (0, 0.0872, 0, −0.9962)     q(10°) = (0, 0.0872, 0, 0.9962)
-dot = −0.985 &lt; 0  →  negate one  →  slerp turns  20°">
-\[
-\begin{aligned}
-\text{Euler channel, linear:} &\quad 350 \to 10 \text{ sweeps } 340^\circ, \text{ the long way round, through } 180 \\
-\text{quaternions:} &\quad q(350^\circ) = (0,\ 0.0872,\ 0,\ {-0.9962}) \\
-&\quad q(10^\circ) = (0,\ 0.0872,\ 0,\ 0.9962) \\
-\text{dot:} &\quad -0.985 \lt 0 \ \to\ \text{negate one} \ \to\ \text{slerp turns } 20^\circ
-\end{aligned}
-\]
-</div>
-
-- exporters **unwrap** Euler channels (`$350 \to 370$`) or key **quaternions** with the sign check
-
-
----
-
-## Interpolate the parts, then rebuild
-
-Halfway between `$A$`, the identity, and `$B = T(2, 0, 0)\,R_y(90^\circ)\,S(2)$`:
-
-<div class="tex" role="img" aria-label="matrix lerp:  column 0 = (0.5, 0, −1):  length 1.118, rotation 63.4°
-              sends (1, 0, 0) to (1.5, 0, −1)
-parts:        t = (1, 0, 0),  R_y(45°) by slerp,  s = 1.5
-              sends (1, 0, 0) to (2.061, 0, −1.061)">
-\[
-\begin{aligned}
-\text{matrix lerp:} &\quad \text{column 0} = (0.5,\ 0,\ {-1})\text{:} \text{ length } 1.118, \text{ rotation } 63.4^\circ \\
-&\quad \text{sends } (1, 0, 0) \text{ to } (1.5,\ 0,\ {-1}) \\[6pt]
-\text{parts:} &\quad t = (1, 0, 0),\ R_y(45^\circ) \text{ by slerp},\ s = 1.5 \\
-&\quad \text{sends } (1, 0, 0) \text{ to } (2.061,\ 0,\ {-1.061})
-\end{aligned}
-\]
-</div>
-
-- glTF and FBX store **translation, rotation, scale** channels per node; the matrix is never stored
-- a camera: interpolate eye and target (or eye and a quaternion), then rebuild the view matrix
+- **slerp** turns at a constant speed along the shortest arc: at blend parameter `$u$` it has turned `$u$` times the whole angle; a quarter of the way through a 120° turn, 30°
+- **Euler angle** keys are plain numbers: yaw keys at 350° and 10° are 20° apart, but a straight line between the numbers spins **340° the long way**
+- **quaternion** keys take the 20° arc after the sign check from the rotation topic; exporters also **unwrap** Euler channels (350 to 370)
+- games often use a normalized straight-line blend between dense keys: the difference is invisible over a few degrees
 
 
 ---
@@ -267,63 +145,60 @@ parts:        t = (1, 0, 0),  R_y(45°) by slerp,  s = 1.5
 ## A skeleton is a scene graph of joints
 
 - each **joint** is a node; its local transform is a **rotation** about the joint (plus a fixed offset to the parent)
-- **forward kinematics**: key the joint angles, slerp them, multiply down the chain: the composite rule
-- most character animation is authored this way: rotation channels on joints, one translation channel on the root (the hips)
+- the animator keys joint angles; each frame the angles are multiplied down the chain: the scene graph's composite rule
+- most character animation is authored this way: rotation channels on every joint, one translation channel on the root (the hips)
 
 
 ---
 
-## Kinematics: the tree run forward and backward
+<!-- .slide: class="demo-full" -->
 
-<img src="../../textbook/figures/anim-ik.svg" alt="a two-link arm reaching for a target, with the elbow-up and elbow-down solutions drawn" style="height:210px">
+## Forward kinematics, live
 
-- **forward kinematics**: joint angles in, hand position out: the composite rule
-- **inverse kinematics** (IK): hand position in, joint angles out: solve the composite rule **backward**
+<div class="cockpit" data-demo="rig-lab" data-controls="view:fk"><pre class="viz-fallback">  a chain of three bones (1, 0.8 and a hand): joint angles in, the hand's position out
+  controls:  θ₁ shoulder, θ₂ elbow, θ₃ wrist, the hand's length; play swings a joint
+  presets:   straight, curled, folded back, the IK slide's two-link arm
+  every joint's angle is relative to its parent, so turning the shoulder carries the whole arm</pre></div>
 
 
 ---
 
-## Worked: two-link inverse kinematics
+## Forward or inverse kinematics
 
-Links `$l_1 = 1$`, `$l_2 = 0.8$`; target `$(1.2, 0.9)$`, distance `$d = 1.5$`:
+| | forward kinematics (FK) | inverse kinematics (IK) |
+| --- | --- | --- |
+| the animator sets | every joint's angle | where the hand or foot must be |
+| the computer finds | where the hand ends up | the joint angles |
+| natural for | swings, gestures, tails, arcs | feet on stairs, a hand on a rail, aiming, looking |
+| goes wrong when | a contact must hold: every joint needs new keys | the goal is out of reach, or several poses reach it |
 
-<div class="tex" style="font-size:0.74em" role="img" aria-label="law of cosines at the elbow:  cos θ2 = (d² − l1² − l2²) / (2 l1 l2) = (2.25 − 1 − 0.64) / 1.6 = 0.3812
-                              θ2 = 67.6°
-shoulder:  θ1 = atan2(0.9, 1.2) − atan2(l2 sin θ2, l1 + l2 cos θ2) = 36.87° − 29.54° = 7.3°
-elbow at (cos 7.3°, sin 7.3°) = (0.992, 0.128);  forward kinematics back to the tip: (1.2, 0.9)">
-\[
-\begin{gathered}
-\text{law of cosines at the elbow:} \quad \cos\theta_2 = \frac{d^2 - l_1^2 - l_2^2}{2\,l_1 l_2} = \frac{2.25 - 1 - 0.64}{1.6} = 0.3812 \\[2pt]
-\theta_2 = 67.6^\circ \\[8pt]
-\text{shoulder:} \quad \theta_1 = \text{atan2}(0.9,\ 1.2) - \text{atan2}(l_2 \sin\theta_2,\ l_1 + l_2 \cos\theta_2) \\
-= 36.87^\circ - 29.54^\circ = 7.3^\circ \\[8pt]
-\text{elbow at } (\cos 7.3^\circ,\ \sin 7.3^\circ) = (0.992,\ 0.128) \\
-\text{forward kinematics back to the tip: } (1.2,\ 0.9)
-\end{gathered}
-\]
-</div>
+Rigs mix both: FK on the spine and arms by default, IK on the legs, switchable limb by limb.
+
+
+---
+
+## How IK solvers work
+
+- **two bones** (an arm, a leg): the upper bone, the lower bone and the line to the target form a triangle with known sides; one formula gives the angles, exactly and instantly
+- **one joint at a time** (CCD): turn each joint so the tip points at the target, from the tip back to the root, and sweep the chain until close; cheap, for spines, tails and tentacles
+- **all joints at once** (the Jacobian methods of robotics): estimate how a small turn of each joint moves the tip, turn them all a little toward the target, repeat; smooth, and handles several goals together
+- in engines: Unity's Animation Rigging (Two Bone IK, Chain IK); three.js `CCDIKSolver`
 
 
 ---
 
 ## IK has two answers, or none
 
-<div class="tex" style="font-size:0.76em" role="img" aria-label="elbow down:  θ1 = 7.3°,   θ2 = 67.6°      elbow at (0.992, 0.128)
-elbow up:    θ1 = 66.4°,  θ2 = −67.6°     elbow at (0.4, 0.916)
-target (2, 0.5):  d = 2.062 &gt; l1 + l2 = 1.8   unreachable: acos of a number above 1">
-\[
-\begin{gathered}
-\begin{aligned}
-\text{elbow down:} &\quad \theta_1 = 7.3^\circ,\ \theta_2 = 67.6^\circ && \text{elbow at } (0.992,\ 0.128) \\
-\text{elbow up:} &\quad \theta_1 = 66.4^\circ,\ \theta_2 = -67.6^\circ && \text{elbow at } (0.4,\ 0.916)
-\end{aligned} \\[8pt]
-\text{target } (2,\ 0.5)\text{:} \quad d = 2.062 \gt l_1 + l_2 = 1.8 \\
-\text{unreachable: } \arccos \text{ of a number above } 1
-\end{gathered}
-\]
-</div>
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 56%; font-size:0.78em;">
 
-Solvers pick a branch (a pole vector for knees and elbows) and **clamp** unreachable targets to the reach circle.
+- a two-bone arm reaches most targets **two ways**, elbow up or elbow down; a rig picks one with a **pole target** that says which way the knee or elbow points
+- **out of reach**: no pose touches the target; the solver straightens the arm toward it
+- long chains have **endless** answers: solvers add joint limits and a preferred pose
+- near full stretch a small move of the target makes a large change of angle: knees **pop** as a leg straightens
+
+</div><div style="flex:1 1 44%;">
+<img src="../../textbook/figures/anim-ik.svg" alt="a two-link arm reaching for a target, with the elbow-up and elbow-down solutions drawn" style="width:100%; max-height:430px;">
+</div></div>
 
 
 ---
@@ -341,49 +216,40 @@ Solvers pick a branch (a pole vector for knees and elbows) and **clamp** unreach
 
 ---
 
-## Skinning: one mesh, many bones
+<!-- .slide: class="demo-full" -->
 
-<img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms" style="height:210px">
+## IK by iteration, live
 
-A character is **one** mesh; each vertex follows a **weighted blend** of a few bones' transforms. Near a joint the weights share; far from it one bone owns the vertex.
+<div class="cockpit" data-demo="rig-lab" data-controls="view:ccd"><pre class="viz-fallback">  a four-joint arm and a target; cyclic coordinate descent, one joint per step
+  at each step: the joint, the direction to the tip and the direction to the target; turn by the angle between
+  step, run, restart, follow the target; the error |target − tip| plotted against joint rotations
+  presets: a near target (1, 0.6), a far target (2.4, 1.2), behind the base (−1.5, −0.5), out of reach (3.5, 1.5)</pre></div>
 
 
 ---
 
-## Linear blend skinning
+## Skinning: one mesh, many bones
 
-<div class="tex" role="img" aria-label="v' = Σ wᵢ · Wᵢ · Bᵢ⁻¹ · v, over bones i, with Σ wᵢ = 1">
-\[
-v' = \sum_i w_i\, W_i\, B_i^{-1}\, v, \qquad \sum_i w_i = 1
-\]
-</div>
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 52%; font-size:0.76em;">
 
-- `$B_i$`: bone `$i$`'s world matrix in the bind pose (when the mesh was attached)
-- `$W_i$`: bone `$i$`'s world matrix now
-- `$B_i^{-1}$` takes the vertex into bone `$i$`'s frame; `$W_i$` carries it back out, posed
+- a character is **one** mesh, modeled once in a rest pose with the skeleton inside it
+- each bone carries a vertex **rigidly**, as if glued to that bone alone: one candidate position per bone
+- **linear blend skinning**: the vertex goes to the **weighted average** of its candidates; near a joint the weights are shared, far from it one bone owns the vertex
+- artists **paint** the weights; games allow up to 4 bones per vertex; the GPU does the averaging
 
-Games cap influences at **4 bones per vertex** (glTF stores `JOINTS_0` and `WEIGHTS_0` as four each).
+</div><div style="flex:1 1 48%;">
+<img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms; at 90 degrees the strip thins at the joint, at 180 degrees it collapses" style="width:100%; max-height:430px;">
+</div></div>
 
 
 ---
 
 ## Pitfall: the candy wrapper
 
-2D vertex `$(2, 0.4)$`, weight `$0.5$`, bone `$B$` turns about `$(2, 0)$`:
-
-<div class="tex" role="img" aria-label="B turns 90°:    B's image (1.6, 0),   blend (1.8, 0.2):   distance from the pivot 0.4 → 0.283
-B turns 180°:   B's image (2, −0.4),  blend (2, 0):       distance 0: the limb collapses to its axis">
-\[
-\begin{aligned}
-B \text{ turns } 90^\circ\text{:} &\quad B\text{'s image } (1.6,\ 0), \quad \text{blend } (1.8,\ 0.2) \\
-&\quad \text{distance from the pivot } 0.4 \to 0.283 \\[6pt]
-B \text{ turns } 180^\circ\text{:} &\quad B\text{'s image } (2,\ {-0.4}), \quad \text{blend } (2,\ 0) \\
-&\quad \text{distance } 0\text{: the limb collapses to its axis}
-\end{aligned}
-\]
-</div>
-
-Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion skinning** (Kavan et al., 2007) blends rotations on the sphere and keeps the volume.
+- the average of two points on a circle lies **inside** the circle: a skin bent or twisted at a joint **shrinks** there
+- at a half twist, the two bones carry a vertex to opposite sides of the limb, and the average lands **on the axis**: the forearm pinches like a candy wrapper
+- linear blending of rotations is the matrix-blend failure again
+- fixes: **dual quaternion skinning** (Kavan et al., 2007) blends the rotations themselves; extra twist bones; corrective shapes
 
 
 ---
@@ -400,19 +266,9 @@ Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion
 
 ---
 
-## Real code: skinning on the GPU
+## Faces, performances and blended clips
 
-```glsl
-// vertex shader: four bone indices and weights per vertex
-mat4 skin = w.x * bones[int(j.x)] + w.y * bones[int(j.y)]
-          + w.z * bones[int(j.z)] + w.w * bones[int(j.w)];   // bones[i] = W_i * inverse(B_i)
-gl_Position = proj * view * skin * vec4(position, 1.0);
-```
-
-| | Unity | three.js |
-| --- | --- | --- |
-| skinned mesh | `SkinnedMeshRenderer` | `THREE.SkinnedMesh` + `THREE.Skeleton` |
-| per-vertex data | `Mesh.boneWeights` | attributes `skinIndex`, `skinWeight` |
-| inverse bind matrices | `Mesh.bindposes` | `skeleton.boneInverses` |
-| influences | `quality = SkinQuality.Bone4` | four, fixed |
-
+- **blend shapes** (faces): an artist sculpts a smile, a blink, a raised brow as offsets from the neutral face; the posed face adds them with weights an animator keys
+- **motion capture**: cameras track markers on a performer at 120 frames a second or more, solved into joint angles: realistic motion in minutes, then days of cleanup
+- **retargeting**: copy the performer's joint **rotations** onto a character of another size; the feet then slide, and IK pins them back down
+- **blend trees**: a game mixes a walk clip and a run clip by the character's speed, joint by joint with slerp, then IK puts the feet on the ground

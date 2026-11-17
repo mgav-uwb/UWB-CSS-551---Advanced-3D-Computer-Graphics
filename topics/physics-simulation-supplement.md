@@ -1,7 +1,16 @@
 <!--
-  CSS 551 · TOPIC DECK: Physics, further (~30 min, 18 slides), mounted after the lecture's wrap, time permitting.
+  CSS 551 · TOPIC DECK: Physics, further (~50 min, 25 slides), mounted after the lecture's wrap, time permitting.
   Cut 2026-11-13 from topics/physics-simulation.md (L14): the slides the core does not build on, in the topic's
-  order. Numbers: physics-simulation.md's header (lib/core/sim-cloth.js, sim-fluid.js, lib/tests/sim.test.mjs).
+  order.
+  REWORKED 2026-11-17 (Marcel: the lecture "more a qualitative review of methods ... the math is too advanced
+    for this audience to cover in any detail"): the core's worked slides moved here unchanged, in the topic's
+    order (one spring by hand and the five-step table, the energy factor and the stability limit with its
+    phase-plane demo, the fixed step live, the stiffness table, one XPBD projection and the constraint
+    table, the push-out formula, one bounce), some retitled "Worked: ..."; "Collisions, step one", "step
+    two" and "Response" removed, since the core's two collision-detection slides and "Collision response"
+    now say what they said.
+  Numbers: physics-simulation.md's header and its git history (lib/core/sim-cloth.js, sim-fluid.js,
+  lib/tests/sim.test.mjs).
   NEEDS: topics/physics-simulation.md.
   reveal.js: FLAT; notes follow "Note:" and stay plain text; display formulas are MathJax blocks
   (lib/deck-math.js; TeX inside, the ASCII form as aria-label); inline math is a code span `$...$`;
@@ -10,7 +19,125 @@
 
 ### Supplement: physics, further
 
-<small>(~30 min, time permitting) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 8 to 14</small>
+<small>(time permitting, or reading) · reading: <a href="../../textbook/animation.html">Animation and Interpolation</a>, Sections 8 to 14</small>
+
+
+---
+
+## One spring, by hand
+
+A 1 kg mass on a spring, `$k = 100$` N/m, pulled to `$x = 1$` m and released; `$h = 0.1$` s.
+
+<div class="tex" style="font-size:0.74em" role="img" aria-label="a = −k·x / m = −100 · 1 / 1 = −100 m/s²
+explicit Euler       (both updates use the OLD state)
+   x ← x + h·v     = 1 + 0.1 · 0      = 1
+   v ← v + h·a     = 0 + 0.1 · (−100) = −10
+semi-implicit Euler  (velocity first, then position with the NEW velocity)
+   v ← v + h·a     = −10
+   x ← x + h·v     = 1 + 0.1 · (−10)  = 0">
+\[
+\begin{aligned}
+a &= -k x / m = -100 \cdot 1 / 1 = -100 \text{ m/s}^2 \\[8pt]
+&\textbf{explicit Euler} \quad \text{(both updates use the old state)} \\
+x &\leftarrow x + h v = 1 + 0.1 \cdot 0 = 1 \\
+v &\leftarrow v + h a = 0 + 0.1 \cdot (-100) = -10 \\[8pt]
+&\textbf{semi-implicit Euler} \quad \text{(velocity first, then position with the new velocity)} \\
+v &\leftarrow v + h a = -10 \\
+x &\leftarrow x + h v = 1 + 0.1 \cdot (-10) = 0
+\end{aligned}
+\]
+</div>
+
+
+---
+
+## Five steps later
+
+| `$t$` (s) | exact `$x = \cos 10t$` | explicit `$x$` | explicit energy (J) | semi-implicit `$x$` | semi-implicit energy (J) |
+| --- | --- | --- | --- | --- | --- |
+| 0.0 | 1.000 | 1 | 50 | 1 | 50 |
+| 0.1 | 0.540 | 1 | 100 | 0 | 50 |
+| 0.2 | −0.416 | 0 | 200 | −1 | 100 |
+| 0.3 | −0.990 | −2 | 400 | −1 | 50 |
+| 0.4 | −0.654 | −4 | 800 | 0 | 50 |
+
+- explicit Euler **doubles** the energy every step: the spring gains energy from nowhere
+- semi-implicit Euler is **wrong in phase**; its energy swings between 50 and 100 J but does **not grow**
+
+
+---
+
+## Energy growth and the stability limit
+
+<div class="tex" style="font-size:0.72em" role="img" aria-label="explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
+   1. x' = x + h·v              v' = v − h·ω²·x
+   2. v'² + ω²x'² = (1 + (h·ω)²)(v² + ω²x²)       the 2h·ω²·x·v terms cancel
+   3. so every step multiplies E by 1 + (h·ω)², the amplitude by √(1 + (h·ω)²)
+   h = 0.1,  ω = 10:   × 2      per step
+   h = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
+semi-implicit Euler:
+   bounded while h·ω &lt; 2      (h &lt; 0.2 s here)
+   h = 0.19:  bounded, peaks at 1,000 J over 200 steps
+   h = 0.21:  energy reaches 9 × 10¹¹¹ J">
+\[
+\begin{aligned}
+&\textbf{explicit Euler}, \text{ spring with } \omega = \sqrt{k/m}, \text{ energy } E = \tfrac{m}{2}(v^2 + \omega^2 x^2)\text{:} \\
+&\quad 1.\ \ x' = x + h v, \qquad v' = v - h\,\omega^2 x \\
+&\quad 2.\ \ v'^2 + \omega^2 x'^2 = \big(1 + (h\omega)^2\big)(v^2 + \omega^2 x^2) \qquad \text{the } 2h\,\omega^2 x v \text{ terms cancel} \\
+&\quad 3.\ \ \text{so every step multiplies } E \text{ by } 1 + (h\omega)^2, \text{ the amplitude by } \sqrt{1 + (h\omega)^2} \\[4pt]
+&\quad h = 0.1,\ \omega = 10\text{:} \ \times 2 \text{ per step} \\
+&\quad h = 0.01,\ \omega = 10\text{:} \ \times 1.01 \text{ per step}, \ \times 2.705 \text{ after 1 s (100 steps)} \\[8pt]
+&\textbf{semi-implicit Euler}\text{:} \\
+&\quad \text{bounded while } h\omega \lt 2 \quad (h \lt 0.2 \text{ s here}) \\
+&\quad h = 0.19\text{:} \ \text{bounded, peaks at } 1{,}000 \text{ J over 200 steps} \\
+&\quad h = 0.21\text{:} \ \text{energy reaches } 9 \times 10^{111} \text{ J}
+\end{aligned}
+\]
+</div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Energy and the step limit, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:phase"><pre class="viz-fallback">  the phase plane: x against v / omega, where the exact motion is a circle; energy against step
+  h = 0.1, omega = 10 (h omega = 1): explicit x2 energy per step, semi-implicit bounded
+  h = 0.01: explicit x1.01 per step, x2.705 after 100 steps
+  semi-implicit at h = 0.19 (h omega = 1.9): bounded; at h = 0.21 (2.1): grows
+  the Step limit view: growth per step against h omega for all four integrators</pre></div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The fixed step, live
+
+<div class="cockpit" data-demo="particle-lab" data-controls="view:stepping"><pre class="viz-fallback">  the same spring stepped two ways while the frames vary: one step per frame (h = the frame's
+  length) against a fixed 10 ms step from the accumulator; the readout is how far each ends from
+  the exact motion
+  steady 60 Hz: 0.096 against 0.055;  jittery frames: 0.15;  a 100 ms hitch: 0.23
+  a 250 ms stall: 0.94 against 0.056;  the stall with 16 substeps per frame: 0.043</pre></div>
+
+
+---
+
+## Stiffness against the step
+
+A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. Links at `$k = 2000$` N/m:
+
+| substeps | `$h$` (ms) | `$h\sqrt{k/m}$` | springs |
+| --- | --- | --- | --- |
+| 4 | 4.167 | 8.16 | explode at once |
+| 16 | 1.042 | 2.04 | explode at once |
+| 32 | 0.521 | 1.02 | explode at once |
+| 64 | 0.260 | 0.51 | hold, about 1 % stretch |
+
+- the cloth fails far **below** one spring's limit of 2: neighbors swing against each other, a particle feels about `$8k$`, and the limit falls to about **0.7**
+- **4 times stiffer, twice the substeps**: the same `$h\sqrt{k/m}$` needs `$h \propto 1/\sqrt{k}$`
+- 64 substeps: about **25&nbsp;ms** per frame on a laptop, over the 16.7&nbsp;ms budget
 
 
 ---
@@ -47,6 +174,48 @@ v_1 = \frac{v_0 - h k x_0 / m}{1 + h^2 k / m}, \qquad x_1 = x_0 + h v_1 \\[6pt]
 - a damper is stiffness in velocity: stepped explicitly it is stable only while `$h c / m$` stays small
 
 **The pitfall, measured**: in this course's cloth, a fixed damper of 0.4 N·s/m on each link made **every** spring cloth explode, even at `$k = 50$` with 16 substeps, because each particle weighs 0.000521 kg. Scaling it to 2 % of critical per link fixed it.
+
+
+---
+
+## Worked: one constraint projection
+
+Instead of a force proportional to the stretch, **move the two particles back** toward the rest length:
+
+<div class="tex" style="font-size:0.74em" role="img" aria-label="two particles, 1 kg each, rest length 1 m, now 1.2 m apart:   C = 1.2 − 1 = 0.2
+rigid link:   each moves 0.1 toward the other        → length 1.0
+XPBD, k = 1000 N/m, h = 1/60 s:
+   α̃ = 1 / (k·h²) = 3.6
+   Δλ = −C / (1 + 1 + α̃) = −0.2 / 5.6 = −0.0357
+   each moves 0.0357 toward the other                 → length 1.1286
+then:  velocity = (new position − old position) / h">
+\[
+\begin{aligned}
+&\text{two particles, 1 kg each, rest length 1 m, now 1.2 m apart:} \quad C = 1.2 - 1 = 0.2 \\[6pt]
+&\textbf{rigid link:} \ \text{each moves } 0.1 \text{ toward the other} \ \to\ \text{length } 1.0 \\[6pt]
+&\textbf{XPBD},\ k = 1000 \text{ N/m},\ h = 1/60 \text{ s}\text{:} \\
+&\quad \tilde\alpha = \frac{1}{k h^2} = 3.6 \\
+&\quad \Delta\lambda = \frac{-C}{1 + 1 + \tilde\alpha} = \frac{-0.2}{5.6} = -0.0357 \\
+&\quad \text{each moves } 0.0357 \text{ toward the other} \ \to\ \text{length } 1.1286 \\[6pt]
+&\text{then: velocity} = (\text{new position} - \text{old position}) / h
+\end{aligned}
+\]
+</div>
+
+
+---
+
+## Constraints: the same cloth, the same k
+
+| substeps | `$h$` (ms) | stretch while it flutters | peak | cost per frame |
+| --- | --- | --- | --- | --- |
+| 1 | 16.67 | about 160 % | 260 % | 0.5 ms |
+| 4 | 4.167 | about 15 % | 25 % | 1.6 ms |
+| 16 | 1.042 | about 1.6 % | 4.3 % | 7 ms |
+| 64 | 0.260 | about 1.2 % | 2.9 % | 28 ms |
+
+- **never explodes**, at any setting; too few substeps make it **rubbery**, not dangerous
+- 16 substeps: a cloth that holds its size within a few percent at about 7 ms
 
 
 ---
@@ -92,6 +261,28 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 
 ---
 
+## Worked: pushing a particle out
+
+<div class="tex" role="img" aria-label="sphere at c, radius r;   particle at p;   d = |p − c|
+if d &lt; r:   p ← c + (p − c) · r / d          (straight out along the normal)
+floor y = y0:   if p.y &lt; y0:   p.y ← y0
+friction: keep only part of this step's sliding motion along the surface">
+\[
+\begin{aligned}
+&\text{sphere at } c, \text{ radius } r; \ \text{particle at } p; \quad d = \lvert p - c \rvert \\
+&\text{if } d \lt r\text{:} \quad p \leftarrow c + (p - c)\,\frac{r}{d} \qquad \text{(straight out along the normal)} \\
+&\text{floor } y = y_0\text{:} \quad \text{if } p_y \lt y_0\text{:} \ \ p_y \leftarrow y_0 \\[6pt]
+&\text{friction: keep only part of this step's sliding motion along the surface}
+\end{aligned}
+\]
+</div>
+
+- **tunneling**: at 5 m/s a particle moves **8.33 cm per frame** at 60 Hz, past any thinner obstacle
+- 16 substeps: **0.52 cm** per step, so thin walls stop it
+
+
+---
+
 ### Rigid bodies in an engine
 
 <small>(~15 min)</small>
@@ -99,30 +290,25 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 
 ---
 
-## Collisions, step one: who might touch?
+## Worked: one bounce
 
-- testing every pair is `$n^2$`: 1,000 bodies make about 500,000 pairs
-- **broad phase**: wrap each body in a simple **bounding volume** (a box or sphere) and keep only pairs whose volumes overlap
-- boxes are kept in a structure (a sorted list, a grid or a **tree**) so overlaps are found without checking every pair
-- the tree of boxes is a **bounding volume hierarchy** (BVH), the structure ray tracers also use
+A ball arrives at `$v = (3, -4, 0)$` on a floor with normal `$n = (0, 1, 0)$`, restitution `$e = 0.5$` (the share of the approach speed along the normal that comes back), no friction:
 
-
----
-
-## Collisions, step two: where exactly?
-
-- **narrow phase**: for each surviving pair, compute the actual **contact**: the points, the direction to separate them (the **contact normal**) and how deep they overlap
-- simple shapes have exact tests: sphere against sphere, box against box, capsule against mesh
-- complex meshes are approximated by **convex pieces** or simple collider shapes, never tested triangle by triangle every frame
-
-
----
-
-## Response: bounce, slide, stop
-
-- **restitution**: how much of the approach speed comes back as bounce (0 for clay, near 1 for a rubber ball)
-- **friction**: resists sliding along the contact; high friction makes objects stick and tumble, low friction makes them skate
-- engines apply short **impulses** (instant velocity changes) at the contact points, which is how a box hit on its corner starts to **spin**
+<div class="tex" style="font-size:0.76em" role="img" aria-label="normal part:   (v · n) n = (0, −4, 0)        tangential part:  (3, 0, 0)
+after:         tangential kept, normal reversed and scaled by e
+               v' = (3, 0, 0) − 0.5 · (0, −4, 0) = (3, 2, 0)
+speed 5 → 3.606;   kinetic energy kept: 13 / 25 = 52 %
+it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)">
+\[
+\begin{aligned}
+\text{normal part:} &\quad (v \cdot n)\,n = (0,\ {-4},\ 0) \qquad \text{tangential part: } (3,\ 0,\ 0) \\
+\text{after:} &\quad \text{tangential kept, normal reversed and scaled by } e \\
+&\quad v' = (3,\ 0,\ 0) - 0.5 \cdot (0,\ {-4},\ 0) = (3,\ 2,\ 0) \\
+\text{speed:} &\quad 5 \to 3.606; \quad \text{kinetic energy kept: } 13 / 25 = 52\,\% \\
+\text{contact:} &\quad \text{ended the step } 0.05 \text{ inside the floor: push out by } (0,\ 0.05,\ 0)
+\end{aligned}
+\]
+</div>
 
 
 ---
