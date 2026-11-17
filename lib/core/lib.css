@@ -823,9 +823,11 @@
 .reveal section.demo-full [data-demo] .demo-shell-rail--embed { max-height: 600px; flex: 0 0 270px; }
 /* width auto alone let a 2D canvas take its width from its own 4:3 buffer (800 px at 600 tall), wider than the
    scene pane, so its right side sat under the rail (17 slides, 2026-11-16). max-width holds it to the pane: a demo
-   that sizes its buffer to its box then redraws at the pane's shape, and object-fit keeps a fixed buffer unstretched. */
+   that sizes its buffer to its box then redraws at the pane's shape, and object-fit keeps a fixed buffer unstretched.
+   Only the scene pane's canvases: a plot in the rail (optim-lab's contour map) keeps its own size. :where() adds no
+   specificity, so a demo's own canvas rule still wins as before (football's inset). */
 .reveal section.demo-full [data-demo] .demo-viewport,
-.reveal section.demo-full [data-demo] canvas { height: 600px !important; width: auto !important; max-width: 100% !important; object-fit: contain; }
+.reveal section.demo-full [data-demo] :where(.demo-shell-scene--embed) canvas { height: 600px !important; width: auto !important; max-width: 100% !important; object-fit: contain; }
 .reveal section.demo-full.demo-rail-2col [data-demo] .demo-shell-rail--embed {
   flex: 0 0 560px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 8px;
   align-content: start; align-items: start;

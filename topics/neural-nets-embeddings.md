@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~60 min, 24 content slides).
+  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~66 min, 26 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/neural-nets-embeddings.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -50,6 +50,8 @@
            deck names "the approximator exhibit" and "the embedding exhibit", and diffusion-1 refers
            back to "smooth between the examples".
   DEMOS:   data-demo="mlp-fit" data-controls="epochs,hidden" (demo-full);
+           data-demo="optim-lab" data-controls="view:optimizers" (demo-full, after the optimizers slide);
+           data-demo="attention-lab" data-controls="view:query.one" (demo-full, after the cost of attention);
            data-demo="embed-map" data-controls="highlight" (demo-full; reads lib/assets/mnist/mlp-denoiser.bin).
   FIGURES: ../../textbook/figures/nn-*.svg|png (computed by tools/gen-textbook-figures.mjs).
   NUMBERS: every value is recomputed by tools/gen-lecture-figures-d1.mjs
@@ -265,6 +267,20 @@ Plain gradient descent crawls where the loss is flat and zig-zags across narrow 
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## Descent, momentum and Adam, live
+
+<div class="cockpit" data-demo="optim-lab" data-controls="view:optimizers"><pre class="viz-fallback">  one start, three optimizers on a loss surface: gradient descent, momentum (beta = 0.9), Adam
+  curved valley, loss after 60 steps:  descent 0.4399, momentum 0.0056, Adam 0.0050
+  zig-zag bowl, after 40 steps:        descent 0.0717, momentum 0.0118, Adam 0.347
+  tab Descent, a bowl with curvatures 1 and 4 (limit eta = 2/4 = 0.5):
+    eta 0.02 still far after 100 steps; 0.40 converges; 0.45 overshoots and converges; 0.60 diverges
+  tab Minibatch: the gradient's noise against the batch size</pre></div>
+
+
+---
+
 ## Capacity, and smoothness between the examples
 
 - **capacity**: with enough units a network approximates any continuous function on a bounded domain (Cybenko 1989; Hornik 1991); each tanh unit is a smooth step at x = −b1/w1
@@ -359,6 +375,20 @@ Every token scores every other token: n tokens make **n²** scores per head per 
 
 - quadrupling the image area quadruples n and multiplies the attention cost by **16**
 - that is why image transformers work on **patches** or on a compressed **latent** (the next diffusion lecture), never on raw pixels
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Attention, live
+
+<div class="cockpit" data-demo="attention-lab" data-controls="view:query.one"><pre class="viz-fallback">  the slide's three tokens in 2D: x = (1, 0), (0, 1), (1, 1); W_q = W_k = I; W_v = [0.5 1; 1 0.5]
+  click a token to make it the query; drag a token; a temperature on the scores
+  token 3: scores (0.707, 0.707, 1.414), alpha (0.248, 0.248, 0.503), y3 = (1.128, 1.128)
+  token 1: scores (0.707, 0, 0.707), alpha (0.401, 0.198, 0.401), y1 = (1.000, 1.102)
+  tabs: why sqrt d; every token (the n x n weights, order and a position code); cross-attention;
+  the cost (n = 1,024 for 512 x 512 in 16 x 16 patches: 1,048,576 scores, 4 MiB per head per layer)</pre></div>
 
 
 ---
@@ -460,3 +490,4 @@ Cosines between two images (rows) and two captions (columns), matches on the dia
 
 - the temperature turns a small cosine margin into a decisive one; CLIP **learns** τ and ends near 0.01
 - the gradient pushes S₁₁, S₂₂ up and the off-diagonal down; the only way to move a cosine is to move the vectors
+
