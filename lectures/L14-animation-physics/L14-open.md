@@ -63,7 +63,7 @@
 
 - **Where motion comes from**: keyframes, inverse kinematics, motion capture, simulation, blended clips
 - **Keyframes**: in-betweening, splines and easing; blend a transform's parts, never its matrix; slerp
-- **Skeletons**: forward against inverse kinematics, how IK solvers work (live), skinning and the candy wrapper
+- **Skeletons**: forward against inverse kinematics (IK), how IK solvers work (live), skinning and the candy wrapper
 - **Simulation**: particles and springs, why stiff springs explode, substeps, implicit steps and constraints (live)
 - **Collisions and beyond**: broad and narrow phase, tunneling, response, level sets, fluids, rigid bodies and ragdolls
 

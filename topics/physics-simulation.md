@@ -166,7 +166,7 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 - store **two positions** instead of a position and a velocity; on a spring it gives the same positions as semi-implicit Euler
 - move a particle to fix a collision or a link, and its velocity **follows by itself**: the basis of **position-based** methods
-- Jakobsen built **Hitman**'s cloth and ragdolls on it (GDC 2001)
+- Jakobsen built **Hitman**'s cloth and ragdolls on it (Game Developers Conference, 2001)
 
 
 ---
@@ -188,7 +188,7 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 - for each link, **move both ends back** toward the rest length: a link of rest length 1 m found 1.2 m long moves each end 0.1 m inward (equal masses)
 - read each velocity off the move, as Verlet does
 - a correction can never **overshoot**, so the solver **cannot explode**; too few passes leave the cloth **rubbery**, never dangerous
-- **compliance** (XPBD, 2016) lets a link give a little: a softer material corrects less per step
+- **compliance** (extended position-based dynamics, XPBD, 2016) lets a link give a little: a softer material corrects less per step
 
 
 ---
@@ -289,7 +289,7 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 - **particles** (smoothed particle hydrodynamics, 2003): each particle measures how crowded its neighbors are and pushes away where it is too dense; splashes and spray, games and real-time
 - **grids** (Stam's Stable Fluids, 1999): velocity stored in cells, a **pressure solve** keeps the volume constant; smoke, fire, film water
-- **hybrids** (FLIP, the material point method): particles carry the material, a grid solves the pressure; Houdini's liquids, Frozen's snow (2013)
+- **hybrids** (fluid-implicit particle, FLIP, and the material point method): particles carry the material, a grid solves the pressure; Houdini's liquids, Frozen's snow (2013)
 - the surface on top: a level set, or a mesh built from the particles
 
 

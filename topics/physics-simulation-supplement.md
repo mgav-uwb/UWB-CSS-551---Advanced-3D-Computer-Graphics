@@ -184,7 +184,7 @@ Instead of a force proportional to the stretch, **move the two particles back** 
 
 <div class="tex" style="font-size:0.74em" role="img" aria-label="two particles, 1 kg each, rest length 1 m, now 1.2 m apart:   C = 1.2 − 1 = 0.2
 rigid link:   each moves 0.1 toward the other        → length 1.0
-XPBD, k = 1000 N/m, h = 1/60 s:
+XPBD (extended position-based dynamics), k = 1000 N/m, h = 1/60 s:
    α̃ = 1 / (k·h²) = 3.6
    Δλ = −C / (1 + 1 + α̃) = −0.2 / 5.6 = −0.0357
    each moves 0.0357 toward the other                 → length 1.1286
@@ -193,7 +193,7 @@ then:  velocity = (new position − old position) / h">
 \begin{aligned}
 &\text{two particles, 1 kg each, rest length 1 m, now 1.2 m apart:} \quad C = 1.2 - 1 = 0.2 \\[6pt]
 &\textbf{rigid link:} \ \text{each moves } 0.1 \text{ toward the other} \ \to\ \text{length } 1.0 \\[6pt]
-&\textbf{XPBD},\ k = 1000 \text{ N/m},\ h = 1/60 \text{ s}\text{:} \\
+&\textbf{XPBD} \text{ (extended position-based dynamics)},\ k = 1000 \text{ N/m},\ h = 1/60 \text{ s}\text{:} \\
 &\quad \tilde\alpha = \frac{1}{k h^2} = 3.6 \\
 &\quad \Delta\lambda = \frac{-C}{1 + 1 + \tilde\alpha} = \frac{-0.2}{5.6} = -0.0357 \\
 &\quad \text{each moves } 0.0357 \text{ toward the other} \ \to\ \text{length } 1.1286 \\[6pt]
@@ -242,7 +242,7 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 ## Rigid bodies and hair from the same parts
 
 - **a cube**: 8 particles and all **28** links between them, solved as rigid constraints; it lands, tumbles and stays a cube (within 2 % in the tests)
-- **a ragdoll**: particles at the joints, links as bones; Jakobsen's **Hitman** (GDC 2001) ran its characters and cloth this way
+- **a ragdoll**: particles at the joints, links as bones; Jakobsen's **Hitman** (Game Developers Conference, 2001) ran its characters and cloth this way
 - **a hair**: a chain of 14 links pinned at the root, with links over every second particle for bending
 - production engines treat rigid bodies with their own solvers (positions, orientations, impulses), but the idea carries
 
@@ -254,7 +254,7 @@ for (const p of particles) p.v = (p.x - p.prev) / h;                         // 
 - model hair as **strands**: chains of particles joined by links, rooted on the scalp
 - simulate a few thousand **guide hairs**; draw many more **children** interpolated between guides
 - each frame: gravity and **wind** push the particles, links keep each hair its length, particles that enter the head are **pushed back out**
-- **follow the leader** (Müller, Kim and Chentanez, VRIPHYS 2012): fix each particle's distance to its parent, root to tip, so hair never stretches
+- **follow the leader** (Müller, Kim and Chentanez, Virtual Reality Interactions and Physical Simulations 2012): fix each particle's distance to its parent, root to tip, so hair never stretches
 
 <img src="../../media/icons/sim-hair.webp" class="media-shot" style="max-height: 190px;" alt="a pastel figure's long hair streaming back in a gusting wind">
 
@@ -329,7 +329,7 @@ it ended the step 0.05 inside the floor:  push out by (0, 0.05, 0)">
 - a box resting on another is in **contact every frame**, pushed by gravity, pushed back by the contact
 - small errors in each correction add up: stacks **jitter**, **creep** sideways or slowly sink into each other
 - engines add tricks: **sleeping** (freeze bodies that stopped moving), many **solver iterations**, a small allowed overlap (a contact **slop**)
-- Baraff (SIGGRAPH 1989) treated resting contact analytically, as forces found all at once for bodies that touch at many points
+- Baraff (SIGGRAPH 1989, the Special Interest Group on Computer Graphics conference) treated resting contact analytically, as forces found all at once for bodies that touch at many points
 
 
 ---
@@ -395,20 +395,20 @@ W(8 \text{ px}) = 2.10 \times 10^{-3}, \ \ 42\,\% \text{ of the peak} \\[8pt]
 ## The fluid's step limit
 
 <div class="tex" role="img" aria-label="pressure waves travel at the speed of sound c; a step must not skip a neighbor:
-   dt ≤ 0.4 · H / c                      (the CFL condition)
+   dt ≤ 0.4 · H / c                      (the Courant-Friedrichs-Lewy or CFL condition)
    c = 1800 px/s:  dt = 3.556 ms          c = 900 px/s:  dt = 7.111 ms
 stiffer (larger c) → less compression, shorter steps, more steps per frame">
 \[
 \begin{gathered}
 \text{pressure waves travel at the speed of sound } c; \text{ a step must not skip a neighbor:} \\[4pt]
-\Delta t \le 0.4\,\frac{H}{c} \qquad \text{(the CFL condition)} \\[6pt]
+\Delta t \le 0.4\,\frac{H}{c} \qquad \text{(the Courant-Friedrichs-Lewy or CFL condition)} \\[6pt]
 c = 1800 \text{ px/s}\text{:} \ \Delta t = 3.556 \text{ ms} \qquad c = 900 \text{ px/s}\text{:} \ \Delta t = 7.111 \text{ ms} \\[6pt]
 \text{stiffer (larger } c) \to \text{less compression, shorter steps, more steps per frame}
 \end{gathered}
 \]
 </div>
 
-- this SPH is only **weakly** incompressible: the demo's densest particle sits **20 to 30 %** above rest in a dam break, about 60 % for a moment when the wave hits the far wall
+- this smoothed particle hydrodynamics (SPH) fluid is only **weakly** incompressible: the demo's densest particle sits **20 to 30 %** above rest in a dam break, about 60 % for a moment when the wave hits the far wall
 - real water compresses by a fraction of a percent: film solvers enforce incompressibility with a pressure solve
 
 

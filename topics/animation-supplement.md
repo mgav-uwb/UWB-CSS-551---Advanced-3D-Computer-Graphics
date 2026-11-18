@@ -196,6 +196,7 @@ s = 3 \cdot 0.1225 - 2 \cdot 0.042875 = 0.3675 - 0.08575 = 0.282 \\[8pt]
 </div>
 
 - 35 % of the time gone, **28.2 %** of the way along; smoothstep's slope at the middle is **1.5**
+- CSS is Cascading Style Sheets, the web's styling language: its `ease-in-out` curve gives the 0.256
 
 
 ---
@@ -312,7 +313,7 @@ parts:        t = (1, 0, 0),  R_y(45°) by slerp,  s = 1.5
 \]
 </div>
 
-- glTF and FBX store **translation, rotation, scale** channels per node; the matrix is never stored
+- glTF (Graphics Library Transmission Format) and FBX (Autodesk's Filmbox format) store **translation, rotation, scale** channels per node; the matrix is never stored
 - a camera: interpolate eye and target (or eye and a quaternion), then rebuild the view matrix
 
 
@@ -455,7 +456,7 @@ Linear blending of rotations is the matrix-lerp failure again. **Dual quaternion
 
 ---
 
-## Real code: skinning on the GPU
+## Real code: skinning in the vertex shader
 
 ```glsl
 // vertex shader: four bone indices and weights per vertex
@@ -489,7 +490,7 @@ copy the position:   knee 0.45 · sin 30° = 0.225 m forward     the thigh must 
 </div>
 
 - retargeting copies **rotations**, never positions
-- shorter legs at the same angles leave the feet **sliding or sinking**: IK repairs the contacts
+- shorter legs at the same angles leave the feet **sliding or sinking**: inverse kinematics (IK) repairs the contacts
 
 
 ---

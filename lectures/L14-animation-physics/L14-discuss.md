@@ -14,7 +14,7 @@
 
 ## Wrap
 
-Motion comes from keys, goals, performances, clips or simulation, and each method has a problem it solves and a way it breaks. Animation blends the parts of a transform and lets IK hold the contacts; simulation steps particles on a fixed clock, keeps stiff materials stable with substeps, implicit steps or constraints, and finds collisions in two phases, against distance fields when the shapes are complex.
+Motion comes from keys, goals, performances, clips or simulation, and each method has a problem it solves and a way it breaks. Animation blends the parts of a transform and lets inverse kinematics hold the contacts; simulation steps particles on a fixed clock, keeps stiff materials stable with substeps, implicit steps or constraints, and finds collisions in two phases, against distance fields when the shapes are complex.
 
 - **Read**: [Animation and Interpolation](../../textbook/animation.html)
 - **Due**: HW5, tomorrow, Wednesday November 18, 11:59 PM. **Out**: HW6, due Wednesday November 25

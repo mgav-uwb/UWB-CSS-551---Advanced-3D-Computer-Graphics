@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Animation: a survey of methods (the core, ~45 min, 19 slides).
+  CSS 551 · TOPIC DECK: Animation: a survey of methods (the core, ~45 min, 20 slides).
   Mounted as <section data-markdown="../../topics/animation.md">. No logistics.
 
   GOALS: know the methods that move a character, what problem each solves, how it works in one picture,
@@ -31,6 +31,9 @@
     the front of animation-supplement.md; new: "Where motion comes from", "Forward or inverse
     kinematics", "How IK solvers work", "Forward kinematics, live", "IK by iteration, live", "Faces,
     performances and blended clips". The 2026-11-13 cut's history is in git.
+  ACRONYMS 2026-11-17 (Marcel: "we should define every acronym, always, e.g. ccd. ccd can be better
+    explained"): every acronym is spelled out at its first use, on the slides and in the notes; new slide
+    "Cyclic coordinate descent (CCD)" before "IK by iteration, live".
 
   reveal.js: FLAT; notes follow "Note:" and stay plain text. Display math is a raw <div class="tex">
   block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form as aria-label, no blank line
@@ -73,7 +76,7 @@
 
 - a **keyframe**: one value at a stated time (a position, an angle, a color)
 - **in-betweening**: the value at every other time, computed from the keys on either side
-- an **animation channel**: one number against time; glTF and FBX store a translation, a rotation and a scale channel per node
+- an **animation channel**: one number against time; glTF (Graphics Library Transmission Format) and FBX (Autodesk's Filmbox format) store a translation, a rotation and a scale channel per node
 - **linear** in-betweening: a share of the time between two keys is the same share of the way between their values; the demo's `$t = 0.35$` is 70&nbsp;% of the way from the key at `$0$` to the key at `$0.5$`
 
 
@@ -157,7 +160,7 @@
 
 <div class="cockpit" data-demo="rig-lab" data-controls="view:fk"><pre class="viz-fallback">  a chain of three bones (1, 0.8 and a hand): joint angles in, the hand's position out
   controls:  θ₁ shoulder, θ₂ elbow, θ₃ wrist, the hand's length; play swings a joint
-  presets:   straight, curled, folded back, the IK slide's two-link arm
+  presets:   straight, curled, folded back, the inverse kinematics slide's two-link arm
   every joint's angle is relative to its parent, so turning the shoulder carries the whole arm</pre></div>
 
 
@@ -180,7 +183,7 @@ Rigs mix both: FK on the spine and arms by default, IK on the legs, switchable l
 ## How IK solvers work
 
 - **two bones** (an arm, a leg): the upper bone, the lower bone and the line to the target form a triangle with known sides; one formula gives the angles, exactly and instantly
-- **one joint at a time** (CCD): turn each joint so the tip points at the target, from the tip back to the root, and sweep the chain until close; cheap, for spines, tails and tentacles
+- **one joint at a time**, cyclic coordinate descent (CCD): turn each joint so the tip points at the target, from the tip back to the root, and sweep the chain until close; cheap, for spines, tails and tentacles
 - **all joints at once** (the Jacobian methods of robotics): estimate how a small turn of each joint moves the tip, turn them all a little toward the target, repeat; smooth, and handles several goals together
 - in engines: Unity's Animation Rigging (Two Bone IK, Chain IK); three.js `CCDIKSolver`
 
@@ -216,6 +219,25 @@ Rigs mix both: FK on the spine and arms by default, IK on the legs, switchable l
 
 ---
 
+## Cyclic coordinate descent (CCD)
+
+<div style="font-size:0.8em;">
+
+The **end effector** is the chain's tip: the hand, the foot, the end of the tail. One **sweep** runs from the joint nearest the tip back to the root:
+
+1. at the current joint, draw two arrows: one to the end effector, one to the target
+2. turn the joint by the angle between the arrows: the end effector swings onto the line toward the target
+3. keep that angle and move one joint toward the root
+4. at the root the sweep is done; sweep again until the end effector is within a tolerance of the target, or a step limit is reached
+
+- **strengths**: no matrix to build or invert, so it is a few lines of code and never blows up near full stretch, where the Jacobian methods need damping; a joint limit is one clamp per turn; no turn ever moves the end effector farther from the target
+- **weaknesses**: the joints nearest the tip turn first and most, so a long chain **curls**; it places the end effector but not its orientation; a long chain that has to straighten takes many sweeps, where FABRIK (forward and backward reaching inverse kinematics) usually needs fewer
+
+</div>
+
+
+---
+
 <!-- .slide: class="demo-full" -->
 
 ## IK by iteration, live
@@ -235,7 +257,7 @@ Rigs mix both: FK on the spine and arms by default, IK on the legs, switchable l
 - a character is **one** mesh, modeled once in a rest pose with the skeleton inside it
 - each bone carries a vertex **rigidly**, as if glued to that bone alone: one candidate position per bone
 - **linear blend skinning**: the vertex goes to the **weighted average** of its candidates; near a joint the weights are shared, far from it one bone owns the vertex
-- artists **paint** the weights; games allow up to 4 bones per vertex; the GPU does the averaging
+- artists **paint** the weights; games allow up to 4 bones per vertex; the GPU (graphics processing unit) does the averaging
 
 </div><div style="flex:1 1 48%;">
 <img src="../../textbook/figures/anim-skinning.svg" alt="a bent limb whose vertices near the joint follow a blend of the two bones' transforms; at 90 degrees the strip thins at the joint, at 180 degrees it collapses" style="width:100%; max-height:430px;">
