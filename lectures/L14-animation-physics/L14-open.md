@@ -1,7 +1,7 @@
 <!--
   CSS 551 · Lecture 14 (Tuesday November 17, week 8, online): Animation and Physics.
   Mounts, in order: L14-open.md, ../../topics/animation.md (the core, ~45 min, 21 slides with its title),
-  ../../topics/physics-simulation.md (the core, ~50 min, 21 slides with its title), L14-discuss.md (the wrap),
+  ../../topics/physics-simulation.md (the core, ~50 min, 24 slides with its title), L14-discuss.md (the wrap),
   then, after the wrap, time permitting or as reading: ../../topics/animation-supplement.md (26 slides) and
   ../../topics/physics-simulation-supplement.md (26 slides), the worked numbers behind the methods.
   Re-sequenced 2026-10-25 (was Lecture 10, Tuesday November 3): after ray and path tracing, the last
@@ -25,7 +25,7 @@
     1:39  questions, HW5 and HW6 help; buffer        21 min
     2:00  end
   If animation runs long, skip "Forward kinematics, live", then "Easing, live". If physics runs long,
-  skip "Tunneling, live", then "Fluids: particles or grids".
+  skip "Tunneling, live", then "Level sets: the same grid for collisions", then "Four ways to step, side by side".
   REWRITTEN 2026-11-17 (Marcel: "can we make the lecture more a qualitative review of methods for the more
   advanced topics: forward vs inverse kinematics, springs and particles, level sets, collision detections,
   etc. the math is too advanced for this audience to cover in any detail"): both cores rewritten as method

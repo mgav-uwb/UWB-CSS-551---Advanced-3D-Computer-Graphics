@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Physics: a survey of simulation methods (the core, ~50 min, 20 slides).
+  CSS 551 · TOPIC DECK: Physics: a survey of simulation methods (the core, ~50 min, 23 slides).
   Mounted as <section data-markdown="../../topics/physics-simulation.md">. No logistics.
 
   GOALS: know the methods that make a scene move by itself, what problem each solves, how it works in
@@ -29,7 +29,7 @@
     physics.mjs; the level set's distances measured from a traced outline, the push-out asserted to
     land on the surface; phys-level-set-merge.svg); anim-integrators.svg; rt-bvh.svg.
   NUMBERS: physics-simulation-supplement.md's slides and the git history of this header (lib/core/
-    sim-cloth.js, sim-fluid.js, lib/tests/sim.test.mjs): one spring stable while h sqrt(k/m) < 2, the
+    sim-cloth.js, sim-fluid.js, lib/tests/sim.test.mjs): one spring stable while Δt sqrt(k/m) < 2, the
     cloth at about 0.7 (measured: holds at 0.64, explodes at 0.68); springs at k = 2000 hold at 64
     substeps, about 25 ms a frame in node; constraints at 16 substeps stretch about 1.6 % for about
     7 ms; 1,000 bodies make 499,500 pairs; 5 m/s at 60 Hz is 8.33 cm a frame, 0.52 cm at 16 substeps.
@@ -49,6 +49,15 @@
     rewritten; new: "Springs and particles", "The order of two lines", "Three ways out of the
     stiffness trap", the two level-set slides, "Fluids: particles or grids", "Rigid bodies and
     ragdolls". The 2026-11-13 cut's history is in git.
+  2026-11-17, later (Marcel: "use Δt everywhere, including the final", "we need to explain verlet better", and
+    a description of implicit integration): the time step is Δt in prose and math and `dt` in code, defined on
+    "A simulation is a state and a step"; "Verlet: positions only" says what is stored and what a step does,
+    with both forms of the step; new "Implicit integration: forces from the end of the step" and "Four ways to
+    step, side by side" after "Three ways out of the stiffness trap"; every acronym spelled out at first use;
+    new "Springs or constraints, side by side" (Marcel's springs-against-constraints description); level sets
+    tied to grid fluids (Marcel: "level sets were meant to be related to grids for fluids, etc. not just a modeling
+    concept"): "Fluids: particles or grids" now comes first, then "Level sets: a liquid's surface on the
+    grid" and "Level sets: the same grid for collisions".
 
   reveal.js: FLAT; notes follow "Note:" and stay plain text. Display math is a raw <div class="tex">
   block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form as aria-label, no blank line
@@ -69,16 +78,18 @@
 
 <div class="cockpit" data-demo="cloth" data-controls="stiffness,substeps"><pre class="viz-fallback">  a 24 × 24 cloth, 0.3 kg, pinned at two corners, over a sphere, in a gusting wind
   controls:  stiffness k (N/m), substeps per 1/60 s frame, links = constraints | springs
-  readout:   step h, h·√(k/m), max stretch, kinetic energy, step time, state</pre></div>
+  readout:   step Δt, Δt·√(k/m), max stretch, kinetic energy, step time, state</pre></div>
 
 
 ---
 
 ## A simulation is a state and a step
 
-<pre style="font-size:0.72em;"><code class="language-js">// every particle, every step of h seconds
-v = v + h * F / m;   // the forces change the velocity (Newton: a = F / m)
-x = x + h * v;       // the velocity changes the position</code></pre>
+<pre style="font-size:0.72em;"><code class="language-js">// every particle, every step of dt seconds
+v = v + dt * F / m;   // the forces change the velocity (Newton: a = F / m)
+x = x + dt * v;       // the velocity changes the position</code></pre>
+
+- **Δt** (`dt` in code), the **time step**: the seconds one step covers, 1/60 s at 60 frames per second
 
 - **state**: each particle's position, velocity and mass
 - **forces**: gravity, springs to its neighbors, wind, contact
@@ -118,7 +129,7 @@ x = x + h * v;       // the velocity changes the position</code></pre>
 
 ## One spring, live
 
-<div class="cockpit" data-demo="particle-lab" data-controls="view:spring"><pre class="viz-fallback">  a 1 kg mass on a k = 100 N/m spring, released at x = 1 m; h = 0.1 s
+<div class="cockpit" data-demo="particle-lab" data-controls="view:spring"><pre class="viz-fallback">  a 1 kg mass on a k = 100 N/m spring, released at x = 1 m; Δt = 0.1 s
   integrator: explicit | semi-implicit | Verlet | implicit; step, back, play; the step table
   by hand, one step:   explicit x = 1, E = 100 J;   semi-implicit x = 0, E = 50 J
   five steps (t = 0.4): explicit x = -4, E = 800 J;  semi-implicit x = 0, E = 50 J
@@ -131,11 +142,11 @@ x = x + h * v;       // the velocity changes the position</code></pre>
 
 ```js
 // each displayed frame (16.7 ms at 60 Hz)
-const h = (1 / 60) / substeps;
+const dt = (1 / 60) / substeps;
 for (let s = 0; s < substeps; s++) {
   applyForces();
-  stepVelocities(h);
-  stepPositions(h);
+  stepVelocities(dt);
+  stepPositions(dt);
   resolveContacts();
 }
 ```
@@ -149,7 +160,7 @@ for (let s = 0; s < substeps; s++) {
 ## Stiff springs need short steps
 
 - a stiff spring on a light particle **vibrates fast**; a step must be short against one vibration, or even semi-implicit Euler explodes
-- the yardstick is `$h\sqrt{k/m}$`, the step times the vibration rate: one spring holds below **2**, a cloth below about **0.7**, because neighbors pull against each other
+- the yardstick is `$\Delta t\sqrt{k/m}$`, the step times the vibration rate: one spring holds below **2**, a cloth below about **0.7**, because neighbors pull against each other
 - keeping the yardstick fixed: **4 times stiffer needs half the step, twice the substeps**; 9 times stiffer, 3 times the substeps
 - the demo's stiff cloth needs **64 substeps** as springs, about 25&nbsp;ms a frame on a laptop: over the 16.7&nbsp;ms budget
 
@@ -158,15 +169,21 @@ for (let s = 0; s < substeps; s++) {
 
 ## Verlet: positions only
 
-<div class="tex" role="img" aria-label="x(next) = 2·x(now) − x(previous) + a·h²          the velocity is implied: (x(now) − x(previous)) / h">
+<div class="tex" role="img" aria-label="x(next) = x(now) + (x(now) − x(previous)) + a·Δt² = 2·x(now) − x(previous) + a·Δt²
+the velocity is implied: (x(now) − x(previous)) / Δt">
 \[
-x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{the velocity is implied: } \frac{x_{\text{now}} - x_{\text{previous}}}{h}
+\begin{gathered}
+x_{\text{next}} = x_{\text{now}} + (x_{\text{now}} - x_{\text{previous}}) + a\,\Delta t^2 = 2\,x_{\text{now}} - x_{\text{previous}} + a\,\Delta t^2 \\[4pt]
+\text{the velocity is implied: } \frac{x_{\text{now}} - x_{\text{previous}}}{\Delta t}
+\end{gathered}
 \]
 </div>
 
-- store **two positions** instead of a position and a velocity; on a spring it gives the same positions as semi-implicit Euler
+- each particle keeps **where it is** and **where it was**, and no velocity: the move since the last step *is* the velocity
+- each step: keep going as it was going (the last move again), plus what the forces add (`$a\,\Delta t^2$`)
+- on a spring it gives the same positions as semi-implicit Euler, with the same step limit: Verlet is not immune to stiff springs
 - move a particle to fix a collision or a link, and its velocity **follows by itself**: the basis of **position-based** methods
-- Jakobsen built **Hitman**'s cloth and ragdolls on it (Game Developers Conference, 2001)
+- ropes, cloth, hair and ragdolls: Jakobsen built **Hitman**'s cloth and ragdolls on it (Game Developers Conference, 2001)
 
 
 ---
@@ -182,6 +199,38 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 ---
 
+## Implicit integration: forces from the end of the step
+
+<div style="font-size:0.84em;">
+
+- **explicit** steps use the forces where the particle **is**; with a stiff spring the push overshoots, the next pull is harder still, and the swing grows without end
+- **implicit** steps ask the other question: which end of the step has forces **there** that account for the move? The step looks back from where it lands
+- the forces at the end depend on where every neighbor ends up, so each step is one **system of equations** for all particles, solved with a linear solver (conjugate gradients in Baraff and Witkin's cloth)
+- for springs it is **stable at any step length**: a stiff cloth at 60 steps a second instead of thousands
+- it **bleeds energy** (numerical damping): fine for cloth, which should settle; wrong for a pendulum that should swing for ever
+- used for film cloth and soft bodies; games mostly take constraints instead, next
+
+</div>
+
+
+---
+
+## Four ways to step, side by side
+
+<div style="font-size:0.78em;">
+
+| method | each step | stays stable | cost a step | used for |
+| --- | --- | --- | --- | --- |
+| **explicit Euler** | move with the old velocity, then update it | never on a spring: the energy grows every step | least | projectiles; nothing that oscillates |
+| **semi-implicit Euler** | update the velocity, then move with the new one | while `$\Delta t\sqrt{k/m} < 2$` | least | game rigid bodies and particles |
+| **Verlet** | the last move again, plus the forces; positions only | the same limit as semi-implicit | least | ropes, cloth, hair, ragdolls, with constraints |
+| **implicit Euler** | solve for the end of the step | any step on springs; loses energy | one linear solve | film cloth, soft bodies |
+
+</div>
+
+
+---
+
 ## Constraints instead of springs
 
 - **predict** where every particle goes this step, ignoring the links
@@ -193,15 +242,32 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 ---
 
+## Springs or constraints, side by side
+
+<div style="font-size:0.76em;">
+
+| | **springs** (force-based) | **constraints** (position-based) |
+| --- | --- | --- |
+| each step | measure each link's stretch, turn it into a force (`$F = -k\,\Delta x$`), let the integrator move the particles | move the particles, then put each link's two ends straight back at the rest length; velocities follow from the moves |
+| stiff cloth (cotton barely stretches) | needs a huge `$k$`: explodes with explicit steps, or costs a linear solve every step with implicit ones | stays stable with cheap steps; more passes make it stiffer |
+| what "stiffness" means | a physical number, N/m, the same at any frame rate | depends on the passes and the step; **XPBD**'s compliance gives it back a physical meaning |
+| cost for stiff cloth | high | low |
+| used for | film cloth and soft bodies, engineering, stretchy materials | games: capes, flags, clothing; interactive tools |
+
+</div>
+
+
+---
+
 <!-- .slide: class="demo-full" -->
 
 ## The cloth, live
 
 <div class="cockpit" data-demo="cloth" data-controls="stiffness,substeps"><pre class="viz-fallback">  a 24 × 24 cloth, 0.3 kg, pinned at two corners, over a sphere, in a gusting wind
   controls:  stiffness k (N/m), substeps per 1/60 s frame, links = constraints | springs
-  readout:   step h, h·√(k/m), max stretch, kinetic energy, step time, state
+  readout:   step Δt, Δt·√(k/m), max stretch, kinetic energy, step time, state
   default k = 1995:  springs explode at 16 and 32 substeps, hold at 64
-  16 substeps:       springs hold at k = 200 (h·√(k/m) = 0.64), explode at k = 224 (0.68)
+  16 substeps:       springs hold at k = 200 (Δt·√(k/m) = 0.64), explode at k = 224 (0.68)
   constraints:       about 160 % stretch at 1 substep, 1.6 % at 16</pre></div>
 
 
@@ -254,29 +320,24 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 ---
 
-## Level sets: a shape stored as distances
+## Fluids: particles or grids
 
-<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 40%; font-size:0.74em;">
-
-- every point of a grid around the shape stores its **distance to the surface**: negative inside, positive outside, zero on it
-- a collision test is then a **lookup**: the sign says inside, the value says how deep, the direction the distance grows points the way out
-- the same cost for any shape: cloth against a body, hair against a head, piles of odd-shaped bodies (Guendelman, Bridson and Fedkiw, 2003)
-
-</div><div style="flex:1 1 60%;">
-<img src="../../textbook/figures/phys-level-set.svg" alt="a blob-shaped body with contour lines of its distance field, blue inside, black at the surface, orange outside, every 0.15; a particle outside at distance +0.56, and a particle inside at distance −0.30 with an arrow 0.30 long that ends on the surface" style="width:100%; max-height:470px;">
-</div></div>
+- **particles** (smoothed particle hydrodynamics, 2003): each particle measures how crowded its neighbors are and pushes away where it is too dense; splashes and spray, games and real-time
+- **grids** (Stam's Stable Fluids, 1999): velocity stored in cells, a **pressure solve** keeps the volume constant; smoke, fire, film water
+- **hybrids** (fluid-implicit particle, FLIP, and the material point method): particles carry the material, a grid solves the pressure; Houdini's liquids, Frozen's snow (2013)
+- the liquid's **surface**: on a grid, a level set, next; from particles, a mesh built around them
 
 
 ---
 
-## Level sets: surfaces that merge and split
+## Level sets: a liquid's surface on the grid
 
-<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 52%; font-size:0.76em;">
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 54%; font-size:0.72em;">
 
-- a liquid's surface is **wherever the distance is zero**; the flow carries the distance field, and the surface moves with it (Osher and Sethian, 1988)
-- drops merge, sheets tear, a splash breaks into droplets: the zero set changes shape, with **no mesh surgery**
-- film water: Foster and Fedkiw (2001); the **particle level set** (Enright, Marschner and Fedkiw, 2002) adds particles so thin sheets survive
-- to draw it, **marching cubes** turns the zero set into triangles (the meshes topic)
+- a grid fluid already has cells; each also stores its **distance to the liquid's surface**: negative in the water, positive in the air
+- each step the fluid's velocities **carry the distances** along, like dye, then the field is tidied back into true distances; the surface is **where the distance is zero** (Osher and Sethian, 1988), and the sign tells the pressure solve **which cells are water**
+- drops merge, sheets tear, a splash breaks up: the zero set changes shape with **no mesh surgery**
+- film water: Foster and Fedkiw (2001); the **particle level set** (Enright, Marschner and Fedkiw, 2002) keeps detail thinner than a cell; **marching cubes** draws the zero set (the meshes topic)
 
 </div><div style="flex:1 1 48%;">
 <img src="../../textbook/figures/phys-level-set-merge.svg" alt="two drops of liquid drawn three times: apart, with two surfaces; touching; overlapping, with one surface and nothing to stitch" style="width:100%; max-height:470px;">
@@ -285,12 +346,17 @@ x_{\text{next}} = 2\,x_{\text{now}} - x_{\text{previous}} + a\,h^2 \qquad \text{
 
 ---
 
-## Fluids: particles or grids
+## Level sets: the same grid for collisions
 
-- **particles** (smoothed particle hydrodynamics, 2003): each particle measures how crowded its neighbors are and pushes away where it is too dense; splashes and spray, games and real-time
-- **grids** (Stam's Stable Fluids, 1999): velocity stored in cells, a **pressure solve** keeps the volume constant; smoke, fire, film water
-- **hybrids** (fluid-implicit particle, FLIP, and the material point method): particles carry the material, a grid solves the pressure; Houdini's liquids, Frozen's snow (2013)
-- the surface on top: a level set, or a mesh built from the particles
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 40%; font-size:0.74em;">
+
+- the same kind of grid, **baked once** around a solid: every point stores its **distance to the solid's surface**, negative inside, positive outside
+- a collision test is then a **lookup**: the sign says inside, the value says how deep, the direction the distance grows points the way out
+- the same cost for any shape: cloth against a body, hair against a head, piles of odd-shaped bodies (Guendelman, Bridson and Fedkiw, 2003)
+
+</div><div style="flex:1 1 60%;">
+<img src="../../textbook/figures/phys-level-set.svg" alt="a blob-shaped body with contour lines of its distance field, blue inside, black at the surface, orange outside, every 0.15; a particle outside at distance +0.56, and a particle inside at distance −0.30 with an arrow 0.30 long that ends on the surface" style="width:100%; max-height:470px;">
+</div></div>
 
 
 ---

@@ -26,24 +26,24 @@
 
 ## One spring, by hand
 
-A 1 kg mass on a spring, `$k = 100$` N/m, pulled to `$x = 1$` m and released; `$h = 0.1$` s.
+A 1 kg mass on a spring, `$k = 100$` N/m, pulled to `$x = 1$` m and released; `$\Delta t = 0.1$` s.
 
 <div class="tex" style="font-size:0.74em" role="img" aria-label="a = −k·x / m = −100 · 1 / 1 = −100 m/s²
 explicit Euler       (both updates use the OLD state)
-   x ← x + h·v     = 1 + 0.1 · 0      = 1
-   v ← v + h·a     = 0 + 0.1 · (−100) = −10
+   x ← x + Δt·v     = 1 + 0.1 · 0      = 1
+   v ← v + Δt·a     = 0 + 0.1 · (−100) = −10
 semi-implicit Euler  (velocity first, then position with the NEW velocity)
-   v ← v + h·a     = −10
-   x ← x + h·v     = 1 + 0.1 · (−10)  = 0">
+   v ← v + Δt·a     = −10
+   x ← x + Δt·v     = 1 + 0.1 · (−10)  = 0">
 \[
 \begin{aligned}
 a &= -k x / m = -100 \cdot 1 / 1 = -100 \text{ m/s}^2 \\[8pt]
 &\textbf{explicit Euler} \quad \text{(both updates use the old state)} \\
-x &\leftarrow x + h v = 1 + 0.1 \cdot 0 = 1 \\
-v &\leftarrow v + h a = 0 + 0.1 \cdot (-100) = -10 \\[8pt]
+x &\leftarrow x + \Delta t\, v = 1 + 0.1 \cdot 0 = 1 \\
+v &\leftarrow v + \Delta t\, a = 0 + 0.1 \cdot (-100) = -10 \\[8pt]
 &\textbf{semi-implicit Euler} \quad \text{(velocity first, then position with the new velocity)} \\
-v &\leftarrow v + h a = -10 \\
-x &\leftarrow x + h v = 1 + 0.1 \cdot (-10) = 0
+v &\leftarrow v + \Delta t\, a = -10 \\
+x &\leftarrow x + \Delta t\, v = 1 + 0.1 \cdot (-10) = 0
 \end{aligned}
 \]
 </div>
@@ -70,27 +70,27 @@ x &\leftarrow x + h v = 1 + 0.1 \cdot (-10) = 0
 ## Energy growth and the stability limit
 
 <div class="tex" style="font-size:0.72em" role="img" aria-label="explicit Euler, spring with ω = √(k/m); energy E = (m/2)(v² + ω²x²):
-   1. x' = x + h·v              v' = v − h·ω²·x
-   2. v'² + ω²x'² = (1 + (h·ω)²)(v² + ω²x²)       the 2h·ω²·x·v terms cancel
-   3. so every step multiplies E by 1 + (h·ω)², the amplitude by √(1 + (h·ω)²)
-   h = 0.1,  ω = 10:   × 2      per step
-   h = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
+   1. x' = x + Δt·v              v' = v − Δt·ω²·x
+   2. v'² + ω²x'² = (1 + (Δt·ω)²)(v² + ω²x²)       the 2Δt·ω²·x·v terms cancel
+   3. so every step multiplies E by 1 + (Δt·ω)², the amplitude by √(1 + (Δt·ω)²)
+   Δt = 0.1,  ω = 10:   × 2      per step
+   Δt = 0.01, ω = 10:   × 1.01   per step,  × 2.705 after 1 s (100 steps)
 semi-implicit Euler:
-   bounded while h·ω &lt; 2      (h &lt; 0.2 s here)
-   h = 0.19:  bounded, peaks at 1,000 J over 200 steps
-   h = 0.21:  energy reaches 9 × 10¹¹¹ J">
+   bounded while Δt·ω &lt; 2      (Δt &lt; 0.2 s here)
+   Δt = 0.19:  bounded, peaks at 1,000 J over 200 steps
+   Δt = 0.21:  energy reaches 9 × 10¹¹¹ J">
 \[
 \begin{aligned}
 &\textbf{explicit Euler}, \text{ spring with } \omega = \sqrt{k/m}, \text{ energy } E = \tfrac{m}{2}(v^2 + \omega^2 x^2)\text{:} \\
-&\quad 1.\ \ x' = x + h v, \qquad v' = v - h\,\omega^2 x \\
-&\quad 2.\ \ v'^2 + \omega^2 x'^2 = \big(1 + (h\omega)^2\big)(v^2 + \omega^2 x^2) \qquad \text{the } 2h\,\omega^2 x v \text{ terms cancel} \\
-&\quad 3.\ \ \text{so every step multiplies } E \text{ by } 1 + (h\omega)^2, \text{ the amplitude by } \sqrt{1 + (h\omega)^2} \\[4pt]
-&\quad h = 0.1,\ \omega = 10\text{:} \ \times 2 \text{ per step} \\
-&\quad h = 0.01,\ \omega = 10\text{:} \ \times 1.01 \text{ per step}, \ \times 2.705 \text{ after 1 s (100 steps)} \\[8pt]
+&\quad 1.\ \ x' = x + \Delta t\, v, \qquad v' = v - \Delta t\,\omega^2 x \\
+&\quad 2.\ \ v'^2 + \omega^2 x'^2 = \big(1 + (\Delta t\,\omega)^2\big)(v^2 + \omega^2 x^2) \qquad \text{the } 2\Delta t\,\omega^2 x v \text{ terms cancel} \\
+&\quad 3.\ \ \text{so every step multiplies } E \text{ by } 1 + (\Delta t\,\omega)^2, \text{ the amplitude by } \sqrt{1 + (\Delta t\,\omega)^2} \\[4pt]
+&\quad \Delta t = 0.1,\ \omega = 10\text{:} \ \times 2 \text{ per step} \\
+&\quad \Delta t = 0.01,\ \omega = 10\text{:} \ \times 1.01 \text{ per step}, \ \times 2.705 \text{ after 1 s (100 steps)} \\[8pt]
 &\textbf{semi-implicit Euler}\text{:} \\
-&\quad \text{bounded while } h\omega \lt 2 \quad (h \lt 0.2 \text{ s here}) \\
-&\quad h = 0.19\text{:} \ \text{bounded, peaks at } 1{,}000 \text{ J over 200 steps} \\
-&\quad h = 0.21\text{:} \ \text{energy reaches } 9 \times 10^{111} \text{ J}
+&\quad \text{bounded while } \Delta t\,\omega \lt 2 \quad (\Delta t \lt 0.2 \text{ s here}) \\
+&\quad \Delta t = 0.19\text{:} \ \text{bounded, peaks at } 1{,}000 \text{ J over 200 steps} \\
+&\quad \Delta t = 0.21\text{:} \ \text{energy reaches } 9 \times 10^{111} \text{ J}
 \end{aligned}
 \]
 </div>
@@ -103,10 +103,10 @@ semi-implicit Euler:
 ## Energy and the step limit, live
 
 <div class="cockpit" data-demo="particle-lab" data-controls="view:phase"><pre class="viz-fallback">  the phase plane: x against v / omega, where the exact motion is a circle; energy against step
-  h = 0.1, omega = 10 (h omega = 1): explicit x2 energy per step, semi-implicit bounded
-  h = 0.01: explicit x1.01 per step, x2.705 after 100 steps
-  semi-implicit at h = 0.19 (h omega = 1.9): bounded; at h = 0.21 (2.1): grows
-  the Step limit view: growth per step against h omega for all four integrators</pre></div>
+  Δt = 0.1, omega = 10 (Δt omega = 1): explicit x2 energy per step, semi-implicit bounded
+  Δt = 0.01: explicit x1.01 per step, x2.705 after 100 steps
+  semi-implicit at Δt = 0.19 (Δt omega = 1.9): bounded; at Δt = 0.21 (2.1): grows
+  the Step limit view: growth per step against Δt omega for all four integrators</pre></div>
 
 
 ---
@@ -115,7 +115,7 @@ semi-implicit Euler:
 
 ## The fixed step, live
 
-<div class="cockpit" data-demo="particle-lab" data-controls="view:stepping"><pre class="viz-fallback">  the same spring stepped two ways while the frames vary: one step per frame (h = the frame's
+<div class="cockpit" data-demo="particle-lab" data-controls="view:stepping"><pre class="viz-fallback">  the same spring stepped two ways while the frames vary: one step per frame (Δt = the frame's
   length) against a fixed 10 ms step from the accumulator; the readout is how far each ends from
   the exact motion
   steady 60 Hz: 0.096 against 0.055;  jittery frames: 0.15;  a 100 ms hitch: 0.23
@@ -128,7 +128,7 @@ semi-implicit Euler:
 
 A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. Links at `$k = 2000$` N/m:
 
-| substeps | `$h$` (ms) | `$h\sqrt{k/m}$` | springs |
+| substeps | `$\Delta t$` (ms) | `$\Delta t\sqrt{k/m}$` | springs |
 | --- | --- | --- | --- |
 | 4 | 4.167 | 8.16 | explode at once |
 | 16 | 1.042 | 2.04 | explode at once |
@@ -136,7 +136,7 @@ A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. L
 | 64 | 0.260 | 0.51 | hold, about 1 % stretch |
 
 - the cloth fails far **below** one spring's limit of 2: neighbors swing against each other, a particle feels about `$8k$`, and the limit falls to about **0.7**
-- **4 times stiffer, twice the substeps**: the same `$h\sqrt{k/m}$` needs `$h \propto 1/\sqrt{k}$`
+- **4 times stiffer, twice the substeps**: the same `$\Delta t\sqrt{k/m}$` needs `$\Delta t \propto 1/\sqrt{k}$`
 - 64 substeps: about **25&nbsp;ms** per frame on a laptop, over the 16.7&nbsp;ms budget
 
 
@@ -146,12 +146,12 @@ A cloth of 576 particles, **0.3 kg** in all: each particle is **0.000521 kg**. L
 
 **Implicit (backward) Euler** uses the acceleration at the **end** of the step. For one spring it solves exactly:
 
-<div class="tex" style="font-size:0.76em" role="img" aria-label="v₁ = (v₀ − h·k·x₀/m) / (1 + h²·k/m)          x₁ = x₀ + h·v₁
-same spring, h = 0.1:   v₁ = (0 − 10) / 2 = −5      x₁ = 1 + 0.1·(−5) = 0.5">
+<div class="tex" style="font-size:0.76em" role="img" aria-label="v₁ = (v₀ − Δt·k·x₀/m) / (1 + Δt²·k/m)          x₁ = x₀ + Δt·v₁
+same spring, Δt = 0.1:   v₁ = (0 − 10) / 2 = −5      x₁ = 1 + 0.1·(−5) = 0.5">
 \[
 \begin{gathered}
-v_1 = \frac{v_0 - h k x_0 / m}{1 + h^2 k / m}, \qquad x_1 = x_0 + h v_1 \\[6pt]
-\text{same spring, } h = 0.1\text{:} \quad v_1 = \frac{0 - 10}{2} = -5, \qquad x_1 = 1 + 0.1 \cdot (-5) = 0.5
+v_1 = \frac{v_0 - \Delta t\, k x_0 / m}{1 + \Delta t^2 k / m}, \qquad x_1 = x_0 + \Delta t\, v_1 \\[6pt]
+\text{same spring, } \Delta t = 0.1\text{:} \quad v_1 = \frac{0 - 10}{2} = -5, \qquad x_1 = 1 + 0.1 \cdot (-5) = 0.5
 \end{gathered}
 \]
 </div>
@@ -171,7 +171,7 @@ v_1 = \frac{v_0 - h k x_0 / m}{1 + h^2 k / m}, \qquad x_1 = x_0 + h v_1 \\[6pt]
 
 - real materials lose energy: a spring gets a **damper**, force `$-c \cdot (\text{relative velocity})$`
 - **critical damping** `$c = 2\sqrt{k m}$`: for the 1 kg, 100 N/m spring, `$c = 20$` N·s/m
-- a damper is stiffness in velocity: stepped explicitly it is stable only while `$h c / m$` stays small
+- a damper is stiffness in velocity: stepped explicitly it is stable only while `$\Delta t\, c / m$` stays small
 
 **The pitfall, measured**: in this course's cloth, a fixed damper of 0.4 N·s/m on each link made **every** spring cloth explode, even at `$k = 50$` with 16 substeps, because each particle weighs 0.000521 kg. Scaling it to 2 % of critical per link fixed it.
 
@@ -184,20 +184,20 @@ Instead of a force proportional to the stretch, **move the two particles back** 
 
 <div class="tex" style="font-size:0.74em" role="img" aria-label="two particles, 1 kg each, rest length 1 m, now 1.2 m apart:   C = 1.2 − 1 = 0.2
 rigid link:   each moves 0.1 toward the other        → length 1.0
-XPBD (extended position-based dynamics), k = 1000 N/m, h = 1/60 s:
-   α̃ = 1 / (k·h²) = 3.6
+XPBD (extended position-based dynamics), k = 1000 N/m, Δt = 1/60 s:
+   α̃ = 1 / (k·Δt²) = 3.6
    Δλ = −C / (1 + 1 + α̃) = −0.2 / 5.6 = −0.0357
    each moves 0.0357 toward the other                 → length 1.1286
-then:  velocity = (new position − old position) / h">
+then:  velocity = (new position − old position) / Δt">
 \[
 \begin{aligned}
 &\text{two particles, 1 kg each, rest length 1 m, now 1.2 m apart:} \quad C = 1.2 - 1 = 0.2 \\[6pt]
 &\textbf{rigid link:} \ \text{each moves } 0.1 \text{ toward the other} \ \to\ \text{length } 1.0 \\[6pt]
-&\textbf{XPBD} \text{ (extended position-based dynamics)},\ k = 1000 \text{ N/m},\ h = 1/60 \text{ s}\text{:} \\
-&\quad \tilde\alpha = \frac{1}{k h^2} = 3.6 \\
+&\textbf{XPBD} \text{ (extended position-based dynamics)},\ k = 1000 \text{ N/m},\ \Delta t = 1/60 \text{ s}\text{:} \\
+&\quad \tilde\alpha = \frac{1}{k \Delta t^2} = 3.6 \\
 &\quad \Delta\lambda = \frac{-C}{1 + 1 + \tilde\alpha} = \frac{-0.2}{5.6} = -0.0357 \\
 &\quad \text{each moves } 0.0357 \text{ toward the other} \ \to\ \text{length } 1.1286 \\[6pt]
-&\text{then: velocity} = (\text{new position} - \text{old position}) / h
+&\text{then: velocity} = (\text{new position} - \text{old position}) / \Delta t
 \end{aligned}
 \]
 </div>
@@ -207,7 +207,7 @@ then:  velocity = (new position − old position) / h">
 
 ## Constraints: the same cloth, the same k
 
-| substeps | `$h$` (ms) | stretch while it flutters | peak | cost per frame |
+| substeps | `$\Delta t$` (ms) | stretch while it flutters | peak | cost per frame |
 | --- | --- | --- | --- | --- |
 | 1 | 16.67 | about 160 % | 260 % | 0.5 ms |
 | 4 | 4.167 | about 15 % | 25 % | 1.6 ms |
@@ -223,15 +223,15 @@ then:  velocity = (new position − old position) / h">
 ## XPBD, one substep in code
 
 ```js
-for (const p of particles) { p.prev = p.x; if (p.w) { p.v += h * g; p.x += h * p.v; } }  // predict
+for (const p of particles) { p.prev = p.x; if (p.w) { p.v += dt * g; p.x += dt * p.v; } }  // predict
 collide(particles);                                                          // contacts
 for (let it = 0; it < 2; it++) for (const L of links) {                     // project, 2 passes
   const d = sub(L.b.x, L.a.x), len = length(d), C = len - L.rest;
-  const alpha = 1 / (k * h * h);
+  const alpha = 1 / (k * dt * dt);
   const dl = -C / (L.a.w + L.b.w + alpha);
   L.a.x -= L.a.w * dl * d / len;   L.b.x += L.b.w * dl * d / len;
 }
-for (const p of particles) p.v = (p.x - p.prev) / h;                         // velocities
+for (const p of particles) p.v = (p.x - p.prev) / dt;                         // velocities
 ```
 
 (`w` = 1/m, 0 for a pinned particle; `lib/core/sim-cloth.js` holds the whole solver, with arrays)
@@ -395,8 +395,8 @@ W(8 \text{ px}) = 2.10 \times 10^{-3}, \ \ 42\,\% \text{ of the peak} \\[8pt]
 ## The fluid's step limit
 
 <div class="tex" role="img" aria-label="pressure waves travel at the speed of sound c; a step must not skip a neighbor:
-   dt ≤ 0.4 · H / c                      (the Courant-Friedrichs-Lewy or CFL condition)
-   c = 1800 px/s:  dt = 3.556 ms          c = 900 px/s:  dt = 7.111 ms
+   Δt ≤ 0.4 · H / c                      (the Courant-Friedrichs-Lewy or CFL condition)
+   c = 1800 px/s:  Δt = 3.556 ms          c = 900 px/s:  Δt = 7.111 ms
 stiffer (larger c) → less compression, shorter steps, more steps per frame">
 \[
 \begin{gathered}
@@ -427,8 +427,8 @@ The dam breaks with viscosity **2.5**. Drop it to **0.2**: what changes first, a
 
 <div class="cockpit" data-demo="fluid" data-controls="viscosity,sound"><pre class="viz-fallback">  a 2D SPH fluid: a dam of 900 particles collapsing across an 800 × 600 px box
   controls:  viscosity, stiffness (speed of sound c)
-  readout:   particles, step dt = 0.4 H / c, sim time, peak compression, max speed, compute per frame
-  at c = 1800 px/s: dt = 3.556 ms; peak compression about 20 to 30 %, near 60 % as the wave hits the far wall</pre></div>
+  readout:   particles, step Δt = 0.4 H / c, sim time, peak compression, max speed, compute per frame
+  at c = 1800 px/s: Δt = 3.556 ms; peak compression about 20 to 30 %, near 60 % as the wave hits the far wall</pre></div>
 
 
 ---

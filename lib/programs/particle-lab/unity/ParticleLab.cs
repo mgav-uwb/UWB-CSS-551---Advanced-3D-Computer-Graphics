@@ -66,30 +66,30 @@ public static class ParticleLab
     // spring that solves in closed form for the new velocity.
     public class Step { public double x, v, a; }
 
-    static Step ImplicitStep(double k, double m, double c, double h, double x, double v)
+    static Step ImplicitStep(double k, double m, double c, double dt, double x, double v)
     {
-        double vNew = (m * v - h * k * x) / (m + h * c + h * h * k);
-        return new Step { x = x + h * vNew, v = vNew };
+        double vNew = (m * v - dt * k * x) / (m + dt * c + dt * dt * k);
+        return new Step { x = x + dt * vNew, v = vNew };
     }
 
-    public static Step SpringStep(string kind, double k, double m, double c, double h, double x, double v)
+    public static Step SpringStep(string kind, double k, double m, double c, double dt, double x, double v)
     {
         double a = SpringForce(k, c, x, v) / m;   // acceleration of the old state, m/s^2
         double xNew = x;
         double vNew = v;
         if (kind == "explicit")
         {
-            xNew = x + h * v;       // position from the old velocity
-            vNew = v + h * a;       // velocity from the old acceleration
+            xNew = x + dt * v;       // position from the old velocity
+            vNew = v + dt * a;       // velocity from the old acceleration
         }
         else if (kind == "semi")
         {
-            vNew = v + h * a;       // velocity first
-            xNew = x + h * vNew;    // then position, from the new velocity
+            vNew = v + dt * a;       // velocity first
+            xNew = x + dt * vNew;    // then position, from the new velocity
         }
         else if (kind == "implicit")
         {
-            Step step = ImplicitStep(k, m, c, h, x, v);
+            Step step = ImplicitStep(k, m, c, dt, x, v);
             xNew = step.x;
             vNew = step.v;
         }
@@ -102,27 +102,27 @@ public static class ParticleLab
     #endregion
 
     #region Verlet: positions only
-    // Verlet keeps two positions and no velocity: the next position is twice this one, minus the last, plus a h^2. The velocity is
+    // Verlet keeps two positions and no velocity: the next position is twice this one, minus the last, plus a dt^2. The velocity is
     // implied by the last two positions. Started from rest it makes the same positions as semi-implicit Euler, and a constraint can
     // move a position directly while the velocity follows.
     public class VerletResult { public double x, xPrev, v; }
 
-    public static VerletResult VerletStep(double k, double m, double c, double h, double x, double xPrev)
+    public static VerletResult VerletStep(double k, double m, double c, double dt, double x, double xPrev)
     {
-        double vOld = (x - xPrev) / h;
+        double vOld = (x - xPrev) / dt;
         double a = SpringForce(k, c, x, vOld) / m;
-        double xNew = 2 * x - xPrev + a * h * h;
-        double v = (xNew - x) / h;
+        double xNew = 2 * x - xPrev + a * dt * dt;
+        double v = (xNew - x) / dt;
         return new VerletResult { x = xNew, xPrev = x, v = v };
     }
     #endregion
 
     #region A run of steps
     // n steps from (x0, v0), recording the time, position, velocity and energy before each step and after the last. Verlet starts
-    // from the previous position x0 - h v0, so that its first step is the same as semi-implicit Euler's.
+    // from the previous position x0 - dt v0, so that its first step is the same as semi-implicit Euler's.
     public class Run { public double[] times, xs, vs, energies; }
 
-    public static Run RunSpring(string kind, double k, double m, double c, double h, double x0, double v0, int n)
+    public static Run RunSpring(string kind, double k, double m, double c, double dt, double x0, double v0, int n)
     {
         double[] times = new double[n + 1];
         double[] xs = new double[n + 1];
@@ -130,23 +130,23 @@ public static class ParticleLab
         double[] energies = new double[n + 1];
         double x = x0;
         double v = v0;
-        double xPrev = x0 - h * v0;
+        double xPrev = x0 - dt * v0;
         for (int i = 0; i <= n; i++)
         {
-            times[i] = i * h;
+            times[i] = i * dt;
             xs[i] = x;
             vs[i] = v;
             energies[i] = EnergyOf(k, m, x, v);
             if (kind == "verlet")
             {
-                VerletResult next = VerletStep(k, m, c, h, x, xPrev);
+                VerletResult next = VerletStep(k, m, c, dt, x, xPrev);
                 xPrev = next.xPrev;
                 x = next.x;
                 v = next.v;
             }
             else
             {
-                Step next = SpringStep(kind, k, m, c, h, x, v);
+                Step next = SpringStep(kind, k, m, c, dt, x, v);
                 x = next.x;
                 v = next.v;
             }
@@ -203,21 +203,21 @@ public static class ParticleLab
     // Every step of the spring is linear, so one step is a 2 by 2 matrix on the state: (x, v), or (x, previous x) for Verlet. The
     // matrix is read off by stepping the two unit states. Its eigenvalues say what a step does to the motion: a complex pair is a
     // rotation scaled by sqrt(det), and a real pair is a decay or a growth along two directions.
-    static double[] ApplyStep(string kind, double k, double m, double c, double h, double first, double second)
+    static double[] ApplyStep(string kind, double k, double m, double c, double dt, double first, double second)
     {
         if (kind == "verlet")
         {
-            VerletResult verlet = VerletStep(k, m, c, h, first, second);
+            VerletResult verlet = VerletStep(k, m, c, dt, first, second);
             return new double[] { verlet.x, verlet.xPrev };
         }
-        Step next = SpringStep(kind, k, m, c, h, first, second);
+        Step next = SpringStep(kind, k, m, c, dt, first, second);
         return new double[] { next.x, next.v };
     }
 
-    public static double[] StepMatrix(string kind, double k, double m, double c, double h)
+    public static double[] StepMatrix(string kind, double k, double m, double c, double dt)
     {
-        double[] left = ApplyStep(kind, k, m, c, h, 1, 0);
-        double[] right = ApplyStep(kind, k, m, c, h, 0, 1);
+        double[] left = ApplyStep(kind, k, m, c, dt, 1, 0);
+        double[] right = ApplyStep(kind, k, m, c, dt, 0, 1);
         return new double[] { left[0], right[0], left[1], right[1] };
     }
 
@@ -235,17 +235,17 @@ public static class ParticleLab
 
     #region Stability: growth per step
     // The largest eigenvalue magnitude of the step matrix is the growth of the amplitude per step: above 1 the motion grows without
-    // bound. For explicit Euler without a damper the energy is multiplied by 1 + (h omega)^2 every step; semi-implicit Euler and
-    // Verlet stay bounded while h omega < 2; implicit Euler never grows.
-    public class Stability { public double omega, hOmega, growth, energyFactor, limit; public bool bounded; public double damperFactor; }
+    // bound. For explicit Euler without a damper the energy is multiplied by 1 + (dt omega)^2 every step; semi-implicit Euler and
+    // Verlet stay bounded while dt omega < 2; implicit Euler never grows.
+    public class Stability { public double omega, dtOmega, growth, energyFactor, limit; public bool bounded; public double damperFactor; }
 
-    public static double GrowthPerStep(string kind, double k, double m, double c, double h)
+    public static double GrowthPerStep(string kind, double k, double m, double c, double dt)
     {
-        double[] matrix = StepMatrix(kind, k, m, c, h);
+        double[] matrix = StepMatrix(kind, k, m, c, dt);
         return SpectralRadius(matrix[0], matrix[1], matrix[2], matrix[3]);
     }
 
-    // The largest h whose growth stays at 1 (within EPSILON): double h until it grows, then bisect. Infinity: it never grows.
+    // The largest dt whose growth stays at 1 (within EPSILON): double dt until it grows, then bisect. Infinity: it never grows.
     public static double StepLimit(string kind, double k, double m, double c)
     {
         double omega = Math.Sqrt(k / m);
@@ -262,16 +262,16 @@ public static class ParticleLab
         return low;
     }
 
-    public static Stability StabilityReport(string kind, double k, double m, double c, double h)
+    public static Stability StabilityReport(string kind, double k, double m, double c, double dt)
     {
         double omega = Math.Sqrt(k / m);
-        double hOmega = h * omega;
-        double growth = GrowthPerStep(kind, k, m, c, h);
+        double dtOmega = dt * omega;
+        double growth = GrowthPerStep(kind, k, m, c, dt);
         double energyFactor = growth * growth;
         double limit = StepLimit(kind, k, m, c);
         bool bounded = growth <= 1 + EPSILON;
-        double damperFactor = 1 - h * c / m;    // a damper stepped explicitly multiplies the velocity by this: |factor| < 1 needs h c / m < 2
-        return new Stability { omega = omega, hOmega = hOmega, growth = growth, energyFactor = energyFactor, limit = limit, bounded = bounded, damperFactor = damperFactor };
+        double damperFactor = 1 - dt * c / m;    // a damper stepped explicitly multiplies the velocity by this: |factor| < 1 needs dt c / m < 2
+        return new Stability { omega = omega, dtOmega = dtOmega, growth = growth, energyFactor = energyFactor, limit = limit, bounded = bounded, damperFactor = damperFactor };
     }
     #endregion
 
@@ -354,11 +354,11 @@ public static class ParticleLab
         int stepsTaken = 0;
         for (int i = 0; i < frames.Length; i++)
         {
-            double h = frames[i] / 1000;
+            double dt = frames[i] / 1000;
             int count = 1;
             if (mode == "substeps")
             {
-                h = frames[i] / 1000 / substeps;
+                dt = frames[i] / 1000 / substeps;
                 count = substeps;
             }
             else if (mode == "fixed")
@@ -371,14 +371,14 @@ public static class ParticleLab
                     count++;
                 }
                 carry = Math.Max(0, left);
-                h = stepMs / 1000;
+                dt = stepMs / 1000;
             }
             for (int j = 0; j < count; j++)
             {
-                Step next = SpringStep(kind, k, m, c, h, x, v);
+                Step next = SpringStep(kind, k, m, c, dt, x, v);
                 x = next.x;
                 v = next.v;
-                time += h;
+                time += dt;
                 stepsTaken++;
                 times.Add(time);
                 xs.Add(x);
@@ -427,7 +427,7 @@ public static class ParticleLab
     // A wall occupies wallMin < x < wallMax. A particle that ENDS a step inside it is put back on the face it came from (the side
     // its velocity says) and bounces with restitution e. One that starts a step before the wall and ends it past the wall was never
     // inside at any step, so nothing pushes it: it tunnels. ThrowRun is a particle thrown with velocity (vx0, vy0) under gravity g,
-    // stepped semi-implicitly with steps of h, against the wall and the floor y = 0.
+    // stepped semi-implicitly with steps of dt, against the wall and the floor y = 0.
     public class Slab { public bool hit; public double x, vx; public bool crossed; }
     public class Throw { public double[] xs, ys, vxs, vys; public int wallStep, tunnelStep, floorStep; }
 
@@ -440,7 +440,7 @@ public static class ParticleLab
         return new Slab { hit = true, x = fromLeft ? wallMin : wallMax, vx = -e * vx, crossed = false };
     }
 
-    public static Throw ThrowRun(double x0, double y0, double vx0, double vy0, double g, double h, int steps, double wallMin, double wallMax, double e, double mu)
+    public static Throw ThrowRun(double x0, double y0, double vx0, double vy0, double g, double dt, int steps, double wallMin, double wallMax, double e, double mu)
     {
         double[] xs = new double[steps + 1];
         double[] ys = new double[steps + 1];
@@ -460,9 +460,9 @@ public static class ParticleLab
         for (int i = 1; i <= steps; i++)
         {
             double xPrev = x;
-            vy = vy - g * h;
-            x = x + h * vx;
-            y = y + h * vy;
+            vy = vy - g * dt;
+            x = x + dt * vx;
+            y = y + dt * vy;
             Slab wall = SlabContact(x, xPrev, vx, wallMin, wallMax, e);
             if (wall.hit && wallStep < 0) wallStep = i;
             if (wall.crossed && tunnelStep < 0) tunnelStep = i;

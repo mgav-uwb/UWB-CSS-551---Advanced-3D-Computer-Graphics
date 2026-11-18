@@ -5,7 +5,7 @@ using UnityEngine;
 // Setup: put this script on an empty GameObject and press Play. The camera should look along +z at the origin, orthographic, size
 // 2.6. It is compiled against the course's stand-in for the Unity API (tools/unity-program-shim/) and has not been run in the
 // Unity editor.
-// Keys: space or right arrow takes one step, P plays and pauses, R starts again, up and down arrows change the step h by 0.01.
+// Keys: space or right arrow takes one step, P plays and pauses, R starts again, up and down arrows change the step dt by 0.01.
 // A mass is drawn at most 3 m from its rest position, so an integrator that blows up leaves the picture and the status line keeps
 // the number. A spring is drawn as a flat bar from the wall to the mass (the coil of the WebGL track is a line mesh).
 // The same scene, step for step, is scene.js in ../webgl/.
@@ -22,7 +22,7 @@ public class ParticleLabScene : MonoBehaviour
     const double M = 1;
     const double C = 0;
     const float Wall = -3f;
-    double h = 0.1;
+    double dt = 0.1;
     int taken = 0;
     bool playing = false;
     float nextTick = 0f;
@@ -53,17 +53,17 @@ public class ParticleLabScene : MonoBehaviour
     // Each refresh reruns every integrator from the start for `taken` steps, so the picture is always the program's own run.
     void Refresh()
     {
-        string line = "h = " + h.ToString("F2") + " s, step " + taken + ", t = " + (taken * h).ToString("F2") + " s";
+        string line = "dt = " + dt.ToString("F2") + " s, step " + taken + ", t = " + (taken * dt).ToString("F2") + " s";
         for (int i = 0; i < Kinds.Length; i++)
         {
             double x = 0;
             if (i == 0)
             {
-                x = ParticleLab.ExactSpring(K, M, C, 1, 0, taken * h).x;
+                x = ParticleLab.ExactSpring(K, M, C, 1, 0, taken * dt).x;
             }
             else
             {
-                ParticleLab.Run run = ParticleLab.RunSpring(Kinds[i], K, M, C, h, 1, 0, taken);
+                ParticleLab.Run run = ParticleLab.RunSpring(Kinds[i], K, M, C, dt, 1, 0, taken);
                 x = run.xs[taken];
                 line += "   " + Kinds[i] + " x " + x.ToString("G3") + " E " + run.energies[taken].ToString("G3");
             }
@@ -83,8 +83,8 @@ public class ParticleLabScene : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.RightArrow)) taken++;
         else if (Input.GetKeyDown(KeyCode.P)) playing = !playing;
         else if (Input.GetKeyDown(KeyCode.R)) taken = 0;
-        else if (Input.GetKeyDown(KeyCode.UpArrow)) h = System.Math.Min(0.3, System.Math.Round(h + 0.01, 2));
-        else if (Input.GetKeyDown(KeyCode.DownArrow)) h = System.Math.Max(0.01, System.Math.Round(h - 0.01, 2));
+        else if (Input.GetKeyDown(KeyCode.UpArrow)) dt = System.Math.Min(0.3, System.Math.Round(dt + 0.01, 2));
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) dt = System.Math.Max(0.01, System.Math.Round(dt - 0.01, 2));
         else changed = false;
         if (playing && Time.time >= nextTick)
         {
