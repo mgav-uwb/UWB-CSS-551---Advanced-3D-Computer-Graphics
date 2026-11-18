@@ -1,6 +1,6 @@
 <!--
   CSS 551 · Lecture 14 (Tuesday November 17, week 8, online): Animation and Physics.
-  Mounts, in order: L14-open.md, ../../topics/animation.md (the core, ~45 min, 20 slides with its title),
+  Mounts, in order: L14-open.md, ../../topics/animation.md (the core, ~45 min, 21 slides with its title),
   ../../topics/physics-simulation.md (the core, ~50 min, 21 slides with its title), L14-discuss.md (the wrap),
   then, after the wrap, time permitting or as reading: ../../topics/animation-supplement.md (26 slides) and
   ../../topics/physics-simulation-supplement.md (26 slides), the worked numbers behind the methods.

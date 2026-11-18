@@ -19,7 +19,8 @@
   GRADED from this topic: Quiz 6 (a slerp angle: "Rotations: slerp, the short way round"); the final
     (a linear in-between: "Keyframes and in-betweening"). Both rules stay on those slides.
   DEMOS:   keyframe (t,ease) before anything is defined; keyframe (t,ease,timing) after easing; rig-lab
-    view:fk after the skeleton; rig-lab view:ik2 and view:ccd after the IK solvers; rig-lab view:wrapper
+    view:fk after the skeleton; rig-lab view:ccd after the CCD slide (the two-link and Jacobian solvers are a
+    button away on the same slide); rig-lab view:wrapper
     after the candy wrapper. Bare view ids (view:ik2, never view:ik.ik2).
   NUMBERS: textbook/figures/numbers-motion.json key anim (keys, slerp, ik, skinning); smoothstep(0.35)
     = 0.282; the matrix midpoint of I and R_z(90) has columns of length 0.707, of I and R_z(180) is 0.
@@ -33,7 +34,11 @@
     performances and blended clips". The 2026-11-13 cut's history is in git.
   ACRONYMS 2026-11-17 (Marcel: "we should define every acronym, always, e.g. ccd. ccd can be better
     explained"): every acronym is spelled out at its first use, on the slides and in the notes; new slide
-    "Cyclic coordinate descent (CCD)" before "IK by iteration, live".
+    "Cyclic coordinate descent (CCD)" before the IK demo.
+  ONE IK DEMO 2026-11-17 (Marcel: "keep only one. i can switch the solver to all three."): "Inverse kinematics,
+    live" opens on view:ccd after the CCD slide, its notes cover all three solvers; "IK by iteration, live" is gone.
+  JACOBIAN 2026-11-17 (Marcel: "lets add a quick conceptual overview of the jacobian method too, after ccd"): new
+    slide "Jacobian IK: all joints at once" between the CCD slide and the demo, no matrices.
 
   reveal.js: FLAT; notes follow "Note:" and stay plain text. Display math is a raw <div class="tex">
   block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form as aria-label, no blank line
@@ -206,19 +211,6 @@ Rigs mix both: FK on the spine and arms by default, IK on the legs, switchable l
 
 ---
 
-<!-- .slide: class="demo-full" -->
-
-## Inverse kinematics, live
-
-<div class="cockpit" data-demo="rig-lab" data-controls="view:ik2"><pre class="viz-fallback">  a two-link arm, l1 = 1 and l2 = 0.8; drag the target, or a preset
-  the lecture's target (1.2, 0.9):  cos θ2 = 0.381, θ1 = 7.3°, θ2 = 67.6°
-  the other elbow:                  θ1 = 66.4°, θ2 = −67.6°
-  out of reach (2, 0.5):            cos θ2 = 1.631, the arm points at the target, stretched
-  stretched (1.8, 0), folded (0.2, 0), inside the fold (0.05, 0)</pre></div>
-
-
----
-
 ## Cyclic coordinate descent (CCD)
 
 <div style="font-size:0.8em;">
@@ -238,14 +230,35 @@ The **end effector** is the chain's tip: the hand, the foot, the end of the tail
 
 ---
 
+## Jacobian IK: all joints at once
+
+<div style="font-size:0.8em;">
+
+The question: if each joint turned a little, which way would the end effector move?
+
+- each joint swings the end effector on a circle around itself: the move is **sideways** to the line from the joint to the end effector, and **faster** the farther the joint is
+- the **Jacobian** is the table of those moves: one arrow per joint, the end effector's motion for a small turn of that joint
+- each step: choose small turns of all the joints whose arrows add up to a move **toward the target**, take that small step, recompute the arrows (the arm has moved), and repeat until close
+- **strengths**: every joint shares the work, so the chain does not curl the way it does under CCD; several goals at once (both feet, a hand, the gaze) go in the same table
+- **where it breaks**: a nearly **straight** arm; every arrow is almost sideways and none points along the arm, so a target just past the end effector asks for huge turns; **damping** (damped least squares) caps the step, trading a little accuracy for stability
+- who uses it: robot arms, and full-body rigs with several goals
+
+</div>
+
+
+---
+
 <!-- .slide: class="demo-full" -->
 
-## IK by iteration, live
+## Inverse kinematics, live
 
-<div class="cockpit" data-demo="rig-lab" data-controls="view:ccd"><pre class="viz-fallback">  a four-joint arm and a target; cyclic coordinate descent, one joint per step
-  at each step: the joint, the direction to the tip and the direction to the target; turn by the angle between
-  step, run, restart, follow the target; the error |target − tip| plotted against joint rotations
-  presets: a near target (1, 0.6), a far target (2.4, 1.2), behind the base (−1.5, −0.5), out of reach (3.5, 1.5)</pre></div>
+<div class="cockpit" data-demo="rig-lab" data-controls="view:ccd"><pre class="viz-fallback">  three solvers on one arm and a target; the buttons switch between them
+  cyclic coordinate descent: a four-joint arm, one joint per step; step, sweep, run, restart, follow the target;
+    the error |target − tip| against joint rotations only falls; presets: near (1, 0.6), far (2.4, 1.2),
+    behind the base (−1.5, −0.5), out of reach (3.5, 1.5)
+  two links, l1 = 1 and l2 = 0.8: the target (1.2, 0.9) gives cos θ2 = 0.381, θ1 = 7.3°, θ2 = 67.6°;
+    the other elbow θ1 = 66.4°, θ2 = −67.6°; out of reach (2, 0.5); inside the fold (0.05, 0)
+  Jacobian: every joint at once, a small step at a time; a straight arm is singular, damping λ steadies it</pre></div>
 
 
 ---
