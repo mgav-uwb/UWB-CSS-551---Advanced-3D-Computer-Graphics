@@ -49,6 +49,11 @@
            Companion of topics/image-space.md and topics/diffusion-1.md (the lectures after it); this
            deck names "the approximator exhibit" and "the embedding exhibit", and diffusion-1 refers
            back to "smooth between the examples".
+  EDIT 2026-11-18 (Marcel asked for a demonstration that mini-batch noise can escape a local minimum): the
+           mini-batch slide separates backpropagation (computes
+           a gradient) from stochastic descent (each step's batch, its own loss surface); "the noise even helps escape poor
+           minima" replaced by a hedged bullet, backed in the note by optim-lab's "escaping a minimum" view (65 of 100 runs at
+           B = 1, eta0 = 0.2; none at full batch; numbers held by lib/tests/programs/optim-lab.test.mjs).
   DEMOS:   data-demo="mlp-fit" data-controls="epochs,hidden" (demo-full);
            data-demo="optim-lab" data-controls="view:optimizers" (demo-full, after the optimizers slide);
            data-demo="attention-lab" data-controls="view:query.one" (demo-full, after the cost of attention);
@@ -227,7 +232,8 @@ The true gradient averages over all N examples; a **mini-batch** of B random exa
    the course's denoiser: 41,210 steps × 512 = 21.1 million examples seen = 351.7 epochs
 ```
 
-- small batches: noisy but cheap steps (the noise even helps escape poor minima); large batches: smooth steps, better GPU use
+- each step descends **its own batch's loss**, a different surface every step; on average, the full loss. Backpropagation computes the gradient of whichever loss it is given
+- small batches: noisy but cheap steps; the noise can carry the weights out of a poor minimum, with no guarantee. Large batches: smooth steps, better GPU use
 - an **epoch** is one pass over the data; an **iteration** is one step
 
 
@@ -276,7 +282,8 @@ Plain gradient descent crawls where the loss is flat and zig-zags across narrow 
   zig-zag bowl, after 40 steps:        descent 0.0717, momentum 0.0118, Adam 0.347
   tab Descent, a bowl with curvatures 1 and 4 (limit eta = 2/4 = 0.5):
     eta 0.02 still far after 100 steps; 0.40 converges; 0.45 overshoots and converges; 0.60 diverges
-  tab Minibatch: the gradient's noise against the batch size</pre></div>
+  tab Minibatch: the gradient's noise against the batch size; escaping a minimum (one sine unit):
+    from the slow wave, batches of 1 escape in 65 of 100 runs, full batch in none</pre></div>
 
 
 ---

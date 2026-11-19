@@ -445,4 +445,105 @@ public static class OptimLab
         return result;
     }
     #endregion
+
+    #region A one-unit network
+    // One unit with a sine activation, f(x) = sin(w x + b), fit to n points of the wave sin(2.5 x + 0.3) plus noise drawn uniformly
+    // from [-0.3, 0.3], with x from -1.5 to 1.5. The loss over (w, b) is not a bowl: a slow wave near w = 0.5 is a minimum, and a
+    // worse one than the right wave near w = 2.5. The slopes are the chain rule: the derivative of (sin z - y)^2 with z = w x + b is
+    // 2 (sin z - y) cos z, times x for w and times 1 for b.
+    public const float WaveW = 2.5f;
+    public const float WaveB = 0.3f;
+
+    public static (float[] xs, float[] ys) MakeWave(int n, int seed)
+    {
+        float[] xs = new float[n];
+        float[] ys = new float[n];
+        int state = seed;
+        for (int i = 0; i < n; i++)
+        {
+            var first = NextState(state);
+            var second = NextState(first.state);
+            state = second.state;
+            float x = 3f * first.u - 1.5f;
+            xs[i] = x;
+            ys[i] = Mathf.Sin(WaveW * x + WaveB) + 0.6f * (second.u - 0.5f);
+        }
+        return (xs, ys);
+    }
+
+    public static (float loss, float gw, float gb) WaveGradient(float w, float b, float[] xs, float[] ys, int[] indices)
+    {
+        float sumLoss = 0f;
+        float sumW = 0f;
+        float sumB = 0f;
+        for (int k = 0; k < indices.Length; k++)
+        {
+            int i = indices[k];
+            float z = w * xs[i] + b;
+            float error = Mathf.Sin(z) - ys[i];
+            float slope = 2f * error * Mathf.Cos(z);
+            sumLoss += error * error;
+            sumW += slope * xs[i];
+            sumB += slope;
+        }
+        float loss = sumLoss / indices.Length;
+        float gw = sumW / indices.Length;
+        float gb = sumB / indices.Length;
+        return (loss, gw, gb);
+    }
+    #endregion
+
+    #region Escaping a minimum
+    // Stochastic descent on the one-unit network, eta decaying from eta0 to 0 by the cosine schedule. Each step draws size examples
+    // (size 0 uses all of them), so each step goes downhill on a different surface: the loss of that batch. Those surfaces average to
+    // the loss over all the data, which losses records after each step. The noise can carry the weights over a ridge that the full
+    // gradient never crosses; EscapeCount repeats a run with runs different seeds and counts the runs that end with a loss below good.
+    public static SgdResult RunWave(float[] xs, float[] ys, float[] start, int size, float eta0, int steps, int seed)
+    {
+        int[] all = AllIndices(xs.Length);
+        List<float> ws = new List<float>();
+        List<float> bs = new List<float>();
+        List<float> losses = new List<float>();
+        List<float> etas = new List<float>();
+        float[] theta = { start[0], start[1] };
+        int state = seed;
+        for (int t = 0; t <= steps; t++)
+        {
+            ws.Add(theta[0]);
+            bs.Add(theta[1]);
+            losses.Add(WaveGradient(theta[0], theta[1], xs, ys, all).loss);
+            if (t == steps) break;
+            int[] indices = all;
+            if (size > 0)
+            {
+                var batch = MinibatchIndices(state, xs.Length, size);
+                state = batch.state;
+                indices = batch.indices;
+            }
+            var g = WaveGradient(theta[0], theta[1], xs, ys, indices);
+            float eta = ScheduleRate(t, steps, eta0, 0).eta;
+            etas.Add(eta);
+            theta = DescentStep(theta, new float[] { g.gw, g.gb }, eta).next;
+        }
+        SgdResult result = new SgdResult();
+        result.ws = ws.ToArray(); result.bs = bs.ToArray(); result.losses = losses.ToArray(); result.etas = etas.ToArray();
+        return result;
+    }
+
+    public static int RunSeed(int run)
+    {
+        return 1000 + 7919 * run;
+    }
+
+    public static (int escaped, int runs) EscapeCount(float[] xs, float[] ys, float[] start, int size, float eta0, int steps, int runs, float good)
+    {
+        int escaped = 0;
+        for (int r = 0; r < runs; r++)
+        {
+            SgdResult result = RunWave(xs, ys, start, size, eta0, steps, RunSeed(r));
+            if (result.losses[steps] < good) escaped++;
+        }
+        return (escaped, runs);
+    }
+    #endregion
 }
