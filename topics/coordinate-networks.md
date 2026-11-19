@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Coordinate networks (the core, ~30 min, 12 content slides).
+  CSS 551 · TOPIC DECK · Coordinate networks (the core, ~30 min, 17 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/coordinate-networks.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -49,6 +49,14 @@
            lectures"): every formula typeset (MathJax, the ASCII kept as aria-label); the network's layers and
            the Fourier rows as tables; new generated figure nn-posenc-octaves (tools/gen-lecture-figures-neural.mjs,
            the ASCII table as alt); the figures set at a readable size. Every number recomputed.
+  RE-SEQUENCED 2026-11-19 (Marcel: "are we using concepts before they are analyzed?", then "proceed ... split dense
+           slides"): the three-network comparison (four-panel figure and PSNR table) moved after the SIREN slides, since
+           it showed SIREN and its omega before they were introduced; the blur slide shows only target and ReLU
+           (nn-coordnet-blur.png, written by analysis/coord-net-figures.mjs, which now writes only on change). Split for
+           density: the MLP | its training; memorizing | PSNR; Fourier features | one pixel; SIREN | its derivative
+           (the shifted sine written out). "Low frequencies" tied to the antialiasing lecture's frequencies. New
+           statements, checked: 2 x 48 + 48 x 48 + 48 x 3 = 2,544 multiply-adds; 32 x 48 + 48 = 1,584; 4,083 - 2,643
+           = 1,440; 10^0.939 = 8.7; d/dx sin = a shifted sine.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
@@ -94,6 +102,8 @@ f : (x, y) \in [-1, 1]^2 \;\to\; (r, g, b) \in [0, 1]^3 \\[8pt]
 
 ## Fitting one image with an MLP
 
+The network the exhibit trains: two inputs, two hidden layers of 48 ReLU units, three outputs.
+
 | layer | computes | weights |
 | ----- | -------- | ------- |
 | input | `$p = (x, y)$`, 2 numbers | |
@@ -102,11 +112,18 @@ f : (x, y) \in [-1, 1]^2 \;\to\; (r, g, b) \in [0, 1]^3 \\[8pt]
 | output | `$W_3 h + b_3 = (r, g, b)$` | 48 × 3 + 3 = 147 |
 | total | | **2,643** |
 
-<div class="tex" style="font-size:0.76em" role="img" aria-label="loss         L = (1/3B) Σ over B pixels, 3 channels: ( f_θ(xᵢ, yᵢ) − cᵢ )²
-training     Adam, η = 0.005, B = 256 random pixels per step">
-\[ \begin{gathered} L = \frac{1}{3B} \sum_{B \text{ pixels, 3 channels}} \big( f_\theta(x_i, y_i) - c_i \big)^2 \\ \text{training: Adam, } \eta = 0.005,\ B = 256 \text{ random pixels per step} \end{gathered} \]
+- each count is the rule for a layer from `$n$` inputs to `$m$` outputs: `$n m + m$` weights
+
+
+---
+
+## Training on one image
+
+<div class="tex" role="img" aria-label="loss         L = (1/3B) Σ over B pixels, 3 channels: ( f_θ(xᵢ, yᵢ) − cᵢ )²">
+\[ L = \frac{1}{3B} \sum_{B \text{ pixels, 3 channels}} \big( f_\theta(x_i, y_i) - c_i \big)^2 \]
 </div>
 
+- `$c_i$` is pixel `$i$`'s true colour; the optimizer is Adam, `$\eta = 0.005$`, on mini-batches of `$B = 256$` random pixels
 - the **training set** is the 4,096 pixels of **one** image; there is no test image
 - one step: 256 pixels × 2,544 multiply-adds forward, about twice that backward
 
@@ -115,33 +132,48 @@ training     Adam, η = 0.005, B = 256 random pixels per step">
 
 ## What "memorizing one signal" means
 
-<div class="tex" style="font-size:0.8em" role="img" aria-label="the image      4,096 pixels × 3 = 12,288 numbers
-the network    2,643 weights               4.6 times fewer numbers
-PSNR = 10 log₁₀( 1 / MSE )     peak signal-to-noise ratio, colours in [0, 1]
-MSE 0.0658    →  11.82 dB
-MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error">
+<div class="tex" role="img" aria-label="the image      4,096 pixels × 3 = 12,288 numbers
+the network    2,643 weights               4.6 times fewer numbers">
 \[
 \begin{aligned}
 &\text{the image} && 4{,}096 \text{ pixels} \times 3 = 12{,}288 \text{ numbers} \\
-&\text{the network} && 2{,}643 \text{ weights: } 4.6 \text{ times fewer numbers} \\[6pt]
-&\text{PSNR} && 10 \log_{10} \big( 1 / \text{MSE} \big) \quad \text{peak signal-to-noise ratio, colours in } [0, 1] \\
-& && \text{MSE } 0.0658 \to 11.82 \text{ dB}, \qquad \text{MSE } 0.00757 \to 21.21 \text{ dB} \\
-& && +10 \text{ dB} = 10 \text{ times less error}
+&\text{the network} && 2{,}643 \text{ weights: } 4.6 \text{ times fewer numbers}
 \end{aligned}
 \]
 </div>
 
 - a perfect fit would be **compression**: the weights would reproduce 12,288 numbers from 2,643
-- the network is overfit **by design**; the only question is how close it gets, and the answer is measured in PSNR
+- the network is overfit **by design**; the only question is how close it gets
 - a trained coordinate network **is** the image: to display it, evaluate it at every pixel centre
+
+
+---
+
+## Measuring the fit: PSNR
+
+The **peak signal-to-noise ratio**, for colours in [0, 1]:
+
+<div class="tex" role="img" aria-label="PSNR = 10 log₁₀( 1 / MSE )     peak signal-to-noise ratio, colours in [0, 1]
+MSE 0.0658    →  11.82 dB
+MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error">
+\[
+\begin{gathered}
+\text{PSNR} = 10 \log_{10} \big( 1 / \text{MSE} \big) \text{ dB} \\[6pt]
+\text{MSE } 0.0658 \to 11.82 \text{ dB}, \qquad \text{MSE } 0.00757 \to 21.21 \text{ dB}
+\end{gathered}
+\]
+</div>
+
+- every **+10 dB** is **10 times** less squared error; higher is better
+- the two values are the plain network and the Fourier-feature network after 2000 steps, a few slides on
 
 
 ---
 
 ## A ReLU network on raw coordinates blurs
 
-<img src="../../textbook/figures/nn-coordnet-fits.png" class="media-shot" style="max-height: 160px;" alt="four 64 by 64 panels: the test card, the ReLU fit (blurred), the Fourier-feature fit and the SIREN fit after 2000 steps">
-<span class="credit">target · ReLU on raw (x, y) · ReLU + Fourier features, σ = 6 · SIREN, ω₀ = 30; 2000 steps each</span>
+<img src="../../textbook/figures/nn-coordnet-blur.png" class="media-shot" style="height: 220px;" alt="two 64 by 64 panels: the test card, and the ReLU fit after 2000 steps, blurred">
+<span class="credit">target · ReLU on raw (x, y), 2000 steps</span>
 
 | region of the test card (ReLU, 2000 steps) | pixels | PSNR |
 | ------------------------------------------ | ------ | ---- |
@@ -157,7 +189,7 @@ MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error">
 
 ## Spectral bias
 
-A network trained by gradient descent fits the **low frequencies** of its target first and the high frequencies late or never (Rahaman et al., ICML 2019, arXiv:1806.08734).
+A network trained by gradient descent fits the **low frequencies** of its target first (slow variation, few cycles across the image: the frequencies of the antialiasing lecture) and the high frequencies late or never (Rahaman et al., ICML 2019, arXiv:1806.08734).
 
 - a ReLU network is **continuous and piecewise linear** in (x, y): its pieces are large and its derivatives piecewise constant; a 4-pixel checkerboard needs a fold every 4 pixels in both directions
 - in the neural tangent kernel (NTK) analysis, gradient descent shrinks each frequency component of the error at a rate that falls with frequency (Tancik et al. 2020)
@@ -175,15 +207,23 @@ B: 16 × 2, entries ~ N(0, σ²), drawn once, fixed">
 \[ \begin{gathered} \gamma(\mathbf{v}) = \big( \cos 2\pi B \mathbf{v},\ \sin 2\pi B \mathbf{v} \big), \qquad \mathbf{v} \in [0, 1]^2 \text{ the pixel's position} \\ B: 16 \times 2,\ \text{entries} \sim \mathcal{N}(0, \sigma^2), \text{ drawn once, fixed} \end{gathered} \]
 </div>
 
-Pixel (10, 20): `$\mathbf{v} = (0.1641,\ 0.3203)$`, `$\sigma = 6$`; 16 rows give 32 inputs, so the first layer has 32 × 48 + 48 weights, 4,083 in all.
+- each row `$\mathbf{b}$` of `$B$` is a plane wave across the image, with `$\lvert \mathbf{b} \rvert$` cycles per image width
+- `$B$` is drawn once and **never trained**; its 16 rows give the network 32 inputs
+- the network now combines waves that already oscillate at the needed rates
+
+
+---
+
+## Fourier features, one pixel
+
+Pixel (10, 20): `$\mathbf{v} = (0.1641,\ 0.3203)$`, `$\sigma = 6$`; the first two of the 16 rows:
 
 | row of `$B$` | `$\mathbf{b}$` | `$2\pi\, \mathbf{b} \cdot \mathbf{v}$` | (cos, sin) |
 | ------------ | --------------- | ------------------------------------------- | ---------- |
 | 1 | (−6.6166, −2.0136) | −10.8731 | (−0.1222, 0.9925) |
 | 2 | (−2.6317, −3.6818) | −10.1228 | (−0.7661, 0.6427) |
 
-- each row of `$B$` is a plane wave across the image, with `$\lvert \mathbf{b} \rvert$` cycles per image width; `$B$` is drawn once and **never trained**
-- the network now combines waves that already oscillate at the needed rates
+- 32 inputs make the first layer 32 × 48 + 48 = 1,584 weights: 4,083 in all, 1,440 more than the plain network
 
 
 ---
@@ -213,22 +253,6 @@ cos   −0.5141   −0.4714   −0.5556   −0.3827   −0.7071    0.0000">
 
 ---
 
-## Fourier features fix the blur
-
-PSNR of the whole image, same picture, same Adam optimizer and batches (the SIREN at a tenth of the learning rate, 0.0005):
-
-| step | 0 | 100 | 300 | 1000 | 2000 | 4000 |
-| ---- | - | --- | --- | ---- | ---- | ---- |
-| ReLU, raw (x, y), 2,643 weights | 7.09 | 11.33 | 11.49 | 11.67 | 11.82 | 12.10 |
-| ReLU + Fourier features (σ = 6), 4,083 | 5.89 | 11.58 | 14.57 | 19.24 | **21.21** | **22.27** |
-| SIREN (ω₀ = 30), 2,643 | 5.35 | **12.95** | **16.01** | 18.14 | 18.89 | 20.16 |
-
-- with Fourier features the stripes rise from 11.29 to 22.30 dB and the checkerboard from 7.56 to 18.74 dB; the backdrop stays near 23 dB
-- 9.4 dB over the plain network at step 2000: the error is **8.7 times** smaller
-
-
----
-
 ## The frequency scale: a trade-off
 
 <img src="../../textbook/figures/nn-coordnet-sigma.png" class="media-shot" style="max-height: 150px;" alt="Fourier-feature fits at sigma 1, 6 and 48 after 2000 steps: blurred, sharp, speckled">
@@ -247,17 +271,57 @@ PSNR of the whole image, same picture, same Adam optimizer and batches (the SIRE
 
 ## SIREN: sine as the activation
 
-A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv:2006.09661) replaces ReLU with a sine in every hidden layer:
+A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv:2006.09661) keeps the raw coordinates and replaces ReLU with a sine in every hidden layer:
 
 <div class="tex" role="img" aria-label="h₁ = sin( ω₀ (W₁ p + b₁) )     h₂ = sin( ω₀ (W₂ h₁ + b₂) )
 f  = W₃ h₂ + b₃                ω₀ = 30">
 \[ \begin{gathered} h_1 = \sin\!\big( \omega_0 (W_1 p + b_1) \big), \qquad h_2 = \sin\!\big( \omega_0 (W_2 h_1 + b_2) \big) \\ f = W_3 h_2 + b_3, \qquad \omega_0 = 30 \end{gathered} \]
 </div>
 
-- the input layer is itself a bank of plane waves, now **trained**; deeper layers build sums and products of waves (sin a · sin b is a sum of waves at a ± b)
-- the derivative of sin is a shifted sin, so **the derivative of a SIREN is a SIREN**: gradients and Laplacians of the fitted signal are smooth and meaningful
+- the input layer is itself a bank of plane waves, now **trained**
+- deeper layers build sums and products of waves (sin a · sin b is a sum of waves at a ± b), so depth multiplies the available frequencies
+- `$\omega_0$` scales every frequency, as `$\sigma$` does for Fourier features
+
+
+---
+
+## The derivative of a SIREN is a SIREN
+
+<div class="tex" role="img" aria-label="d/dx sin(ω₀(w x + b)) = ω₀ w cos(ω₀(w x + b)) = ω₀ w sin(ω₀(w x + b) + π/2)">
+\[ \frac{d}{dx} \sin\!\big( \omega_0 (w x + b) \big) = \omega_0 w \cos\!\big( \omega_0 (w x + b) \big) = \omega_0 w \sin\!\big( \omega_0 (w x + b) + \tfrac{\pi}{2} \big) \]
+</div>
+
+- the derivative of a sine unit is a shifted, scaled sine unit, so gradients and Laplacians of the fitted signal are smooth and meaningful
 - a ReLU network's second derivative is zero almost everywhere: it cannot be fitted to a gradient or a differential equation
 - the paper fits images, audio, video, signed distance functions (SDFs), and solutions of the Poisson, Helmholtz and wave equations
+
+
+---
+
+## Fourier features and SIREN fix the blur
+
+<img src="../../textbook/figures/nn-coordnet-fits.png" class="media-shot" style="max-height: 190px;" alt="four 64 by 64 panels: the test card, the ReLU fit (blurred), the Fourier-feature fit and the SIREN fit after 2000 steps">
+<span class="credit">target · ReLU on raw (x, y) · ReLU + Fourier features, σ = 6 · SIREN, ω₀ = 30; 2000 steps each</span>
+
+- whole image at step 2000: ReLU 11.82, Fourier features 21.21, SIREN 18.89 dB
+- with Fourier features the stripes rise from 11.29 to 22.30 dB and the checkerboard from 7.56 to 18.74 dB; the backdrop stays near 23 dB
+- 9.4 dB over the plain network: the error is **8.7 times** smaller
+
+
+---
+
+## PSNR during training
+
+PSNR of the whole image, same picture, same Adam optimizer and batches (the SIREN at a tenth of the learning rate, 0.0005):
+
+| step | 0 | 100 | 300 | 1000 | 2000 | 4000 |
+| ---- | - | --- | --- | ---- | ---- | ---- |
+| ReLU, raw (x, y), 2,643 weights | 7.09 | 11.33 | 11.49 | 11.67 | 11.82 | 12.10 |
+| ReLU + Fourier features (σ = 6), 4,083 | 5.89 | 11.58 | 14.57 | 19.24 | **21.21** | **22.27** |
+| SIREN (ω₀ = 30), 2,643 | 5.35 | **12.95** | **16.01** | 18.14 | 18.89 | 20.16 |
+
+- the SIREN learns fastest early (16.01 dB at step 300); Fourier features pass it by step 1000
+- the SIREN has the plain network's 2,643 weights: its gain is not extra capacity
 
 
 ---

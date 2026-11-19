@@ -33,7 +33,7 @@
       </blockquote>
 
       <p class="lead">
-        Three ideas underlie every model in the chapters that follow: a neural network is a function whose weights are set by examples; an embedding is a learned vector that stands for a concept, placed so that similar concepts are near; and an encoder and a decoder move between things and their embeddings, with two encoders trained side by side making words and pictures one coordinate system. This chapter states each idea, runs the smallest possible example of it by hand, and shows the same thing computed at full size from the course&rsquo;s own trained network. Between the ideas it supplies what a working model needs: the activation functions and their derivatives, backpropagation through more than one hidden layer, the optimizers that replace plain gradient descent, the overfitting that a held-out set exposes and weight decay tames, and the two layer types, convolution and attention, that image and text models are built from.
+        Three ideas underlie every model in the chapters that follow: a neural network is a function whose weights are set by examples; an embedding is a learned vector that stands for a concept, placed so that similar concepts are near; and an encoder and a decoder move between things and their embeddings, with two encoders trained side by side making words and pictures one coordinate system. This chapter states each idea, runs the smallest possible example of it by hand, and shows the same thing computed at full size from the course&rsquo;s own trained network. Between the ideas it supplies what a working model needs: the activation functions and their derivatives, mini-batches, the classification loss, backpropagation through more than one hidden layer, the optimizers that replace plain gradient descent, the overfitting that a held-out set exposes and weight decay tames, and the two layer types, convolution and attention, that image and text models are built from.
       </p>
 
       <div class="toc">
@@ -140,7 +140,25 @@
         obtained in one backward sweep through the diagram; that organization
         is <strong>backpropagation</strong>
         (<a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">Rumelhart, Hinton &amp; Williams 1986</a>).
-        For the perceptron the four derivatives are short enough to write down:
+      </p>
+      <p>
+        For the perceptron, follow one input weight to the loss. With a single example the loss is
+        \((f - y)^2\). The weight \(w^{(1)}_h\) changes \(z_h\); \(z_h\) changes \(a_h\) through the
+        \(\tanh\); \(a_h\) changes \(f\) through the output weight \(w^{(2)}_h\); \(f\) changes the loss.
+        The chain rule multiplies the four local derivatives:
+      </p>
+      \[
+        \frac{\partial \mathcal{L}}{\partial w^{(1)}_h}
+        = \underbrace{\frac{\partial \mathcal{L}}{\partial f}}_{\delta \,=\, 2(f - y)}
+        \cdot \underbrace{\frac{\partial f}{\partial a_h}}_{w^{(2)}_h}
+        \cdot \underbrace{\frac{\partial a_h}{\partial z_h}}_{1 - a_h^2}
+        \cdot \underbrace{\frac{\partial z_h}{\partial w^{(1)}_h}}_{x}.
+      \]
+      <p>
+        The other derivatives are the same chain cut short: the bias \(b^{(1)}_h\) ends with
+        \(\partial z_h / \partial b^{(1)}_h = 1\) instead of \(x\), the output weight stops at
+        \(\partial f / \partial w^{(2)}_h = a_h\), and the output bias at \(\partial f / \partial b_2 = 1\).
+        All four:
       </p>
       \[
         \begin{gathered}
@@ -179,6 +197,11 @@
         looking at the problem. Repeat a few thousand times over a few thousand
         examples and that is all training is.
       </div>
+      <p>
+        Training is counted in <strong>iterations</strong>, single steps, and <strong>epochs</strong>,
+        passes over the whole training set. The approximator below uses all 12 of its points in every
+        step (full-batch gradient descent), so for it an epoch is one step; Section 2.1 separates the two.
+      </p>
       <figure>
         <img src="figures/nn-fit-progress.svg" alt="Left: twelve training points on a hidden sine-like curve, with the perceptron's curve drawn at epochs 0, 20, 100, 400 and 3000 bending progressively onto the points. Right: the mean squared error falling from about 1.7 to below 0.001 on a log-log plot." />
         <figcaption>
@@ -206,6 +229,103 @@
         of Section 4, whose normalization bounds each step regardless of the
         gradient&rsquo;s size.
       </div>
+
+      <h3>2.1 Mini-batches and stochastic gradient descent</h3>
+      <p>
+        The loss of Section 2 averages over all \(N\) examples, and so does its gradient. For a
+        data set of 60,000 images that is 60,000 forward and backward passes per step. No real
+        network is trained that way: each step uses a <strong>mini-batch</strong> of \(B\) random
+        examples instead.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (mini-batch, stochastic gradient descent, epoch)</span>
+        With \(\ell_i\) the loss of example \(i\), the mini-batch gradient
+        \[
+          \mathbf{g}_{\text{batch}} = \frac{1}{B} \sum_{i \in \text{batch}} \nabla_\theta\, \ell_i
+        \]
+        is a Monte Carlo estimate of the full gradient (the estimator of
+        <a href="ray-tracing.html">the path-tracing chapter</a>): unbiased, with noise falling as
+        \(1/\sqrt{B}\). <strong>Stochastic gradient descent</strong> takes one step along
+        \(-\eta\,\mathbf{g}_{\text{batch}}\) per batch, drawing a fresh batch each time. An
+        <strong>iteration</strong> is one such step; an <strong>epoch</strong> is one pass over the
+        training set, \(N/B\) iterations.
+      </div>
+      <div class="ex">
+        <span class="tag">Worked example (batch sizes and counts)</span>
+        Batches of \(B = 1\), 16 and 256 give gradient noise 1, 0.25 and 0.0625 relative to a single
+        example: sixteen times the batch, a quarter of the noise. MNIST (60,000 handwritten digits)
+        in batches of 128 takes \(60{,}000/128 = 468.75\), so 469 iterations per epoch, the last batch
+        short. The course&rsquo;s digit denoiser ran 41,210 steps of 512 images: 21.1 million examples
+        seen, \(21{,}099{,}520/60{,}000 = 351.7\) epochs, each digit about 350 times.
+      </div>
+      <p>
+        Two things are easy to conflate here. Backpropagation computes the gradient of whatever loss
+        it is given; stochastic descent decides which loss that is: at each step the loss of that
+        step&rsquo;s batch, a slightly different surface every time, equal to the full loss only on
+        average. Full-batch descent uses backpropagation too. The noise has a cost and a use. Small
+        batches give cheap, noisy steps; large batches give smooth steps and use a GPU better. The
+        noise can also carry the weights out of a poor minimum, with no guarantee. The optim-lab
+        measures it on one sine unit \(\sin(w x + b)\) fitted to 40 points: besides the right wave
+        (\(w = 2.55\), \(b = 0.29\), loss 0.029) the loss has a slow-wave minimum (\(w = 0.53\),
+        \(b = 0.02\), loss 0.330). Started at \((0.55, 0)\) and run for 200 steps with a cosine-decayed
+        rate from \(\eta_0 = 0.2\), 65 of 100 runs with batches of 1 escape to the right wave (final
+        full loss below 0.1); batches of 2, 15 runs; of 4, one; of 8, 16 or the full batch, none. A larger
+        rate escapes more often (\(\eta_0 = 0.3\): 98 of 100 at \(B = 1\)), a smaller one less
+        (\(\eta_0 = 0.1\): 6). The noise helps leave a basin whose ridge is low compared with the
+        noise; it does not find the best minimum in general.
+      </p>
+      <div class="demo">
+        <span class="tag">See it live</span>
+        <a href="../lib/demo.html?demo=optim-lab" target="_blank" rel="noopener">Optimizers, live</a>:
+        the Minibatch tab plots the gradient&rsquo;s noise against the batch size, and its
+        &ldquo;escaping a minimum&rdquo; view runs the sine unit above; with the map on
+        &ldquo;this step&rsquo;s batch&rdquo;, every step descends a different surface.
+      </div>
+
+      <h3>2.2 Choosing the loss: regression and classification</h3>
+      <p>
+        Squared error suits <strong>regression</strong>, predicting numbers such as a denoised image.
+        For <strong>classification</strong>, predicting one of \(K\) classes, the network outputs
+        \(K\) scores, the <strong>logits</strong> \(\mathbf{z}\), and two more pieces turn them into a loss.
+      </p>
+      <div class="def">
+        <span class="tag">Definition (softmax, cross-entropy, one-hot)</span>
+        The <strong>softmax</strong> turns logits into probabilities, positive and summing to 1,
+        \[
+          p_k = \operatorname{softmax}(\mathbf{z})_k = \frac{e^{z_k}}{\sum_j e^{z_j}},
+        \]
+        and the <strong>cross-entropy</strong> scores the probability given to the right class \(c\),
+        \(\ell = -\log p_c\). The target written as a vector is <strong>one-hot</strong>: 1 at the
+        right class, 0 elsewhere (class 0 of 3 is \((1, 0, 0)\)).
+      </div>
+      <p>
+        The pair is always used together because its gradient is as simple as a gradient can be.
+        Write \(\ell = -z_c + \log \sum_j e^{z_j}\) and differentiate by \(z_k\): the first term gives
+        \(-1\) when \(k = c\) and 0 otherwise, the second gives \(e^{z_k}/\sum_j e^{z_j} = p_k\). So
+        \[
+          \frac{\partial \ell}{\partial \mathbf{z}} = \mathbf{p} - \text{onehot}(c).
+        \]
+      </p>
+      <div class="ex">
+        <span class="tag">Worked example (softmax and cross-entropy)</span>
+        Logits \(\mathbf{z} = (2, 1, 0.1)\): \(e^{\mathbf{z}} = (7.389, 2.718, 1.105)\), sum 11.212,
+        so \(\mathbf{p} = (0.659, 0.242, 0.099)\). If the right class is 0 the loss is
+        \(-\log 0.659 = 0.417\); if it is class 2, \(-\log 0.099 = 2.317\): a confident wrong answer
+        costs more than five times as much. For class 0 the gradient is
+        \(\mathbf{p} - (1, 0, 0) = (-0.341, 0.242, 0.099)\), so a step against it raises the right
+        logit and lowers the others, each in proportion to its probability.
+      </div>
+      <div class="pitfall">
+        <span class="tag">Pitfall</span>
+        \(e^{z}\) overflows a 32-bit float above \(z \approx 88\). Since
+        \(\operatorname{softmax}(\mathbf{z} - m) = \operatorname{softmax}(\mathbf{z})\) for any constant \(m\)
+        (the factor \(e^{-m}\) cancels), implementations subtract \(m = \max_j z_j\) first, which keeps
+        every exponent at or below 0.
+      </div>
+      <p>
+        Softmax returns twice in this chapter: as the weighting inside attention (Section 6.2) and,
+        over cosines, as CLIP&rsquo;s contrastive loss (Section 8).
+      </p>
 
 <!-- ============================================================ -->
       <h2 id="deep">3 &middot; Backpropagation through two hidden layers</h2>
@@ -313,7 +433,7 @@
         <figcaption>The wave fit of Section 2 three ways, same initialization, same 12 points. Mean squared error at epochs 100, 300, 1000, 3000: gradient descent 0.069, 0.019, 0.0016, 0.0008; momentum 0.0019, 0.0008, 0.0007, 0.0006; Adam 0.070, 0.008, 0.0005, 0.0003. Momentum is fastest here (a smooth, low-dimensional problem); Adam ends lowest.</figcaption>
       </figure>
       <p>
-        On a large network trained on minibatches, whose gradients are noisy
+        On a large network trained on mini-batches (Section 2.1), whose gradients are noisy
         estimates, Adam&rsquo;s per-weight normalization is what makes one
         learning rate work across layers whose gradient scales differ by
         orders of magnitude, and the AdamW variant (weight decay applied
@@ -464,7 +584,9 @@
           \mathbf{y}_i = \sum_j \alpha_{ij}\,\mathbf{v}_j, \qquad
           \alpha_{ij} = \frac{\exp(\mathbf{q}_i\cdot\mathbf{k}_j/\sqrt d)}{\sum_{j'}\exp(\mathbf{q}_i\cdot\mathbf{k}_{j'}/\sqrt d)}.
         \]
-        The weights depend on the data, not only on the position, which is what
+        Here \(d\) is the length of the query and key vectors, and the weights
+        \(\alpha_{ij}\) are a softmax over \(j\) (Section 2.2). The matrices \(W_q, W_k, W_v\)
+        are learned. The weights depend on the data, not only on the position, which is what
         a convolution cannot do; and every vector can look at every other in
         one layer.
       </div>
@@ -528,12 +650,15 @@
         version that you can check to the last digit: the digit-drawing network
         of <a href="diffusion-models.html">the diffusion chapter</a> carries a table of eleven 64-dimensional class vectors
         (one per digit, one for &ldquo;no class&rdquo;) that it learned only from
-        denoising. Nobody told it that a 4 looks like a 9.
+        denoising. Nobody told it that a 4 looks like a 9. Looking a class up in such a table is a
+        linear layer applied to a one-hot vector (Section 2.2): one-hot(3) times the \(11 \times 64\)
+        matrix is row 3, so the table is trained by the same gradient as every other weight, and
+        only the looked-up row receives a gradient on each example.
       </p>
       <figure>
         <img src="figures/nn-embed-map.svg" alt="Left: eleven labeled dots, the class embeddings of the trained digit denoiser projected onto their two principal axes; 4 and 9 sit together, 3 and 5 close, 7 near 9; the 1 has the weakest nearest neighbor. Right: a 10 by 10 matrix of cosine similarities between the ten digit vectors, darker where larger." />
         <figcaption>
-          Read straight from the weight file. Left: the eleven vectors projected onto their two principal axes (18 % and 18 % of the variance; the picture is a shadow of a 64-dimensional arrangement). Right: every pairwise cosine, computed in all 64 dimensions. The nearest neighbor of 4 is 9 (0.54), of 3 is 5 (0.52), of 7 is 9 (0.48), of 2 is 3 (0.39); the 1, a single stroke, has the weakest nearest neighbor of the ten, 3 at 0.31. The network placed digits that share strokes together because a denoiser that knows &ldquo;this is a 4&rdquo; and &ldquo;this is a 9&rdquo; must do nearly the same work for both.
+          Read straight from the weight file. Left: the eleven vectors projected onto their two principal axes, the two directions of greatest spread (the principal components of <a href="image-space.html">the image-space chapter</a>; 18 % and 18 % of the variance; the picture is a shadow of a 64-dimensional arrangement). Right: every pairwise cosine, computed in all 64 dimensions. The nearest neighbor of 4 is 9 (0.54), of 3 is 5 (0.52), of 7 is 9 (0.48), of 2 is 3 (0.39); the 1, a single stroke, has the weakest nearest neighbor of the ten, 3 at 0.31. The network placed digits that share strokes together because a denoiser that knows &ldquo;this is a 4&rdquo; and &ldquo;this is a 9&rdquo; must do nearly the same work for both.
         </figcaption>
       </figure>
       <div class="ex">
@@ -597,8 +722,8 @@
         maps back, \(D : \mathbb{R}^d \to \text{thing}\). Trained together to
         reproduce their input through a narrow middle,
         \(\min_{E,D} \sum_i \|D(E(x_i)) - x_i\|^2\), they form an
-        <strong>autoencoder</strong>, and the middle is forced to keep only what
-        matters (<a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov 2006</a>).
+        <strong>autoencoder</strong>, and the vector in the middle, the <em>code</em> or
+        <strong>latent</strong>, is forced to keep only what matters (<a href="https://doi.org/10.1126/science.1127647" target="_blank" rel="noopener">Hinton &amp; Salakhutdinov 2006</a>).
         Stable Diffusion&rsquo;s autoencoder is exactly this, with a variational
         twist that keeps the latent well behaved (<a href="diffusion-models.html#scaling">the
         diffusion chapter</a> says which): a \(512\times512\times3\) image
@@ -704,7 +829,9 @@
 
       <h3>9.1 Spectral bias</h3>
       <p>
-        A network trained by gradient descent fits the low frequencies of its target first and the
+        A network trained by gradient descent fits the low frequencies of its target first (slow
+        variation, few cycles across the image, in the sense of
+        <a href="antialiasing.html">the antialiasing chapter</a>) and the
         high frequencies late or never
         (<a href="https://arxiv.org/abs/1806.08734" target="_blank" rel="noopener">Rahaman et al. 2019</a>).
         A ReLU network is continuous and piecewise linear in its input, so a 4-pixel checkerboard
@@ -969,8 +1096,31 @@
         </details>
       </div>
 
+      <div class="ex">
+        <span class="tag">Exercise 13 (softmax and cross-entropy, Section 2.2)</span>
+        A classifier outputs the logits \(\mathbf{z} = (1, 3, 0)\). Compute the softmax, the cross-entropy
+        if the right class is 0 and if it is 1, and the gradient with respect to the logits for class 0.
+        <details><summary>Solution</summary>
+          \(e^{\mathbf{z}} = (2.718, 20.086, 1)\), sum 23.804, so \(\mathbf{p} = (0.1142, 0.8438, 0.0420)\).
+          Class 0: loss \(-\log 0.1142 = 2.170\); class 1: \(-\log 0.8438 = 0.170\). The gradient for class 0
+          is \(\mathbf{p} - (1, 0, 0) = (-0.8858, 0.8438, 0.0420)\): the step raises \(z_0\) most and lowers
+          \(z_1\), the confident wrong answer, most among the others.
+        </details>
+      </div>
+      <div class="ex">
+        <span class="tag">Exercise 14 (mini-batches, Section 2.1)</span>
+        A data set has 50,000 examples and training uses batches of 125. How many iterations make an
+        epoch? How many epochs are 10,000 iterations? How large must the batch be to halve the
+        gradient noise of \(B = 125\)?
+        <details><summary>Solution</summary>
+          \(50{,}000/125 = 400\) iterations per epoch; \(10{,}000/400 = 25\) epochs. The noise falls as
+          \(1/\sqrt{B}\), so halving it needs four times the batch, \(B = 500\) (and each step costs four
+          times as much: a smoother step is not a cheaper one).
+        </details>
+      </div>
+
       <footer>
-        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.2 &middot; prepared by Dr. Marcel
+        CSS 551 &middot; course text &middot; Neural Networks and Embeddings v3.3 &middot; prepared by Dr. Marcel
         Gavriliu. Figures computed by <code>tools/gen-textbook-figures.mjs</code>; the coordinate-network figures by <code>lectures/L15-neural-nets-embeddings/analysis/coord-net-figures.mjs</code>. <a href="index.html">All chapters</a>.
       </footer>
     </div>
