@@ -45,9 +45,15 @@
     teaches hash grids again. Corrected: the SIREN trains at a tenth of the others' learning rate; hash levels
     776 and 2048.
 
+  POLISHED 2026-11-19 (Marcel: "let's apply the formula and illustration polish we used in previous
+           lectures"): every formula typeset (MathJax, the ASCII kept as aria-label); the network's layers and
+           the Fourier rows as tables; new generated figure nn-posenc-octaves (tools/gen-lecture-figures-neural.mjs,
+           the ASCII table as alt); the figures set at a readable size. Every number recomputed.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
-  follow "Note:". Math is plain unicode text or fenced ```text blocks (no
-  KaTeX plugin). Never two "_" on one markdown line outside a code fence;
+  follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
+  TeX inside, the ASCII form as aria-label, no blank line inside); inline math is a code span written
+  `$...$`. Never two "_" on one markdown line outside a code fence;
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
@@ -64,32 +70,42 @@
 
 A picture of 64 × 64 pixels is a table of 4,096 colours. Read it as a function instead:
 
-```text
-   f : (x, y) ∈ [−1, 1]²  →  (r, g, b) ∈ [0, 1]³
+<div class="tex" style="font-size:0.72em" role="img" aria-label="f : (x, y) ∈ [−1, 1]²  →  (r, g, b) ∈ [0, 1]³
+pixel (i, j) = (10, 20)     x = (10 + 0.5)/64 · 2 − 1 = −0.6719
+                            y = (20 + 0.5)/64 · 2 − 1 = −0.3594
+f(−0.6719, −0.3594) = (0.95, 0.35, 0.20)        inside the orange disc">
+\[
+\begin{gathered}
+f : (x, y) \in [-1, 1]^2 \;\to\; (r, g, b) \in [0, 1]^3 \\[8pt]
+\begin{aligned}
+&\text{pixel } (i, j) = (10, 20) && x = \tfrac{10 + 0.5}{64} \cdot 2 - 1 = -0.6719 \\
+& && y = \tfrac{20 + 0.5}{64} \cdot 2 - 1 = -0.3594 \\
+& && f({-0.6719},\ {-0.3594}) = (0.95,\ 0.35,\ 0.20) \quad \text{(the orange disc)}
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
-   pixel (i, j) = (10, 20)     x = (10 + 0.5)/64 · 2 − 1 = −0.6719
-                               y = (20 + 0.5)/64 · 2 − 1 = −0.3594
-   f(−0.6719, −0.3594) = (0.95, 0.35, 0.20)        inside the orange disc
-```
-
-- the table stores f at 4,096 points; a **coordinate network** is an MLP (multilayer perceptron) `f_θ` that can be evaluated at **any** (x, y)
-- the same idea fits a shape, `(x, y, z) → distance`, or a scene, `(x, y, z, direction) → (density, colour)`
+- the table stores `$f$` at 4,096 points; a **coordinate network** is an MLP (multilayer perceptron) `$f_\theta$` that can be evaluated at **any** `$(x, y)$`
+- the same idea fits a shape, `$(x, y, z) \to \text{distance}$`, or a scene, `$(x, y, z, \text{direction}) \to (\text{density}, \text{colour})$`
 
 
 ---
 
 ## Fitting one image with an MLP
 
-```text
-   input        (x, y)                                 2 numbers
-   hidden 1     ReLU(W₁ p + b₁)          2 × 48 + 48        144 weights
-   hidden 2     ReLU(W₂ h + b₂)          48 × 48 + 48     2,352
-   output       W₃ h + b₃ = (r, g, b)    48 × 3 + 3         147
-   total                                                 2,643
+| layer | computes | weights |
+| ----- | -------- | ------- |
+| input | `$p = (x, y)$`, 2 numbers | |
+| hidden 1 | `$h = \operatorname{ReLU}(W_1 p + b_1)$` | 2 × 48 + 48 = 144 |
+| hidden 2 | `$h = \operatorname{ReLU}(W_2 h + b_2)$` | 48 × 48 + 48 = 2,352 |
+| output | `$W_3 h + b_3 = (r, g, b)$` | 48 × 3 + 3 = 147 |
+| total | | **2,643** |
 
-   loss         L = (1/3B) Σ over B pixels, 3 channels: ( f_θ(xᵢ, yᵢ) − cᵢ )²
-   training     Adam, η = 0.005, B = 256 random pixels per step
-```
+<div class="tex" style="font-size:0.76em" role="img" aria-label="loss         L = (1/3B) Σ over B pixels, 3 channels: ( f_θ(xᵢ, yᵢ) − cᵢ )²
+training     Adam, η = 0.005, B = 256 random pixels per step">
+\[ \begin{gathered} L = \frac{1}{3B} \sum_{B \text{ pixels, 3 channels}} \big( f_\theta(x_i, y_i) - c_i \big)^2 \\ \text{training: Adam, } \eta = 0.005,\ B = 256 \text{ random pixels per step} \end{gathered} \]
+</div>
 
 - the **training set** is the 4,096 pixels of **one** image; there is no test image
 - one step: 256 pixels × 2,544 multiply-adds forward, about twice that backward
@@ -99,14 +115,21 @@ A picture of 64 × 64 pixels is a table of 4,096 colours. Read it as a function 
 
 ## What "memorizing one signal" means
 
-```text
-   the image      4,096 pixels × 3 = 12,288 numbers
-   the network    2,643 weights               4.6 times fewer numbers
-
-   PSNR = 10 log₁₀( 1 / MSE )     peak signal-to-noise ratio, colours in [0, 1]
-   MSE 0.0658    →  11.82 dB
-   MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error
-```
+<div class="tex" style="font-size:0.8em" role="img" aria-label="the image      4,096 pixels × 3 = 12,288 numbers
+the network    2,643 weights               4.6 times fewer numbers
+PSNR = 10 log₁₀( 1 / MSE )     peak signal-to-noise ratio, colours in [0, 1]
+MSE 0.0658    →  11.82 dB
+MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error">
+\[
+\begin{aligned}
+&\text{the image} && 4{,}096 \text{ pixels} \times 3 = 12{,}288 \text{ numbers} \\
+&\text{the network} && 2{,}643 \text{ weights: } 4.6 \text{ times fewer numbers} \\[6pt]
+&\text{PSNR} && 10 \log_{10} \big( 1 / \text{MSE} \big) \quad \text{peak signal-to-noise ratio, colours in } [0, 1] \\
+& && \text{MSE } 0.0658 \to 11.82 \text{ dB}, \qquad \text{MSE } 0.00757 \to 21.21 \text{ dB} \\
+& && +10 \text{ dB} = 10 \text{ times less error}
+\end{aligned}
+\]
+</div>
 
 - a perfect fit would be **compression**: the weights would reproduce 12,288 numbers from 2,643
 - the network is overfit **by design**; the only question is how close it gets, and the answer is measured in PSNR
@@ -147,18 +170,19 @@ A network trained by gradient descent fits the **low frequencies** of its target
 
 Feed the network sines and cosines of the coordinates instead of the coordinates (Tancik et al., NeurIPS 2020, arXiv:2006.10739):
 
-```text
-   γ(v) = ( cos 2πBv, sin 2πBv ),    v = (u, v) ∈ [0, 1]²
-   B: 16 × 2, entries ~ N(0, σ²), drawn once, fixed
+<div class="tex" style="font-size:0.8em" role="img" aria-label="γ(v) = ( cos 2πBv, sin 2πBv ),    v ∈ [0, 1]² the pixel's position
+B: 16 × 2, entries ~ N(0, σ²), drawn once, fixed">
+\[ \begin{gathered} \gamma(\mathbf{v}) = \big( \cos 2\pi B \mathbf{v},\ \sin 2\pi B \mathbf{v} \big), \qquad \mathbf{v} \in [0, 1]^2 \text{ the pixel's position} \\ B: 16 \times 2,\ \text{entries} \sim \mathcal{N}(0, \sigma^2), \text{ drawn once, fixed} \end{gathered} \]
+</div>
 
-   pixel (10, 20):  v = (0.1641, 0.3203),  σ = 6
-          b                    2π b·v      (cos, sin)
-   row 1  (−6.6166, −2.0136)   −10.8731    (−0.1222, 0.9925)
-   row 2  (−2.6317, −3.6818)   −10.1228    (−0.7661, 0.6427)
-   16 rows → 32 inputs;  first layer 32 × 48 + 48;  total 4,083 weights
-```
+Pixel (10, 20): `$\mathbf{v} = (0.1641,\ 0.3203)$`, `$\sigma = 6$`; 16 rows give 32 inputs, so the first layer has 32 × 48 + 48 weights, 4,083 in all.
 
-- each row of B is a plane wave across the image, with |b| cycles per image width; B is drawn once and **never trained**
+| row of `$B$` | `$\mathbf{b}$` | `$2\pi\, \mathbf{b} \cdot \mathbf{v}$` | (cos, sin) |
+| ------------ | --------------- | ------------------------------------------- | ---------- |
+| 1 | (−6.6166, −2.0136) | −10.8731 | (−0.1222, 0.9925) |
+| 2 | (−2.6317, −3.6818) | −10.1228 | (−0.7661, 0.6427) |
+
+- each row of `$B$` is a plane wave across the image, with `$\lvert \mathbf{b} \rvert$` cycles per image width; `$B$` is drawn once and **never trained**
 - the network now combines waves that already oscillate at the needed rates
 
 
@@ -168,18 +192,23 @@ Feed the network sines and cosines of the coordinates instead of the coordinates
 
 NeRF (neural radiance fields; Mildenhall et al., ECCV 2020, arXiv:2003.08934) uses fixed, axis-aligned octaves in place of random B:
 
-```text
-   γ(p) = ( sin 2ᵏπp, cos 2ᵏπp ),   k = 0 … L−1,   for each coordinate p
+<div class="tex" style="font-size:0.82em" role="img" aria-label="γ(p) = ( sin 2ᵏπp, cos 2ᵏπp ),   k = 0 … L−1,   for each coordinate p">
+\[ \gamma(p) = \big( \sin 2^k \pi p,\ \cos 2^k \pi p \big), \qquad k = 0 \dots L - 1, \quad \text{for each coordinate } p \]
+</div>
 
-   p = x = −0.6719, L = 6
-   k        0         1         2         3         4         5
-   freq     π         2π        4π        8π        16π       32π
-   sin   −0.8577    0.8819   −0.8315    0.9239   −0.7071    1.0000
-   cos   −0.5141   −0.4714   −0.5556   −0.3827   −0.7071    0.0000
-```
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 35%; font-size:0.72em;">
 
-- on 64 pixels across [−1, 1], the 32π pair has a period of **2 pixels**: the finest pattern the grid can hold
-- NeRF uses L = 10 for position and L = 4 for direction; the transformer's position code and the diffusion denoiser's time code are the same construction
+- worked: `$p = x = -0.6719$`, `$L = 6$`; each octave doubles the frequency
+- on 64 pixels across `$[-1, 1]$`, the `$32\pi$` pair has a period of **2 pixels**: the finest pattern the grid can hold
+- NeRF uses `$L = 10$` for position and `$L = 4$` for direction; the transformer's position code and the diffusion denoiser's time code are the same construction
+
+</div><div style="flex:1 1 65%;">
+<img src="../../textbook/figures/nn-posenc-octaves.svg" style="width:100%; max-height:440px;" alt="p = x = −0.6719, L = 6
+k        0         1         2         3         4         5
+freq     π         2π        4π        8π        16π       32π
+sin   −0.8577    0.8819   −0.8315    0.9239   −0.7071    1.0000
+cos   −0.5141   −0.4714   −0.5556   −0.3827   −0.7071    0.0000">
+</div></div>
 
 
 ---
@@ -220,10 +249,10 @@ PSNR of the whole image, same picture, same Adam optimizer and batches (the SIRE
 
 A sinusoidal representation network (SIREN; Sitzmann et al., NeurIPS 2020, arXiv:2006.09661) replaces ReLU with a sine in every hidden layer:
 
-```text
-   h₁ = sin( ω₀ (W₁ p + b₁) )     h₂ = sin( ω₀ (W₂ h₁ + b₂) )
-   f  = W₃ h₂ + b₃                ω₀ = 30
-```
+<div class="tex" role="img" aria-label="h₁ = sin( ω₀ (W₁ p + b₁) )     h₂ = sin( ω₀ (W₂ h₁ + b₂) )
+f  = W₃ h₂ + b₃                ω₀ = 30">
+\[ \begin{gathered} h_1 = \sin\!\big( \omega_0 (W_1 p + b_1) \big), \qquad h_2 = \sin\!\big( \omega_0 (W_2 h_1 + b_2) \big) \\ f = W_3 h_2 + b_3, \qquad \omega_0 = 30 \end{gathered} \]
+</div>
 
 - the input layer is itself a bank of plane waves, now **trained**; deeper layers build sums and products of waves (sin a · sin b is a sum of waves at a ± b)
 - the derivative of sin is a shifted sin, so **the derivative of a SIREN is a SIREN**: gradients and Laplacians of the fitted signal are smooth and meaningful

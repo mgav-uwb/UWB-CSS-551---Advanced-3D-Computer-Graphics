@@ -4,11 +4,13 @@
   not build on, in the topic's order. Numbers: as in that topic's header (tools/gen-lecture-figures-d1.mjs,
   textbook/figures/numbers.json).
   NEEDS: topics/neural-nets-embeddings.md.
-  reveal.js: FLAT; notes follow "Note:"; plain unicode math in text blocks; never two "_" on one markdown line
-  outside a code fence.
+  POLISHED 2026-11-19 (Marcel: "let's apply the formula and illustration polish we used in previous lectures"):
+  every formula typeset, the ASCII kept as aria-label.
+  reveal.js: FLAT; notes follow "Note:" and stay plain text; never two "_" on one markdown line outside a code
+  fence or code span.
+  Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form
+  as aria-label, no blank line inside); inline math is a code span written `$...$`.
 -->
-
----
 
 ### Supplement: neural networks, further
 
@@ -37,14 +39,23 @@
 
 The course's digit denoiser, layer by layer (weights and biases):
 
-```text
-   class embedding   11 × 64                         704
-   layer 1           512 × (400 + 64 + 64) + 512     270,848     image + time + class
-   layer 2           512 × 512 + 512                 262,656
-   layer 3           512 × 512 + 512                 262,656
-   output            400 × 512 + 400                 205,200
-   total                                            1,002,064
-```
+<div class="tex" style="font-size:0.74em" role="img" aria-label="class embedding   11 × 64                         704
+layer 1           512 × (400 + 64 + 64) + 512     270,848     image + time + class
+layer 2           512 × 512 + 512                 262,656
+layer 3           512 × 512 + 512                 262,656
+output            400 × 512 + 400                 205,200
+total                                            1,002,064">
+\[
+\begin{array}{llrl}
+\text{class embedding} & 11 \times 64 & 704 & \\
+\text{layer 1} & 512 \times (400 + 64 + 64) + 512 & 270{,}848 & \text{image + time + class} \\
+\text{layer 2} & 512 \times 512 + 512 & 262{,}656 & \\
+\text{layer 3} & 512 \times 512 + 512 & 262{,}656 & \\
+\text{output} & 400 \times 512 + 400 & 205{,}200 & \\ \hline
+\text{total} & & 1{,}002{,}064 &
+\end{array}
+\]
+</div>
 
 - one forward pass ≈ **one million multiply-adds**; a 30-step sample ≈ **30 million**
 - a GPU is built for exactly this: the same multiply-add over large arrays, which is what vertex and fragment shading also are
@@ -54,19 +65,32 @@ The course's digit denoiser, layer by layer (weights and biases):
 
 ## What one layer cannot do: XOR
 
-XOR is 1 when exactly one input is 1. No single line separates {(0,1), (1,0)} from {(0,0), (1,1)}, so no single threshold unit computes it. Two hidden units do:
+XOR is 1 when exactly one input is 1. No single line separates `$\{(0,1), (1,0)\}$` from `$\{(0,0), (1,1)\}$`, so no single threshold unit computes it. Two hidden units do:
 
-```text
-   h₁ = step(x₁ + x₂ − 0.5)       "at least one"
-   h₂ = step(x₁ + x₂ − 1.5)       "both"
-   y  = step(h₁ − h₂ − 0.5)       "at least one, but not both"
-
-   x₁ x₂ | h₁ h₂ | y
-    0  0 |  0  0 | 0
-    0  1 |  1  0 | 1
-    1  0 |  1  0 | 1
-    1  1 |  1  1 | 0
-```
+<div class="tex" style="font-size:0.72em" role="img" aria-label="h₁ = step(x₁ + x₂ − 0.5)       &quot;at least one&quot;
+h₂ = step(x₁ + x₂ − 1.5)       &quot;both&quot;
+y  = step(h₁ − h₂ − 0.5)       &quot;at least one, but not both&quot;
+x₁ x₂ | h₁ h₂ | y
+ 0  0 |  0  0 | 0
+ 0  1 |  1  0 | 1
+ 1  0 |  1  0 | 1
+ 1  1 |  1  1 | 0">
+\[
+\begin{aligned}
+h_1 &= \operatorname{step}(x_1 + x_2 - 0.5) && \text{“at least one”} \\
+h_2 &= \operatorname{step}(x_1 + x_2 - 1.5) && \text{“both”} \\
+y &= \operatorname{step}(h_1 - h_2 - 0.5) && \text{“at least one, but not both”}
+\end{aligned}
+\qquad
+\begin{array}{cc|cc|c}
+x_1 & x_2 & h_1 & h_2 & y \\ \hline
+0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 1 & 0 & 1 \\
+1 & 0 & 1 & 0 & 1 \\
+1 & 1 & 1 & 1 & 0
+\end{array}
+\]
+</div>
 
 - the hidden layer **re-describes** the input so that the output's single line suffices
 - this is the 1969 objection, answered by one hidden layer; it was the training, not the capacity, that was missing until 1986
@@ -76,28 +100,45 @@ XOR is 1 when exactly one input is 1. No single line separates {(0,1), (1,0)} fr
 
 ## Outside the data: networks do not extrapolate
 
-A tanh saturates at ±1, so far from the data every hidden unit is a constant:
+A tanh saturates at `$\pm 1$`, so far from the data every hidden unit is a constant:
 
-```text
-   the hand network:   f(x) = 0.1 + 0.8 tanh(x + 0.5) − 0.6 tanh(−x + 0.5)
-   x → +∞:   0.1 + 0.8·(+1) − 0.6·(−1) = 1.5
-   x → −∞:   0.1 + 0.8·(−1) − 0.6·(+1) = −1.3
-```
+<div class="tex" style="font-size:0.8em" role="img" aria-label="the hand network:   f(x) = 0.1 + 0.8 tanh(x + 0.5) − 0.6 tanh(−x + 0.5)
+x → +∞:   0.1 + 0.8·(+1) − 0.6·(−1) = 1.5
+x → −∞:   0.1 + 0.8·(−1) − 0.6·(+1) = −1.3">
+\[
+\begin{gathered}
+\text{the hand network:} \quad f(x) = 0.1 + 0.8 \tanh(x + 0.5) - 0.6 \tanh(-x + 0.5) \\[4pt]
+\begin{aligned}
+x \to +\infty\text{:} &\quad 0.1 + 0.8 \cdot (+1) - 0.6 \cdot (-1) = 1.5 \\
+x \to -\infty\text{:} &\quad 0.1 + 0.8 \cdot (-1) - 0.6 \cdot (+1) = -1.3
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
 - a trained network is reliable **between** its examples and **flat** (tanh) or **linear** (ReLU) beyond them
-- the wave fit knows nothing about the wave outside [−1, 1]; asked there, it answers with confidence anyway
+- the wave fit knows nothing about the wave outside `$[-1, 1]$`; asked there, it answers with confidence anyway
 
 
 ---
 
 ## Pitfall: softmax overflows
 
-```text
-   logits (1000, 999)
-   naive:     exp(1000) = Infinity in double precision  →  Infinity / Infinity = NaN
-   stable:    subtract the maximum: exp(0), exp(−1)  →  (0.731, 0.269)     the same answer
-   wrong fix: divide by 1000: softmax(1, 0.999) = (0.50025, 0.49975)   a different answer
-```
+<div class="tex" style="font-size:0.66em" role="img" aria-label="logits (1000, 999)
+naive:     exp(1000) = Infinity in double precision  →  Infinity / Infinity = NaN
+stable:    subtract the maximum: exp(0), exp(−1)  →  (0.731, 0.269)     the same answer
+wrong fix: divide by 1000: softmax(1, 0.999) = (0.50025, 0.49975)   a different answer">
+\[
+\begin{gathered}
+\text{logits } (1000,\ 999) \\[4pt]
+\begin{aligned}
+\text{naive:} &\quad \exp(1000) = \text{Infinity in double precision} \ \to\ \text{Infinity} / \text{Infinity} = \text{NaN} \\
+\text{stable:} &\quad \text{subtract the maximum: } \exp(0),\ \exp(-1) \ \to\ (0.731,\ 0.269) \quad\ \ \text{the same answer} \\
+\text{wrong fix:} &\quad \text{divide by 1000: } \operatorname{softmax}(1,\ 0.999) = (0.50025,\ 0.49975) \quad\ \ \text{a different answer}
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
 - softmax is unchanged by adding a constant to every logit; subtracting the maximum makes the largest exponent 0
 - the same **log-sum-exp** trick appears in the exact denoiser of the diffusion lecture, where the logits reach −1700
@@ -109,15 +150,23 @@ A tanh saturates at ±1, so far from the data every hidden unit is a constant:
 
 Every hand-derived or hand-coded gradient gets tested against a finite difference:
 
-```text
-   ∂L/∂b₂ ≈ ( L(b₂ + h) − L(b₂ − h) ) / (2h),     h = 10⁻⁴
+<div class="tex" style="font-size:0.8em" role="img" aria-label="∂L/∂b₂ ≈ ( L(b₂ + h) − L(b₂ − h) ) / (2h),     h = 10⁻⁴
+central difference     0.626475
+analytic δ = 2(f − y)  0.626475          agree to 10⁻¹⁰
+a bug (the 2 dropped)  0.313237          off by a factor of two: the check catches it">
+\[
+\begin{gathered}
+\frac{\partial L}{\partial b_2} \approx \frac{L(b_2 + h) - L(b_2 - h)}{2h}, \qquad h = 10^{-4} \\[8pt]
+\begin{array}{lll}
+\text{central difference} & 0.626475 & \\
+\text{analytic } \delta = 2(f - y) & 0.626475 & \text{agree to } 10^{-10} \\
+\text{a bug (the 2 dropped)} & 0.313237 & \text{off by a factor of two: the check catches it}
+\end{array}
+\end{gathered}
+\]
+</div>
 
-   central difference     0.626475
-   analytic δ = 2(f − y)  0.626475          agree to 10⁻¹⁰
-   a bug (the 2 dropped)  0.313237          off by a factor of two: the check catches it
-```
-
-- central differences have error O(h²); compare with a **relative** tolerance
+- central differences have error `$O(h^2)$`; compare with a **relative** tolerance
 - check a few random weights of a real network the same way before trusting a training run
 
 
@@ -145,21 +194,32 @@ opt.step()                            # update: p -= lr * p.grad
 
 ## Two hidden layers, worked
 
-Keep layer 1; add `W2 = [0.6 −0.4; 0.3 0.9]`, `b2 = (0, −0.2)`, output `w3 = (0.8, −0.6)`, `b3 = 0.1`; tanh everywhere; x = 0.4, y = 0.3.
+Keep layer 1; add `$W_2 = \left[\begin{smallmatrix} 0.6 & {-0.4} \\ 0.3 & 0.9 \end{smallmatrix}\right]$`, `$b_2 = (0, -0.2)$`, output `$w_3 = (0.8, -0.6)$`, `$b_3 = 0.1$`; tanh everywhere; `$x = 0.4$`, `$y = 0.3$`.
 
-```text
-   forward   a1 = (0.7163, 0.0997)   z2 = (0.3899, 0.1046)   a2 = (0.3713, 0.1042)
-             f = 0.1 + 0.8·0.3713 − 0.6·0.1042 = 0.3345        loss 0.0012
-   δ3        2(f − y) = 0.0690
-   δ2        0.0690·(0.8, −0.6) ⊙ (1 − a2²)
-             = 0.0690·(0.8, −0.6) ⊙ (0.8621, 0.9891)            = (0.0476, −0.0410)
-   ∂/∂W2     δ2 a1ᵀ = [ 0.0341  0.0047 ; −0.0293  −0.0041 ]
-   δ1        W2ᵀδ2 = (0.0163, −0.0559),  ⊙ (0.4869, 0.9901)  = (0.0079, −0.0553)
-   ∂/∂W1     δ1 · x = (0.0032, −0.0221)
-   after one step (η = 0.1):  f = 0.3126,  loss 0.0002
-```
+<div class="tex" style="font-size:0.66em" role="img" aria-label="forward   a1 = (0.7163, 0.0997)   z2 = (0.3899, 0.1046)   a2 = (0.3713, 0.1042)
+          f = 0.1 + 0.8·0.3713 − 0.6·0.1042 = 0.3345        loss 0.0012
+δ3        2(f − y) = 0.0690
+δ2        0.0690·(0.8, −0.6) ⊙ (1 − a2²)
+          = 0.0690·(0.8, −0.6) ⊙ (0.8621, 0.9891)            = (0.0476, −0.0410)
+∂/∂W2     δ2 a1ᵀ = [ 0.0341  0.0047 ; −0.0293  −0.0041 ]
+δ1        W2ᵀδ2 = (0.0163, −0.0559),  ⊙ (0.4869, 0.9901)  = (0.0079, −0.0553)
+∂/∂W1     δ1 · x = (0.0032, −0.0221)
+after one step (η = 0.1):  f = 0.3126,  loss 0.0002">
+\[
+\begin{aligned}
+&\text{forward} && a_1 = (0.7163,\ 0.0997) \qquad z_2 = (0.3899,\ 0.1046) \qquad a_2 = (0.3713,\ 0.1042) \\
+& && f = 0.1 + 0.8 \cdot 0.3713 - 0.6 \cdot 0.1042 = 0.3345, \qquad \text{loss } 0.0012 \\
+&\delta_3 && 2(f - y) = 0.0690 \\
+&\delta_2 && 0.0690 \cdot (0.8,\ {-0.6}) \odot (1 - a_2^2) \\
+& && = 0.0690 \cdot (0.8,\ {-0.6}) \odot (0.8621,\ 0.9891) = (0.0476,\ {-0.0410}) \\
+&\partial L / \partial W_2 && \delta_2\, a_1^T = \begin{bmatrix} 0.0341 & 0.0047 \\ {-0.0293} & {-0.0041} \end{bmatrix} \\
+&\delta_1 && W_2^T \delta_2 = (0.0163,\ {-0.0559}), \quad \odot\ (0.4869,\ 0.9901) = (0.0079,\ {-0.0553}) \\
+&\partial L / \partial W_1 && \delta_1 \cdot x = (0.0032,\ {-0.0221}) \qquad \text{after one step } (\eta = 0.1)\text{:} \ \ f = 0.3126, \ \ \text{loss } 0.0002
+\end{aligned}
+\]
+</div>
 
-- at every layer δ is multiplied by a weight and a tanh slope: unit 1's error **shrank six-fold** (0.0476 to 0.0079), unit 2's **grew** (−0.0410 to −0.0553), because W2's 0.9 outweighs its slope; where those products stay below 1 layer after layer, the first layer's gradient vanishes
+- at every layer `$\delta$` is multiplied by a weight and a tanh slope: unit 1's error **shrank six-fold** (0.0476 to 0.0079), unit 2's **grew** (−0.0410 to −0.0553), because `$W_2$`'s 0.9 outweighs its slope; where those products stay below 1 layer after layer, the first layer's gradient vanishes
 
 
 ---
@@ -168,12 +228,11 @@ Keep layer 1; add `W2 = [0.6 −0.4; 0.3 0.9]`, `b2 = (0, −0.2)`, output `w3 =
 
 Each layer multiplies the backward signal by a weight and by the activation's slope. With slopes below 1:
 
-```text
-   slope per layer     5 layers     10 layers     20 layers
-   0.5                 0.031        0.00098       0.00000095
-   0.487 (tanh at 0.9) 0.027        0.00075       0.00000056
-   1 (ReLU, active)    1            1             1
-```
+| slope per layer | 5 layers | 10 layers | 20 layers |
+| --- | --- | --- | --- |
+| 0.5 | 0.031 | 0.00098 | 0.00000095 |
+| 0.487 (tanh at 0.9) | 0.027 | 0.00075 | 0.00000056 |
+| 1 (ReLU, active) | 1 | 1 | 1 |
 
 - a 20-layer tanh network's first layer learns **a million times** slower than its last
 - three fixes, used together in every deep network: **rectifiers**, **careful initialization**, **skip connections** (next slides)
@@ -185,16 +244,25 @@ Each layer multiplies the backward signal by a weight and by the activation's sl
 
 Weights start random. Too small and the signal shrinks layer by layer; too large and it explodes.
 
-```text
-   He initialization (He et al. 2015, arXiv:1502.01852), for ReLU layers with n inputs:
-   w ~ N(0, 2/n)                     keeps the activations' variance constant through depth
+<div class="tex" style="font-size:0.74em" role="img" aria-label="He initialization (He et al. 2015, arXiv:1502.01852), for ReLU layers with n inputs:
+w ~ N(0, 2/n)                     keeps the activations' variance constant through depth
+n = 64:     std 0.177
+n = 512:    std 0.0625          the course's hidden layers
+n = 4096:   std 0.0221">
+\[
+\begin{gathered}
+\text{He initialization (He et al. 2015, arXiv:1502.01852), for ReLU layers with } n \text{ inputs:} \\[4pt]
+\begin{aligned}
+&w \sim \mathcal{N}(0,\ 2/n) && \text{keeps the activations' variance constant through depth} \\[6pt]
+&n = 64\text{:} \ \ \text{std } 0.177 \\
+&n = 512\text{:} \ \ \text{std } 0.0625 && \text{the course's hidden layers} \\
+&n = 4096\text{:} \ \ \text{std } 0.0221
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
-   n = 64:     std 0.177
-   n = 512:    std 0.0625          the course's hidden layers
-   n = 4096:   std 0.0221
-```
-
-- the 2 compensates for ReLU zeroing half its inputs; for tanh the rule is 1/n (Glorot & Bengio 2010)
+- the 2 compensates for ReLU zeroing half its inputs; for tanh the rule is `$1/n$` (Glorot & Bengio 2010)
 - biases start at **0**; never start all weights **equal** (every unit would compute, and learn, the same thing)
 
 
@@ -204,15 +272,15 @@ Weights start random. Too small and the signal shrinks layer by layer; too large
 
 **Layer normalization** rescales each example's activations to mean 0 and variance 1 (Ba et al. 2016, arXiv:1607.06450), then applies a learned scale and shift:
 
-```text
-   activations (2, 4, 6):   mean 4,  std 1.633   →   (−1.225, 0, 1.225)
-```
+<div class="tex" style="font-size:0.8em" role="img" aria-label="activations (2, 4, 6):   mean 4,  std 1.633   →   (−1.225, 0, 1.225)">
+\[ \text{activations } (2,\ 4,\ 6)\text{:} \quad \text{mean } 4,\ \ \text{std } 1.633 \quad \to \quad ({-1.225},\ 0,\ 1.225) \]
+</div>
 
 A **residual (skip) connection** adds a layer's input to its output (He et al. 2015, arXiv:1512.03385):
 
-```text
-   y = x + F(x)          ∂y/∂x = 1 + F′(x)          the gradient always has the "1" path
-```
+<div class="tex" style="font-size:0.8em" role="img" aria-label="y = x + F(x)          ∂y/∂x = 1 + F′(x)          the gradient always has the &quot;1&quot; path">
+\[ y = x + F(x) \qquad \frac{\partial y}{\partial x} = 1 + F'(x) \qquad \text{the gradient always has the “1” path} \]
+</div>
 
 - normalization keeps every layer's inputs in the range where its slopes are healthy
 - skip connections let gradients reach the first layer undiminished; the U-Net and the transformer both rely on them
@@ -224,10 +292,15 @@ A **residual (skip) connection** adds a layer's input to its output (He et al. 2
 
 A ReLU unit whose pre-activation is **negative for every input** outputs 0 and has gradient 0: it never recovers.
 
-```text
-   inputs in [0, 1],  w = 1,  b = −3      z = w·x + b ≤ 1 − 3 = −2 < 0   for every input
-   output 0, gradient 0, forever
-```
+<div class="tex" style="font-size:0.72em" role="img" aria-label="inputs in [0, 1],  w = 1,  b = −3      z = w·x + b ≤ 1 − 3 = −2 &lt; 0   for every input
+output 0, gradient 0, forever">
+\[
+\begin{gathered}
+\text{inputs in } [0,\ 1],\ \ w = 1,\ \ b = -3 \qquad z = w \cdot x + b \le 1 - 3 = -2 \lt 0 \ \text{ for every input} \\
+\text{output 0, gradient 0, forever}
+\end{gathered}
+\]
+</div>
 
 - a large learning-rate step can push many units there at once; the loss stalls with capacity to spare
 - symptoms: a large fraction of units that are **exactly zero** on every example
@@ -238,7 +311,7 @@ A ReLU unit whose pre-activation is **negative for every input** outputs 0 and h
 
 ## Three optimizers, measured
 
-The wave fit (H = 12) from the same starting weights, loss after each number of epochs:
+The wave fit (`$H = 12$`) from the same starting weights, loss after each number of epochs:
 
 | epochs | 100 | 300 | 1000 | 3000 |
 | ------ | --- | --- | ---- | ---- |
@@ -255,20 +328,29 @@ The wave fit (H = 12) from the same starting weights, loss after each number of 
 
 ## Adam's first step, worked
 
-Apply Adam with η = 0.01 to the seven gradients of the hand step:
+Apply Adam with `$\eta = 0.01$` to the seven gradients of the hand step:
 
-```text
-   g = (0.0976, −0.1489, 0.2440, −0.3722, 0.4487, 0.0624, 0.6265)
-   t = 1:   m̂ = g,   v̂ = g²   ⇒   update = η · g / |g| = ±0.01   in every coordinate
-
-   gradient              0.0624      0.6265
-   gradient descent      0.0006      0.0063      (η = 0.01)
-   Adam                  0.0100      0.0100
-```
+<div class="tex" style="font-size:0.74em" role="img" aria-label="g = (0.0976, −0.1489, 0.2440, −0.3722, 0.4487, 0.0624, 0.6265)
+t = 1:   m̂ = g,   v̂ = g²   ⇒   update = η · g / |g| = ±0.01   in every coordinate
+gradient              0.0624      0.6265
+gradient descent      0.0006      0.0063      (η = 0.01)
+Adam                  0.0100      0.0100">
+\[
+\begin{gathered}
+g = (0.0976,\ {-0.1489},\ 0.2440,\ {-0.3722},\ 0.4487,\ 0.0624,\ 0.6265) \\
+t = 1\text{:} \quad \hat m = g, \quad \hat v = g^2 \quad \Rightarrow \quad \text{update} = \eta \cdot g / \lvert g \rvert = \pm 0.01 \ \text{ in every coordinate} \\[6pt]
+\begin{array}{lrrl}
+\text{gradient} & 0.0624 & 0.6265 & \\
+\text{gradient descent} & 0.0006 & 0.0063 & (\eta = 0.01) \\
+\text{Adam} & 0.0100 & 0.0100 &
+\end{array}
+\end{gathered}
+\]
+</div>
 
 <img src="../../textbook/figures/nn-optimizers.svg" class="media-shot" style="max-height: 200px;" alt="training loss against epoch for gradient descent, momentum and Adam on the wave fit">
 
-- the first Adam step is a step of length η along the **sign** of the gradient; a step can never exceed about η, whatever the gradient
+- the first Adam step is a step of length `$\eta$` along the **sign** of the gradient; a step can never exceed about `$\eta$`, whatever the gradient
 
 
 ---
@@ -277,15 +359,21 @@ Apply Adam with η = 0.01 to the seven gradients of the hand step:
 
 The best step size changes during training: large early, small late.
 
-```text
-   warmup:        η rises linearly from 0 over the first few hundred steps
-   cosine decay:  η(t) = η₀ · ½ (1 + cos(π t / T))
-                  t = 0: η₀      t = T/2: 0.5 η₀      t = 3T/4: 0.146 η₀      t = T: 0
-```
+<div class="tex" style="font-size:0.74em" role="img" aria-label="warmup:        η rises linearly from 0 over the first few hundred steps
+cosine decay:  η(t) = η₀ · ½ (1 + cos(π t / T))
+               t = 0: η₀      t = T/2: 0.5 η₀      t = 3T/4: 0.146 η₀      t = T: 0">
+\[
+\begin{aligned}
+&\text{warmup:} && \eta \text{ rises linearly from 0 over the first few hundred steps} \\
+&\text{cosine decay:} && \eta(t) = \eta_0 \cdot \tfrac12 \big(1 + \cos(\pi t / T)\big) \\
+& && t = 0\text{: } \eta_0 \qquad t = T/2\text{: } 0.5\, \eta_0 \qquad t = 3T/4\text{: } 0.146\, \eta_0 \qquad t = T\text{: } 0
+\end{aligned}
+\]
+</div>
 
 - warmup protects Adam's early steps, whose variance estimates are still poor
 - the decay lets the final steps settle into a minimum instead of rattling around it
-- **weight decay** shrinks every weight each step, θ ← θ − η(g + λθ); with η = 0.1 and λ = 0.002, 5000 steps of decay alone scale a weight by 0.9998⁵⁰⁰⁰ = **0.368**
+- **weight decay** shrinks every weight each step, `$\theta \leftarrow \theta - \eta(g + \lambda\theta)$`; with `$\eta = 0.1$` and `$\lambda = 0.002$`, 5000 steps of decay alone scale a weight by `$0.9998^{5000}$` = **0.368**
 
 
 ---
@@ -295,7 +383,7 @@ The best step size changes during training: large early, small late.
 | split | used for | touched |
 | ----- | -------- | ------- |
 | **training** | computing gradients | every step |
-| **validation** | choosing H, η, λ, when to stop | after each epoch |
+| **validation** | choosing `$H$`, `$\eta$`, `$\lambda$`, when to stop | after each epoch |
 | **test** | the number you report | **once**, at the end |
 
 - the validation set is overfit **too**, slowly, by every choice made while looking at it; the test set exists to catch that
@@ -307,11 +395,17 @@ The best step size changes during training: large early, small late.
 
 ## Shared weights: the parameter count
 
-```text
-   a fully connected unit on a 512 × 512 RGB image         786,432 weights, for ONE output
-   a 3 × 3 convolution, RGB in, 64 channels out            3·3·3·64 + 64 = 1,792 weights
-   a 3 × 3 convolution, 64 channels in, 64 out             3·3·64·64 + 64 = 36,928 weights
-```
+<div class="tex" style="font-size:0.7em" role="img" aria-label="a fully connected unit on a 512 × 512 RGB image         786,432 weights, for ONE output
+a 3 × 3 convolution, RGB in, 64 channels out            3·3·3·64 + 64 = 1,792 weights
+a 3 × 3 convolution, 64 channels in, 64 out             3·3·64·64 + 64 = 36,928 weights">
+\[
+\begin{aligned}
+&\text{a fully connected unit on a } 512 \times 512 \text{ RGB image} && 786{,}432 \text{ weights, for ONE output} \\
+&\text{a } 3 \times 3 \text{ convolution, RGB in, 64 channels out} && 3 \cdot 3 \cdot 3 \cdot 64 + 64 = 1{,}792 \text{ weights} \\
+&\text{a } 3 \times 3 \text{ convolution, 64 channels in, 64 out} && 3 \cdot 3 \cdot 64 \cdot 64 + 64 = 36{,}928 \text{ weights}
+\end{aligned}
+\]
+</div>
 
 - the convolution's weights do not grow with the **image size**: the same 1,792 weights run on a 20 × 20 digit or a 4K frame
 - **translation equivariance**: shift the input, and the feature map shifts with it
@@ -324,10 +418,9 @@ The best step size changes during training: large early, small late.
 
 Each 3 × 3 layer lets an output see one more pixel in every direction:
 
-```text
-   layers        1     2     5     10
-   field         3     5     11    21        pixels across: 2L + 1
-```
+| layers `$L$` | 1 | 2 | 5 | 10 |
+| --- | --- | --- | --- | --- |
+| field, pixels across: `$2L + 1$` | 3 | 5 | 11 | 21 |
 
 - stacking small kernels reaches far with few weights: two 3 × 3 layers see 5 × 5 with 18 weights per channel pair instead of 25
 - **downsampling** by 2 between stages doubles the reach of every later layer; a few stages see the whole image
@@ -359,18 +452,24 @@ function attention(X, Wq, Wk, Wv) {
 
 ## How the network is told the time
 
-The diffusion denoiser must know **how much noise** it is looking at. It receives t as a 64-number code of sines and cosines at 32 frequencies:
+The diffusion denoiser must know **how much noise** it is looking at. It receives `$t$` as a 64-number code of sines and cosines at 32 frequencies:
 
-```text
-   angle_i = t · 1000 · 10000^(−i/32)
-   code    = (sin angle_0 … sin angle_31, cos angle_0 … cos angle_31)
+<div class="tex" style="font-size:0.8em" role="img" aria-label="angle_i = t · 1000 · 10000^(−i/32)
+code    = (sin angle_0 … sin angle_31, cos angle_0 … cos angle_31)">
+\[
+\begin{aligned}
+\text{angle}_i &= t \cdot 1000 \cdot 10000^{-i/32} \\
+\text{code} &= (\sin \text{angle}_0 \ldots \sin \text{angle}_{31},\ \cos \text{angle}_0 \ldots \cos \text{angle}_{31})
+\end{aligned}
+\]
+</div>
 
-              i = 0 (fast)       i = 16             i = 31 (slow)
-   t = 0.50   (−0.468, −0.884)   (−0.959, 0.284)    (0.067, 0.998)        (sin, cos)
-   t = 0.51   ( 0.873,  0.487)   (−0.926, 0.378)    (0.068, 0.998)
-```
+| (sin, cos) | `$i = 0$` (fast) | `$i = 16$` | `$i = 31$` (slow) |
+| --- | --- | --- | --- |
+| `$t = 0.50$` | (−0.468, −0.884) | (−0.959, 0.284) | (0.067, 0.998) |
+| `$t = 0.51$` | (0.873, 0.487) | (−0.926, 0.378) | (0.068, 0.998) |
 
-- the fast frequencies distinguish **nearby** times; the slow ones say roughly **where** in [0, 1] t is
+- the fast frequencies distinguish **nearby** times; the slow ones say roughly **where** in `$[0, 1]$` `$t$` is
 - the same trick encodes **positions** in a transformer and **pixel or point coordinates** in a coordinate network
 
 
@@ -378,14 +477,13 @@ The diffusion denoiser must know **how much noise** it is looking at. It receive
 
 ## On unit vectors, cosine and distance agree
 
-For normalized u, v: `‖u − v‖² = 2 − 2 cos(u, v)`, so ranking by distance and ranking by cosine give **the same** nearest neighbors.
+For normalized `$u$`, `$v$`: `$\lVert u - v \rVert^2 = 2 - 2 \cos(u, v)$`, so ranking by distance and ranking by cosine give **the same** nearest neighbors.
 
-```text
-   cos    ‖u − v‖²    ‖u − v‖
-   0.96   0.08        0.283
-   0.5    1           1
-   0      2           1.414
-```
+| `$\cos(u, v)$` | `$\lVert u - v \rVert^2$` | `$\lVert u - v \rVert$` |
+| --- | --- | --- |
+| 0.96 | 0.08 | 0.283 |
+| 0.5 | 1 | 1 |
+| 0 | 2 | 1.414 |
 
 - nearest-neighbor search over millions of embeddings (image search, retrieval) uses this to run on fast Euclidean indexes
 - unnormalized vectors break the equivalence: a long vector is "close" to many things by dot product
@@ -397,10 +495,15 @@ For normalized u, v: `‖u − v‖² = 2 − 2 cos(u, v)`, so ranking by distan
 
 Try the word trick on the digit vectors:
 
-```text
-   e₄ − e₉ + e₇   nearest class other than the operands: 2 (cos 0.31);   among all: 7 (0.75)
-   e₃ − e₅ + e₈   nearest class other than the operands: 9 (cos 0.24);   among all: 8 (0.68)
-```
+<div class="tex" style="font-size:0.7em" role="img" aria-label="e₄ − e₉ + e₇   nearest class other than the operands: 2 (cos 0.31);   among all: 7 (0.75)
+e₃ − e₅ + e₈   nearest class other than the operands: 9 (cos 0.24);   among all: 8 (0.68)">
+\[
+\begin{aligned}
+&e_4 - e_9 + e_7 && \text{nearest class other than the operands: 2 (cos 0.31);} \quad \text{among all: 7 (0.75)} \\
+&e_3 - e_5 + e_8 && \text{nearest class other than the operands: 9 (cos 0.24);} \quad \text{among all: 8 (0.68)}
+\end{aligned}
+\]
+</div>
 
 - the result stays near its last operand; the digit space has no "subtract a loop, add a stroke" direction
 - nothing in the denoising task needed one, and **eleven points in 64 dimensions are too few to define directions**
@@ -414,10 +517,15 @@ Try the word trick on the digit vectors:
 
 A plain autoencoder's codes land wherever training puts them, with gaps between; decoding a random code gives garbage. A **VAE** (Kingma & Welling 2013, arXiv:1312.6114) fixes the layout:
 
-```text
-   encoder outputs a mean μ and a spread σ;  code z = μ + σ ⊙ ε,  ε ~ N(0, I)
-   loss = reconstruction error + KL( N(μ, σ²) ‖ N(0, I) )     pulls codes toward N(0, I)
-```
+<div class="tex" style="font-size:0.72em" role="img" aria-label="encoder outputs a mean μ and a spread σ;  code z = μ + σ ⊙ ε,  ε ~ N(0, I)
+loss = reconstruction error + KL( N(μ, σ²) ‖ N(0, I) )     pulls codes toward N(0, I)">
+\[
+\begin{gathered}
+\text{encoder outputs a mean } \mu \text{ and a spread } \sigma; \quad \text{code } z = \mu + \sigma \odot \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, I) \\
+\text{loss} = \text{reconstruction error} + \mathrm{KL}\big(\mathcal{N}(\mu, \sigma^2) \,\Vert\, \mathcal{N}(0, I)\big) \qquad \text{pulls codes toward } \mathcal{N}(0, I)
+\end{gathered}
+\]
+</div>
 
 - the code space becomes **dense**: every point near the origin decodes to something plausible
 - Stable Diffusion's autoencoder is KL-regularized in this way (lightly), so its 64 × 64 × 4 latents are well behaved for diffusion
@@ -430,13 +538,21 @@ A plain autoencoder's codes land wherever training puts them, with gaps between;
 
 Classify an image with **no classifier training**: embed a caption per class and pick the closest.
 
-```text
-   prompts:   "a photo of a cat",  "a photo of a dog",  "a photo of a car"
-   illustrative cosines to one image:   0.31   0.24   0.22
+| prompts | illustrative cosines to one image |
+| --- | --- |
+| "a photo of a cat" | 0.31 |
+| "a photo of a dog" | 0.24 |
+| "a photo of a car" | 0.22 |
 
-   softmax at τ = 0.01:   (0.999, 0.0009, 0.0001)      decisive
-   softmax at τ = 1:      (0.351, 0.328, 0.321)        nearly uniform
-```
+<div class="tex" style="font-size:0.8em" role="img" aria-label="softmax at τ = 0.01:   (0.999, 0.0009, 0.0001)      decisive
+softmax at τ = 1:      (0.351, 0.328, 0.321)        nearly uniform">
+\[
+\begin{aligned}
+&\operatorname{softmax} \text{ at } \tau = 0.01\text{:} && (0.999,\ 0.0009,\ 0.0001) && \text{decisive} \\
+&\operatorname{softmax} \text{ at } \tau = 1\text{:} && (0.351,\ 0.328,\ 0.321) && \text{nearly uniform}
+\end{aligned}
+\]
+</div>
 
 - CLIP was trained on **400 million** image-text pairs; zero-shot, its largest model matched the ImageNet accuracy of a ResNet-50 trained on ImageNet's labels (76.2 % top-1)
 - a new class is **one new sentence**, not a new dataset

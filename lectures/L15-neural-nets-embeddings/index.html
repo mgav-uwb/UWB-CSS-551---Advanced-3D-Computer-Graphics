@@ -37,6 +37,9 @@
     [data-demo] canvas { height: 200px !important; width: auto !important; }
     /* fallback shows only when the live demo failed to build */
     .reveal .viz-fallback { font-size: 0.6em; text-align: left; }
+    /* MathJax display formulas (lib/deck-math.js): the ASCII form stays as aria-label */
+    .reveal .tex { font-size: 0.88em; margin: 0.3em auto; text-align: center; }
+    .reveal .tex mjx-container[display="true"] { margin: 0.15em 0 !important; }
 
     /* Full-slide exhibits (demo-full slides hold only a short ## title + the
        embed): override the 200px teaser crop above so the viewport is ~500px
@@ -70,32 +73,32 @@
     <div class="slides">
       <!-- One section per file, in order: the lecture opening (L15-open.md),
            one or more ../../topics/*.md, then discussion and wrap (L15-discuss.md). -->
-      <section data-markdown="L15-open.md?v=20261113b"
+      <section data-markdown="L15-open.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/neural-nets-embeddings.md?v=20261118a"
+      <section data-markdown="../../topics/neural-nets-embeddings.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/coordinate-networks.md?v=20261113a"
+      <section data-markdown="../../topics/coordinate-networks.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="L15-discuss.md?v=20261113b"
+      <section data-markdown="L15-discuss.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/neural-nets-embeddings-supplement.md?v=20261113a"
+      <section data-markdown="../../topics/neural-nets-embeddings-supplement.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
       </section>
-      <section data-markdown="../../topics/coordinate-networks-supplement.md?v=20261113a"
+      <section data-markdown="../../topics/coordinate-networks-supplement.md?v=20261119a"
         data-separator="^\r?\n---\r?\n$"
         data-separator-vertical="^\r?\n--\r?\n$"
         data-separator-notes="^Note:">
@@ -107,6 +110,8 @@
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/markdown/markdown.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+  <script src="../../lib/deck-math.js?v=20261029a"></script>
 
   <script type="module">
     import { initDeckDemos } from '../../lib/deck.js';
@@ -120,6 +125,7 @@
       // Markdown slides exist in the DOM only after init resolves: build the
       // embedded [data-demo] hosts now (never on DOMContentLoaded).
       initDeckDemos();
+      typesetDeckMath();
 
       // Demo slider focus vs. deck navigation: when a demo's range input is set
       // PROGRAMMATICALLY (the verify-deck harness's slider.fill, which focuses

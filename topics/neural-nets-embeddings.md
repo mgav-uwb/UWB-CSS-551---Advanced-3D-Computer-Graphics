@@ -64,9 +64,15 @@
            textbook/figures/numbers.json; the rest are quoted from textbook/neural-nets-embeddings.html.
   Replaces, for Plan C, the networks half of topics/archive/learned-images-foundations.md (archived).
 
+  POLISHED 2026-11-19 (Marcel: "let's apply the formula and illustration polish we used in previous
+           lectures"): every formula typeset (MathJax, the ASCII kept as aria-label); new generated figures
+           nn-conv-one-output, nn-cosine and nn-onehot-lookup (tools/gen-lecture-figures-neural.mjs, ASCII as
+           alt); the small figures set beside their text at a readable size. Every number recomputed.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
-  follow "Note:". Math is plain unicode text or fenced ```text blocks (no
-  KaTeX plugin). Never two "_" on one markdown line outside a code fence;
+  follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
+  TeX inside, the ASCII form as aria-label, no blank line inside); inline math is a code span written
+  `$...$`. Never two "_" on one markdown line outside a code fence;
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
@@ -81,13 +87,13 @@
 
 ## A network is a function
 
-A **neural network** is a function `f_θ` from ℝⁿ to ℝᵐ built from alternating **linear maps** and fixed **nonlinearities**; the vector of **weights** θ sets its shape.
+A **neural network** is a function `$f_\theta$` from `$\mathbb{R}^n$` to `$\mathbb{R}^m$` built from alternating **linear maps** and fixed **nonlinearities**; the vector of **weights** `$\theta$` sets its shape.
 
-```text
-   f(x) = b₂ + Σₕ w2ₕ · tanh(w1ₕ · x + b1ₕ)          h = 1 … H,   3H + 1 weights
-```
+<div class="tex" role="img" aria-label="f(x) = b₂ + Σₕ w2ₕ · tanh(w1ₕ · x + b1ₕ)          h = 1 … H,   3H + 1 weights">
+\[ f(x) = b_2 + \sum_{h=1}^{H} w2_h \tanh\!\big(w1_h\, x + b1_h\big) \qquad 3H + 1 \text{ weights} \]
+</div>
 
-<img src="../../textbook/figures/nn-perceptron.svg" class="media-shot" style="max-height: 250px;" alt="the two-layer perceptron as a wiring diagram with four hidden units: input times weights plus biases, tanh, then a weighted sum">
+<img src="../../textbook/figures/nn-perceptron.svg" class="media-shot" style="max-height: 200px;" alt="the two-layer perceptron as a wiring diagram with four hidden units: input times weights plus biases, tanh, then a weighted sum">
 
 - read left to right: scale and shift (blue), squash (green), combine (red); nothing else happens
 - a **deep** network repeats the middle two stages, with vectors in place of single numbers
@@ -97,14 +103,20 @@ A **neural network** is a function `f_θ` from ℝⁿ to ℝᵐ built from alter
 
 ## A forward pass, by hand
 
-H = 2, weights `w1 = (1.0, −1.0)`, `b1 = (0.5, 0.5)`, `w2 = (0.8, −0.6)`, `b2 = 0.1`; input x = 0.4.
+`$H = 2$`, weights `$w1 = (1.0,\ {-1.0})$`, `$b1 = (0.5,\ 0.5)$`, `$w2 = (0.8,\ {-0.6})$`, `$b2 = 0.1$`; input `$x = 0.4$`.
 
-```text
-   pre-activations   z = (1.0·0.4 + 0.5,  −1.0·0.4 + 0.5)          = (0.9, 0.1)
-   activations       a = (tanh 0.9, tanh 0.1)                       = (0.7163, 0.0997)
-   output            f = 0.1 + 0.8·0.7163 − 0.6·0.0997
-                       = 0.1 + 0.5730 − 0.0598                       = 0.6132
-```
+<div class="tex" style="font-size:0.78em" role="img" aria-label="pre-activations   z = (1.0·0.4 + 0.5,  −1.0·0.4 + 0.5)          = (0.9, 0.1)
+activations       a = (tanh 0.9, tanh 0.1)                       = (0.7163, 0.0997)
+output            f = 0.1 + 0.8·0.7163 − 0.6·0.0997 = 0.1 + 0.5730 − 0.0598 = 0.6132">
+\[
+\begin{aligned}
+&\text{pre-activations} && z = (1.0 \cdot 0.4 + 0.5,\ \ {-1.0} \cdot 0.4 + 0.5) && = (0.9,\ 0.1) \\
+&\text{activations} && a = (\tanh 0.9,\ \tanh 0.1) && = (0.7163,\ 0.0997) \\
+&\text{output} && f = 0.1 + 0.8 \cdot 0.7163 - 0.6 \cdot 0.0997 && \\
+& && \phantom{f} = 0.1 + 0.5730 - 0.0598 && = \mathbf{0.6132}
+\end{aligned}
+\]
+</div>
 
 - seven weights, four multiplications, three additions, two table lookups
 - the course's digit-drawing network is this table with 512 rows per stage, four stages, 1,002,064 weights
@@ -114,16 +126,22 @@ H = 2, weights `w1 = (1.0, −1.0)`, `b1 = (0.5, 0.5)`, `w2 = (0.8, −0.6)`, `b
 
 ## The same pass, as matrices
 
-Stack the hidden units into vectors and the pass is three lines:
+Stack the hidden units into vectors, `$W_1 = (1.0,\ {-1.0})^T$`, `$b_1 = (0.5,\ 0.5)$`, `$w_2 = (0.8,\ {-0.6})$`, `$b_2 = 0.1$`, and the pass is three lines:
 
-```text
-   z = W₁ x + b₁          W₁ = (1.0, −1.0)ᵀ,  b₁ = (0.5, 0.5)       z = (0.9, 0.1)
-   a = tanh(z)                                                      a = (0.7163, 0.0997)
-   f = w₂ · a + b₂        w₂ = (0.8, −0.6),   b₂ = 0.1              f = 0.6132
-```
+<div class="tex" role="img" aria-label="z = W₁ x + b₁          W₁ = (1.0, −1.0)ᵀ,  b₁ = (0.5, 0.5)       z = (0.9, 0.1)
+a = tanh(z)                                                      a = (0.7163, 0.0997)
+f = w₂ · a + b₂        w₂ = (0.8, −0.6),   b₂ = 0.1              f = 0.6132">
+\[
+\begin{aligned}
+z &= W_1 x + b_1 &&= (0.9,\ 0.1) \\
+a &= \tanh(z) &&= (0.7163,\ 0.0997) \\
+f &= w_2 \cdot a + b_2 &&= 0.6132
+\end{aligned}
+\]
+</div>
 
-- a **batch** of B inputs is a matrix X with B columns: `Z = W₁ X + b₁` evaluates all B at once
-- a layer from n inputs to m outputs has **n·m + m** weights and costs **n·m** multiply-adds per input
+- a **batch** of `$B$` inputs is a matrix `$X$` with `$B$` columns: `$Z = W_1 X + b_1$` evaluates all `$B$` at once
+- a layer from `$n$` inputs to `$m$` outputs has **`$n m + m$`** weights and costs **`$n m$`** multiply-adds per input
 
 
 ---
@@ -138,48 +156,72 @@ A composition of linear maps is linear, so without the squash a network of any d
 | ---------- | ------------ | ------------ | ------- |
 | sigmoid | 0.711 | 0.206 | probabilities, gates |
 | tanh | 0.716 | 0.487 | small networks, the perceptron |
-| ReLU `max(0, z)` | 0.900 | 1 | most deep networks since 2012 |
-| SiLU `z·σ(z)` | 0.640 | 0.896 | the course denoiser, diffusion networks |
+| ReLU `$\max(0, z)$` | 0.900 | 1 | most deep networks since 2012 |
+| SiLU `$z\,\sigma(z)$` | 0.640 | 0.896 | the course denoiser, diffusion networks |
 
 
 ---
 
 ## Training is gradient descent
 
-Given examples (xᵢ, yᵢ), define a **loss** and move every weight a little **downhill**:
+Given examples `$(x_i, y_i)$`, define a **loss** and move every weight a little **downhill**:
 
-```text
-   L(θ) = (1/N) Σᵢ ( f_θ(xᵢ) − yᵢ )²              mean squared error
-   θ  ←  θ − η ∇L(θ)                              η: the learning rate
-```
+<div class="tex" role="img" aria-label="L(θ) = (1/N) Σᵢ ( f_θ(xᵢ) − yᵢ )²              mean squared error
+θ  ←  θ − η ∇L(θ)                              η: the learning rate">
+\[
+\begin{aligned}
+L(\theta) &= \tfrac{1}{N} \textstyle\sum_i \big( f_\theta(x_i) - y_i \big)^2 &&\qquad \text{mean squared error} \\
+\theta &\leftarrow \theta - \eta\, \nabla L(\theta) &&\qquad \eta\text{: the learning rate}
+\end{aligned}
+\]
+</div>
 
-- ∇L is the direction in weight space that **increases** the loss fastest; step the other way
+- `$\nabla L$` is the direction in weight space that **increases** the loss fastest; step the other way
 - the gradient comes from the **chain rule**, organized as one backward sweep: **backpropagation** (Rumelhart, Hinton & Williams, *Nature* 323, 1986)
-- for the perceptron, with δ = 2(f − y) and tanh′ = 1 − tanh²:
+- for the perceptron, with `$\delta = 2(f - y)$` and `$\tanh' = 1 - \tanh^2$`:
 
-```text
-   ∂L/∂b₂  = δ                        ∂L/∂w2ₕ = δ·aₕ
-   ∂L/∂b1ₕ = δ·w2ₕ·(1 − aₕ²)            ∂L/∂w1ₕ = δ·w2ₕ·(1 − aₕ²)·x
-```
+<div class="tex" role="img" aria-label="∂L/∂b₂  = δ                        ∂L/∂w2ₕ = δ·aₕ
+∂L/∂b1ₕ = δ·w2ₕ·(1 − aₕ²)            ∂L/∂w1ₕ = δ·w2ₕ·(1 − aₕ²)·x">
+\[
+\begin{aligned}
+\partial L / \partial b_2 &= \delta &\qquad \partial L / \partial w2_h &= \delta\, a_h \\
+\partial L / \partial b1_h &= \delta\, w2_h\, (1 - a_h^2) &\qquad \partial L / \partial w1_h &= \delta\, w2_h\, (1 - a_h^2)\, x
+\end{aligned}
+\]
+</div>
 
 
 ---
 
 ## One gradient step, by hand
 
-Continue the forward pass: target y = 0.3, η = 0.1. Error f − y = 0.3132, loss 0.0981, δ = 0.6265.
+Continue the forward pass: target `$y = 0.3$`, `$\eta = 0.1$`. Error `$f - y = 0.3132$`, loss 0.0981, `$\delta = 0.6265$`.
 
-```text
-   ∂/∂b₂      0.6265
-   ∂/∂w2      0.6265 · (0.7163, 0.0997)                         = (0.4487,  0.0624)
-   1 − a²     (1 − 0.5131, 1 − 0.0099)                          = (0.4869,  0.9901)
-   ∂/∂b1      0.6265 · (0.8·0.4869, −0.6·0.9901)                = (0.2440, −0.3722)
-   ∂/∂w1      the row above times x = 0.4                       = (0.0976, −0.1489)
-
-   step θ ← θ − 0.1·∇:   w1 = (0.9902, −0.9851)   b1 = (0.4756, 0.5372)
-                         w2 = (0.7551, −0.6062)   b2 = 0.0374
-   forward again:        f = 0.4814,  loss 0.0329   (was 0.0981)
-```
+<div class="tex" style="font-size:0.74em" role="img" aria-label="∂/∂b₂      0.6265
+∂/∂w2      0.6265 · (0.7163, 0.0997)                         = (0.4487,  0.0624)
+1 − a²     (1 − 0.5131, 1 − 0.0099)                          = (0.4869,  0.9901)
+∂/∂b1      0.6265 · (0.8·0.4869, −0.6·0.9901)                = (0.2440, −0.3722)
+∂/∂w1      the row above times x = 0.4                       = (0.0976, −0.1489)
+step θ ← θ − 0.1·∇:   w1 = (0.9902, −0.9851)   b1 = (0.4756, 0.5372)
+                      w2 = (0.7551, −0.6062)   b2 = 0.0374
+forward again:        f = 0.4814,  loss 0.0329   (was 0.0981)">
+\[
+\begin{aligned}
+&\partial L / \partial b_2 && 0.6265 && \\
+&\partial L / \partial w2 && 0.6265 \cdot (0.7163,\ 0.0997) && = (0.4487,\ 0.0624) \\
+&1 - a^2 && (1 - 0.5131,\ 1 - 0.0099) && = (0.4869,\ 0.9901) \\
+&\partial L / \partial b1 && 0.6265 \cdot (0.8 \cdot 0.4869,\ {-0.6} \cdot 0.9901) && = (0.2440,\ {-0.3722}) \\
+&\partial L / \partial w1 && \text{the row above} \times (x = 0.4) && = (0.0976,\ {-0.1489})
+\end{aligned}
+\]
+\[
+\begin{aligned}
+&\text{step } \theta \leftarrow \theta - 0.1\, \nabla && w1 = (0.9902,\ {-0.9851}),\ \ b1 = (0.4756,\ 0.5372) \\
+& && w2 = (0.7551,\ {-0.6062}),\ \ b2 = 0.0374 \\
+&\text{forward again} && f = 0.4814,\ \ \text{loss } \mathbf{0.0329}\ \ (\text{was } 0.0981)
+\end{aligned}
+\]
+</div>
 
 - one step closed **42 %** of the gap to the target and cut the loss to **a third**; the sign of every change came from the chain rule
 
@@ -203,34 +245,40 @@ Continue the forward pass: target y = 0.3, η = 0.1. Error f − y = 0.3132, los
 
 ## Pitfall: the learning rate
 
-The one number that can make training fail outright. The wave fit, H = 12, 300 epochs:
+The one number that can make training fail outright. The wave fit, `$H = 12$`, 300 epochs:
 
-| η | loss after 300 epochs |
+| `$\eta$` | loss after 300 epochs |
 | - | --------------------- |
 | 0.05 | 0.019 |
 | 0.3 | not a number |
 | 1.0 | not a number |
 
 - a step that overshoots the valley lands **higher** on the far wall; the next gradient is larger, the next step larger still
-- symptom: a loss that **rises**, then becomes NaN (here after 225 epochs at η = 0.3, after 122 at η = 1.0)
-- cures: a smaller η, a schedule that decays it, or an optimizer that bounds each step (Adam, below)
+- symptom: a loss that **rises**, then becomes NaN (here after 225 epochs at `$\eta = 0.3$`, after 122 at `$\eta = 1.0$`)
+- cures: a smaller `$\eta$`, a schedule that decays it, or an optimizer that bounds each step (Adam, below)
 
 
 ---
 
 ## Mini-batches and stochastic gradient descent
 
-The true gradient averages over all N examples; a **mini-batch** of B random examples estimates it:
+The true gradient averages over all `$N$` examples; a **mini-batch** of `$B$` random examples estimates it, a Monte Carlo estimate:
 
-```text
-   g_batch = (1/B) Σ_(i in batch) ∇ℓᵢ      unbiased, noise ∝ 1/√B   (the Monte Carlo estimator)
-
-   B        1      16      256
-   noise    1      0.25    0.0625      relative to one example
-
-   MNIST, 60,000 images, B = 128:   469 iterations per epoch
-   the course's denoiser: 41,210 steps × 512 = 21.1 million examples seen = 351.7 epochs
-```
+<div class="tex" style="font-size:0.72em" role="img" aria-label="g_batch = (1/B) Σ_(i in batch) ∇ℓᵢ      unbiased, noise ∝ 1/√B   (the Monte Carlo estimator)
+B = 1, 16, 256:   noise 1, 0.25, 0.0625 relative to one example
+MNIST, 60,000 images, B = 128:   469 iterations per epoch
+the course's denoiser: 41,210 steps × 512 = 21.1 million examples seen = 351.7 epochs">
+\[
+\begin{gathered}
+g_{\text{batch}} = \tfrac{1}{B} \textstyle\sum_{i \in \text{batch}} \nabla \ell_i \qquad \text{unbiased; noise} \propto 1/\sqrt{B} \\[6pt]
+\begin{aligned}
+&B = 1,\ 16,\ 256 && \text{noise } 1,\ 0.25,\ 0.0625 \text{ (relative to one example)} \\
+&\text{MNIST: } 60{,}000 \text{ images, } B = 128 && 469 \text{ iterations per epoch} \\
+&\text{the denoiser} && 41{,}210 \text{ steps} \times 512 = 21.1 \text{ million} = 351.7 \text{ epochs}
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
 - each step descends **its own batch's loss**, a different surface every step; on average, the full loss. Backpropagation computes the gradient of whichever loss it is given
 - small batches: noisy but cheap steps; the noise can carry the weights out of a poor minimum, with no guarantee. Large batches: smooth steps, better GPU use
@@ -241,12 +289,17 @@ The true gradient averages over all N examples; a **mini-batch** of B random exa
 
 ## Backpropagation through layers
 
-One rule, applied once per layer from the top down. With δ⁽ᵏ⁾ = ∂L/∂z⁽ᵏ⁾ at layer k:
+One rule, applied once per layer from the top down. With `$\delta^{(k)} = \partial L / \partial z^{(k)}$` at layer `$k$`, the error from above is pulled back through `$W^T$` and multiplied by the slope:
 
-```text
-   δ⁽ᵏ⁾ = ( W⁽ᵏ⁺¹⁾ᵀ δ⁽ᵏ⁺¹⁾ ) ⊙ σ′(z⁽ᵏ⁾)     error from above, through Wᵀ, times the slope
-   ∂L/∂W⁽ᵏ⁾ = δ⁽ᵏ⁾ a⁽ᵏ⁻¹⁾ᵀ        ∂L/∂b⁽ᵏ⁾ = δ⁽ᵏ⁾
-```
+<div class="tex" style="font-size:0.76em" role="img" aria-label="δ⁽ᵏ⁾ = ( W⁽ᵏ⁺¹⁾ᵀ δ⁽ᵏ⁺¹⁾ ) ⊙ σ′(z⁽ᵏ⁾)     error from above, through Wᵀ, times the slope
+∂L/∂W⁽ᵏ⁾ = δ⁽ᵏ⁾ a⁽ᵏ⁻¹⁾ᵀ        ∂L/∂b⁽ᵏ⁾ = δ⁽ᵏ⁾">
+\[
+\begin{aligned}
+\delta^{(k)} &= \big( {W^{(k+1)}}^{T} \delta^{(k+1)} \big) \odot \sigma'\big(z^{(k)}\big) \\
+\partial L / \partial W^{(k)} &= \delta^{(k)}\, {a^{(k-1)}}^{T}, \qquad \partial L / \partial b^{(k)} = \delta^{(k)}
+\end{aligned}
+\]
+</div>
 
 - each weight's gradient is **the error arriving at its output** times **the activation at its input**
 - the forward pass stores every a; the backward pass is **one matrix multiply per layer**
@@ -259,15 +312,22 @@ One rule, applied once per layer from the top down. With δ⁽ᵏ⁾ = ∂L/∂z
 
 Plain gradient descent crawls where the loss is flat and zig-zags across narrow valleys.
 
-```text
-   momentum   v ← βv + g,            θ ← θ − ηv                        β ≈ 0.9
-   Adam       m ← β₁m + (1−β₁)g,     v ← β₂v + (1−β₂)g²
-              θ ← θ − η · m̂ / (√v̂ + ε)          β₁ = 0.9, β₂ = 0.999, ε = 10⁻⁸
-              m̂ = m/(1−β₁ᵗ),  v̂ = v/(1−β₂ᵗ)       bias corrections for the zero start
-```
+<div class="tex" style="font-size:0.7em" role="img" aria-label="momentum   v ← βv + g,            θ ← θ − ηv                        β ≈ 0.9
+Adam       m ← β₁m + (1−β₁)g,     v ← β₂v + (1−β₂)g²
+           θ ← θ − η · m̂ / (√v̂ + ε)          β₁ = 0.9, β₂ = 0.999, ε = 10⁻⁸
+           m̂ = m/(1−β₁ᵗ),  v̂ = v/(1−β₂ᵗ)       bias corrections for the zero start">
+\[
+\begin{aligned}
+&\text{momentum} && v \leftarrow \beta v + g, \quad \theta \leftarrow \theta - \eta v \qquad (\beta \approx 0.9) \\
+&\text{Adam} && m \leftarrow \beta_1 m + (1 - \beta_1)\, g, \quad v \leftarrow \beta_2 v + (1 - \beta_2)\, g^2 \\
+& && \theta \leftarrow \theta - \eta\, \hat m \,/\, \big(\sqrt{\hat v} + \epsilon\big) \qquad (\beta_1 = 0.9,\ \beta_2 = 0.999,\ \epsilon = 10^{-8}) \\
+& && \hat m = m / (1 - \beta_1^{\,t}), \quad \hat v = v / (1 - \beta_2^{\,t}) \qquad \text{(bias corrections for the zero start)}
+\end{aligned}
+\]
+</div>
 
 - **momentum**: gradients that agree from step to step add up; gradients that alternate cancel
-- **Adam** (Kingma & Ba 2015, arXiv:1412.6980): every weight gets its own step size, η divided by the typical size of **that weight's** gradient
+- **Adam** (Kingma & Ba 2015, arXiv:1412.6980): every weight gets its own step size, `$\eta$` divided by the typical size of **that weight's** gradient
 - AdamW (Adam plus **weight decay**, a small shrink of every weight at each step) is the default for the diffusion models and transformers of the coming lectures; the course's denoiser was trained with Adam
 
 
@@ -302,15 +362,15 @@ Plain gradient descent crawls where the loss is flat and zig-zags across narrow 
 
 ## Overfitting, and the held-out set
 
-A network large enough to trace any curve traces the **noise** too. The wave at 12 points, noise σ = 0.15 (variance 0.0225); held-out error against the true wave on 150 points (**weight decay**: each step also shrinks every weight a little):
+A network large enough to trace any curve traces the **noise** too. The wave at 12 points, noise `$\sigma = 0.15$` (variance 0.0225); held-out error against the true wave on 150 points (**weight decay**: each step also shrinks every weight a little):
 
 <img src="../../textbook/figures/nn-overfit.svg" class="media-shot" style="max-height: 195px;" alt="training error dashed and held-out error solid against epoch for H = 4, H = 40, and H = 40 with weight decay">
 
 | network, 5000 epochs | training error | held-out error |
 | -------------------- | -------------- | -------------- |
-| H = 40 | 0.0057 (a quarter of the noise floor) | minimum 0.0099 at epoch 950, then 0.0108 |
-| H = 40, weight decay λ = 0.002 | 0.0124 | **0.0080** |
-| H = 4 | | 0.0164 (too little capacity) |
+| `$H = 40$` | 0.0057 (a quarter of the noise floor) | minimum 0.0099 at epoch 950, then 0.0108 |
+| `$H = 40$`, weight decay `$\lambda = 0.002$` | 0.0124 | **0.0080** |
+| `$H = 4$` | | 0.0164 (too little capacity) |
 
 
 ---
@@ -320,50 +380,60 @@ A network large enough to trace any curve traces the **noise** too. The wave at 
 - **regression** (predict numbers, such as a denoised image): mean squared error
 - **classification** (predict one of K classes): turn K scores into probabilities with **softmax**, and score the right class with **cross-entropy**
 
-```text
-   softmax(z)ₖ = exp(zₖ) / Σⱼ exp(zⱼ)          cross-entropy = −log p(right class)
+<div class="tex" role="img" aria-label="softmax(z)ₖ = exp(zₖ) / Σⱼ exp(zⱼ)          cross-entropy = −log p(right class)
+logits z = (2, 1, 0.1)
+softmax  = (0.659, 0.242, 0.099)
+loss if the right class is 0:  −log 0.659 = 0.417
+loss if the right class is 2:  −log 0.099 = 2.317">
+\[
+\begin{gathered}
+\operatorname{softmax}(z)_k = \frac{e^{z_k}}{\sum_j e^{z_j}} \qquad\qquad \text{cross-entropy} = -\log p(\text{right class}) \\[8pt]
+\begin{aligned}
+&\text{logits } z = (2,\ 1,\ 0.1) && \operatorname{softmax}(z) = (0.659,\ 0.242,\ 0.099) \\
+&\text{loss if the right class is 0:} && -\log 0.659 = 0.417 \\
+&\text{loss if the right class is 2:} && -\log 0.099 = 2.317
+\end{aligned}
+\end{gathered}
+\]
+</div>
 
-   logits z = (2, 1, 0.1)
-   softmax  = (0.659, 0.242, 0.099)
-   loss if the right class is 0:  −log 0.659 = 0.417
-   loss if the right class is 2:  −log 0.099 = 2.317
-```
-
-- cross-entropy punishes a **confident wrong** answer hard, and its gradient is simply `p − onehot`
+- cross-entropy punishes a **confident wrong** answer hard, and its gradient is simply `$p - \text{onehot}$`
 
 
 ---
 
 ## Convolution
 
-A **convolutional layer** slides one small kernel K over the image: `y_ij = σ(b + Σ K_uv · x_(i+u, j+v))`.
+A **convolutional layer** slides one small kernel `$K$` over the image: `$y_{ij} = \sigma\big(b + \sum_{u,v} K_{uv}\, x_{i+u,\, j+v}\big)$`.
+
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 58%; font-size:0.78em;">
 
 - the nine weights of a 3×3 kernel are **shared by every position**: ten parameters instead of millions, and a pattern learned in one place is found everywhere
-- one output, worked: the vertical-edge kernel `[−1 0 1; −2 0 2; −1 0 1]` at pixel (12, 15) of a handwritten 3, whose neighborhood is three rows of (0.99, 0.29, 0):
 
-```text
-   −1(0.99) + 0(0.29) + 1(0)  −2(0.99) + 0 + 0  −1(0.99) + 0 + 0  =  −3.96     after ReLU: 0
-```
+</div><div style="flex:1 1 42%;">
+<img src="../../textbook/figures/nn-conv-feature.png" class="media-shot" style="width:100%; max-height:150px;" alt="the digit 3, its convolution with the vertical-edge kernel, and the feature map after ReLU">
+</div></div>
 
-<img src="../../textbook/figures/nn-conv-feature.png" class="media-shot" style="max-height: 150px;" alt="the digit 3, its convolution with the vertical-edge kernel, and the feature map after ReLU">
+<img src="../../textbook/figures/nn-conv-one-output.svg" style="height:270px; display:block; margin:0.2em auto;" alt="one output of the vertical-edge kernel [−1 0 1; −2 0 2; −1 0 1] at pixel (12, 15), whose neighborhood is three rows of (0.99, 0.29, 0):
+−1(0.99) + 0(0.29) + 1(0)  −2(0.99) + 0 + 0  −1(0.99) + 0 + 0  =  −3.96     after ReLU: 0">
 
 
 ---
 
 ## Attention
 
-For a set of vectors x₁ … xₙ (words, image patches), each gets a query `qᵢ = W_q xᵢ`, a key `kᵢ = W_k xᵢ`, a value `vᵢ = W_v xᵢ`:
+For a set of vectors `$x_1 \dots x_n$` (words, image patches), each gets a query `$q_i = W_q x_i$`, a key `$k_i = W_k x_i$`, a value `$v_i = W_v x_i$`:
 
-```text
-   yᵢ = Σⱼ αᵢⱼ vⱼ,      αᵢⱼ = softmaxⱼ( qᵢ·kⱼ / √d )
-```
+<div class="tex" role="img" aria-label="yᵢ = Σⱼ αᵢⱼ vⱼ,      αᵢⱼ = softmaxⱼ( qᵢ·kⱼ / √d )">
+\[ y_i = \sum_j \alpha_{ij}\, v_j, \qquad \alpha_{ij} = \operatorname{softmax}_j\!\Big( \frac{q_i \cdot k_j}{\sqrt{d}} \Big) \]
+</div>
 
-Worked, three tokens in 2D: x = (1, 0), (0, 1), (1, 1); `W_q = W_k = I`; `W_v = [0.5 1; 1 0.5]`, so the values are (0.5, 1), (1, 0.5), (1.5, 1.5).
+Worked, three tokens in 2D: `$x = (1, 0),\ (0, 1),\ (1, 1)$`; `$W_q = W_k = I$`; `$W_v = \begin{bmatrix} 0.5 & 1 \\ 1 & 0.5 \end{bmatrix}$`, so the values are (0.5, 1), (1, 0.5), (1.5, 1.5).
 
-```text
-   token 3:  scores (0.707, 0.707, 1.414)   α = (0.248, 0.248, 0.503)   y₃ = (1.128, 1.128)
-   token 1:  scores (0.707, 0,     0.707)   α = (0.401, 0.198, 0.401)   y₁ = (1.000, 1.102)
-```
+| query | scores `$q_i \cdot k_j / \sqrt{2}$` | weights `$\alpha_{ij}$` | output `$y_i$` |
+| ----- | ------------------------------------- | ------------------------ | ---------------- |
+| token 3 | (0.707, 0.707, 1.414) | (0.248, 0.248, 0.503) | (1.128, 1.128) |
+| token 1 | (0.707, 0, 0.707) | (0.401, 0.198, 0.401) | (1.000, 1.102) |
 
 - the weights depend on the **data**, not only on position; every vector can look at every other in one layer
 
@@ -372,15 +442,15 @@ Worked, three tokens in 2D: x = (1, 0), (0, 1), (1, 1); `W_q = W_k = I`; `W_v = 
 
 ## The cost of attention
 
-Every token scores every other token: n tokens make **n²** scores per head per layer.
+Every token scores every other token: `$n$` tokens make **`$n^2$`** scores per head per layer.
 
-```text
-   n = 256       65,536 scores
-   n = 1,024     1,048,576          a 512 × 512 image cut into 16 × 16 patches
-   n = 4,096     16,777,216
-```
+| tokens `$n$` | scores `$n^2$` | |
+| ------------ | -------------- | - |
+| 256 | 65,536 | |
+| 1,024 | 1,048,576 | a 512 × 512 image cut into 16 × 16 patches |
+| 4,096 | 16,777,216 | |
 
-- quadrupling the image area quadruples n and multiplies the attention cost by **16**
+- quadrupling the image area quadruples `$n$` and multiplies the attention cost by **16**
 - that is why image transformers work on **patches** or on a compressed **latent** (the next diffusion lecture), never on raw pixels
 
 
@@ -411,29 +481,39 @@ Every token scores every other token: n tokens make **n²** scores per head per 
 
 ## Embeddings
 
-An **embedding** maps each thing (a word, a digit, an image) to a vector in ℝᵈ, **learned** so that things that behave alike land near each other. Similarity is the cosine:
+An **embedding** maps each thing (a word, a digit, an image) to a vector in `$\mathbb{R}^d$`, **learned** so that things that behave alike land near each other. Similarity is the cosine:
 
-```text
-   cos(u, v) = u·v / (‖u‖ ‖v‖)  ∈ [−1, 1]
-   u = (3, 4, 0), v = (4, 3, 0), w = (−4, 3, 0), all of length 5
-   cos(u, v) = 24/25 = 0.96     nearly the same direction
-   cos(u, w) = 0/25  = 0        unrelated
-```
+<div class="tex" style="font-size:0.76em" role="img" aria-label="cos(u, v) = u·v / (‖u‖ ‖v‖)  ∈ [−1, 1]
+u = (3, 4, 0), v = (4, 3, 0), w = (−4, 3, 0), all of length 5
+cos(u, v) = 24/25 = 0.96     nearly the same direction
+cos(u, w) = 0/25  = 0        unrelated">
+\[
+\begin{gathered}
+\cos(u, v) = \frac{u \cdot v}{\lVert u \rVert\, \lVert v \rVert} \in [-1,\ 1] \\[4pt]
+u = (3, 4, 0),\ v = (4, 3, 0),\ w = ({-4}, 3, 0)\text{, all of length 5} \\
+\cos(u, v) = 24/25 = 0.96, \qquad \cos(u, w) = 0/25 = 0
+\end{gathered}
+\]
+</div>
+
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 54%; font-size:0.74em;">
 
 - cosine ignores length; embeddings are usually normalized and only direction carries meaning
 - nobody places the points: a network puts them where its task goes better. Word vectors trained only to predict neighboring words support "king − man + woman ≈ queen" (Mikolov et al. 2013, arXiv:1301.3781)
+
+</div><div style="flex:1 1 46%;">
+<img src="../../textbook/figures/nn-cosine.svg" style="width:100%; max-height:300px;" alt="u = (3, 4) and v = (4, 3) 16.3° apart, cosine 0.96, nearly the same direction; w = (−4, 3) at 90° to u, cosine 0, unrelated; all of length 5">
+</div></div>
 
 
 ---
 
 ## An embedding table is a linear layer
 
-A class label as a **one-hot** vector times a matrix E picks out **one row**:
+A class label as a **one-hot** vector times a matrix `$E$` picks out **one row**:
 
-```text
-   one-hot(3) = (0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)       11 classes (10 digits + "no class")
-   one-hot(3) · E  =  row 3 of E                          E is 11 × 64: 704 weights
-```
+<img src="../../textbook/figures/nn-onehot-lookup.svg" style="height:290px; display:block; margin:0.2em auto;" alt="one-hot(3) = (0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)       11 classes (10 digits + &quot;no class&quot;)
+one-hot(3) · E  =  row 3 of E                          E is 11 × 64: 704 weights">
 
 - "embedding lookup" is a linear layer applied to a one-hot input, implemented as indexing
 - its rows are trained by the same gradient as every other weight: only the looked-up row gets a gradient on each example
@@ -458,7 +538,7 @@ A class label as a **one-hot** vector times a matrix E picks out **one row**:
 
 ## Encoders, decoders, autoencoders
 
-An **encoder** E maps a thing to its embedding; a **decoder** D maps an embedding back. Trained together through a narrow middle, `min Σᵢ ‖D(E(xᵢ)) − xᵢ‖²`, they form an **autoencoder** (Hinton & Salakhutdinov, *Science* 313, 2006).
+An **encoder** E maps a thing to its embedding; a **decoder** D maps an embedding back. Trained together through a narrow middle, `$\min \sum_i \lVert D(E(x_i)) - x_i \rVert^2$`, they form an **autoencoder** (Hinton & Salakhutdinov, *Science* 313, 2006).
 
 <img src="../../textbook/figures/nn-autoencoder-clip.svg" class="media-shot" style="max-height: 230px;" alt="top: an autoencoder with a narrow code in the middle; bottom: an image encoder and a text encoder mapping into one shared space">
 
@@ -470,13 +550,13 @@ An **encoder** E maps a thing to its embedding; a **decoder** D maps an embeddin
 
 ## Two encoders, one space: CLIP
 
-Train an image encoder `E_I` and a text encoder `E_T` side by side on hundreds of millions of (image, caption) pairs so that a matching pair has a higher cosine than every mismatched one:
+Train an image encoder `$E_I$` and a text encoder `$E_T$` side by side on hundreds of millions of (image, caption) pairs so that a matching pair has a higher cosine than every mismatched one:
 
-```text
-   L = − Σᵢ log  exp( cos(E_I(xᵢ), E_T(tᵢ)) / τ )  /  Σⱼ exp( cos(E_I(xᵢ), E_T(tⱼ)) / τ )
-```
+<div class="tex" role="img" aria-label="L = − Σᵢ log  exp( cos(E_I(xᵢ), E_T(tᵢ)) / τ )  /  Σⱼ exp( cos(E_I(xᵢ), E_T(tⱼ)) / τ )">
+\[ L = -\sum_i \log \frac{\exp\!\big( \cos(E_I(x_i),\, E_T(t_i)) / \tau \big)}{\sum_j \exp\!\big( \cos(E_I(x_i),\, E_T(t_j)) / \tau \big)} \]
+</div>
 
-- **contrastive** training; τ is a temperature. This is CLIP (Radford et al. 2021, arXiv:2103.00020)
+- **contrastive** training; `$\tau$` is a temperature. This is CLIP (Radford et al. 2021, arXiv:2103.00020)
 - afterwards a sentence and a photograph are vectors in **the same space**: "aim the picture at this caption" becomes geometry
 - a CLIP embedding of a caption is the condition every text-to-image model reads
 
@@ -487,14 +567,24 @@ Train an image encoder `E_I` and a text encoder `E_T` side by side on hundreds o
 
 Cosines between two images (rows) and two captions (columns), matches on the diagonal:
 
-```text
-   S = [ 0.8  0.2 ]     τ = 0.1, row 1:  e⁸ = 2981.0  vs  e² = 7.39
-       [ 0.1  0.7 ]       p(right caption) = 2981.0 / 2988.3 = 0.9975,   loss 0.0025
-                        τ = 1,   row 1:  p = e^0.8 / (e^0.8 + e^0.2) = 0.646,   loss 0.437
-```
+<div class="tex" style="font-size:0.7em" role="img" aria-label="S = [ 0.8  0.2 ]     τ = 0.1, row 1:  e⁸ = 2981.0  vs  e² = 7.39
+    [ 0.1  0.7 ]       p(right caption) = 2981.0 / 2988.3 = 0.9975,   loss 0.0025
+                     τ = 1,   row 1:  p = e^0.8 / (e^0.8 + e^0.2) = 0.646,   loss 0.437">
+\[
+S = \begin{bmatrix} 0.8 & 0.2 \\ 0.1 & 0.7 \end{bmatrix} \qquad
+\begin{aligned}[c]
+&\tau = 0.1\text{, row 1:} && e^{8} = 2981.0 \text{ vs } e^{2} = 7.39 \\
+& && p = 2981.0 / 2988.3 = 0.9975,\ \text{loss } 0.0025 \\
+&\tau = 1\text{, row 1:} && p = e^{0.8} / (e^{0.8} + e^{0.2}) = 0.646,\ \text{loss } 0.437
+\end{aligned}
+\]
+</div>
 
-<img src="../../textbook/figures/nn-temperature.svg" class="media-shot" style="max-height: 210px;" alt="probability of the right caption and loss against temperature for the same cosines">
+<div style="display:flex; gap:18px; align-items:center;"><div style="flex:0 0 46%; font-size:0.8em;">
 
-- the temperature turns a small cosine margin into a decisive one; CLIP **learns** τ and ends near 0.01
-- the gradient pushes S₁₁, S₂₂ up and the off-diagonal down; the only way to move a cosine is to move the vectors
+- the temperature turns a small cosine margin into a decisive one; CLIP **learns** `$\tau$` and ends near 0.01
+- the gradient pushes `$S_{11}$`, `$S_{22}$` up and the off-diagonal down; the only way to move a cosine is to move the vectors
 
+</div><div style="flex:1 1 54%;">
+<img src="../../textbook/figures/nn-temperature.svg" style="width:100%; max-height:300px;" alt="probability of the right caption and loss against temperature for the same cosines">
+</div></div>
