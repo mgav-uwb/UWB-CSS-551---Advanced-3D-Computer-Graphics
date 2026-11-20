@@ -13,6 +13,8 @@
   2026-11-13: Part 3 (the DCT) is walked in Lecture 16, after the cosine basis it needs; Parts 1 and 2,
   the hand step and the fit, stay here (Marcel: "ok" to the split).
   2026-11-19: acronyms spelled out at first use (homework 7 (HW7), Adam, CLIP, XOR, VAEs, DCT).
+  2026-11-19 (Marcel: "give the gradients"): HW7 gives gradients(); students write forward, sgdStep
+  and train, and run a learning-rate study (0.002, 0.05, 0.4) with a short report graded by hand.
 -->
 
 ### Homework 7 (HW7), and the wrap
@@ -27,10 +29,11 @@
 Out **Tuesday November 24**, due **Wednesday December 2, 11:59 PM**. JavaScript (the WebGL track) or a Python notebook.
 
 ```text
-   1  forward, gradients, sgdStep: the tiny net, x = 0.4, y = 0.3, lr = 0.1
+   1  forward and sgdStep (gradients is given): the tiny net, x = 0.4, y = 0.3, lr = 0.1
         before:  f = 0.61324, loss 0.09812        after one step:  f = 0.48142
-   2  the fit: 12 hidden units on the course's 12 wave samples, lr = 0.05
+   2  train: 12 hidden units on the course's 12 wave samples, lr = 0.05
         loss after 400 steps: 0.008355
+      the learning rate: 0.002, 0.05 and 0.4 for 40 steps, and a short report on what each did
    3  dct2, idct2Truncated, psnr: a digit's cosine transform
         walked in Lecture 16, after the cosine basis
 ```
@@ -62,3 +65,4 @@ Specification and skeletons: [HW7](../../homework/hw07/index.html)
 - **Due:** HW6, Wednesday November 25, 11:59 PM; HW7 goes out Tuesday November 24
 - **Quiz 6**, on Canvas: tonight 8 PM to Sunday November 22, 11:59 PM; Lectures 13, 14, HW5
 - **After this slide**: further slides, time permitting, or reading
+

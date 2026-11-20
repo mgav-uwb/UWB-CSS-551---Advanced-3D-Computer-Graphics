@@ -11,7 +11,8 @@
   Goals: a network is a function whose weights are set by gradient descent on a loss, by hand; the
   vocabulary the later lectures use without re-deriving it; one image as a function, spectral bias and
   frequency encodings (the bridge to NeRF). The outcomes are in each topic's header. Graded: HW7 Parts 1
-  and 2 (the hand step, the fit); Quiz 7 a forward pass and a cosine; the final a gradient step.
+  and 2 (the forward pass and the step against the given gradient; the training loop and the
+  learning-rate study); Quiz 7 and the final ask conceptual questions on this lecture (2026-11-19).
   CUT 2026-11-13 (Marcel: review of next week's lectures, goals and outcomes): both topics cut to cores of 25
   and 13 slides from 53 and 19; the rest moved in order to two supplements after the wrap; "The step, in
   code" deleted (Marcel: "pull them", it answered HW7 Part 1); errata (see the topic headers).
@@ -68,3 +69,4 @@
 - the walk-through of **homework 7 (HW7)**, Parts 1 and 2
 
 Reading: [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), Sections 1 to 9
+

@@ -53,22 +53,33 @@
   <div class="meta">Out Tuesday November 24 · due Wednesday December 2, 11:59 PM on Canvas · 31.25 points · JavaScript or Python · <a href="../../index.html">hub</a> · <a href="../../schedule/index.html">schedule</a> · <a href="../../syllabus/index.html">syllabus</a> · <a href="../index.html">all homework</a></div>
 </header>
 
-<div class="read"><b>Read before this homework:</b> <a href="../../textbook/neural-nets-embeddings.html#networks">Neural Networks and Embeddings §1 and §2</a> · <a href="../../textbook/neural-nets-embeddings.html#deep">§3, backpropagation</a> · <a href="../../textbook/image-space.html#fourier">The Space of Images §4, the Fourier basis</a> · <a href="../../textbook/image-space.html#compression">§8, what JPEG keeps</a> · <a href="../../textbook/image-space.html#metrics">§9, PSNR</a></div>
+<div class="read"><b>Read before this homework:</b> <a href="../../textbook/neural-nets-embeddings.html#networks">Neural Networks and Embeddings §1 and §2</a> · <a href="../../textbook/neural-nets-embeddings.html#deep">§3, backpropagation (the given <code>gradients</code> implements it)</a> · <a href="../../textbook/image-space.html#fourier">The Space of Images §4, the Fourier basis</a> · <a href="../../textbook/image-space.html#compression">§8, what JPEG keeps</a> · <a href="../../textbook/image-space.html#metrics">§9, PSNR</a></div>
 
 <h2>What you build</h2>
-<p>First the text's tiny network by hand: one forward pass, one backward pass, one step. Then the same code trains the 12-unit network on the course's
-      12 wave samples. Then a digit through the discrete cosine transform: keep the lowest k × k frequencies,
-      rebuild, and measure what was lost in decibels.</p>
+<p>The text's tiny network and the 12-unit network of the lectures, trained with the gradients provided. <code>gradients</code>
+      is given and not graded: it computes the mean squared error and its gradient for every parameter (backpropagation, Neural
+      Networks and Embeddings §3), and you do not edit it. You write the forward pass, the step that moves each parameter against its
+      gradient, and the training loop that repeats that step; then you train at three learning rates and report what changed.
+      Then a digit through the discrete cosine transform: keep the lowest k × k frequencies, rebuild, and measure what was
+      lost in decibels.</p>
 <div class="tw"><table>
   <tr><th>JavaScript</th><th>Python</th><th>What it computes</th></tr>
 <tr><td><code>forward</code></td><td><code>forward</code></td><td>a<sub>h</sub> = tanh(w1<sub>h</sub> x + b1<sub>h</sub>), f = b2 + Σ w2<sub>h</sub> a<sub>h</sub>.</td></tr>
-<tr><td><code>gradients</code></td><td><code>gradients</code></td><td>The mean squared error over the samples and its gradient with respect to w1, b1, w2, b2, by backpropagation.</td></tr>
+<tr><td><code>gradients</code></td><td><code>gradients</code></td><td><b>Given, do not edit.</b> The mean squared error over the samples and its gradient with respect to w1, b1, w2, b2.</td></tr>
 <tr><td><code>sgdStep</code></td><td><code>sgd_step</code></td><td>A new model, each parameter moved by −lr times its gradient.</td></tr>
+<tr><td><code>train</code></td><td><code>train</code></td><td>steps full-batch steps, each <code>g = gradients(m, xs, ys)</code> then <code>m = sgdStep(m, g, lr)</code>; returns the steps + 1 losses: entry 0 is the loss before any step, entry k the loss after k steps. The model you were given is not changed.</td></tr>
 <tr><td><code>dct2</code></td><td><code>dct2</code></td><td>The orthonormal 2D DCT-II of an n × n image.</td></tr>
 <tr><td><code>idct2Truncated</code></td><td><code>idct2_truncated</code></td><td>The image rebuilt from the k × k low-frequency block only.</td></tr>
 <tr><td><code>psnr</code></td><td><code>psnr</code></td><td>10 log<sub>10</sub>(1 / MSE) for pixel values in [0, 1].</td></tr>
 </table></div>
-<ul><li>The tiny net: w1 = (1, −1), b1 = (0.5, 0.5), w2 = (0.8, −0.6), b2 = 0.1, one sample x = 0.4, y = 0.3, lr = 0.1.</li><li>The fit starts from the seeded 12-unit weights and 12 samples in <code>data.json</code> (the JavaScript track imports the same values from <code>lib/skeletons/data-hw07.js</code>).</li><li>The digit is the first 3 of the course's 2,000 digits, 20 × 20, gray in [0, 1], row-major.</li></ul>
+<ul><li>The tiny net: w1 = (1, −1), b1 = (0.5, 0.5), w2 = (0.8, −0.6), b2 = 0.1, one sample x = 0.4, y = 0.3, lr = 0.1.</li><li>The fit and the learning-rate study start from the seeded 12-unit weights and 12 samples in <code>data.json</code> (the JavaScript track imports the same values from <code>lib/skeletons/data-hw07.js</code>). <code>train</code> is called on a copy of the initial model each time.</li><li>The <code>fit</code> check calls <code>train</code> for 400 steps at lr 0.05 and compares the history length, the first loss and the last loss. The <code>lr</code> check calls it for 40 steps at each of the three rates and compares the last loss at lr 0.002 and at lr 0.05, and, at lr 0.4, the first step whose loss exceeds 10 times the starting loss (the divergence step, an integer; −1 if the loss never does).</li><li>The digit is the first 3 of the course's 2,000 digits, 20 × 20, gray in [0, 1], row-major.</li></ul>
+<h2>The learning-rate study and report (10 points, graded by hand)</h2>
+<p>Train the 12-unit network on the 12 wave samples for 40 steps at three learning rates: <b>0.002</b> (too small: the loss falls slowly), <b>0.05</b> (the loss falls steadily) and <b>0.4</b> (too large: the loss diverges, growing every step).
+In the runner the middle panel plots the loss at every step of your <code>train</code> at those rates; in the notebook the cell
+before the report prints the loss at steps 0, 5, 10, 20 and 40. Change the rates and the number of steps to see more.</p>
+<p>Write 3 to 5 sentences: which rate was too slow, which diverged, and why, in terms of the size of the step.
+JavaScript: the string constant <code>LR_REPORT</code> in <code>hw07.js</code>. Python: the markdown cell headed &ldquo;Your report&rdquo;.
+A person reads it; the checks do not.</p>
 
 <h2>The numbers a correct build reproduces</h2>
 <p>Each row is one check, run on your functions with the published inputs below. The same table appears under
@@ -76,13 +87,15 @@ the scene in the runner and in the notebook's last cell.</p>
 <div class="tw"><table>
   <tr><th>#</th><th>Check</th><th>Expected</th><th>Tolerance</th><th>Points</th></tr>
 <tr><td>1</td><td>forward on the tiny net at x = 0.4: hidden a and output f</td><td class="num">((0.7163, 0.09967), 0.61324)</td><td class="num">0.0001</td><td>10</td></tr>
-<tr><td>2</td><td>gradients on the one sample: loss, dw1, db1, dw2, db2</td><td class="num">(0.09812, (0.09761, -0.14886), (0.24403, -0.37215), (0.44874, 0.06244), 0.62647)</td><td class="num">0.0001</td><td>20</td></tr>
-<tr><td>3</td><td>after one sgdStep (lr 0.1): the new output f</td><td class="num">0.48142</td><td class="num">0.0001</td><td>10</td></tr>
-<tr><td>4</td><td>12-unit net on the 12 wave samples: loss after 400 steps (lr 0.05)</td><td class="num">0.008355</td><td class="num">0.00001</td><td>20</td></tr>
+<tr><td>2</td><td>after one sgdStep (lr 0.1) with the given gradients: the new output f</td><td class="num">0.48142</td><td class="num">0.0001</td><td>10</td></tr>
+<tr><td>3</td><td>train the 12-unit net on the 12 wave samples, 400 steps at lr 0.05: history length, first loss, last loss</td><td class="num">(401, 1.726201, 0.008355)</td><td class="num">0.00001</td><td>20</td></tr>
+<tr><td>4</td><td>the same net trained 40 steps at lr 0.002, 0.05 and 0.4: the last loss at the first two rates, and at 0.4 the first step whose loss exceeds 10 times the starting loss (-1 if none)</td><td class="num">(0.65435, 0.0912, 2)</td><td class="num">0.0001</td><td>10</td></tr>
 <tr><td>5</td><td>dct2 of the digit: the first three coefficients C[0][0], C[0][1], C[1][0]</td><td class="num">(6.85706, -1.34555, -0.04291)</td><td class="num">0.0001</td><td>10</td></tr>
 <tr><td>6</td><td>psnr of the 5 × 5 low-frequency rebuild against the digit</td><td class="num">10.3045</td><td class="num">0.001</td><td>15</td></tr>
 <tr><td>7</td><td>psnr of the 8 × 8 low-frequency rebuild against the digit</td><td class="num">16.5246</td><td class="num">0.001</td><td>15</td></tr>
+<tr><td>8</td><td>learning-rate report: which rate was too slow, which diverged, and why (3 to 5 sentences)</td><td class="num">read by the grader</td><td class="num">not run</td><td>10</td></tr>
 </table></div>
+<p>The checks above are 90 of the 100 points; the report is the other 10, read by a person.</p>
 <details><summary>The published inputs</summary><pre>{
  "tiny": {
   "w1": [ 1, -1 ],
@@ -96,6 +109,11 @@ the scene in the runner and in the notebook's last cell.</p>
  "fit": {
   "steps": 400,
   "lr": 0.05
+ },
+ "lr": {
+  "steps": 40,
+  "rates": [ 0.002, 0.05, 0.4 ],
+  "blowup": 10
  },
  "dct": {
   "n": 20,
@@ -133,7 +151,7 @@ check your result. These are off limits in your submission:</p>
 </ul>
 <p>Grading runs your functions twice: on the published inputs above and on a second set of inputs that is not
 published. A check earns its points only when your value is within its tolerance on both, so the numbers have
-to come from the math. The rubric score is the sum of the points earned, out of 100; it counts as 31.25 course points (the rubric score times 0.3125). A submission that does not load
+to come from the math. The checks are 90 points and the learning-rate report is 10, graded by hand: it is not run, and an empty report earns 0 of its 10. The rubric score is the sum of the points earned, out of 100; it counts as 31.25 course points (the rubric score times 0.3125). A submission that does not load
 or compile earns no check points. Name any collaborators and tools in the submission comment.</p>
 <div class="box warn"><b>Late tokens.</b> You have two for the quarter. Declare one in the submission comment to
 extend this homework by 48 hours without penalty. Without a token, late work is not accepted, and nothing is
