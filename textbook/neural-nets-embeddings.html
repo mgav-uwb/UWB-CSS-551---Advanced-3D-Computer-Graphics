@@ -60,13 +60,13 @@
         <span class="tag">Definition (neural network)</span>
         A <strong>neural network</strong> is a function \(f_\theta : \mathbb{R}^{n} \to \mathbb{R}^{m}\)
         built from alternating linear maps and fixed nonlinearities, whose
-        behavior is set by a vector of <strong>weights</strong> \(\theta\). The
+        behavior is set by a vector of <strong>weights</strong> \(\theta\) (theta). The
         two-layer perceptron of the lecture&rsquo;s approximator exhibit is
         \[
           f_\theta(x) \;=\; b_2 + \sum_{h=1}^{H} w^{(2)}_h \,\tanh\!\big(w^{(1)}_h x + b^{(1)}_h\big),
           \qquad \theta = (w^{(1)}, b^{(1)}, w^{(2)}, b_2) \in \mathbb{R}^{3H+1},
         \]
-        with \(\tanh\) the hyperbolic tangent.
+        with \(\Sigma\) (capital sigma) the sum over the hidden units and \(\tanh\) the hyperbolic tangent.
       </div>
       <div class="fig-tabs">
         <figure data-label="Neurons">
@@ -75,7 +75,7 @@
         </figure>
         <figure data-label="Neuron vs artificial neuron">
           <img src="figures/nn-intro-neuron.svg" alt="Left: a neuron with dendrites, cell body, axon and terminals. Right: an artificial neuron; inputs x1, x2, x3 times weights w1, w2, w3, plus a bias b, summed, passed through an activation sigma to the output y = sigma(w1 x1 + w2 x2 + w3 x3 + b)." />
-          <figcaption>A neuron and an artificial neuron, the corresponding parts in one color: weighted inputs (the dendrites), a sum and a fixed activation (the cell body), one output (the axon), \(y = \sigma(\mathbf{w}^\top\mathbf{x} + b)\).</figcaption>
+          <figcaption>A neuron and an artificial neuron, the corresponding parts in one color: weighted inputs (the dendrites), a sum and a fixed activation (the cell body), one output (the axon), \(y = \sigma(\mathbf{w}^\top\mathbf{x} + b)\) with \(\sigma\) (sigma) the activation.</figcaption>
         </figure>
         <figure data-label="&#8477; &rarr; &#8477;">
           <img src="figures/nn-intro-1d.svg" alt="The perceptron with one input x, four hidden tanh units and one output f; beside it, f plotted for x from -2 to 2 as b2 plus four scaled S-curves, one per hidden unit." />
@@ -147,7 +147,7 @@
         <tr><td>tanh</td><td>\((e^{z} - e^{-z})/(e^{z} + e^{-z})\)</td><td>\(1 - \tanh^2 z\)</td><td>0.716</td><td>0.487</td><td>the perceptron above; small networks</td></tr>
         <tr><td>ReLU</td><td>\(\max(0, z)\)</td><td>\(0\) or \(1\)</td><td>0.900</td><td>1</td><td>most deep networks since 2012</td></tr>
         <tr><td>SiLU</td><td>\(z\,\sigma(z)\)</td><td>\(\sigma(z)\,(1 + z(1 - \sigma(z)))\)</td><td>0.640</td><td>0.896</td><td>the course denoiser; diffusion U-Nets</td></tr>
-        <tr><td>GELU</td><td>\(z\,\Phi(z)\), \(\Phi\) the standard normal cumulative distribution function</td><td>numerical</td><td>0.734</td><td>near 0.9</td><td>transformers</td></tr>
+        <tr><td>GELU</td><td>\(z\,\Phi(z)\), \(\Phi\) (capital phi) the standard normal cumulative distribution function</td><td>numerical</td><td>0.734</td><td>near 0.9</td><td>transformers</td></tr>
       </table>
       <p>
         The saturating functions were the original choice and are still right
@@ -164,7 +164,7 @@
         <strong>Training</strong> is not programming. Given examples
         \((x_i, y_i)\), define a loss such as the mean squared error
         \(\mathcal{L}(\theta) = \frac{1}{N}\sum_i (f_\theta(x_i) - y_i)^2\), and
-        repeat two steps: compute the gradient \(\nabla_\theta \mathcal{L}\), the
+        repeat two steps: compute the gradient \(\nabla_\theta \mathcal{L}\) (nabla, the gradient symbol), the
         direction in weight space that increases the loss fastest, and move
         every weight a little the other way,
       </p>
@@ -172,7 +172,7 @@
         \theta \;\leftarrow\; \theta - \eta\, \nabla_\theta \mathcal{L}(\theta),
       \]
       <p>
-        with a small <em>learning rate</em> \(\eta\). The gradient is computed
+        with a small <em>learning rate</em> \(\eta\) (eta). The gradient is computed
         by the chain rule, organized so that every weight&rsquo;s derivative is
         obtained in one backward sweep through the diagram; that organization
         is <strong>backpropagation</strong>
@@ -182,7 +182,7 @@
         For the perceptron, follow one input weight to the loss. With a single example the loss is
         \((f - y)^2\). The weight \(w^{(1)}_h\) changes \(z_h\); \(z_h\) changes \(a_h\) through the
         \(\tanh\); \(a_h\) changes \(f\) through the output weight \(w^{(2)}_h\); \(f\) changes the loss.
-        The chain rule multiplies the four local derivatives:
+        The chain rule multiplies the four local derivatives; the first, \(\delta\) (delta), is the error at the output:
       </p>
       \[
         \frac{\partial \mathcal{L}}{\partial w^{(1)}_h}
@@ -433,7 +433,7 @@
       <div class="def">
         <span class="tag">Definition (momentum, Adam)</span>
         <em>Momentum</em> keeps a running velocity, \(\mathbf{v} \leftarrow \beta\mathbf{v} + \mathbf{g}\),
-        \(\theta \leftarrow \theta - \eta\mathbf{v}\), with \(\beta \approx 0.9\): gradients that
+        \(\theta \leftarrow \theta - \eta\mathbf{v}\), with \(\beta \approx 0.9\) (beta): gradients that
         agree from step to step add up (a rolling ball), gradients that
         alternate cancel. <em>Adam</em> (adaptive moment estimation; Kingma and Ba, 2015) keeps two running
         averages, of the gradient and of its square,
@@ -444,7 +444,7 @@
         \]
         with \(\hat{\mathbf{m}} = \mathbf{m}/(1 - \beta_1^t)\), \(\hat{\mathbf{v}} = \mathbf{v}/(1 - \beta_2^t)\)
         correcting the averages&rsquo; bias toward zero at the start, and defaults
-        \(\beta_1 = 0.9\), \(\beta_2 = 0.999\), \(\epsilon = 10^{-8}\). Each weight
+        \(\beta_1 = 0.9\), \(\beta_2 = 0.999\), \(\epsilon = 10^{-8}\) (epsilon, which only prevents a division by zero). Each weight
         gets its own step size, the learning rate divided by the typical size of
         that weight&rsquo;s gradient.
       </div>
@@ -534,7 +534,7 @@
         held-out error against the true wave reached its minimum, 0.0099, at
         epoch 950, and rose to 0.0108 by the end; every epoch after 950 made the
         network worse at the thing it was for. With <em>weight decay</em>
-        \(\lambda = 0.002\) (each step also shrinks every weight by
+        \(\lambda = 0.002\) (lambda) (each step also shrinks every weight by
         \(\eta\lambda\theta\), penalizing large weights, which are what a sharp
         wiggle needs) the training error stays at 0.0124 and the held-out
         error ends at 0.0080, the best of the three. The \(H = 4\) network
@@ -622,7 +622,7 @@
           \alpha_{ij} = \frac{\exp(\mathbf{q}_i\cdot\mathbf{k}_j/\sqrt d)}{\sum_{j'}\exp(\mathbf{q}_i\cdot\mathbf{k}_{j'}/\sqrt d)}.
         \]
         Here \(d\) is the length of the query and key vectors, and the weights
-        \(\alpha_{ij}\) are a softmax over \(j\) (Section 2.2). The matrices \(W_q, W_k, W_v\)
+        \(\alpha_{ij}\) (alpha) are a softmax over \(j\) (Section 2.2). The matrices \(W_q, W_k, W_v\)
         are learned. The weights depend on the data, not only on the position, which is what
         a convolution cannot do; and every vector can look at every other in
         one layer.
@@ -787,7 +787,7 @@
              {\sum_{j} \exp\big(\cos(E_I(x_i), E_T(t_j))/\tau\big)} ,
       \]
       <p>
-        with a temperature \(\tau\). After training, a sentence and a photograph
+        with a temperature \(\tau\) (tau). After training, a sentence and a photograph
         are vectors in the same space, so &ldquo;aim the picture at this
         caption&rdquo; becomes geometry. This is
         <a href="https://arxiv.org/abs/2103.00020" target="_blank" rel="noopener">CLIP (Radford et al. 2021)</a>,
@@ -863,7 +863,7 @@
       </div>
       <figure>
         <img src="figures/nn-coordnet-fits.png" class="pix" alt="Four 64 by 64 panels: the test card; the plain ReLU fit, a blur with a soft disc and no checkerboard; the Fourier-feature fit, sharp with slight speckle; the SIREN fit, sharp with a softer checkerboard." />
-        <figcaption>The test card and three networks after 2,000 steps of Adam on mini-batches of 256 pixels, computed by <code>lectures/L15-neural-nets-embeddings/analysis/coord-net-figures.mjs</code> with <code>lib/core/coord-net.js</code>: ReLU on raw \((x, y)\), 11.82 dB; ReLU on Fourier features with \(\sigma = 6\), 21.21 dB; SIREN (a sinusoidal representation network, Section 9.3) with \(\omega_0 = 30\), 18.89 dB.</figcaption>
+        <figcaption>The test card and three networks after 2,000 steps of Adam on mini-batches of 256 pixels, computed by <code>lectures/L15-neural-nets-embeddings/analysis/coord-net-figures.mjs</code> with <code>lib/core/coord-net.js</code>: ReLU on raw \((x, y)\), 11.82 dB; ReLU on Fourier features with \(\sigma = 6\), 21.21 dB; SIREN (a sinusoidal representation network, Section 9.3) with \(\omega_0 = 30\) (omega zero, its frequency factor), 18.89 dB.</figcaption>
       </figure>
 
       <h3>9.1 Spectral bias</h3>
@@ -886,8 +886,8 @@
       <div class="def">
         <span class="tag">Definition (Fourier features, positional encoding)</span>
         A <strong>Fourier feature mapping</strong> replaces the coordinates
-        \(\mathbf v \in [0, 1]^2\) by \(\gamma(\mathbf v) = (\cos 2\pi B\mathbf v, \sin 2\pi B\mathbf v)\),
-        where \(B\) is an \(m \times 2\) matrix with entries drawn once from \(N(0, \sigma^2)\) and never
+        \(\mathbf v \in [0, 1]^2\) by \(\gamma(\mathbf v) = (\cos 2\pi B\mathbf v, \sin 2\pi B\mathbf v)\) (gamma; \(\pi\), pi, the circle constant),
+        where \(B\) is an \(m \times 2\) matrix with entries drawn once from \(N(0, \sigma^2)\), \(\sigma\) its spread, and never
         trained; each row is a plane wave with \(|\mathbf b|\) cycles per image width. A
         <strong>positional encoding</strong> uses fixed octaves instead,
         \(\gamma(p) = (\sin 2^k\pi p, \cos 2^k\pi p)_{k = 0}^{L-1}\) for each coordinate, as in NeRF

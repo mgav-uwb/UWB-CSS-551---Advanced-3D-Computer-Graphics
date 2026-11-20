@@ -67,7 +67,8 @@
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
   ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
            out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
-           and product names stay as names.
+           and product names stay as names. Each Greek letter is named in parentheses at its first use (Marcel: "greek
+           letters should get the pronounciation in parens when first introduced").
 -->
 
 ### Coordinate networks
@@ -97,7 +98,7 @@ f : (x, y) \in [-1, 1]^2 \;\to\; (r, g, b) \in [0, 1]^3 \\[8pt]
 \]
 </div>
 
-- the table stores `$f$` at 4,096 points; a **coordinate network** is an MLP (multilayer perceptron) `$f_\theta$` that can be evaluated at **any** `$(x, y)$`
+- the table stores `$f$` at 4,096 points; a **coordinate network** is an MLP (multilayer perceptron) `$f_\theta$`, with weights `$\theta$` (theta), that can be evaluated at **any** `$(x, y)$`
 - the same idea fits a shape, `$(x, y, z) \to \text{distance}$`, or a scene, `$(x, y, z, \text{direction}) \to (\text{density}, \text{colour})$`
 
 
@@ -126,7 +127,7 @@ The network the exhibit trains: two inputs, two hidden layers of 48 ReLU (rectif
 \[ L = \frac{1}{3B} \sum_{B \text{ pixels, 3 channels}} \big( f_\theta(x_i, y_i) - c_i \big)^2 \]
 </div>
 
-- `$c_i$` is pixel `$i$`'s true colour; the optimizer is Adam (adaptive moment estimation), `$\eta = 0.005$`, on mini-batches of `$B = 256$` random pixels
+- `$\Sigma$` (capital sigma) sums over the batch; `$c_i$` is pixel `$i$`'s true colour; the optimizer is Adam (adaptive moment estimation), learning rate `$\eta = 0.005$` (eta), on mini-batches of `$B = 256$` random pixels
 - the **training set** is the 4,096 pixels of **one** image; there is no test image
 - one step: 256 pixels × 2,544 multiply-adds forward, about twice that backward
 
@@ -210,6 +211,7 @@ B: 16 × 2, entries ~ N(0, σ²), drawn once, fixed">
 \[ \begin{gathered} \gamma(\mathbf{v}) = \big( \cos 2\pi B \mathbf{v},\ \sin 2\pi B \mathbf{v} \big), \qquad \mathbf{v} \in [0, 1]^2 \text{ the pixel's position} \\ B: 16 \times 2,\ \text{entries} \sim \mathcal{N}(0, \sigma^2), \text{ drawn once, fixed} \end{gathered} \]
 </div>
 
+- `$\gamma$` (gamma) names the mapping, `$\pi$` (pi) is the circle constant, `$\sigma$` (sigma) is the spread of `$B$`'s entries
 - each row `$\mathbf{b}$` of `$B$` is a plane wave across the image, with `$\lvert \mathbf{b} \rvert$` cycles per image width
 - `$B$` is drawn once and **never trained**; its 16 rows give the network 32 inputs
 - the network now combines waves that already oscillate at the needed rates
@@ -283,7 +285,7 @@ f  = W₃ h₂ + b₃                ω₀ = 30">
 
 - the input layer is itself a bank of plane waves, now **trained**
 - deeper layers build sums and products of waves (sin a · sin b is a sum of waves at a ± b), so depth multiplies the available frequencies
-- `$\omega_0$` scales every frequency, as `$\sigma$` does for Fourier features
+- `$\omega_0$` (omega zero) scales every frequency, as `$\sigma$` does for Fourier features
 
 
 ---

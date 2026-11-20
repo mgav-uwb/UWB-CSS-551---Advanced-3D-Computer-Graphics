@@ -12,7 +12,8 @@
   as aria-label, no blank line inside); inline math is a code span written `$...$`.
   ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
            out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
-           and product names stay as names.
+           and product names stay as names. Each Greek letter is named in parentheses at its first use (Marcel: "greek
+           letters should get the pronounciation in parens when first introduced").
 -->
 
 ### Supplement: neural networks, further
@@ -151,7 +152,7 @@ wrong fix: divide by 1000: softmax(1, 0.999) = (0.50025, 0.49975)   a different 
 
 ## Check the gradient numerically
 
-Every hand-derived or hand-coded gradient gets tested against a finite difference:
+Every hand-derived or hand-coded gradient gets tested against a finite difference; here the output error `$\delta$` (delta):
 
 <div class="tex" style="font-size:0.8em" role="img" aria-label="∂L/∂b₂ ≈ ( L(b₂ + h) − L(b₂ − h) ) / (2h),     h = 10⁻⁴
 central difference     0.626475
@@ -222,7 +223,7 @@ after one step (η = 0.1):  f = 0.3126,  loss 0.0002">
 \]
 </div>
 
-- at every layer `$\delta$` is multiplied by a weight and a tanh slope: unit 1's error **shrank six-fold** (0.0476 to 0.0079), unit 2's **grew** (−0.0410 to −0.0553), because `$W_2$`'s 0.9 outweighs its slope; where those products stay below 1 layer after layer, the first layer's gradient vanishes
+- at every layer `$\delta$` (delta) is multiplied by a weight and a tanh slope: unit 1's error **shrank six-fold** (0.0476 to 0.0079), unit 2's **grew** (−0.0410 to −0.0553), because `$W_2$`'s 0.9 outweighs its slope; where those products stay below 1 layer after layer, the first layer's gradient vanishes
 
 
 ---
@@ -360,7 +361,7 @@ t = 1\text{:} \quad \hat m = g, \quad \hat v = g^2 \quad \Rightarrow \quad \text
 
 ## Learning-rate schedules
 
-The best step size changes during training: large early, small late.
+The best step size `$\eta$` (eta) changes during training: large early, small late; `$\pi$` (pi) below is the circle constant.
 
 <div class="tex" style="font-size:0.74em" role="img" aria-label="warmup:        η rises linearly from 0 over the first few hundred steps
 cosine decay:  η(t) = η₀ · ½ (1 + cos(π t / T))
@@ -376,7 +377,7 @@ cosine decay:  η(t) = η₀ · ½ (1 + cos(π t / T))
 
 - warmup protects Adam's early steps, whose variance estimates are still poor
 - the decay lets the final steps settle into a minimum instead of rattling around it
-- **weight decay** shrinks every weight each step, `$\theta \leftarrow \theta - \eta(g + \lambda\theta)$`; with `$\eta = 0.1$` and `$\lambda = 0.002$`, 5000 steps of decay alone scale a weight by `$0.9998^{5000}$` = **0.368**
+- **weight decay** shrinks every weight each step, `$\theta \leftarrow \theta - \eta(g + \lambda\theta)$`, with `$\theta$` (theta) the weights and `$\lambda$` (lambda) the decay rate; with `$\eta = 0.1$` and `$\lambda = 0.002$`, 5000 steps of decay alone scale a weight by `$0.9998^{5000}$` = **0.368**
 
 
 ---
@@ -532,16 +533,17 @@ loss = reconstruction error + KL( N(μ, σ²) ‖ N(0, I) )     pulls codes towa
 \]
 </div>
 
+- `$\mu$` (mu) is the mean, `$\sigma$` (sigma) the spread, `$\varepsilon$` (epsilon) the noise
 - KL, the **Kullback–Leibler divergence**, measures how far the codes spread from `$\mathcal{N}(0, I)$`; with it the code space becomes **dense**: every point near the origin decodes to something plausible
 - Stable Diffusion's autoencoder is KL-regularized in this way (lightly), so its 64 × 64 × 4 latents are well behaved for diffusion
-- alone, VAE samples are **blurry**: the squared error hedges toward the average, as the image-space lecture's metrics pitfall predicts
+- alone, VAE samples are **blurry**: squared error hedges toward the average
 
 
 ---
 
 ## Zero-shot classification with CLIP
 
-Classify an image with **no classifier training**: embed a caption per class and pick the closest.
+Classify an image with **no classifier training**: embed a caption per class and pick the closest; a softmax at temperature `$\tau$` (tau) turns the cosines into probabilities.
 
 | prompts | illustrative cosines to one image |
 | --- | --- |

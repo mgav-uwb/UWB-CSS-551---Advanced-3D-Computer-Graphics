@@ -10,7 +10,8 @@
   as aria-label, no blank line inside); inline math is a code span written `$...$`.
   ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
            out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
-           and product names stay as names.
+           and product names stay as names. Each Greek letter is named in parentheses at its first use (Marcel: "greek
+           letters should get the pronounciation in parens when first introduced").
 -->
 
 ### Supplement: coordinate networks, further
@@ -21,6 +22,8 @@
 ---
 
 ## Pitfall: choosing the scale by the training error
+
+The Fourier-feature scale `$\sigma$` (sigma), by the error on the pixels and between them:
 
 | | on the pixels | between them | |
 | --- | --- | --- | --- |
@@ -55,7 +58,7 @@ hidden layer   W ~ U(−√(6/n)/ω₀, √(6/n)/ω₀), n = 48:
 | mean `$\lvert \omega_0 z \rvert$`, layer 2 | 2.35 rad | 23.87 rad |
 | PSNR at step 2000 | 18.89 dB | 13.27 dB |
 
-- the bound `$\sqrt{6/n}$` keeps each layer's input to the sine spread over about one period whatever the depth; dividing by `$\omega_0$` cancels the factor inside the sine
+- `$\omega_0$` (omega zero) is the SIREN's frequency factor; the bound `$\sqrt{6/n}$` keeps each layer's input to the sine spread over about one period whatever the depth; dividing by `$\omega_0$` cancels the factor inside the sine
 - without it every hidden sine sees phases spread over many periods: its output is effectively random in the input, and training starts from noise
 
 

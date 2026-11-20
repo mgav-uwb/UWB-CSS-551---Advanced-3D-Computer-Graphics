@@ -93,7 +93,8 @@
            as its table. "A forward pass, by hand" is the forward-pass demo (lib/demos/forward-pass.js; its test
            lib/tests/forward-pass.test.mjs holds 0.9, 0.1, 0.7163, 0.0997, 0.6132 and the 1-2-2-1 network's 0.3345).
            Columns throughout: "The same pass, as matrices" writes W1 (2 x 1), b1 and a as columns and the output as w2^T a;
-           the embedding lookup is E (64 x 11) times one-hot(3) = column 3. Acronyms defined at first use in this file.
+           the embedding lookup is E (64 x 11) times one-hot(3) = column 3. Acronyms defined, and each Greek letter named in
+           parentheses, at first use in this file ("greek letters should get the pronounciation in parens when first introduced").
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
@@ -113,11 +114,11 @@
 
 ## A network is a function
 
-A **neural network** is a function from `$\mathbb{R}^n$` to `$\mathbb{R}^m$` built from **artificial neurons**: each takes a weighted sum of its inputs, adds a bias and applies a fixed **nonlinearity**. Its **weights** `$\theta$` set its shape.
+A **neural network** is a function from `$\mathbb{R}^n$` to `$\mathbb{R}^m$` built from **artificial neurons**: each takes a weighted sum of its inputs, adds a bias and applies a fixed **nonlinearity**. Its **weights** `$\theta$` (theta) set its shape.
 
 <div class="fig-tabs">
 <figure data-label="Neurons"><img src="../../textbook/figures/nn-intro-neurons.svg" alt="three columns of nerve cells: each cell body sends its axon to the right, and the axon's terminals end on the dendrites of cells in the next column (synapses)"><figcaption>A neuron sums the signals on its dendrites and, past a threshold, fires along its axon to the next neurons.</figcaption></figure>
-<figure data-label="Neuron vs artificial neuron"><img src="../../textbook/figures/nn-intro-neuron.svg" alt="left: a neuron with dendrites, cell body, axon and terminals; right: an artificial neuron, inputs x1, x2, x3 times weights w1, w2, w3, plus a bias b, summed, passed through an activation sigma to the output y = sigma(w1 x1 + w2 x2 + w3 x3 + b)"><figcaption>The same plan: weighted inputs (the dendrites), a sum and an activation (the cell body), one output (the axon).</figcaption></figure>
+<figure data-label="Neuron vs artificial neuron"><img src="../../textbook/figures/nn-intro-neuron.svg" alt="left: a neuron with dendrites, cell body, axon and terminals; right: an artificial neuron, inputs x1, x2, x3 times weights w1, w2, w3, plus a bias b, summed, passed through an activation sigma to the output y = sigma(w1 x1 + w2 x2 + w3 x3 + b)"><figcaption>The same plan: weighted inputs (the dendrites), a sum <code>$\Sigma$</code> (capital sigma) and an activation <code>$\sigma$</code> (sigma) (the cell body), one output (the axon).</figcaption></figure>
 <figure data-label="ℝ → ℝ"><img src="../../textbook/figures/nn-intro-1d.svg" alt="the perceptron with one input x, four hidden tanh units and one output f; beside it, f plotted over x from -2 to 2 as b2 plus four scaled S-curves, one per hidden unit"><figcaption><code>$f(x) = b_2 + \sum_{h=1}^{H} w2_h \tanh(w1_h x + b1_h)$</code>, tanh the hyperbolic tangent: <code>$3H + 1$</code> weights, and a graph that is a sum of <code>$H$</code> shifted, stretched S-curves.</figcaption></figure>
 <figure data-label="ℝ³ → ℝ⁵"><img src="../../textbook/figures/nn-intro-3d5d.svg" alt="a fully connected network: 3 inputs, three hidden layers of 6 nodes, 5 outputs; weights per layer 3*6+6 = 24, 6*6+6 = 42, 42, 6*5+5 = 35; 143 in all"><figcaption>Every node takes every output of the layer before; a layer from <code>$n$</code> to <code>$m$</code> nodes has <code>$n m + m$</code> weights.</figcaption></figure>
 <figure data-label="One layer"><img src="../../textbook/figures/nn-intro-layer.svg" alt="a layer from 3 inputs to 4 nodes; node z2's three incoming weights w21, w22, w23 are row 2 of the 4 by 3 matrix W in z = W x + b"><figcaption>Node <code>$j$</code>'s incoming weights are row <code>$j$</code> of <code>$W$</code>, so a whole layer is <code>$z = W x + b$</code>, then <code>$a = \sigma(z)$</code>.</figcaption></figure>
@@ -194,8 +195,8 @@ L(\theta) &= \tfrac{1}{N} \textstyle\sum_i \big( f_\theta(x_i) - y_i \big)^2 &&\
 \]
 </div>
 
-- `$\nabla L$` is the direction in weight space that **increases** the loss fastest; step the other way
-- `$\eta$` sets the step length; too large a step diverges (the pitfall, a few slides on)
+- `$\nabla L$` (nabla L, the gradient) is the direction in weight space that **increases** the loss fastest; step the other way
+- `$\eta$` (eta) sets the step length; too large a step diverges (the pitfall, a few slides on)
 - the gradient comes from the **chain rule**, organized as one backward sweep: **backpropagation** (Rumelhart, Hinton & Williams, *Nature* 323, 1986)
 
 
@@ -223,7 +224,7 @@ The other three weights are the same chain, cut short:
 </div>
 
 - the slope is `$\tanh' = 1 - \tanh^2 = 1 - a_h^2$`; every factor except `$\delta$` was computed on the forward pass
-- `$\delta$` is computed once and passed **backward**: through the output weights, then the tanh slopes, to the input weights
+- `$\delta$` (delta) is computed once and passed **backward**: through the output weights, then the tanh slopes, to the input weights
 
 
 ---
@@ -365,7 +366,7 @@ Plain gradient descent crawls where the loss is flat and zig-zags across narrow 
 \[ v \leftarrow \beta v + g, \qquad \theta \leftarrow \theta - \eta\, v \qquad (\beta \approx 0.9) \]
 </div>
 
-- `$g$` is this step's gradient; `$v$` sums the recent ones, each step older weighted by one more factor `$\beta$`
+- `$g$` is this step's gradient; `$v$` sums the recent ones, each step older weighted by one more factor `$\beta$` (beta)
 - gradients that agree from step to step **add up**: a constant gradient grows `$v$` to `$g / (1 - \beta) = 10\, g$`
 - gradients that alternate **cancel**: the zig-zag across a valley damps out
 
@@ -388,7 +389,7 @@ m &\leftarrow \beta_1 m + (1 - \beta_1)\, g, \qquad v \leftarrow \beta_2 v + (1 
 \]
 </div>
 
-- every weight gets its own step size: `$\eta$` divided by the typical size of **that weight's** gradient
+- every weight gets its own step size: `$\eta$` divided by the typical size of **that weight's** gradient; `$\epsilon$` (epsilon) only prevents a division by zero
 - the first step: `$\hat m = g$` and `$\hat v = g^2$`, so each weight moves by `$\eta$` times the **sign** of its gradient
 - AdamW (Adam with decoupled **weight decay**, a small shrink of every weight at each step) is the default for the diffusion models and transformers of the coming lectures; the course's denoiser was trained with Adam
 
@@ -431,7 +432,7 @@ A network large enough to trace any curve traces the **noise** too. The wave at 
 | network, 5000 epochs | training error | held-out error |
 | -------------------- | -------------- | -------------- |
 | `$H = 40$` | 0.0057 (a quarter of the noise floor) | minimum 0.0099 at epoch 950, then 0.0108 |
-| `$H = 40$`, weight decay `$\lambda = 0.002$` | 0.0124 | **0.0080** |
+| `$H = 40$`, weight decay `$\lambda = 0.002$` (lambda) | 0.0124 | **0.0080** |
 | `$H = 4$` | | 0.0164 (too little capacity) |
 
 
@@ -511,7 +512,7 @@ For a set of vectors `$x_1 \dots x_n$` (words, image patches), each gets a query
 \[ y_i = \sum_j \alpha_{ij}\, v_j, \qquad \alpha_{ij} = \operatorname{softmax}_j\!\Big( \frac{q_i \cdot k_j}{\sqrt{d}} \Big) \]
 </div>
 
-- each output is an average of **all** the values, weighted by how well its query matches each key; `$d$` is the length of the query and key vectors
+- each output is an average of **all** the values, with weights `$\alpha_{ij}$` (alpha) set by how well its query matches each key; `$d$` is the length of the query and key vectors
 - the weights depend on the **data**, not only on position; every vector can look at every other in one layer
 
 
@@ -657,7 +658,7 @@ An **encoder** E maps a thing to its embedding; a **decoder** D maps an embeddin
 \[ L = -\sum_i \log \frac{\exp\!\big( \cos(E_I(x_i),\, E_T(t_i)) / \tau \big)}{\sum_j \exp\!\big( \cos(E_I(x_i),\, E_T(t_j)) / \tau \big)} \]
 </div>
 
-- **contrastive** training; `$\tau$` is a temperature (Radford et al. 2021, arXiv:2103.00020)
+- **contrastive** training; `$\tau$` (tau) is a temperature (Radford et al. 2021, arXiv:2103.00020)
 - afterwards a sentence and a photograph are vectors in **the same space**: "aim the picture at this caption" becomes geometry
 - a CLIP embedding of a caption is the condition every text-to-image model reads
 
