@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~62 min, 37 content slides).
+  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~60 min, 36 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/neural-nets-embeddings.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -14,8 +14,8 @@
     (δ = 2(f − y), the four derivatives, the update from the old weights); predict how hidden units,
     epochs and the learning rate change a fit, and that a trained network is smooth between its examples
     and unconstrained outside them; tell overfitting from training and held-out error; describe the
-    backward rule, what a mini-batch estimates and what Adam changes; compute a softmax and one attention
-    row and state attention's n² cost; compute a cosine and read nearest neighbors in an embedding;
+    backward rule, what a mini-batch estimates and what Adam changes; compute a softmax; explain query, key
+    and value and why attention costs n²; compute a cosine and read nearest neighbors in an embedding;
     define encoder, decoder and latent, and compute one row of CLIP's contrastive loss.
   CUT 2026-11-13 (Marcel: review of next week's lectures, goals and outcomes): the core keeps the slides
     the outcomes need; "Choosing the loss" moved next to attention, its first use; the rest moved, in
@@ -98,6 +98,11 @@
            Adam (from a pasted note on its m and v): m named the first moment (momentum's velocity as an average: which way),
            v the second moment (mean of g^2, not the momentum slide's velocity: its RMS says how steep or noisy); the slide split
            in two ("Optimizers: Adam" | "Adam: one step size per weight"), 37 content slides.
+  ATTENTION CONCEPTUAL 2026-11-19 (Marcel: "i think we should stay conceptual with attention. no need to compute it by hand?
+           are students implementing it or being tested on it?", then "proceed"): no homework implements attention and no
+           quiz or final item computes it (Quiz 8 asks only about the n² cost); "Attention, worked: three tokens" moved to
+           neural-nets-embeddings-supplement.md after "Attention, in code"; the definition slide gains the takeaway (a token
+           attends to tokens that share its features); the exhibit's note no longer works numbers. 36 content slides.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
@@ -530,21 +535,8 @@ For a set of vectors `$x_1 \dots x_n$` (words, image patches), each gets a query
 </div>
 
 - each output is an average of **all** the values, with weights `$\alpha_{ij}$` (alpha) set by how well its query matches each key; `$d$` is the length of the query and key vectors
+- a token attends most to the tokens whose keys point along its query: those that share its features
 - the weights depend on the **data**, not only on position; every vector can look at every other in one layer
-
-
----
-
-## Attention, worked: three tokens
-
-Three tokens in 2D: `$x = (1, 0),\ (0, 1),\ (1, 1)$`; `$W_q = W_k = I$`; `$W_v = \begin{bmatrix} 0.5 & 1 \\ 1 & 0.5 \end{bmatrix}$`, so the values are (0.5, 1), (1, 0.5), (1.5, 1.5).
-
-| query | scores `$q_i \cdot k_j / \sqrt{2}$` | weights `$\alpha_{ij}$` | output `$y_i$` |
-| ----- | ------------------------------------- | ------------------------ | ---------------- |
-| token 3 | (0.707, 0.707, 1.414) | (0.248, 0.248, 0.503) | (1.128, 1.128) |
-| token 1 | (0.707, 0, 0.707) | (0.401, 0.198, 0.401) | (1.000, 1.102) |
-
-- token 1 attends to itself and to token 3, which shares its first coordinate, and least to token 2, which shares nothing
 
 
 ---
@@ -569,7 +561,7 @@ Every token scores every other token: `$n$` tokens make **`$n^2$`** scores per h
 
 ## Attention, live
 
-<div class="cockpit" data-demo="attention-lab" data-controls="view:query.one"><pre class="viz-fallback">  the slide's three tokens in 2D: x = (1, 0), (0, 1), (1, 1); W_q = W_k = I; W_v = [0.5 1; 1 0.5]
+<div class="cockpit" data-demo="attention-lab" data-controls="view:query.one"><pre class="viz-fallback">  three tokens in 2D: x = (1, 0), (0, 1), (1, 1); W_q = W_k = I; W_v = [0.5 1; 1 0.5]
   click a token to make it the query; drag a token; a temperature on the scores
   token 3: scores (0.707, 0.707, 1.414), alpha (0.248, 0.248, 0.503), y3 = (1.128, 1.128)
   token 1: scores (0.707, 0, 0.707), alpha (0.401, 0.198, 0.401), y1 = (1.000, 1.102)

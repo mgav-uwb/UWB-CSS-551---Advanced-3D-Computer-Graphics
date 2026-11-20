@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Neural networks and embeddings, further (~40 min, 28 slides), mounted after the lecture's
+  CSS 551 · TOPIC DECK: Neural networks and embeddings, further (~42 min, 29 slides), mounted after the lecture's
   wrap, time permitting. Cut 2026-11-13 from topics/neural-nets-embeddings.md (L15): the slides the core does
   not build on, in the topic's order. Numbers: as in that topic's header (tools/gen-lecture-figures-d1.mjs,
   textbook/figures/numbers.json).
@@ -14,11 +14,13 @@
            out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
            and product names stay as names. Each Greek letter is named in parentheses at its first use (Marcel: "greek
            letters should get the pronounciation in parens when first introduced").
+  ATTENTION WORKED 2026-11-19 (Marcel: "i think we should stay conceptual with attention", then "proceed"): "Attention,
+           worked: three tokens" moved here from the core, after "Attention, in code".
 -->
 
 ### Supplement: neural networks, further
 
-<small>(~40 min, time permitting) · reading: <a href="../../textbook/neural-nets-embeddings.html">Neural Networks and Embeddings</a></small>
+<small>(~42 min, time permitting) · reading: <a href="../../textbook/neural-nets-embeddings.html">Neural Networks and Embeddings</a></small>
 
 
 ---
@@ -452,6 +454,20 @@ function attention(X, Wq, Wk, Wv) {
 // the worked example: X = [[1,0],[0,1],[1,1]], Wq = Wk = I, Wv = [[0.5,1],[1,0.5]]
 // → token 3: (1.128, 1.128);  token 1: (1.000, 1.102)
 ```
+
+
+---
+
+## Attention, worked: three tokens
+
+The core's attention formula on three tokens in 2D, with weights `$\alpha_{ij}$` (alpha): `$x = (1, 0),\ (0, 1),\ (1, 1)$`; `$W_q = W_k = I$`; `$W_v = \begin{bmatrix} 0.5 & 1 \\ 1 & 0.5 \end{bmatrix}$`, so the values are (0.5, 1), (1, 0.5), (1.5, 1.5).
+
+| query | scores `$q_i \cdot k_j / \sqrt{2}$` | weights `$\alpha_{ij}$` | output `$y_i$` |
+| ----- | ------------------------------------- | ------------------------ | ---------------- |
+| token 3 | (0.707, 0.707, 1.414) | (0.248, 0.248, 0.503) | (1.128, 1.128) |
+| token 1 | (0.707, 0, 0.707) | (0.401, 0.198, 0.401) | (1.000, 1.102) |
+
+- token 1 attends to itself and to token 3, which shares its first coordinate, and least to token 2, which shares nothing
 
 
 ---
