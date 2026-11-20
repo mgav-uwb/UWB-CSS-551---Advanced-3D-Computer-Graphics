@@ -54,7 +54,8 @@
            a gradient) from stochastic descent (each step's batch, its own loss surface); "the noise even helps escape poor
            minima" replaced by a hedged bullet, backed in the note by optim-lab's "escaping a minimum" view (65 of 100 runs at
            B = 1, eta0 = 0.2; none at full batch; numbers held by lib/tests/programs/optim-lab.test.mjs).
-  DEMOS:   data-demo="mlp-fit" data-controls="epochs,hidden" (demo-full);
+  DEMOS:   data-demo="forward-pass" (demo-full, "A forward pass, by hand"; self-contained, lib/demos/forward-pass.js);
+           data-demo="mlp-fit" data-controls="epochs,hidden" (demo-full);
            data-demo="optim-lab" data-controls="view:optimizers" (demo-full, after the optimizers slide);
            data-demo="attention-lab" data-controls="view:query.one" (demo-full, after the cost of attention);
            data-demo="embed-map" data-controls="highlight" (demo-full; reads lib/assets/mnist/mlp-denoiser.bin).
@@ -84,6 +85,16 @@
            New statements, all checked: the momentum gain 1/(1 - beta) = 10; Adam's first step eta times the sign; the cross-entropy gradient (-0.341, 0.242, 0.099); w1 = 1.0 - 0.1(0.0976)
            = 0.9902; 60,000 / 128 = 468.75, so 469 iterations.
 
+  INTRO AND DEMO 2026-11-19 (Marcel: "take some inspiration from https://mriquestions.com/what-is-a-neural-network.html when introducing NN. the illustrations are better", "make our illustration tabbed: neurons, 1D function -> 1D network, 3D -> 5D network, a single neuron vs artificial neuron, activations, etc.", "the by hand slide could be interactive ... allow 1 or 2 layers, 1D/2D input, 1D output, feed-forward only", "lay out the numbers so the matrix interpretation becomes obvious", "make all vectors columns, and transpose when needed", "define any and all acronyms on first use"):
+           "A network is a function" carries six figure tabs (lib/fig-tabs.js): neurons, a neuron beside an artificial
+           neuron, R to R (the perceptron beside its output as b2 plus four S-curves), R^3 to R^5 (143 weights, per layer
+           n m + m), one layer as a matrix (row j of W is node j's incoming weights), four activations (values at 0.9 marked);
+           nn-intro-*.svg from tools/gen-lecture-figures-neural.mjs. The nonlinearity slide shows the same four activations
+           as its table. "A forward pass, by hand" is the forward-pass demo (lib/demos/forward-pass.js; its test
+           lib/tests/forward-pass.test.mjs holds 0.9, 0.1, 0.7163, 0.0997, 0.6132 and the 1-2-2-1 network's 0.3345).
+           Columns throughout: "The same pass, as matrices" writes W1 (2 x 1), b1 and a as columns and the output as w2^T a;
+           the embedding lookup is E (64 x 11) times one-hot(3) = column 3. Acronyms defined at first use in this file.
+
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
   TeX inside, the ASCII form as aria-label, no blank line inside); inline math is a code span written
@@ -102,61 +113,53 @@
 
 ## A network is a function
 
-A **neural network** is a function `$f_\theta$` from `$\mathbb{R}^n$` to `$\mathbb{R}^m$` built from alternating **linear maps** and fixed **nonlinearities**; the vector of **weights** `$\theta$` sets its shape.
+A **neural network** is a function from `$\mathbb{R}^n$` to `$\mathbb{R}^m$` built from **artificial neurons**: each takes a weighted sum of its inputs, adds a bias and applies a fixed **nonlinearity**. Its **weights** `$\theta$` set its shape.
 
-<div class="tex" role="img" aria-label="f(x) = b₂ + Σₕ w2ₕ · tanh(w1ₕ · x + b1ₕ)          h = 1 … H,   3H + 1 weights">
-\[ f(x) = b_2 + \sum_{h=1}^{H} w2_h \tanh\!\big(w1_h\, x + b1_h\big) \qquad 3H + 1 \text{ weights} \]
+<div class="fig-tabs">
+<figure data-label="Neurons"><img src="../../textbook/figures/nn-intro-neurons.svg" alt="three columns of nerve cells: each cell body sends its axon to the right, and the axon's terminals end on the dendrites of cells in the next column (synapses)"><figcaption>A neuron sums the signals on its dendrites and, past a threshold, fires along its axon to the next neurons.</figcaption></figure>
+<figure data-label="Neuron vs artificial neuron"><img src="../../textbook/figures/nn-intro-neuron.svg" alt="left: a neuron with dendrites, cell body, axon and terminals; right: an artificial neuron, inputs x1, x2, x3 times weights w1, w2, w3, plus a bias b, summed, passed through an activation sigma to the output y = sigma(w1 x1 + w2 x2 + w3 x3 + b)"><figcaption>The same plan: weighted inputs (the dendrites), a sum and an activation (the cell body), one output (the axon).</figcaption></figure>
+<figure data-label="ℝ → ℝ"><img src="../../textbook/figures/nn-intro-1d.svg" alt="the perceptron with one input x, four hidden tanh units and one output f; beside it, f plotted over x from -2 to 2 as b2 plus four scaled S-curves, one per hidden unit"><figcaption><code>$f(x) = b_2 + \sum_{h=1}^{H} w2_h \tanh(w1_h x + b1_h)$</code>, tanh the hyperbolic tangent: <code>$3H + 1$</code> weights, and a graph that is a sum of <code>$H$</code> shifted, stretched S-curves.</figcaption></figure>
+<figure data-label="ℝ³ → ℝ⁵"><img src="../../textbook/figures/nn-intro-3d5d.svg" alt="a fully connected network: 3 inputs, three hidden layers of 6 nodes, 5 outputs; weights per layer 3*6+6 = 24, 6*6+6 = 42, 42, 6*5+5 = 35; 143 in all"><figcaption>Every node takes every output of the layer before; a layer from <code>$n$</code> to <code>$m$</code> nodes has <code>$n m + m$</code> weights.</figcaption></figure>
+<figure data-label="One layer"><img src="../../textbook/figures/nn-intro-layer.svg" alt="a layer from 3 inputs to 4 nodes; node z2's three incoming weights w21, w22, w23 are row 2 of the 4 by 3 matrix W in z = W x + b"><figcaption>Node <code>$j$</code>'s incoming weights are row <code>$j$</code> of <code>$W$</code>, so a whole layer is <code>$z = W x + b$</code>, then <code>$a = \sigma(z)$</code>.</figcaption></figure>
+<figure data-label="Activations"><img src="../../textbook/figures/nn-intro-activations.svg" alt="sigmoid, tanh, ReLU and SiLU plotted for z from -4 to 4, with each curve's value at z = 0.9 marked by a dot"><figcaption>Sigmoid, tanh, ReLU (rectified linear unit) and SiLU (sigmoid linear unit); the dots mark each one's value at <code>$z = 0.9$</code>.</figcaption></figure>
 </div>
-
-<img src="../../textbook/figures/nn-perceptron.svg" class="media-shot" style="max-height: 200px;" alt="the two-layer perceptron as a wiring diagram with four hidden units: input times weights plus biases, tanh, then a weighted sum">
-
-- read left to right: scale and shift (blue), squash (green), combine (red); nothing else happens
-- a **deep** network repeats the middle two stages, with vectors in place of single numbers
 
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
 ## A forward pass, by hand
 
-`$H = 2$`, weights `$w1 = (1.0,\ {-1.0})$`, `$b1 = (0.5,\ 0.5)$`, `$w2 = (0.8,\ {-0.6})$`, `$b2 = 0.1$`; input `$x = 0.4$`.
-
-<div class="tex" style="font-size:0.78em" role="img" aria-label="pre-activations   z = (1.0·0.4 + 0.5,  −1.0·0.4 + 0.5)          = (0.9, 0.1)
-activations       a = (tanh 0.9, tanh 0.1)                       = (0.7163, 0.0997)
-output            f = 0.1 + 0.8·0.7163 − 0.6·0.0997 = 0.1 + 0.5730 − 0.0598 = 0.6132">
-\[
-\begin{aligned}
-&\text{pre-activations} && z = (1.0 \cdot 0.4 + 0.5,\ \ {-1.0} \cdot 0.4 + 0.5) && = (0.9,\ 0.1) \\
-&\text{activations} && a = (\tanh 0.9,\ \tanh 0.1) && = (0.7163,\ 0.0997) \\
-&\text{output} && f = 0.1 + 0.8 \cdot 0.7163 - 0.6 \cdot 0.0997 && \\
-& && \phantom{f} = 0.1 + 0.5730 - 0.0598 && = \mathbf{0.6132}
-\end{aligned}
-\]
-</div>
-
-- seven weights, four multiplications, three additions, two table lookups
-- the course's digit-drawing network is this table with 512 rows per stage, four stages, 1,002,064 weights
+<div data-demo="forward-pass"><pre class="viz-fallback">  H = 2 hidden units, one input, tanh; every vector is a column
+  x = 0.4    W1 = (1.0, −1.0)ᵀ    b1 = (0.5, 0.5)ᵀ    wᵀ = (0.8  −0.6)    b = 0.1
+  step 1   z1 = 1.0 · 0.4 + 0.5 = 0.9          row 1 of W1 times x, plus b1,1
+  step 2   z2 = (−1.0) · 0.4 + 0.5 = 0.1       row 2 of W1 times x, plus b1,2
+  step 3   a = tanh(z): tanh 0.9 = 0.7163, tanh 0.1 = 0.0997
+  step 4   f = 0.8 · 0.7163 + (−0.6) · 0.0997 + 0.1 = 0.6132
+  buttons: inputs 1 | 2, hidden layers 1 | 2, step, back, all; every weight and input is an editable box</pre></div>
 
 
 ---
 
 ## The same pass, as matrices
 
-Stack the hidden units into vectors, `$W_1 = (1.0,\ {-1.0})^T$`, `$b_1 = (0.5,\ 0.5)$`, `$w_2 = (0.8,\ {-0.6})$`, `$b_2 = 0.1$`, and the pass is three lines:
+Every vector is a **column**, and a row is written as a transpose. The hidden layer's weights form the `$2 \times 1$` matrix `$W_1$`; the output weights are the row `$w_2^T$`:
 
-<div class="tex" role="img" aria-label="z = W₁ x + b₁          W₁ = (1.0, −1.0)ᵀ,  b₁ = (0.5, 0.5)       z = (0.9, 0.1)
-a = tanh(z)                                                      a = (0.7163, 0.0997)
-f = w₂ · a + b₂        w₂ = (0.8, −0.6),   b₂ = 0.1              f = 0.6132">
+<div class="tex" style="font-size:0.85em" role="img" aria-label="z = W₁ x + b₁ = [1.0; −1.0] · 0.4 + [0.5; 0.5] = [0.9; 0.1]
+a = tanh(z) = [tanh 0.9; tanh 0.1] = [0.7163; 0.0997]
+f = w₂ᵀ a + b₂ = [0.8  −0.6] [0.7163; 0.0997] + 0.1 = 0.6132      ([p; q] is a column)">
 \[
 \begin{aligned}
-z &= W_1 x + b_1 &&= (0.9,\ 0.1) \\
-a &= \tanh(z) &&= (0.7163,\ 0.0997) \\
-f &= w_2 \cdot a + b_2 &&= 0.6132
+z &= W_1\, x + b_1 = \begin{pmatrix} 1.0 \\ -1.0 \end{pmatrix} 0.4 + \begin{pmatrix} 0.5 \\ 0.5 \end{pmatrix} = \begin{pmatrix} 0.9 \\ 0.1 \end{pmatrix} \\[6pt]
+a &= \tanh(z) = \begin{pmatrix} \tanh 0.9 \\ \tanh 0.1 \end{pmatrix} = \begin{pmatrix} 0.7163 \\ 0.0997 \end{pmatrix} \\[6pt]
+f &= w_2^T a + b_2 = \begin{pmatrix} 0.8 & -0.6 \end{pmatrix} \begin{pmatrix} 0.7163 \\ 0.0997 \end{pmatrix} + 0.1 = 0.6132
 \end{aligned}
 \]
 </div>
 
-- a **batch** of `$B$` inputs is a matrix `$X$` with `$B$` columns: `$Z = W_1 X + b_1$` evaluates all `$B$` at once
-- a layer from `$n$` inputs to `$m$` outputs has **`$n m + m$`** weights and costs **`$n m$`** multiply-adds per input
+- a **batch** of `$B$` inputs is the `$1 \times B$` matrix `$X$`, one input per column: `$Z = W_1 X + b_1$` evaluates all `$B$` at once
+- a layer from `$n$` inputs to `$m$` outputs is an `$m \times n$` matrix and `$m$` biases: **`$n m + m$`** weights, **`$n m$`** multiply-adds per input
 
 
 ---
@@ -165,7 +168,7 @@ f &= w_2 \cdot a + b_2 &&= 0.6132
 
 A composition of linear maps is linear, so without the squash a network of any depth is **one matrix**.
 
-<img src="../../textbook/figures/nn-activations.svg" class="media-shot" style="max-height: 230px;" alt="five activation functions plotted: sigmoid, tanh, ReLU, SiLU, GELU">
+<img src="../../textbook/figures/nn-intro-activations.svg" class="media-shot" style="height: 230px;" alt="sigmoid, tanh, ReLU and SiLU plotted for z from -4 to 4, each one's value at z = 0.9 marked by a dot">
 
 | activation | value at 0.9 | slope at 0.9 | used in |
 | ---------- | ------------ | ------------ | ------- |
@@ -313,8 +316,8 @@ The one number that can make training fail outright. The wave fit, `$H = 12$`, 3
 | 1.0 | not a number |
 
 - a step that overshoots the valley lands **higher** on the far wall; the next gradient is larger, the next step larger still
-- symptom: a loss that **rises**, then becomes NaN (here after 225 epochs at `$\eta = 0.3$`, after 122 at `$\eta = 1.0$`)
-- cures: a smaller `$\eta$`, a schedule that decays it, or an optimizer that bounds each step (Adam, below)
+- symptom: a loss that **rises**, then becomes NaN, not a number (here after 225 epochs at `$\eta = 0.3$`, after 122 at `$\eta = 1.0$`)
+- cures: a smaller `$\eta$`, a schedule that decays it, or an optimizer that bounds each step (Adam, adaptive moment estimation, below)
 
 
 ---
@@ -346,7 +349,7 @@ B = 1,\ 16,\ 256: \quad \text{noise } 1,\ 0.25,\ 0.0625 \text{ (relative to one 
 
 | training run | batch | count |
 | ------------ | ----- | ----- |
-| MNIST (60,000 handwritten digits) | `$B = 128$` | 60,000 / 128 ≈ **469** iterations per epoch |
+| MNIST (Modified National Institute of Standards and Technology): 60,000 handwritten digits | `$B = 128$` | 60,000 / 128 ≈ **469** iterations per epoch |
 | the course's denoiser | `$B = 512$` | 41,210 steps × 512 = 21.1 million examples = **351.7** epochs |
 
 - the approximator's batch is all 12 points: there an epoch **is** one step, so the pitfall's 300 epochs were 300 steps
@@ -387,7 +390,7 @@ m &\leftarrow \beta_1 m + (1 - \beta_1)\, g, \qquad v \leftarrow \beta_2 v + (1 
 
 - every weight gets its own step size: `$\eta$` divided by the typical size of **that weight's** gradient
 - the first step: `$\hat m = g$` and `$\hat v = g^2$`, so each weight moves by `$\eta$` times the **sign** of its gradient
-- AdamW (Adam plus **weight decay**, a small shrink of every weight at each step) is the default for the diffusion models and transformers of the coming lectures; the course's denoiser was trained with Adam
+- AdamW (Adam with decoupled **weight decay**, a small shrink of every weight at each step) is the default for the diffusion models and transformers of the coming lectures; the course's denoiser was trained with Adam
 
 
 ---
@@ -553,7 +556,7 @@ Every token scores every other token: `$n$` tokens make **`$n^2$`** scores per h
   token 3: scores (0.707, 0.707, 1.414), alpha (0.248, 0.248, 0.503), y3 = (1.128, 1.128)
   token 1: scores (0.707, 0, 0.707), alpha (0.401, 0.198, 0.401), y1 = (1.000, 1.102)
   tabs: why sqrt d; every token (the n x n weights, order and a position code); cross-attention;
-  the cost (n = 1,024 for 512 x 512 in 16 x 16 patches: 1,048,576 scores, 4 MiB per head per layer)</pre></div>
+  the cost (n = 1,024 for 512 x 512 in 16 x 16 patches: 1,048,576 scores, 4 MiB (mebibytes) per head per layer)</pre></div>
 
 
 ---
@@ -602,14 +605,14 @@ u = (3, 4, 0),\ v = (4, 3, 0),\ w = ({-4}, 3, 0)\text{, all of length 5} \\
 
 ## An embedding table is a linear layer
 
-A class label as a **one-hot** vector times a matrix `$E$` picks out **one row**:
+A class label as a **one-hot** column, times `$E$`, picks out **one column**:
 
-<img src="../../textbook/figures/nn-onehot-lookup.svg" style="height:290px; display:block; margin:0.2em auto;" alt="one-hot(3) = (0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)       11 classes (10 digits + &quot;no class&quot;)
-one-hot(3) · E  =  row 3 of E                          E is 11 × 64: 704 weights">
+<img src="../../textbook/figures/nn-onehot-lookup.svg" style="height:270px; display:block; margin:0.2em auto;" alt="one-hot(3) = (0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)ᵀ, a column: 11 classes (10 digits + &quot;no class&quot;)
+E · one-hot(3)  =  column 3 of E                      E is 64 × 11: 704 weights">
 
 - "embedding lookup" is a linear layer applied to a one-hot input, implemented as indexing
-- its rows are trained by the same gradient as every other weight: only the looked-up row gets a gradient on each example
-- this 11 × 64 table is the course denoiser's class embedding, the vectors of the embedding exhibit ahead
+- trained by the same gradient as every other weight; only the looked-up column gets one
+- this 64 × 11 table (stored as 11 rows of 64) is the course denoiser's class embedding, the vectors of the embedding exhibit ahead
 
 
 ---
@@ -648,13 +651,13 @@ An **encoder** E maps a thing to its embedding; a **decoder** D maps an embeddin
 
 ## Two encoders, one space: CLIP
 
-Train an image encoder `$E_I$` and a text encoder `$E_T$` side by side on hundreds of millions of (image, caption) pairs so that a matching pair has a higher cosine than every mismatched one:
+**CLIP** (Contrastive Language-Image Pre-training) trains an image encoder `$E_I$` and a text encoder `$E_T$` side by side on hundreds of millions of (image, caption) pairs so that a matching pair has a higher cosine than every mismatched one:
 
 <div class="tex" role="img" aria-label="L = − Σᵢ log  exp( cos(E_I(xᵢ), E_T(tᵢ)) / τ )  /  Σⱼ exp( cos(E_I(xᵢ), E_T(tⱼ)) / τ )">
 \[ L = -\sum_i \log \frac{\exp\!\big( \cos(E_I(x_i),\, E_T(t_i)) / \tau \big)}{\sum_j \exp\!\big( \cos(E_I(x_i),\, E_T(t_j)) / \tau \big)} \]
 </div>
 
-- **contrastive** training; `$\tau$` is a temperature. This is CLIP (Radford et al. 2021, arXiv:2103.00020)
+- **contrastive** training; `$\tau$` is a temperature (Radford et al. 2021, arXiv:2103.00020)
 - afterwards a sentence and a photograph are vectors in **the same space**: "aim the picture at this caption" becomes geometry
 - a CLIP embedding of a caption is the condition every text-to-image model reads
 

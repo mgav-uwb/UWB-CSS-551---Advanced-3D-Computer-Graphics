@@ -65,6 +65,9 @@
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
+  ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
+           out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
+           and product names stay as names.
 -->
 
 ### Coordinate networks
@@ -102,7 +105,7 @@ f : (x, y) \in [-1, 1]^2 \;\to\; (r, g, b) \in [0, 1]^3 \\[8pt]
 
 ## Fitting one image with an MLP
 
-The network the exhibit trains: two inputs, two hidden layers of 48 ReLU units, three outputs.
+The network the exhibit trains: two inputs, two hidden layers of 48 ReLU (rectified linear unit) units, three outputs.
 
 | layer | computes | weights |
 | ----- | -------- | ------- |
@@ -123,7 +126,7 @@ The network the exhibit trains: two inputs, two hidden layers of 48 ReLU units, 
 \[ L = \frac{1}{3B} \sum_{B \text{ pixels, 3 channels}} \big( f_\theta(x_i, y_i) - c_i \big)^2 \]
 </div>
 
-- `$c_i$` is pixel `$i$`'s true colour; the optimizer is Adam, `$\eta = 0.005$`, on mini-batches of `$B = 256$` random pixels
+- `$c_i$` is pixel `$i$`'s true colour; the optimizer is Adam (adaptive moment estimation), `$\eta = 0.005$`, on mini-batches of `$B = 256$` random pixels
 - the **training set** is the 4,096 pixels of **one** image; there is no test image
 - one step: 256 pixels × 2,544 multiply-adds forward, about twice that backward
 
@@ -151,7 +154,7 @@ the network    2,643 weights               4.6 times fewer numbers">
 
 ## Measuring the fit: PSNR
 
-The **peak signal-to-noise ratio**, for colours in [0, 1]:
+The **peak signal-to-noise ratio** (PSNR) of colours in [0, 1], from the **mean squared error** (MSE):
 
 <div class="tex" role="img" aria-label="PSNR = 10 log₁₀( 1 / MSE )     peak signal-to-noise ratio, colours in [0, 1]
 MSE 0.0658    →  11.82 dB
@@ -164,7 +167,7 @@ MSE 0.00757   →  21.21 dB      +10 dB = 10 times less error">
 \]
 </div>
 
-- every **+10 dB** is **10 times** less squared error; higher is better
+- PSNR is measured in decibels (dB); every **+10 dB** is **10 times** less squared error; higher is better
 - the two values are the plain network and the Fourier-feature network after 2000 steps, a few slides on
 
 

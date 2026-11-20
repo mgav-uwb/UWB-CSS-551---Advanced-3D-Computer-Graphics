@@ -12,9 +12,10 @@
   2026-11-13: "Out tonight" corrected to Tuesday November 24; the supplements after the wrap named.
   2026-11-13: Part 3 (the DCT) is walked in Lecture 16, after the cosine basis it needs; Parts 1 and 2,
   the hand step and the fit, stay here (Marcel: "ok" to the split).
+  2026-11-19: acronyms spelled out at first use (homework 7 (HW7), Adam, CLIP, XOR, VAEs, DCT).
 -->
 
-### HW7, and the wrap
+### Homework 7 (HW7), and the wrap
 
 <small>(~6 min)</small>
 
@@ -42,7 +43,7 @@ The specification, skeletons and the run-and-compare rubric: [HW7](../../homewor
 ## HW7: tracks and what is off limits
 
 - **JavaScript**: plain arrays and loops; no machine-learning or signal-processing library
-- **Python notebook**: NumPy arrays and products are allowed; no `scipy`, `torch`, `jax` or other autodiff, no `np.fft` or other DCT routine
+- **Python notebook**: NumPy arrays and products are allowed; no `scipy`, `torch`, `jax` or other autodiff, no `np.fft` or other DCT (discrete cosine transform) routine
 - a library routine may be used to **check** your own result, never in the submission
 - graded on the page's inputs and on a hidden input set: a check scores only when both match
 

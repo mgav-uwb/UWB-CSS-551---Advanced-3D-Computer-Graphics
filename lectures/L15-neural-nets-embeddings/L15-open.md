@@ -39,6 +39,7 @@
   If it runs late, drop in this order: the temperature, the contrastive batch of two, the cost of attention,
   epochs and iterations.
   CUT 2026-10-08: the five multiple-choice discussion questions.
+  2026-11-19: acronyms spelled out at first use (homework 7 (HW7), Adam, CLIP, XOR, VAEs, DCT).
 -->
 
 ## CSS 551
@@ -60,10 +61,10 @@
 
 - a network is a **function**: a forward pass by hand
 - training is **gradient descent**: the chain rule, one step by hand, **backpropagation** through layers
-- training in practice, live: the learning rate, **mini-batches**, **Adam**; then **overfitting**
+- training in practice, live: the learning rate, **mini-batches**, **Adam** (adaptive moment estimation); then **overfitting**
 - the classification loss (**softmax**); **convolution** and **attention**, one output each
-- **embeddings**, autoencoders, and **CLIP**'s shared space
+- **embeddings**, autoencoders, and the shared space of **CLIP** (Contrastive Language-Image Pre-training)
 - **coordinate networks**: one image as a function of (x, y)
-- the **HW7** walk-through, Parts 1 and 2
+- the walk-through of **homework 7 (HW7)**, Parts 1 and 2
 
 Reading: [Neural Networks and Embeddings](../../textbook/neural-nets-embeddings.html), Sections 1 to 9

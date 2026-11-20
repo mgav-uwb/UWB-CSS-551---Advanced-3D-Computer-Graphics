@@ -10,6 +10,9 @@
   fence or code span.
   Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form
   as aria-label, no blank line inside); inline math is a code span written `$...$`.
+  ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
+           out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
+           and product names stay as names.
 -->
 
 ### Supplement: neural networks, further
@@ -100,7 +103,7 @@ x_1 & x_2 & h_1 & h_2 & y \\ \hline
 
 ## Outside the data: networks do not extrapolate
 
-A tanh saturates at `$\pm 1$`, so far from the data every hidden unit is a constant:
+A tanh (hyperbolic tangent) saturates at `$\pm 1$`, so far from the data every hidden unit is a constant:
 
 <div class="tex" style="font-size:0.8em" role="img" aria-label="the hand network:   f(x) = 0.1 + 0.8 tanh(x + 0.5) − 0.6 tanh(−x + 0.5)
 x → +∞:   0.1 + 0.8·(+1) − 0.6·(−1) = 1.5
@@ -116,7 +119,7 @@ x \to -\infty\text{:} &\quad 0.1 + 0.8 \cdot (-1) - 0.6 \cdot (+1) = -1.3
 \]
 </div>
 
-- a trained network is reliable **between** its examples and **flat** (tanh) or **linear** (ReLU) beyond them
+- a trained network is reliable **between** its examples and **flat** (tanh) or **linear** (ReLU, the rectified linear unit) beyond them
 - the wave fit knows nothing about the wave outside `$[-1, 1]$`; asked there, it answers with confidence anyway
 
 
@@ -125,7 +128,7 @@ x \to -\infty\text{:} &\quad 0.1 + 0.8 \cdot (-1) - 0.6 \cdot (+1) = -1.3
 ## Pitfall: softmax overflows
 
 <div class="tex" style="font-size:0.66em" role="img" aria-label="logits (1000, 999)
-naive:     exp(1000) = Infinity in double precision  →  Infinity / Infinity = NaN
+naive:     exp(1000) = Infinity in double precision  →  Infinity / Infinity = NaN (not a number)
 stable:    subtract the maximum: exp(0), exp(−1)  →  (0.731, 0.269)     the same answer
 wrong fix: divide by 1000: softmax(1, 0.999) = (0.50025, 0.49975)   a different answer">
 \[
@@ -187,7 +190,7 @@ opt.step()                            # update: p -= lr * p.grad
 ```
 
 - `backward()` is the backward sweep of the backpropagation slides, generated from the recorded forward pass
-- swapping `SGD` for `Adam` or the loss for cross-entropy changes one line
+- swapping `SGD` (stochastic gradient descent) for `Adam` or the loss for cross-entropy changes one line
 
 
 ---
@@ -304,7 +307,7 @@ output 0, gradient 0, forever">
 
 - a large learning-rate step can push many units there at once; the loss stalls with capacity to spare
 - symptoms: a large fraction of units that are **exactly zero** on every example
-- fixes: smaller steps, He initialization, or activations with a slope below zero (leaky ReLU, SiLU, GELU)
+- fixes: smaller steps, He initialization, or activations with a slope below zero (leaky ReLU; SiLU, the sigmoid linear unit; GELU, the Gaussian error linear unit)
 
 
 ---
@@ -394,6 +397,8 @@ cosine decay:  η(t) = η₀ · ½ (1 + cos(π t / T))
 ---
 
 ## Shared weights: the parameter count
+
+An RGB image (red, green, blue: three numbers per pixel):
 
 <div class="tex" style="font-size:0.7em" role="img" aria-label="a fully connected unit on a 512 × 512 RGB image         786,432 weights, for ONE output
 a 3 × 3 convolution, RGB in, 64 channels out            3·3·3·64 + 64 = 1,792 weights
@@ -515,7 +520,7 @@ e₃ − e₅ + e₈   nearest class other than the operands: 9 (cos 0.24);   am
 
 ## Variational autoencoders
 
-A plain autoencoder's codes land wherever training puts them, with gaps between; decoding a random code gives garbage. A **VAE** (Kingma & Welling 2013, arXiv:1312.6114) fixes the layout:
+A plain autoencoder's codes land wherever training puts them, with gaps between; decoding a random code gives garbage. A **VAE** (variational autoencoder; Kingma & Welling 2013, arXiv:1312.6114) fixes the layout:
 
 <div class="tex" style="font-size:0.72em" role="img" aria-label="encoder outputs a mean μ and a spread σ;  code z = μ + σ ⊙ ε,  ε ~ N(0, I)
 loss = reconstruction error + KL( N(μ, σ²) ‖ N(0, I) )     pulls codes toward N(0, I)">
@@ -527,7 +532,7 @@ loss = reconstruction error + KL( N(μ, σ²) ‖ N(0, I) )     pulls codes towa
 \]
 </div>
 
-- the code space becomes **dense**: every point near the origin decodes to something plausible
+- KL, the **Kullback–Leibler divergence**, measures how far the codes spread from `$\mathcal{N}(0, I)$`; with it the code space becomes **dense**: every point near the origin decodes to something plausible
 - Stable Diffusion's autoencoder is KL-regularized in this way (lightly), so its 64 × 64 × 4 latents are well behaved for diffusion
 - alone, VAE samples are **blurry**: the squared error hedges toward the average, as the image-space lecture's metrics pitfall predicts
 
@@ -563,8 +568,8 @@ softmax at τ = 1:      (0.351, 0.328, 0.321)        nearly uniform">
 ## Small networks inside graphics
 
 - **denoisers** for path-traced frames (the previous lecture): a network reads noisy color plus normals, albedo and depth
-- **learned upscaling** in games (NVIDIA DLSS, in games from 2019): render at lower resolution, let a network reconstruct the full frame using motion vectors
-- **neural radiance fields** (the learned-scenes lecture): a small network (the original paper's weights take about 5 MB) stands in for a whole scene
+- **learned upscaling** in games (NVIDIA DLSS, Deep Learning Super Sampling, in games from 2019): render at lower resolution, let a network reconstruct the full frame using motion vectors
+- **neural radiance fields** (the learned-scenes lecture): a small network (the original paper's weights take about 5 MB, megabytes) stands in for a whole scene
 - **neural texture and material compression**: a small network per material decoded in the shader
 
 

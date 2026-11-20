@@ -8,6 +8,9 @@
   fence or code span.
   Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js; TeX inside, the ASCII form
   as aria-label, no blank line inside); inline math is a code span written `$...$`.
+  ACRONYMS 2026-11-19 (Marcel: "remember to define any and all acronyms on first use"): each acronym is spelled
+           out at its first use in this file, slides and notes alike; citation venues (ICML, NeurIPS, ECCV, ACM TOG)
+           and product names stay as names.
 -->
 
 ### Supplement: coordinate networks, further
@@ -68,7 +71,7 @@ hidden layer   W ~ U(−√(6/n)/ω₀, √(6/n)/ω₀), n = 48:
 | PSNR on the pixels | 11.05 | 11.87 | 13.34 | **18.89** | 17.95 |
 | PSNR between the pixels | 12.86 | 14.16 | 16.26 | **22.56** | 17.82 |
 
-- `$\omega_0 = 1$`: the sines stay near their linear part; the network is a smooth function like the plain ReLU one
+- `$\omega_0 = 1$`: the sines stay near their linear part; the network is a smooth function like the plain ReLU (rectified linear unit) one
 - `$\omega_0 = 90$`: speckle between the pixels, the large-`$\sigma$` failure again; the paper's 30 is best here
 
 
@@ -82,8 +85,8 @@ Instant NGP (neural graphics primitives; Müller et al., *ACM TOG* 41(4), 2022, 
 N_min = 16, N_max = 2048, L = 16:   b = 1.3819
 level l:  the cell around p;  its 4 corners (8 in 3D) index a table
           of T feature vectors (F = 2 numbers);  interpolate bilinearly
-concatenate L · F = 32 features  →  a small MLP  →  colour
-spatial hash  h(v) = ( v₁ · 1  XOR  v₂ · 2654435761 ) mod T,  T = 2¹⁴
+concatenate L · F = 32 features  →  a small multilayer perceptron  →  colour
+spatial hash  h(v) = ( v₁ · 1  ⊕  v₂ · 2654435761 ),  ⊕ bitwise exclusive or mod T,  T = 2¹⁴
 (37, 12) → 13417    (38, 12) → 13418
 (37, 13) → 11736    (38, 13) → 11739">
 \[
@@ -92,8 +95,8 @@ spatial hash  h(v) = ( v₁ · 1  XOR  v₂ · 2654435761 ) mod T,  T = 2¹⁴
 &N_{\min} = 16,\ N_{\max} = 2048,\ L = 16\text{:} \quad b = 1.3819 \\
 &\text{level } l\text{: the cell around } p; \text{ its 4 corners (8 in 3D) index a table} \\
 &\quad \text{of } T \text{ feature vectors } (F = 2 \text{ numbers}); \text{ interpolate bilinearly} \\
-&\text{concatenate } L \cdot F = 32 \text{ features} \ \to\ \text{a small MLP} \ \to\ \text{colour} \\[6pt]
-&\text{spatial hash} \quad h(v) = (v_1 \cdot 1 \ \ \text{XOR} \ \ v_2 \cdot 2654435761) \bmod T, \quad T = 2^{14} \\
+&\text{concatenate } L \cdot F = 32 \text{ features} \ \to\ \text{a small multilayer perceptron} \ \to\ \text{colour} \\[6pt]
+&\text{spatial hash} \quad h(v) = (v_1 \cdot 1  \oplus v_2 \cdot 2654435761) \bmod T, \quad T = 2^{14} \\
 &\quad (37, 12) \to 13417 \qquad (38, 12) \to 13418 \\
 &\quad (37, 13) \to 11736 \qquad (38, 13) \to 11739
 \end{aligned}
@@ -101,7 +104,7 @@ spatial hash  h(v) = ( v₁ · 1  XOR  v₂ · 2654435761 ) mod T,  T = 2¹⁴
 </div>
 
 - coarse levels fit in the table one entry per vertex; fine levels have more vertices than `$T$` entries and **collide**
-- a shared entry receives the gradients of every vertex hashed to it; the other levels and the MLP tell the colliding points apart
+- `$\oplus$` is bitwise exclusive or; a shared entry receives the gradients of every vertex hashed to it, and the other levels and the network tell the colliding points apart
 
 
 ---
@@ -140,7 +143,7 @@ the first 12 levels (16 … 561) dense;  the last 4 (776 … 2048) hashed">
 | Year | Paper | What it added |
 | ---- | ----- | ------------- |
 | 2019 | Rahaman et al., ICML, arXiv:1806.08734 | spectral bias: networks learn low frequencies first |
-| 2020 | Mildenhall et al., ECCV, arXiv:2003.08934 | NeRF, with positional encoding of coordinates |
+| 2020 | Mildenhall et al., ECCV, arXiv:2003.08934 | NeRF (neural radiance fields), with positional encoding of coordinates |
 | 2020 | Tancik et al., NeurIPS, arXiv:2006.10739 | Fourier features; `$\sigma$` as the kernel's bandwidth |
 | 2020 | Sitzmann et al., NeurIPS, arXiv:2006.09661 | SIREN: sine activations and their initialization |
 | 2022 | Müller et al., *ACM TOG* 41(4), DOI 10.1145/3528223.3530127 | Instant NGP: multiresolution hash encoding |
