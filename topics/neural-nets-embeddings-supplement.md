@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Neural networks and embeddings, further (~38 min, 27 slides), mounted after the lecture's
+  CSS 551 · TOPIC DECK: Neural networks and embeddings, further (~40 min, 28 slides), mounted after the lecture's
   wrap, time permitting. Cut 2026-11-13 from topics/neural-nets-embeddings.md (L15): the slides the core does
   not build on, in the topic's order. Numbers: as in that topic's header (tools/gen-lecture-figures-d1.mjs,
   textbook/figures/numbers.json).
@@ -18,7 +18,7 @@
 
 ### Supplement: neural networks, further
 
-<small>(~38 min, time permitting) · reading: <a href="../../textbook/neural-nets-embeddings.html">Neural Networks and Embeddings</a></small>
+<small>(~40 min, time permitting) · reading: <a href="../../textbook/neural-nets-embeddings.html">Neural Networks and Embeddings</a></small>
 
 
 ---
@@ -493,6 +493,17 @@ For normalized `$u$`, `$v$`: `$\lVert u - v \rVert^2 = 2 - 2 \cos(u, v)$`, so ra
 
 - nearest-neighbor search over millions of embeddings (image search, retrieval) uses this to run on fast Euclidean indexes
 - unnormalized vectors break the equivalence: a long vector is "close" to many things by dot product
+
+
+---
+
+## A sphere, or hyperbolic space
+
+<img src="../../textbook/figures/nn-sphere-hyperbolic.svg" style="height:310px; display:block; margin:0.1em auto 0;" alt="Left, on a sphere, direction only: the unit circle with cats at 90 degrees, dogs at 210, humans at 330, each a cluster of dots, one per example; equal angles 120 degrees apart, cos 120 degrees = -0.5 = -1/(K - 1). Right, in the Poincare disk, a hierarchy: mammal at the center; carnivore and primate one step out; cat, dog and human two steps; tabby, siamese, beagle and collie three steps, near the rim; edges are arcs that meet the rim at right angles; the dashed circles are equal hyperbolic steps; radius: how general, angle: which branch.">
+
+- **a sphere**: only direction counts; `$K$` classes sit farthest apart at equal angles (face recognition: ArcFace, arXiv:1801.07698)
+- **a hierarchy** multiplies at every level; a sphere's room is fixed, the **Poincaré disk**'s grows exponentially toward the rim
+- WordNet's nouns: 5 hyperbolic dimensions beat 200 Euclidean (Nickel & Kiela 2017, arXiv:1705.08039); the gain is in few dimensions
 
 
 ---
