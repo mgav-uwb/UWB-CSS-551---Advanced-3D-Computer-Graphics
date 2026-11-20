@@ -446,7 +446,13 @@
         correcting the averages&rsquo; bias toward zero at the start, and defaults
         \(\beta_1 = 0.9\), \(\beta_2 = 0.999\), \(\epsilon = 10^{-8}\) (epsilon, which only prevents a division by zero). Each weight
         gets its own step size, the learning rate divided by the typical size of
-        that weight&rsquo;s gradient.
+        that weight&rsquo;s gradient. Adam&rsquo;s \(\mathbf m\) is the <em>first moment</em>, a running
+        mean of the gradient: momentum&rsquo;s velocity kept as an average, the direction each weight
+        should move with noisy zig-zags averaged out. Its \(\mathbf v\) is the <em>second moment</em>, a
+        running mean of the squared gradient, and not momentum&rsquo;s velocity: squaring drops the sign,
+        so \(\sqrt{\hat{\mathbf v}}\) is the typical size of the gradient, its root mean square (RMS).
+        Dividing by it shrinks the step where the gradient is large or noisy and enlarges it where the
+        gradient is small and steady.
       </div>
       <div class="ex">
         <span class="tag">Worked example (the first Adam step)</span>

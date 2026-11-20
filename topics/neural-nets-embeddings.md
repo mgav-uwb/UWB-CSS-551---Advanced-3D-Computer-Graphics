@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~62 min, 36 content slides).
+  CSS 551 · TOPIC DECK · Neural networks and embeddings (the core, ~62 min, 37 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/neural-nets-embeddings.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -95,6 +95,9 @@
            Columns throughout: "The same pass, as matrices" writes W1 (2 x 1), b1 and a as columns and the output as w2^T a;
            the embedding lookup is E (64 x 11) times one-hot(3) = column 3. Acronyms defined, and each Greek letter named in
            parentheses, at first use in this file ("greek letters should get the pronounciation in parens when first introduced").
+           Adam (from a pasted note on its m and v): m named the first moment (momentum's velocity as an average: which way),
+           v the second moment (mean of g^2, not the momentum slide's velocity: its RMS says how steep or noisy); the slide split
+           in two ("Optimizers: Adam" | "Adam: one step size per weight"), 37 content slides.
 
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Display math is a raw <div class="tex"> block typeset by MathJax (lib/deck-math.js;
@@ -389,9 +392,23 @@ m &\leftarrow \beta_1 m + (1 - \beta_1)\, g, \qquad v \leftarrow \beta_2 v + (1 
 \]
 </div>
 
-- every weight gets its own step size: `$\eta$` divided by the typical size of **that weight's** gradient; `$\epsilon$` (epsilon) only prevents a division by zero
+- `$m$`, the **first moment**, a running mean of `$g$`: momentum's velocity as an average; it says **which way** to move, with the zig-zags averaged out
+- `$v$`, the **second moment**, a running mean of `$g^2$` (not the previous slide's velocity): squaring drops the sign, so `$\sqrt{\hat v}$` is the gradient's typical size, its root mean square (RMS); it says **how steep or noisy** the ground is
+
+
+---
+
+## Adam: one step size per weight
+
+Each weight's step is its direction over its own typical size:
+
+<div class="tex" role="img" aria-label="Δθ = − η · m̂ / ( √v̂ + ε )        which way, over how steep or noisy">
+\[ \Delta\theta = -\eta\, \frac{\hat m}{\sqrt{\hat v} + \epsilon} \qquad \frac{\text{which way}}{\text{how steep or noisy}} \]
+</div>
+
+- `$\Delta\theta$` (delta theta) is the change of one weight; `$\epsilon$` (epsilon) only prevents a division by zero
+- large or noisy gradients get **smaller** steps, small and steady ones **larger**: one `$\eta$` serves layers whose gradients differ by orders of magnitude
 - the first step: `$\hat m = g$` and `$\hat v = g^2$`, so each weight moves by `$\eta$` times the **sign** of its gradient
-- AdamW (Adam with decoupled **weight decay**, a small shrink of every weight at each step) is the default for the diffusion models and transformers of the coming lectures; the course's denoiser was trained with Adam
 
 
 ---

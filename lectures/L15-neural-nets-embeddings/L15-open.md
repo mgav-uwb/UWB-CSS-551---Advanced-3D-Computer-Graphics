@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L15 · Thursday November 19, 2026 (week 8, in person): Neural networks and embeddings.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/neural-nets-embeddings.md (the core, ~62 min, 36 slides),
+  tonight), ../../topics/neural-nets-embeddings.md (the core, ~62 min, 37 slides),
   ../../topics/coordinate-networks.md (the core, ~30 min, 17 slides), L15-discuss.md (the HW7 walk-through,
   Parts 1 and 2, and the wrap), then, after the wrap, time permitting: ../../topics/neural-nets-embeddings-supplement.md
   (~38 min, 27 slides) and ../../topics/coordinate-networks-supplement.md (~10 min, 6 slides).
@@ -29,7 +29,7 @@
   coord-net (sigma,omega).
 
   Minute plan (120 min, Thu 5:45-7:45 PM in person), at the room's pace (about 2.4 min a slide, measured on
-  denser slides; 61 slides on the page after the 2026-11-19 splits, five live exhibits):
+  denser slides; 62 slides on the page after the 2026-11-19 splits (Adam in two since the moments were named), five live exhibits):
     0:00  Title and tonight                                    2 min
     0:02  Neural networks and embeddings, the core            62 min
     1:04  Coordinate networks, the core                        30 min   (two exhibit runs, not four)
