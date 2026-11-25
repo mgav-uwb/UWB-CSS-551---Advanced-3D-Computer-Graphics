@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: Diffusion models I, further (~80 min, 38 content slides plus six dividers),
+  CSS 551 · TOPIC DECK: Diffusion models I, further (~83 min, 39 content slides plus six dividers),
   mounted after the lecture's wrap, time permitting. Cut 2026-11-24 from topics/diffusion-1.md (L17)
   (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of the class. can the
   following lectures use less math?"): every derivation and worked step of the core, in the topic's
@@ -19,7 +19,7 @@
 
 ### Supplement: diffusion models I, further
 
-<small>(~80 min, time permitting) · reading: <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 1 to 4</small>
+<small>(~83 min, time permitting) · reading: <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 1 to 4</small>
 
 
 ---
@@ -162,6 +162,19 @@ A standard Gaussian vector in d dimensions has length close to **√d**:
 
 - the "cloud" at t = 1 is a thin **shell**, not a ball: almost no noise vector is short
 - the image-space lecture's "the cube is all corners" in Gaussian form; it matters when noises are **interpolated** (the interpolation slide)
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## The walk, measured, live
+
+<div class="cockpit" data-demo="diffusion-path" data-controls="view:highdim"><pre class="viz-fallback">  digits, 400 numbers each, pixel values from -1 to 1
+  distance to the nearest shrunken training digit tracks the noise cloud's radius: 19.2 against 19.0 at step 6
+  the sample's own length stays near 20 the whole way (digits are 17.3 to 19.7 long)
+  coarse 4 x 4 cosine band against the fine band, distance from final: 0.28 against 0.56 at step 6
+  start to every digit: 27.6 +- 0.5 (x1), 63.5 (x3), 23.3 (x0.7)</pre></div>
 
 
 ---

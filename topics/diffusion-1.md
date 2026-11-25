@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Diffusion models I: destroy, learn to undo, sample (~97 min, 41 content slides).
+  CSS 551 · TOPIC DECK · Diffusion models I: destroy, learn to undo, sample (~104 min, 44 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-1.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -63,6 +63,9 @@
   came from" before the denoiser's question; "What if the noise starts far away?" after the interpolation slide
   (distances in the demos' units, pixels from −1 to 1; the trained network's off-shell failures measured by the
   diffusion-path demo).
+  DEMO 2026-11-25: data-demo="diffusion-path" (built by the css551-demos session; private d7f506e3, public 6957bb0):
+  view:cloud after "What if the noise starts far away?"; view:coarse and view:commit after "Digits, the exact
+  denoiser"; view:highdim in the supplement after "The noise lives on a shell".
 -->
 
 ### Diffusion models I: destroy, learn to undo, sample
@@ -455,6 +458,19 @@ Every starting noise for a digit has length close to **20** (√400: the image-s
 
 ---
 
+<!-- .slide: class="demo-full" -->
+
+## How the sampler finds its way, live
+
+<div class="cockpit" data-demo="diffusion-path" data-controls="view:cloud"><pre class="viz-fallback">  the spiral; shaded: the noised-data cloud at the current step; arrows: the denoiser's pull
+  step 0: the cloud covers everything and the sample sits inside it; step 30: the cloud hugs the spiral
+  30 small steps land about 0.01 from the spiral
+  one big step from pure noise lands at the data's mean (-0.014, 0.095), 0.127 from any data point
+  starting noise x3 or x0.7: off the shell the network was trained on</pre></div>
+
+
+---
+
 ## From dots to digits
 
 2,000 handwritten digits, 20 × 20: each is a point with 400 coordinates. The same exact denoiser, the same sampler.
@@ -478,6 +494,30 @@ Every starting noise for a digit has length close to **20** (√400: the image-s
   distance 0.000, verdict "memorized": an exact denoiser only returns the set
   buttons pick the digit (conditioning); click a sample to inspect it
   MNIST (LeCun, Cortes, Burges) · CC BY-SA 3.0</pre></div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## From a blur to one digit, live
+
+<div class="cockpit" data-demo="diffusion-path" data-controls="view:coarse"><pre class="viz-fallback">  top: the noisy sample at each step; bottom: the denoiser's guess for it
+  seed 1: the guess starts as the average of all digits, a gray blur;
+          the largest weight is 0.38 at step 6 and above 0.99 by step 9;
+          the walk ends on training digit #1882, a 2
+  the coarse shape settles before the fine detail; starting noise x3 with the trained network: garbage</pre></div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## When a sample commits, live
+
+<div class="cockpit" data-demo="diffusion-path" data-controls="view:commit"><pre class="viz-fallback">  two samples from nearby starting noise (3.9 apart); top: the five heaviest training digits' weights
+  their guesses are one gray blur until about step 3, split at step 7, and end on two different digits
+  (#1882, a 2, and #110, a 0); starts closer together end on the same digit</pre></div>
 
 
 ---

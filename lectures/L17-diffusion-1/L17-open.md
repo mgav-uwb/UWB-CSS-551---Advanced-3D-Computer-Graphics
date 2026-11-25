@@ -10,15 +10,17 @@
   markdown line outside a code fence.
 
   DEMO EMBEDS (all demo-full, in the topic): diffusion-image (t), diffusion-2d (t), diffusion-2d (steps,stochastic),
-  diffusion-digits (steps), diffusion-digits (smooth), diffusion-net (steps).
+  diffusion-digits (steps), diffusion-digits (smooth), diffusion-net (steps); diffusion-path (view:cloud, after "What if
+  the noise starts far away?"; view:coarse and view:commit, after "Digits, the exact denoiser"); in the supplement,
+  diffusion-path (view:highdim). Drop order if time runs short: the commit view, then the coarse view.
   NUMBERS: tools/gen-lecture-figures-d1.mjs writes analysis/numbers-d1.json (this folder), the
   source of every computed value in L15, L16 and L17.
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Diffusion models I (topic, 41 slides)              97 min
-    1:39  Wrap                                                2 min
-    1:41  Questions and buffer; the supplement if time       19 min
+    0:02  Diffusion models I (topic, 44 slides)             104 min
+    1:46  Wrap                                                2 min
+    1:48  Questions and buffer; the supplement if time       12 min
   CUT 2026-10-08: the four discussion questions; their 16 minutes are questions and buffer.
   EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of
   the class. can the following lectures use less math?"): the topic is a conceptual core of 38 slides;
