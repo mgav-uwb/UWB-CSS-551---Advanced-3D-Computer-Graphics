@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK: The space of images, further (~10 min, 3 slides), mounted after the lecture's wrap, time
+  CSS 551 · TOPIC DECK: The space of images, further (~13 min, 4 slides), mounted after the lecture's wrap, time
   permitting. Cut 2026-11-24 from topics/image-space.md (L16) (Marcel: "PCA, eigenvalues, hilbert spaces... way
   over the math level of the class. can the following lectures use less math?"): the distance as an integral,
   principal components and eigenfaces, in the topic's order. Nothing graded depends on them.
@@ -12,7 +12,7 @@
 
 ### Supplement: the space of images, further
 
-<small>(~10 min, time permitting) · reading: <a href="../../textbook/image-space.html">The Space of Images</a></small>
+<small>(~13 min, time permitting) · reading: <a href="../../textbook/image-space.html">The Space of Images</a></small>
 
 
 ---
@@ -30,6 +30,16 @@ f = mid-gray (½, ½, ½); g = the ramp (u, u, u). With integrals in place of su
 ```
 
 - every tool of the finite view carries over with sums replaced by integrals: lengths, distances, angles θ (theta), projections
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Keep the k × k lowest frequencies, live
+
+<div class="cockpit" data-demo="dct-lab" data-controls="view:lowpass"><pre class="viz-fallback">  keep only the k x k lowest-frequency cosine weights, rebuild, compare (PSNR against k)
+  the edge: k = 1 gives 7.96 dB, k = 2 gives 16.30 dB, k = 4 is exact</pre></div>
 
 
 ---

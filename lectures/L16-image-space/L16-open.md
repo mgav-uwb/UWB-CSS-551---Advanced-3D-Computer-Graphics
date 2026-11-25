@@ -1,22 +1,23 @@
 <!--
   CSS 551 · L16 · Tuesday November 24, 2026 (week 9, online): The space of images.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/image-space.md (~88 min), L16-discuss.md (HW7 Part 3 and the wrap),
-  then ../../topics/image-space-supplement.md (~10 min, time permitting: the integral, PCA, eigenfaces).
+  tonight), ../../topics/image-space.md (~93 min), L16-discuss.md (HW7 Part 3 and the wrap),
+  then ../../topics/image-space-supplement.md (~13 min, time permitting: the integral, keep k × k live, PCA, eigenfaces).
   Re-sequenced 2026-10-25 (was L15, Thursday November 19, opened by paper Quiz 5): a Tuesday online
   meeting with no quiz; the HW7 walk-through moved to Lecture 15; HW7 goes out tonight (moved here 2026-11-09).
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX; never two "_" on one
   markdown line outside a code fence.
 
-  DEMO EMBEDS (demo-full, in the topic): dims-lab (view:highdims), after the thin shell; diffusion-image (t), used as a PSNR meter.
+  DEMO EMBEDS (demo-full, in the topic): dims-lab (view:highdims), after the thin shell; dct-lab (view:bases, view:rebuild),
+  after the digit in the cosine basis; diffusion-image (t), used as a PSNR meter; in the supplement dct-lab (view:lowpass).
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  The space of images (topic, 55 slides)             88 min
-    1:30  HW7 Part 3 walk-through (Parts 1 and 2 in L15)      3 min
-    1:33  Wrap                                                2 min
-    1:35  Questions, HW6 and HW7 help; buffer                25 min
+    0:02  The space of images (topic, 57 slides)             93 min
+    1:35  HW7 Part 3 walk-through (Parts 1 and 2 in L15)      3 min
+    1:38  Wrap                                                2 min
+    1:40  Questions, HW6 and HW7 help; buffer                20 min
   CUT 2026-10-08: the three multiple-choice discussion questions and four topic Check slides.
 -->
 

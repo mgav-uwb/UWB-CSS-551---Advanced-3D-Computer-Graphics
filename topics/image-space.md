@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~88 min, 55 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~93 min, 57 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -53,11 +53,15 @@
   diff-shell-rings.svg (tools/gen-lecture-figures-shell.mjs) and the coin-flip picture.
   DEMO 2026-11-25: data-demo="dims-lab" data-controls="view:highdims" (demo-full, after the thin-shell slide; built by
   the css551-demos session, private fe5881b9, public e26d60e).
+  DEMO 2026-11-25: data-demo="dct-lab" (built by the css551-demos session; private 0160364d, public 560cec8):
+  view:bases and view:rebuild after "A digit in the cosine basis"; view:lowpass in the supplement. Its
+  view:build and view:coef (building C, computing the weights) are HELD until HW7 is graded; add their
+  slides to the supplement only after css551-demos releases them.
 -->
 
 ### The space of images
 
-<small>(~88 min)</small>
+<small>(~93 min)</small>
 
 
 ---
@@ -365,6 +369,30 @@ Transform the 20 × 20 digit (400 coefficients) and rebuild it from only the K �
 - one coefficient is the mean gray; nine give a blob; **64 of 400** give a 3 anyone can read
 - the pixel basis spends its numbers evenly; the cosine basis puts **what matters first**
 - a noise schedule does the same thing in time: the coarse structure survives longest
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Two bases for a 4 × 4 image, live
+
+<div class="cockpit" data-demo="dct-lab" data-controls="view:bases"><pre class="viz-fallback">  pixel basis: 16 images, each a single 1; the image = each pixel value times its basis image, added up
+  cosine basis: 16 cosine images; the same image = each weight times its cosine image, added up
+  an edge (0.10 on the left, 0.90 on the right): cosine weights 2.00 (the average), -1.478 and 0.61
+  (horizontal frequencies 1 and 3), every other weight 0</pre></div>
+
+
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Rebuilding an image from its cosine weights, live
+
+<div class="cockpit" data-demo="dct-lab" data-controls="view:rebuild"><pre class="viz-fallback">  left: the cosine weights drawn as an image; slider: how many cosine images are added back,
+  lowest frequencies first (zigzag order); then the partial sum, the error, the image being added, PSNR
+  the edge: 3 cosine images give 16.30 dB
+  click a row or column number to drop that frequency, a cell to drop one weight; "restore all" undoes</pre></div>
 
 
 ---
