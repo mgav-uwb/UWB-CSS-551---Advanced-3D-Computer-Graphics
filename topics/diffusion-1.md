@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · Diffusion models I: destroy, learn to undo, sample (~90 min, 38 content slides).
+  CSS 551 · TOPIC DECK · Diffusion models I: destroy, learn to undo, sample (~97 min, 41 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/diffusion-1.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -57,6 +57,12 @@
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
+  EDIT 2026-11-25 THIN SHELLS (Marcel: "let's make sure we explain this very clearly without complicated math. we
+  may need to clarify the thin shell concepts better"): three slides, no formulas, both figures from
+  tools/gen-lecture-figures-shell.mjs: "Where noisy images live: thin shells" and "Heavy noise hides which digit it
+  came from" before the denoiser's question; "What if the noise starts far away?" after the interpolation slide
+  (distances in the demos' units, pixels from −1 to 1; the trained network's off-shell failures measured by the
+  diffusion-path demo).
 -->
 
 ### Diffusion models I: destroy, learn to undo, sample
@@ -200,6 +206,27 @@ function noisify(x0, t, rng) {
   drag t: by t = 0.6 the spiral is gone; by t = 1 the cloud is plain Gaussian noise
   data buttons: ring, moons: the cloud at t = 1 is the same for every shape
   readout: ᾱ(t) and SNR; t = 0.35 by default</pre></div>
+
+
+---
+
+## Where noisy images live: thin shells
+
+<img src="../../textbook/figures/diff-shell-rings.svg" class="media-shot" style="max-height: 275px;" alt="400 noise images drawn at their distance from the all-zero image: a blob at 2 pixels, a ring at 20, a thin ring at about 20 for 400 pixels">
+
+- from the image-space lecture: every 400-pixel noise image is about **20** from the center, give or take 0.7; noise fills a **thin shell**
+- noise one digit by a fixed amount: all its noisy copies sit on a thin shell **around that digit**; more noise, a bigger shell
+- pure noise, where sampling starts, is the biggest shell: every training digit, noised all the way, lands on it, so the **starting point is exactly where the network was trained**
+
+
+---
+
+## Heavy noise hides which digit it came from
+
+<img src="../../textbook/figures/diff-shell-crowd.svg" class="media-shot" style="max-height: 330px;" alt="one 3 noised three ways; histograms of its distance to the 2,000 training digits: heavy noise, a single spike with the true 3 number 54; medium, the 3 just nearest; light, the 3 clearly nearest">
+
+- **heavy** noise: every digit is about equally far (18.96 to 19.20), so the best guess is the **average** of all of them; **light** noise: the true 3 stands apart and takes all the weight
+- sampling runs this backwards with no true digit: it starts at the average, and small tilts in the noise settle the **broad shape first**, then the detail
 
 
 ---
@@ -412,6 +439,18 @@ Every starting noise for a digit has length close to **20** (√400: the image-s
 
 - two random noises are nearly perpendicular, so their average is shorter by √2; no real noise is that short, the model never saw such an input, and the result comes out washed out
 - **spherical interpolation** (slerp) moves along the great circle between the two, keeping the length at 20: the rotation lecture's slerp, applied to noise
+
+
+---
+
+## What if the noise starts far away?
+
+- it cannot start far from where the network was trained: the start is drawn the way training noised its images, so it lands on the **same shell**
+- it is far from every digit, but **equally** far (about 27 from each, give or take 0.5): it points at none of them, so there is **no wrong neighborhood** to miss; the digit is decided along the way
+- a start **off** the shell does fail, with a trained network:
+  - too long (3 times the noise): an input it never saw; garbage strokes
+  - too short (0.7 times, the midpoint of two noises): faint, thin digits
+  - training whose noisiest level kept a trace of the image: early Stable Diffusion could not make very dark or very bright pictures
 
 
 ---

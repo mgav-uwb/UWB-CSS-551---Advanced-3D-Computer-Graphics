@@ -16,9 +16,9 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Diffusion models I (topic, 38 slides)              90 min
-    1:32  Wrap                                                2 min
-    1:34  Questions and buffer; the supplement if time       26 min
+    0:02  Diffusion models I (topic, 41 slides)              97 min
+    1:39  Wrap                                                2 min
+    1:41  Questions and buffer; the supplement if time       19 min
   CUT 2026-10-08: the four discussion questions; their 16 minutes are questions and buffer.
   EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of
   the class. can the following lectures use less math?"): the topic is a conceptual core of 38 slides;
@@ -45,6 +45,7 @@
 
 - where diffusion sits among the **generative model families**
 - **destroy**: mix the picture with noise on a schedule; nothing is learned
+- **thin shells**: why sampling cannot start in the wrong place, and why heavy noise hides which image it came from
 - **the denoiser**: the best guess for a finite dataset is a weighted average of it; it blurs at high noise and copies at low noise
 - **learn**: a network trained by plain regression to make that guess
 - **sample**: re-noise the guess a little less, step by step; DDIM (denoising diffusion implicit models) and DDPM; steps are the cost
