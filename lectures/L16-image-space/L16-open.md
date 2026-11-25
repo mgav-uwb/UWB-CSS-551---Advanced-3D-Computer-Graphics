@@ -1,7 +1,7 @@
 <!--
   CSS 551 · L16 · Tuesday November 24, 2026 (week 9, online): The space of images.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/image-space.md (~82 min), L16-discuss.md (HW7 Part 3 and the wrap).
+  tonight), ../../topics/image-space.md (~92 min), L16-discuss.md (HW7 Part 3 and the wrap).
   Re-sequenced 2026-10-25 (was L15, Thursday November 19, opened by paper Quiz 5): a Tuesday online
   meeting with no quiz; the HW7 walk-through moved to Lecture 15; HW7 goes out tonight (moved here 2026-11-09).
 
@@ -12,10 +12,10 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  The space of images (topic, 53 slides)             82 min
-    1:24  HW7 Part 3 walk-through (Parts 1 and 2 in L15)      3 min
-    1:27  Wrap                                                2 min
-    1:29  Questions, HW6 and HW7 help; buffer                31 min
+    0:02  The space of images (topic, 57 slides)             92 min
+    1:34  HW7 Part 3 walk-through (Parts 1 and 2 in L15)      3 min
+    1:37  Wrap                                                2 min
+    1:39  Questions, HW6 and HW7 help; buffer                21 min
   CUT 2026-10-08: the three multiple-choice discussion questions and four topic Check slides.
 -->
 
@@ -36,8 +36,8 @@
 
 ## Tonight
 
-- an image is a **point** in a space too large to count, and a **function**; pixels are samples; sRGB is not light
-- high dimensions: distances concentrate, the cube is all corners
+- an image is a **point** in a space too large to count, and a **function**; pixels are samples; sRGB is not light; a render is a stack of images
+- high dimensions: distances concentrate, the cube is all corners, a Gaussian is a thin shell
 - **bases**: cosine, Fourier and the data's own (PCA, eigenfaces); the convolution theorem
 - what linear algebra does to images: **filters**, borders, sharpening, **pyramids**, resampling, **histograms**, noise, **JPEG**
 - comparing two images: **PSNR** and **SSIM** worked, what they reward, and averaging

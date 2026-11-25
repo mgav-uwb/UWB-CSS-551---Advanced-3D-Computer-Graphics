@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~82 min, 53 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~92 min, 57 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -25,6 +25,10 @@
   Laplacian pyramid; one JPEG coefficient quantized (−50.9 → −2 → −48); a nearest neighbor measured.
   EDIT 2026-10-08: the four multiple-choice Check slides cut (midpoint distance, checkerboard spectrum,
   equalizing two values, the 2× null space); each result moved into the note of the slide it checked.
+  DETAILED (2026-11-24, from Marcel's pasted notes): the cube's outer skin (0.9^d) beside the ball; a Gaussian
+  is a thin shell at √d (0.71 thick; the diffusion link); the function view in three slides (L², Hilbert
+  space, the angle 30°, the Riemann sum ¼ − 1/(4n²), why it matters); the render stack at 12 numbers per
+  pixel; deferred shading and the G-buffer. Numbers recomputed in node.
   NEEDS:   vectors and dot products; the neural-nets-embeddings topic for "encoder" and "embedding";
            the antialiasing lecture for the sampling slide (named, not required).
            Companion of topics/diffusion-1.md, which picks up "noise is the missing choice".
@@ -45,7 +49,7 @@
 
 ### The space of images
 
-<small>(~82 min)</small>
+<small>(~92 min)</small>
 
 
 ---
@@ -128,7 +132,7 @@ Stored pixel values are **sRGB codes**, not light. The code 0.5 is not half the 
    one 4K frame (3840 × 2160), RGBA 8-bit  33,177,600 bytes      ≈ 2 GB per second at 60 fps
 ```
 
-- 8 bits per channel is enough for **display**; renders and HDR images need **floats**, because light values exceed 1
+- 8 bits per channel is enough for **display**; renders and HDR (high dynamic range) images need **floats**, because light values exceed 1
 - networks work in floats in [−1, 1] or [0, 1]: the course's digits are 400 numbers in [−1, 1]
 
 
@@ -179,53 +183,119 @@ Two random points of the cube [−1, 1]ᵈ:
 
 ## High dimensions: the cube is all corners
 
-The fraction of the cube [−1, 1]ᵈ inside the unit ball:
+How much of the cube [−1, 1]ᵈ lies near its center?
 
 ```text
-   d = 2       0.785           a disk in a square
-   d = 3       0.524
-   d = 10      0.0025
-   d = 20      2.5 × 10⁻⁸
-   d = 400     10^−395.9
+   d        inner cube [−0.9, 0.9]ᵈ      unit ball
+   2        0.81                         0.785          a disk in a square
+   3        0.729                        0.524
+   10       0.349                        0.0025
+   100      2.7 × 10⁻⁵                   1.9 × 10⁻⁷⁰
+   1000     1.7 × 10⁻⁴⁶                  10^−1186.5
 ```
 
-- almost all of a high-dimensional cube's volume is **far from its center**, out in the corners
-- a Gaussian cloud in d dimensions is a thin **shell** at radius about √d, not a solid ball (the diffusion lecture uses this)
+- the inner cube holds 0.9ᵈ of the volume: in high dimensions almost all of it lies in the **outer skin**, within 0.1 of a face
+- the ball touches every face yet holds almost nothing: the volume is out in the **corners**, at distance √d from the center
+
+
+---
+
+## High dimensions: a Gaussian cloud is a soap bubble
+
+Draw x from N(0, I) in ℝᵈ, the standard normal: every coordinate independent, mean 0, variance 1.
+
+```text
+   ‖x‖² = x₁² + x₂² + … + x_d²       d independent terms, each with mean 1 and variance 2
+   mean of ‖x‖² = d, spread √(2d)    ⇒    ‖x‖ ≈ √d, give or take 0.71
+
+   d            √d        mean ‖x‖     spread of ‖x‖
+   2            1.41      1.25         0.66
+   400          20.0      19.99        0.71
+   196,608      443.4     443.40       0.71        (a 256 × 256 RGB image)
+```
+
+- the density is highest at the center, yet no draw lands near it: the samples fill a **thin shell** of radius √d, its thickness 0.71 / √d of the radius (0.16 % at image size)
+- diffusion: noise carries an image off the sheet of meaningful images onto a thin shell around it, and pure noise is the shell of radius √d; the network learns, at each noise level, the way back toward the sheet (the diffusion lecture)
 
 
 ---
 
 ## The image as a function
 
-A continuous image is a function f : [0, 1]² → [0, 1]³. With finite energy these form a vector space with an inner product:
+A continuous image is a function f : [0, 1]² → [0, 1]³, a color at every point (u, v) of the unit square. Functions add and scale pointwise, so they form a vector space; an integral gives it an inner product:
 
 ```text
-   ⟨f, g⟩ = ∫∫ f(u,v)·g(u,v) du dv          ‖f‖² = ⟨f, f⟩
-
-   f = mid-gray (½, ½, ½),   g = horizontal ramp (u, u, u)
-   ‖f − g‖² = 3 ∫₀¹ (½ − u)² du = 3 · (¼ − ½ + ⅓) = 3 · 1/12 = ¼       ‖f − g‖ = ½
+   ⟨f, g⟩ = ∫∫ f(u,v)·g(u,v) du dv           the dot product, summed over the whole square
+   ‖f‖² = ⟨f, f⟩       distance ‖f − g‖       cos θ = ⟨f, g⟩ / (‖f‖ ‖g‖),   θ (theta) the angle
 ```
 
-- sample both on an m × n grid: the per-pixel mean squared error converges to the same ¼. **Resolution changes the count of numbers, not the geometry**
-- why it matters here: antialiasing is filtering a function before sampling it; a texture is a function on [0, 1]²; a NeRF is a network standing in for a function on ℝ³ × S²
+- the images of finite energy (‖f‖ finite) form **L²** ("L two"), a **Hilbert space**: a vector space whose inner product gives lengths and angles, as the dot product does in ℝⁿ, and in which a converging sequence of images has an image as its limit
+- every tool of the finite view carries over, with sums replaced by integrals: projection, bases, nearest neighbors
+
+
+---
+
+## Two images as functions: a distance, worked
+
+f = mid-gray (½, ½, ½) everywhere; g = the horizontal ramp (u, u, u), black at the left edge, white at the right:
+
+```text
+   squared color difference at (u, v):   3 (½ − u)²          three equal channels; no v
+   ‖f − g‖² = ∫₀¹∫₀¹ 3 (½ − u)² du dv = 3 ∫₀¹ (¼ − u + u²) du = 3 (¼ − ½ + ⅓) = 3 · 1/12 = ¼
+   ‖f − g‖ = ½         ⟨f, g⟩ = ¾,  ‖f‖ = √3/2,  ‖g‖ = 1   ⇒   cos θ = √3/2,  θ = 30°
+
+   sampled at the centers of n columns: the mean over pixels of the squared color difference
+   n = 4          0.234375
+   n = 100        0.249975
+   n = 3,840      0.24999998       (the width of a 4K frame)       exactly ¼ − 1/(4n²)
+```
+
+- the raster distance is a **Riemann sum** of the integral: resolution changes how many numbers there are, not the distance
+- per channel, as PSNR counts its mean squared error, the same pair gives ¼ / 3 = 1/12
+
+
+---
+
+## Why the function view matters
+
+- **resolution independence**: a 100 × 100 raster and a 4K raster are two samplings of one function; a distance or a filter defined on the function means the same at both
+- **antialiasing**: a function can hold detail finer than the pixel grid can represent; sampling it directly aliases (jagged edges, moiré). Antialiasing low-pass filters (blurs) the function first, then samples (the sampling slides below)
+- **textures**: a texture is a function on [0, 1]² stored as samples; a mipmap stores it prefiltered on coarser grids
+- **NeRF** (neural radiance field): a network standing in for a function from 3D position (ℝ³) and view direction (S², the sphere of directions) to color and density, in place of a voxel grid (the learned-scenes lecture)
 
 
 ---
 
 ## A render is many images
 
-A renderer produces, per pixel, more than a color:
+A renderer writes, per pixel, an aligned stack of images on one pixel grid:
 
 | buffer | what each pixel stores | used by |
 | ------ | ---------------------- | ------- |
-| color | radiance, often in floats | display, after tone mapping |
+| color | radiance, in floats (high dynamic range) | display, after tone mapping |
 | depth | distance along the view ray | depth testing, fog, depth of field |
-| normals | the surface normal | deferred lighting, denoisers |
-| albedo | the surface's base color | denoisers, relighting |
-| motion vectors | where the pixel was last frame | temporal antialiasing, upscaling |
+| normals | the surface normal, (x, y, z) in three channels | lighting, denoisers |
+| albedo | the surface's base color, without light or shadow | denoisers, relighting |
+| motion vectors | the 2D offset to where the surface was last frame | temporal antialiasing (TAA), upscalers |
 
-- each buffer is a point in its own image space; learned denoisers and upscalers read **several at once**
-- a **G-buffer** is exactly this stack, written by a rasterizer before lighting (deferred shading)
+- each buffer is a point in its own image space; the stack is 3 + 1 + 3 + 3 + 2 = **12 numbers per pixel**
+- at 1920 × 1080 that is 24,883,200 numbers, four times the color image; learned denoisers and upscalers read the **whole stack** at once
+
+
+---
+
+## Deferred shading: geometry first, light later
+
+```text
+   geometry pass   rasterize every triangle once; at each pixel keep the nearest surface's
+                   depth, normal, albedo and motion                     → the G-buffer
+   lighting pass   for each pixel, for each light: shade from the G-buffer's values  → color
+```
+
+- a **G-buffer** (geometry buffer) is the stack of the last slide, written before any lighting; lighting then costs about lights × pixels, however many triangles were drawn over each other
+- one surface per pixel: transparent surfaces (glass, smoke) are shaded afterwards, in an ordinary forward pass
+- denoisers: normals, albedo and depth are nearly noise-free even when the color is not, so they mark the real edges and textures; the denoiser smooths the noise and keeps those
+- TAA and upscalers follow the motion vectors to reuse the previous frame's samples
 
 
 ---
