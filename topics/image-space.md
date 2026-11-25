@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~86 min, 54 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~88 min, 55 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -48,11 +48,16 @@
   backtick names with underscores. No <small> on math. Demo embeds live on
   demo-full slides (a short ## title + the embed div + its viz-fallback pre).
   Paths are relative to the lecture page (lectures/LNN-slug/index.html).
+  EDIT 2026-11-25 THIN SHELL (Marcel: "let's make sure we explain this very clearly without complicated math"): the
+  Gaussian slide is "High dimensions: noise lives on a thin shell", no formulas, on the generated figure
+  diff-shell-rings.svg (tools/gen-lecture-figures-shell.mjs) and the coin-flip picture.
+  DEMO 2026-11-25: data-demo="dims-lab" data-controls="view:highdims" (demo-full, after the thin-shell slide; built by
+  the css551-demos session, private fe5881b9, public e26d60e).
 -->
 
 ### The space of images
 
-<small>(~86 min)</small>
+<small>(~88 min)</small>
 
 
 ---
@@ -203,22 +208,25 @@ How much of the cube [−1, 1]ᵈ lies near its center?
 
 ---
 
-## High dimensions: a Gaussian cloud is a soap bubble
+## Noise lives on a thin shell
 
-Draw x from N(0, I) in ℝᵈ, the standard normal: every coordinate independent, mean 0, variance 1.
+<img src="../../textbook/figures/diff-shell-rings.svg" class="media-shot" style="max-height: 215px;" alt="400 noise images drawn at their distance from the all-zero image: at 2 pixels a blob at the center, at 20 pixels a ring at about 4.4, at 400 pixels a thin ring at about 20">
 
-```text
-   ‖x‖² = x₁² + x₂² + … + x_d²       d independent terms, each with mean 1 and variance 2
-   mean of ‖x‖² = d, spread √(2d)    ⇒    ‖x‖ ≈ √d, give or take 0.71
+- each noise pixel is a random number from a bell curve around 0; the image's **distance from the all-zero image** adds up all the pixels' squares
+- like 400 coin flips landing near 200 heads every time, the total is predictable: every 400-pixel noise image is about **20** from the center, give or take 0.7
+- so noise fills a **thin shell**, a soap bubble's skin: none near the center, none far out (a 256 × 256 color image: 443, still 0.7 thick); diffusion starts every sample there
 
-   d            √d        mean ‖x‖     spread of ‖x‖
-   2            1.41      1.25         0.66
-   400          20.0      19.99        0.71
-   196,608      443.4     443.40       0.71        (a 256 × 256 RGB image)
-```
 
-- the density is highest at the center, yet no draw lands near it: the samples fill a **thin shell** of radius √d, its thickness 0.71 / √d of the radius (0.16 % at image size)
-- diffusion: noise carries an image off the sheet of meaningful images onto a thin shell around it, and pure noise is the shell of radius √d; the network learns, at each noise level, the way back toward the sheet (the diffusion lecture)
+---
+
+<!-- .slide: class="demo-full" -->
+
+## Noise and high dimensions, live
+
+<div class="cockpit" data-demo="dims-lab" data-controls="view:highdims"><pre class="viz-fallback">  d = 400 (a 20 x 20 digit): |x| = 19.99 +- 0.71; inner cube [-0.9, 0.9]^d holds 5.0 x 10^-19
+  d = 1,000: 0.9^d = 1.7 x 10^-46
+  d = 196,608 (256 x 256 color): |x| = 443.40 +- 0.71; random pairs in [0,1]^d: 181.02 +- 0.24;
+              0.9^d = 5.1 x 10^-8997</pre></div>
 
 
 ---
