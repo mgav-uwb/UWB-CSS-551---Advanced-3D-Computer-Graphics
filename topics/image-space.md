@@ -1,5 +1,5 @@
 <!--
-  CSS 551 · TOPIC DECK · The space of images (~92 min, 57 content slides).
+  CSS 551 · TOPIC DECK · The space of images (~86 min, 54 content slides).
   A topic is a reusable stretch of slides that a lecture page mounts as one
   <section data-markdown="../../topics/image-space.md"> among others; it carries no
   session logistics (no title, Thursday, homework, wrap) and no "Part N" numbering.
@@ -26,9 +26,12 @@
   EDIT 2026-10-08: the four multiple-choice Check slides cut (midpoint distance, checkerboard spectrum,
   equalizing two values, the 2× null space); each result moved into the note of the slide it checked.
   DETAILED (2026-11-24, from Marcel's pasted notes): the cube's outer skin (0.9^d) beside the ball; a Gaussian
-  is a thin shell at √d (0.71 thick; the diffusion link); the function view in three slides (L², Hilbert
-  space, the angle 30°, the Riemann sum ¼ − 1/(4n²), why it matters); the render stack at 12 numbers per
-  pixel; deferred shading and the G-buffer. Numbers recomputed in node.
+  is a thin shell at √d (0.71 thick; the diffusion link); the function view and why it matters; the render
+  stack at 12 numbers per pixel; deferred shading and the G-buffer. Numbers recomputed in node.
+  EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of the
+  class"): the function view is one slide with no integral (the grid table settles to ¼); the integral,
+  principal components and eigenfaces moved to topics/image-space-supplement.md; the sheet figure is described
+  without PCA; Pearson and Turk & Pentland left the papers table.
   NEEDS:   vectors and dot products; the neural-nets-embeddings topic for "encoder" and "embedding";
            the antialiasing lecture for the sampling slide (named, not required).
            Companion of topics/diffusion-1.md, which picks up "noise is the missing choice".
@@ -49,7 +52,7 @@
 
 ### The space of images
 
-<small>(~92 min)</small>
+<small>(~86 min)</small>
 
 
 ---
@@ -222,36 +225,19 @@ Draw x from N(0, I) in ℝᵈ, the standard normal: every coordinate independent
 
 ## The image as a function
 
-A continuous image is a function f : [0, 1]² → [0, 1]³, a color at every point (u, v) of the unit square. Functions add and scale pointwise, so they form a vector space; an integral gives it an inner product:
+A continuous image is a **function**: a color f(u, v) at every point (u, v) of the unit square. A raster stores that function's values at the pixel centers, its **samples**.
+
+Mid-gray against a black-to-white ramp, compared on finer and finer grids:
 
 ```text
-   ⟨f, g⟩ = ∫∫ f(u,v)·g(u,v) du dv           the dot product, summed over the whole square
-   ‖f‖² = ⟨f, f⟩       distance ‖f − g‖       cos θ = ⟨f, g⟩ / (‖f‖ ‖g‖),   θ (theta) the angle
+   columns sampled           average squared color difference per pixel
+   4                         0.234
+   100                       0.249975
+   3,840  (a 4K frame)       0.24999998          the finer the grid, the closer to ¼
 ```
 
-- the images of finite energy (‖f‖ finite) form **L²** ("L two"), a **Hilbert space**: a vector space whose inner product gives lengths and angles, as the dot product does in ℝⁿ, and in which a converging sequence of images has an image as its limit
-- every tool of the finite view carries over, with sums replaced by integrals: projection, bases, nearest neighbors
-
-
----
-
-## Two images as functions: a distance, worked
-
-f = mid-gray (½, ½, ½) everywhere; g = the horizontal ramp (u, u, u), black at the left edge, white at the right:
-
-```text
-   squared color difference at (u, v):   3 (½ − u)²          three equal channels; no v
-   ‖f − g‖² = ∫₀¹∫₀¹ 3 (½ − u)² du dv = 3 ∫₀¹ (¼ − u + u²) du = 3 (¼ − ½ + ⅓) = 3 · 1/12 = ¼
-   ‖f − g‖ = ½         ⟨f, g⟩ = ¾,  ‖f‖ = √3/2,  ‖g‖ = 1   ⇒   cos θ = √3/2,  θ = 30°
-
-   sampled at the centers of n columns: the mean over pixels of the squared color difference
-   n = 4          0.234375
-   n = 100        0.249975
-   n = 3,840      0.24999998       (the width of a 4K frame)       exactly ¼ − 1/(4n²)
-```
-
-- the raster distance is a **Riemann sum** of the integral: resolution changes how many numbers there are, not the distance
-- per channel, as PSNR counts its mean squared error, the same pair gives ¼ / 3 = 1/12
+- the comparison settles to one value, ¼ (a distance of ½), whatever the resolution: resolution changes **how many numbers** describe the image, not the image
+- per color channel, the way PSNR averages it, the same pair gives 1/12
 
 
 ---
@@ -375,36 +361,6 @@ Transform the 20 × 20 digit (400 coefficients) and rebuild it from only the K �
 
 ---
 
-## Principal components: the data's own basis
-
-The cosine basis is fixed in advance. **PCA** finds the basis that fits **this** data: the eigenvectors of its covariance, in order of variance.
-
-```text
-   four points (2, 0), (0, 1), (−2, 0), (0, −1): mean 0
-   covariance  [2  0; 0  0.5]      eigenvectors: the x and y axes
-   variance explained: 2 / 2.5 = 80 %,   0.5 / 2.5 = 20 %
-
-   the 2,000 digits in ℝ⁴⁰⁰: first two components 10.4 % and 7.4 %
-```
-
-- the first component is the direction of **greatest spread**; each later one the greatest spread perpendicular to the earlier ones
-- PCA is a **linear** encoder; the learned encoders of the networks lecture are its nonlinear generalization
-
-
----
-
-## Eigenfaces
-
-Turk and Pentland (1991) ran PCA on aligned face photographs:
-
-- each principal component, displayed as an image, is a ghostly face: an **eigenface**
-- a new face is described by its coordinates on the top few dozen eigenfaces instead of by its pixels
-- recognition becomes **nearest neighbor** among those short coordinate vectors
-
-It worked on aligned, frontal, evenly lit faces and failed under changes of pose and light: a **linear** subspace cannot follow a **curved** sheet. Learned embeddings replaced it.
-
-
----
 
 ## The Fourier transform
 
@@ -874,7 +830,7 @@ const near = nd.nearestIndex(a, rest);                   // brute force over 1,9
 
 <img src="../../textbook/figures/img-pca-digits.svg" class="media-shot" style="max-height: 300px;" alt="the 2,000 digits projected onto their two principal directions, colored by class">
 
-- the 2,000 vectors of ℝ⁴⁰⁰ on their two directions of greatest variance (**10 %** and **7 %** of the total; a crude shadow)
+- the 2,000 digits drawn along the two directions in which they vary most: a flat **shadow** of 400 dimensions
 - 1s, thin and vertical, sit alone at the left; 0s, wide loops, at the right; the axis between them is roughly "how much ink"
 - moving along the sheet changes content in ways that **have names**; a learned encoder finds coordinates like these, many more of them, nonlinear
 
@@ -962,10 +918,8 @@ Every inverse problem becomes an optimization with two terms:
 | year | source | what it added |
 | ---- | ------ | ------------- |
 | 1822 | Fourier, *Théorie analytique de la chaleur* | functions as sums of sinusoids |
-| 1901 | Pearson, *Philosophical Magazine* | principal components |
 | 1928, 1949 | Nyquist; Shannon, *Proc. IRE* 37 | the sampling limit |
 | 1965 | Cooley & Tukey, *Math. Comp.* 19 | the fast Fourier transform |
-| 1991 | Turk & Pentland, *J. Cognitive Neuroscience* 3 | eigenfaces |
 | 1992 | ITU-T T.81 | the JPEG standard |
 | 1995 | Smith, Microsoft technical memo 6 | a pixel is not a little square |
 | 2004 | Wang, Bovik, Sheikh & Simoncelli, *IEEE TIP* 13 | SSIM |
