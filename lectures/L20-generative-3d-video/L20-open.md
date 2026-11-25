@@ -5,18 +5,22 @@
   inverse-rendering lecture that followed it is unscheduled (lectures/archive/L20-inverse-rendering).
 
   COMPOSITION: index.html mounts L20-open.md (title + tonight), then
-  ../../topics/generative-3d-video.md (~84 min), then ../../topics/graphics-meets-generative.md
-  (~14 min), then L20-discuss.md (wrap).
+  ../../topics/generative-3d-video.md (~86 min), then ../../topics/graphics-meets-generative.md
+  (~14 min), then L20-discuss.md (wrap), then ../../topics/generative-3d-video-supplement.md
+  (~65 min, time permitting, or reading).
+  EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of the
+  class. can the following lectures use less math?"): the generative topic is a method survey (36 content
+  slides from 59); its worked and counted slides are in the supplement after the wrap.
 
   reveal.js: FLAT deck; notes follow "Note:"; plain-unicode math, no KaTeX;
   never two "_" on one markdown line outside a code fence; no "next time".
 
-  Plan (120 min, Thu 5:45-7:45 PM in person; 71 slides):
-    0:00  Opening                                          2 min
-    0:02  Generative 3D and video, networks, VR (topic, 60 slides)   84 min
-    1:26  Graphics meets generative models (topic, 8 slides)         14 min
-    1:40  Questions and buffer                                       18 min
-    1:58  Wrap                                                        2 min
+  Plan (120 min, Thu 5:45-7:45 PM in person; 48 slides in the core, 33 in the supplement):
+    0:00  Opening                                                    2 min
+    0:02  Generative 3D and video, networks, VR (topic, 37 slides)  86 min
+    1:28  Graphics meets generative models (topic, 8 slides)        14 min
+    1:42  Wrap                                                       2 min
+    1:44  Questions and buffer, or the supplement                   16 min
     2:00  end
   CUT 2026-10-08: the six discussion questions; their 18 minutes are questions and buffer.
 -->
@@ -38,11 +42,11 @@
 
 ## Tonight
 
-- **Generative 3D, three routes**: what an engine needs; views that agree (an epipolar line by hand, checked); one pass (unknowns counted)
-- **Video**: a 3D autoencoder, the attention bill, temporal attention by hand, flicker, render-then-restyle
-- **World models**: the loop, drift derived, GameNGen and four steps live, the fix, Genie
-- **Networks inside the renderer**: frame generation, Halton jitter, accumulation derived, upscaling, radiance caching, neural materials
-- **Relighting, and VR**: one number with many answers, two lights; budgets, pixels per degree, latency, reprojection, foveation, stereo
+- **Generative 3D, three routes**: what an engine needs; a 2D image model as critic, and how it fails; views that agree; reconstruction in one pass
+- **Video**: a time axis, the attention bill, a 3D autoencoder, flicker, render-then-restyle
+- **World models**: the loop, drift, GameNGen and four steps live, noising the context, Genie
+- **Networks inside the renderer**: upscaling, frame generation, jitter and accumulation, radiance caching
+- **Relighting, and VR (virtual reality)**: one number with many answers; the frame budget, latency, reprojection, foveation
 - **Graphics meets generative models**: reading a generated image, data and compute, provenance, the merged field
 
 <small>Reading: the course text, <a href="../../textbook/diffusion-models.html">Diffusion Models</a>, Sections 8 and 10, and <a href="../../textbook/learned-scenes.html">Learned Scenes</a>, Section 9.</small>

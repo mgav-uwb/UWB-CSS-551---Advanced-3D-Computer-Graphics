@@ -1,7 +1,8 @@
 <!--
   CSS 551 · L17 · Tuesday December 1, 2026 (week 10, online): Diffusion models I.
   Plan C lecture shell (lectures/README.md). index.html mounts, in order: this file (title +
-  tonight), ../../topics/diffusion-1.md (~100 min), L17-discuss.md (wrap).
+  tonight), ../../topics/diffusion-1.md (~90 min), L17-discuss.md (wrap), then
+  ../../topics/diffusion-1-supplement.md (time permitting, or reading).
   Re-sequenced 2026-10-25 (was L16, Tuesday November 24, the week of Thanksgiving): the first meeting
   after the Thanksgiving break; diffusion models II follows on Thursday.
 
@@ -15,10 +16,14 @@
 
   Minute plan (120 min, Tue 5:45-7:45 PM synchronous online):
     0:00  Title and tonight                                   2 min
-    0:02  Diffusion models I (topic, 69 slides)             100 min
-    1:42  Questions and buffer                               16 min
-    1:58  Wrap                                                2 min
+    0:02  Diffusion models I (topic, 38 slides)              90 min
+    1:32  Wrap                                                2 min
+    1:34  Questions and buffer; the supplement if time       26 min
   CUT 2026-10-08: the four discussion questions; their 16 minutes are questions and buffer.
+  EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of
+  the class. can the following lectures use less math?"): the topic is a conceptual core of 38 slides;
+  its derivations and worked numbers are topics/diffusion-1-supplement.md, mounted after the wrap.
+  Tonight's bullets follow. DDPM, DDIM and HW are spelled out at first use.
 -->
 
 ## CSS 551
@@ -27,7 +32,7 @@
 
 **Lecture 17: Diffusion Models I**
 
-> DDPM (2020) used T = 1000 noise steps, and sampling ran the network once per step.
+> DDPM (denoising diffusion probabilistic models, 2020) used 1000 noise steps, and sampling ran the network once per step.
 
 <small>Ho, Jain and Abbeel, arXiv:2006.11239</small>
 
@@ -39,11 +44,11 @@
 ## Tonight
 
 - where diffusion sits among the **generative model families**
-- **destroy**: the forward process in code and by hand, the schedule, the noise shell, the terminal-SNR pitfall
-- **the denoiser**: the exact answer for a finite dataset, derived; its Gaussian case; Tweedie; four coordinates; the score field
-- **learn**: the training loop, one example by hand, the weights counted, the loss's weighting and floor, and where it comes from
-- **sample**: DDIM and DDPM worked, the sampler in code, its cost, the ODE and Euler, inversion, slerp
-- from **lookup table** to **network**: digits memorized, blended, then drawn; three sources of error; 2015 to 2022
+- **destroy**: mix the picture with noise on a schedule; nothing is learned
+- **the denoiser**: the best guess for a finite dataset is a weighted average of it; it blurs at high noise and copies at low noise
+- **learn**: a network trained by plain regression to make that guess
+- **sample**: re-noise the guess a little less, step by step; DDIM (denoising diffusion implicit models) and DDPM; steps are the cost
+- from **lookup table** to **network**: digits copied, blended, then drawn
 
 Reading: [Diffusion Models](../../textbook/diffusion-models.html), Sections 1 to 6
 

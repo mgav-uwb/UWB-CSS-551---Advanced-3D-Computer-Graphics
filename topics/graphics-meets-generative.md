@@ -10,6 +10,10 @@
            (Plan C, 2026-09-29), where they are worked with numbers.
   DEMOS:   none. Media: ../../media/generative/gallery-*.jpg, credit lines VERBATIM from media/generative/CREDITS.md.
 
+  EDIT 2026-11-24 LESS MATH (Marcel: "PCA, eigenvalues, hilbert spaces... way over the math level of the class.
+    can the following lectures use less math?"): no slide derived anything; the data slide's numbers became
+    bullets, every acronym is spelled out at its first use (LAION, GPU, CPU, C2PA, BBC, NeRF, DLSS, UV, PBR, VR),
+    and the closing table names buffers and matrices instead of projection Jacobians and integrals.
   reveal.js: FLAT (every slide a top-level "---" section, never "--"). Notes
   follow "Note:". Math is plain unicode text or fenced ```text blocks (no
   KaTeX plugin). Never two "_" on one markdown line outside a code fence;
@@ -64,11 +68,9 @@ Read the gallery like a renderer would:
 
 ## The data and the compute
 
-```text
-   LAION-5B (Schuhmann et al. 2022, arXiv:2210.08402):   5.85 billion image-text pairs, 2.32 billion in English
-   Stable Diffusion v1 (its model card):                 32 × 8 A100 GPUs; 150,000 GPU-hours reported
-   the course's digit network:                           60,000 digits; 15 minutes of CPU
-```
+- **LAION-5B**, from LAION, the Large-scale Artificial Intelligence Open Network (Schuhmann et al. 2022, arXiv:2210.08402): 5.85 billion image-text pairs, 2.32 billion in English
+- **Stable Diffusion v1** (its model card): 32 × 8 A100 GPUs (graphics processing units); 150,000 GPU-hours reported
+- **the course's digit network**: 60,000 digits; 15 minutes of CPU (central processing unit) time
 
 - the recipe is the same across seven orders of magnitude; what separates the course's network from a product is **data and compute**
 - the data is scraped from the web: licensing, consent and memorization are open questions, not settled ones
@@ -78,7 +80,7 @@ Read the gallery like a renderer would:
 
 ## Provenance: marking what was made
 
-- **Content Credentials (C2PA)**: an open standard, founded in February 2021 by Adobe, Arm, BBC, Intel, Microsoft and Truepic, for attaching **tamper-evident metadata** about a file's origin and edits
+- **Content Credentials**, from the C2PA (Coalition for Content Provenance and Authenticity): an open standard, founded in February 2021 by Adobe, Arm, the BBC (British Broadcasting Corporation), Intel, Microsoft and Truepic, for attaching **tamper-evident metadata** about a file's origin and edits
 - **invisible watermarks**: SynthID (Google DeepMind, 2023) embeds a pattern in the pixels of generated images that a detector network can find after resizing or rotation, with a confidence rather than a certainty
 - metadata can be stripped; watermarks can be attacked; neither proves an unmarked image is real
 
@@ -90,8 +92,8 @@ Read the gallery like a renderer would:
 ```text
    generated assets in engines     textures, props, characters from a prompt, then authored on
    learned rendering of authored   a renderer that is partly a network: denoising, upscaling,
-     scenes                          neural materials, learned lighting (DLSS-class)
-   scenes from photographs         NeRF and splats as capture; edited, relit, exported
+     scenes                          neural materials, learned lighting, upscaling
+   scenes from photographs         NeRF (neural radiance field) and splats as capture; edited, relit, exported
    world models                    predict the next frame from an action: a renderer with no scene
 ```
 
@@ -105,9 +107,9 @@ Read the gallery like a renderer would:
 
 | row of the merged field | the pipeline it stands on | the lectures |
 | ----------------------- | ------------------------- | ------------ |
-| generated assets | meshes, UVs, PBR materials, levels of detail | meshes, textures, PBR |
+| generated assets | meshes, UV coordinates, PBR (physically based rendering) materials, levels of detail | meshes, textures, PBR |
 | learned rendering | jitter, motion vectors, accumulation, path tracing | antialiasing, ray tracing, light transport |
-| scenes from photographs | poses, rays, compositing, projection Jacobians | viewing, rasterization, learned scenes |
+| scenes from photographs | poses, rays, compositing, projecting splats | viewing, rasterization, learned scenes |
 | world models | the frame loop, input, latency | interaction, diffusion |
-| VR | two `V`s, reprojection, foveation | viewing, texture filtering, interaction |
+| VR (virtual reality) | two `V`s, reprojection, foveation | viewing, texture filtering, interaction |
 
